@@ -58,8 +58,8 @@ const Navbar = () => {
   }, [openGroup]);
 
   return (
-    <div className="!bg-transparent">
-      <Sidebar className="!bg-transparent">
+    <div className="">
+      <Sidebar className="">
         {/* --- Header --- */}
         <SidebarHeader>
           <div className="text-lg font-semibold text-center text-blue-600">

@@ -1,0 +1,28 @@
+# Dockerfile.frontend (dev)
+FROM node:20-slim
+
+# Créer le dossier de travail
+WORKDIR /app
+
+# Copier uniquement les fichiers nécessaires pour l’installation
+COPY /../../frontend/package*.json ./
+
+# Installer les dépendances
+RUN npm install
+
+# Copier le reste du code de l’application
+COPY /../../frontend ./
+
+# Désactiver la télémétrie Next.js
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Exposer le port Next.js
+EXPOSE 3000
+
+# Corriger les permissions (si tu veux exécuter en tant que node)
+RUN chown -R node:node /app
+USER node
+
+# Lancer le serveur Next.js
+CMD ["npm", "run", "dev"]

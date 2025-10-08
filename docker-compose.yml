@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:17
+    container_name: stackschool-postgres
+
+    environment:
+      POSTGRES_USER: joseph
+      POSTGRES_PASSWORD: 1020
+      POSTGRES_DB: stackschool
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7
+    container_name: stackschool-redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: infra/docker/dockerfile.backend
+    container_name: stackschool-backend
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+    ports:
+      - "4000:4000"
+    command: npm run dev
+    environment:
+      DATABASE_URL: "postgresql://joseph:1020@db:5432/stackschool"
+      REDIS_URL: "redis://redis:6379"
+      JWT_SECRET: "joseph"
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/docker/dockerfile.frontend
+    container_name: stackschool-frontend
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:4000"
+
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+  backend_node_modules:
+  frontend_node_modules:

@@ -1,0 +1,57 @@
+{
+  "name": "StackSchool Dev Environment",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "frontend",
+  "workspaceFolder": "/app",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "files.autoSave": "onFocusChange",
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "css.validate": false,
+        "tailwindCSS.includeLanguages": {
+          "plaintext": "html",
+          "javascript": "javascript",
+          "typescriptreact": "typescriptreact",
+          "javascriptreact": "javascriptreact"
+        }
+      },
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "usernamehw.errorlens",
+        "eamodio.gitlens",
+        "ms-azuretools.vscode-docker",
+        "Prisma.prisma",
+        "ms-vscode.vscode-typescript-next",
+        "ms-vscode-remote.remote-containers"
+      ]
+    }
+  },
+
+  "forwardPorts": [3000, 4000, 5433],
+
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js Frontend",
+      "onAutoForward": "notify"
+    },
+    "4000": {
+      "label": "Backend API",
+      "onAutoForward": "notify"
+    },
+    "5433": {
+      "label": "PostgreSQL Database",
+      "onAutoForward": "notify"
+    }
+  },
+
+  "postCreateCommand": "cd /app && npm install",
+  "remoteUser": "node"
+}

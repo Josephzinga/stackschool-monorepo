@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/client"
+  provider      = "prisma-client-js"
+  output        = "../generated/client"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -42,12 +43,15 @@ model User {
   id         String      @id @default(cuid())
   email      String      @unique
   password   String
-  globalRole GlobalRole?
+  globalRole GlobalRole? @default(USER)
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
   emailVerified DateTime?
+
+  profileCompleted Boolean? @default(false)
+  hasMembership    Boolean? @default(false)
 
   profile     Profile?
   memberships SchoolUser[]
@@ -58,12 +62,11 @@ model User {
 }
 
 model Profile {
-  id String @id @default(cuid())
-
-  firstname String
-  lastname  String
-  phone     String?
-  photo     String?
+  id        String   @id @default(cuid())
+  image     String?
+  firstname String?
+  lastname  String?
+  phone     String?  @unique
   gender    Gender?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -112,6 +115,8 @@ model SchoolUser {
   subject      Subject[] // matières dont il est responsable (optionnel)
   ClassTeacher ClassTeacher[] // pivot prof <-> classe (s'il enseigne plusieurs classes)
   Class        Class[] // s'il est chef de classe (teacherId sur Class)
+  Teacher      Teacher?
+  Staff        Staff?
 
   @@unique([schoolId, userId])
   @@index([schoolId])
@@ -123,20 +128,22 @@ model SchoolUser {
  * Subject: utilise pivot ClassSubjects (explicit)
  */
 model Subject {
-  id        String      @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
   code      String?
-  school    School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   schoolId  String
-  teacher   SchoolUser? @relation(fields: [teacherId], references: [id])
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
   teacherId String?
 
   // pivot explicit many-to-many
   ClassSubjects ClassSubjects[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Exam      Exam[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  Exam         Exam[]
+  SchoolUser   SchoolUser? @relation(fields: [schoolUserId], references: [id])
+  schoolUserId String?
 
   @@unique([code, schoolId])
   @@index([schoolId])
@@ -215,13 +222,16 @@ model Class {
  * Pivot Prof <-> Classe (nouveau)
  */
 model ClassTeacher {
-  id        String     @id @default(cuid())
-  class     Class      @relation(fields: [classId], references: [id], onDelete: Cascade)
-  classId   String
-  teacher   SchoolUser @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  teacherId String
+  id            String @id @default(cuid())
+  class         Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId       String
+  staffMemberId String
 
-  createdAt DateTime @default(now())
+  teacher      Teacher     @relation(fields: [teacherId], references: [id])
+  teacherId    String
+  createdAt    DateTime    @default(now())
+  SchoolUser   SchoolUser? @relation(fields: [schoolUserId], references: [id])
+  schoolUserId String?
 
   @@unique([classId, teacherId])
   @@index([classId])
@@ -233,7 +243,7 @@ model ClassTeacher {
  */
 model Student {
   id             String   @id @default(cuid())
-  profile        Profile  @relation(fields: [profileId], references: [id])
+  profile        Profile? @relation(fields: [profileId], references: [id])
   profileId      String
   matricule      String
   enrollmentYear String
@@ -302,6 +312,9 @@ model Attendance {
   date      DateTime
   status    AttendanceStatus
 
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId String?
+
   createdAt DateTime @default(now())
 
   @@unique([studentId, date])
@@ -341,7 +354,7 @@ model Subscription {
  */
 model Account {
   id                String  @id @default(cuid())
-  user              User    @relation(fields: [userId], references: [id])
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String
   type              String
   provider          String
@@ -376,4 +389,38 @@ model Session {
   createdAt    DateTime @default(now())
 
   @@index([userId])
+}
+
+model Teacher {
+  id             String     @id @default(cuid())
+  schoolUser     SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  schoolUserId   String     @unique
+  diploma        String?
+  experience     String?
+  hireDate       DateTime?
+  isActive       Boolean
+  salary         Float?
+  departement    String?
+  specialization String?
+
+  attendance   Attendance[]
+  classTeacher ClassTeacher[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Subject      Subject[]
+
+  @@map("Teachers")
+}
+
+model Staff {
+  id           String     @id @default(cuid())
+  schoolUser   SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  schoolUserId String     @unique
+  position     String
+  hireDate     DateTime?
+  salary       Float?
+  departement  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

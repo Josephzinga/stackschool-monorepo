@@ -3,16 +3,16 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "node dist/index.js",
-    "build": "tsc",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name init",
-    "seed": "ts-node ./scripts/seed.ts"
+    "build": "tsc"
   },
+  "main": "dist/index.js",
   "dependencies": {
-    "@prisma/client": "^6.16.3",
+    "@prisma/client": "^6.17.1",
     "@prisma/extension-accelerate": "^2.0.2",
     "argon2": "^0.30.0",
+    "bcryptjs": "^3.0.2",
     "bullmq": "^2.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "depcheck": "^1.4.7",
     "dotenv": "^17.2.3",
@@ -20,13 +20,22 @@
     "express-validator": "^7.2.1",
     "helmet": "^6.0.0",
     "ioredis": "^5.0.0",
-    "jsonwebtoken": "^9.0.0",
-    "prisma": "^5.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.9",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "prisma": "^6.17.1",
     "socket.io": "^4.8.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.6.2",
+    "@types/nodemailer": "^7.0.1",
+    "@types/redis": "^4.0.10",
+    "redis": "^5.8.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   }

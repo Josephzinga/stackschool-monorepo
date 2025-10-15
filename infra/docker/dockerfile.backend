@@ -5,9 +5,11 @@ COPY ../../backend/package.json backend/package-lock.json* ./
 RUN npm install
 
 COPY ../../backend ./
+RUN npx prisma generate --schema=./src/prisma/schema.prisma
+RUN apt-get update -y && apt-get install -y openssl
 
 ENV NODE_ENV=development
-EXPOSE 4000
+EXPOSE 4000 5555
 CMD ["npm", "run", "dev"]
 
 

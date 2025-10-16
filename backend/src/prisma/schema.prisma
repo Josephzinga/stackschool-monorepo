@@ -42,7 +42,7 @@ enum AttendanceStatus {
 model User {
   id         String      @id @default(cuid())
   email      String      @unique
-  password   String
+  password   String?
   globalRole GlobalRole? @default(USER)
 
   createdAt     DateTime  @default(now())
@@ -63,7 +63,7 @@ model User {
 
 model Profile {
   id        String   @id @default(cuid())
-  image     String?
+  photo     String?
   firstname String?
   lastname  String?
   phone     String?  @unique

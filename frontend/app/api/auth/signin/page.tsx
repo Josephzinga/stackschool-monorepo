@@ -1,68 +1,57 @@
-// pages/signin.js
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-export default function SigninPage() {
-  const [csrfToken, setCsrfToken] = useState("");
-  /*
-  useEffect(() => {
-    // Récupérer le jeton CSRF au chargement de la page
-    const fetchCsrfToken = async () => {
-      try {
-        const response = await axios.get(`http://localhost:4000/auth/csrf`, {
-          withCredentials: true,
-        });
-        setCsrfToken(response.data.csrfToken);
-        console.log("Jeton CSRF récupéré:", response.data.csrfToken);
-      } catch (error) {
-        console.error("Erreur lors de la récupération du jeton CSRF:", error);
-      }
-    };
-    fetchCsrfToken();
-  }, []);
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post(
-          `http://localhost:4000/auth/signin/google`,
-          {
-            withCredentials: true,
-          }
-        );
-        console.log("Réponse de l'API:", response.data);
-      } catch (error) {
-        console.error("Erreur lors de l'appel à l'API:", error);
-      }
-    };
-    fetchData();
-  }, []);
-  return (
-    <form action={`http://localhost:4000/auth/signin/google`} method="POST">
-      <h1>Se connecter</h1>
-      <button type="submit">Se connecter avec google</button>
-    </form>
-  );*/
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Login:", { email, password });
+    // Ici tu peux appeler ton API Express ou ton routeur Next.js API
 
-  // Dans votre composant React / Next.js
-  // Si vous l'utilisez pour d'autres appels
-
-  // useEffect et la récupération du CSRF ne sont pas nécessaires pour Google
-  // Supprimez ce bloc de code
-
-  const handleGoogleLogin = () => {
-    window.location.href = `http://localhost:4000/auth/callback/google`;
+    try {
+      await axios.get(`${process.env.NODE_ENV}/login`);
+    } catch (error) {
+      console.error("Erreur login", error);
+    }
   };
 
   return (
-    <div>
-      <h1>Se connecter</h1>
-      <button onClick={handleGoogleLogin}>Se connecter avec google</button>
+    <div className="flex h-screen items-center justify-center">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-slate-700/70 p-6 rounded-2xl shadow-md w-80">
+        <h1 className="text-xl font-bold mb-4 text-center">Login</h1>
+
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full p-2 mb-3 border rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-2 mb-4 border rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+          Sign in
+        </button>
+      </form>
     </div>
   );
 }
-
-// Note: Le CSRF token n'est pas nécessaire pour les connexions OAuth comme Google
-// Il est principalement utilisé pour les connexions par identifiants (credentials)

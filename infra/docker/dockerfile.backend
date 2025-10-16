@@ -1,10 +1,11 @@
-FROM node:20-slim
+FROM node:lts-slim
 WORKDIR /app
 
 COPY ../../backend/package.json backend/package-lock.json* ./
-RUN npm install
+
 
 COPY ../../backend ./
+
 RUN npx prisma generate --schema=./src/prisma/schema.prisma
 RUN apt-get update -y && apt-get install -y openssl
 

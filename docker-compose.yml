@@ -29,6 +29,7 @@ services:
     ports:
       - "4000:4000"
       - "5555:5555"
+      - "3002:3002"
     command: npm run dev
     environment:
       DATABASE_URL: "postgresql://joseph:1020@db:5432/stackschool"

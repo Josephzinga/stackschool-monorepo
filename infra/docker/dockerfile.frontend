@@ -1,5 +1,5 @@
 # Dockerfile.frontend (dev)
-FROM node:20-slim
+FROM node:lts-slim
 
 # Créer le dossier de travail
 WORKDIR /app

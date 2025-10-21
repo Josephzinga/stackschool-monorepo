@@ -40,10 +40,13 @@ enum AttendanceStatus {
  */
 
 model User {
-  id         String      @id @default(cuid())
-  email      String      @unique
-  password   String?
-  globalRole GlobalRole? @default(USER)
+  id          String      @id @default(cuid())
+  email       String?     @unique
+  password    String?
+  phoneNumber String?     @unique
+  username    String?     @unique
+  globalRole  GlobalRole? @default(USER)
+  isVerified  Boolean?
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -62,11 +65,11 @@ model User {
 }
 
 model Profile {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   photo     String?
   firstname String?
   lastname  String?
-  phone     String?  @unique
+
   gender    Gender?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -356,8 +359,8 @@ model Account {
   id                String  @id @default(cuid())
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String
-  type              String
-  provider          String
+  type              String?
+  provider          String?
   providerAccountId String
   refresh_token     String? @db.Text
   access_token      String? @db.Text
@@ -372,20 +375,40 @@ model Account {
 }
 
 model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  method    String   @default("email")
+  type      String   @default("password_reset")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
 
-  @@unique([identifier, token])
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  userId    String
+  codeHash  String // hash du code 6-chiffres (recommandé)
+  method    String   @default("whatsapp") // "whatsapp" | "sms"
+  type      String   @default("password_reset")
+  used      Boolean  @default(false)
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([codeHash])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String
-  expires      DateTime
+  id           String   @id @default(cuid()) @map("sid")
+  sessionToken String   @unique @map("sess")
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
+  expires      DateTime @map("expire")
   createdAt    DateTime @default(now())
 
   @@index([userId])

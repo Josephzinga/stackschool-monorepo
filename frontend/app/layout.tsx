@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import Header from "@/components/Header";
 import { ModeToggle } from "@/components/DropMenu";
 import { prisma } from "../lib/prisma";
+import { Toaster } from "@/components/ui/sonner";
 /*
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,12 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`antialiased`}>
-        <ThemeProvider attribute="class">
+        <ThemeProvider attribute="class" enableSystem={false}>
+          <Toaster
+            position="top-center"
+            className="!bg-sky-500 text-lg"
+            duration={3000}
+          />
           {children}
           <div className="absolute top-2 right-2">
             <ModeToggle />

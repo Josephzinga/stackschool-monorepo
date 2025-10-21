@@ -1,0 +1,87 @@
+// users/schemas.ts
+import { z } from "zod";
+
+export const loginFormSchema = z.object({
+  identifier: z
+    .string()
+    .min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères.")
+    .max(30, "Le nom d'utilisateur ne peut pas dépasser 30 caractères."),
+
+  password: z
+    .string()
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères.")
+    .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une majuscule.")
+    .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre.")
+    .regex(
+      /[^a-zA-Z0-9]/,
+      "Le mot de passe doit contenir au moins un caractère spécial."
+    ),
+});
+
+export const registerFormSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères.")
+      .max(30, "Le nom d'utilisateur ne peut pas dépasser 30 caractères."),
+
+    password: z
+      .string()
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères.")
+      .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une majuscule.")
+      .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre.")
+      .regex(
+        /[^a-zA-Z0-9]/,
+        "Le mot de passe doit contenir au moins un caractère spécial."
+      ),
+
+    email: z
+      .string()
+      .trim()
+      .email("Veuillez entrer un email valide.")
+      .optional()
+      .or(z.literal("")), // <-- permet champ vide sans erreur
+
+    phoneNumber: z
+      .string()
+      .trim()
+      .regex(/^\+?[0-9]{8,15}$/, {
+        message:
+          "Numéro invalide (format international recommandé, ex: +223...)",
+      })
+      .optional()
+      .or(z.literal("")), // <-- permet champ vide aussi
+
+    confirm: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    // Vérifie la correspondance des mots de passe
+    if (data.password !== data.confirm) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confirm"],
+        message: "Les mots de passe ne correspondent pas.",
+      });
+    }
+
+    // Vérifie qu'au moins un moyen de contact est fourni
+    const hasEmail = data.email && data.email.trim() !== "";
+    const hasPhone = data.phoneNumber && data.phoneNumber.trim() !== "";
+
+    if (!hasEmail && !hasPhone) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["email"],
+        message: "Veuillez fournir un email ou un numéro de téléphone.",
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["phoneNumber"],
+        message: "Veuillez fournir un email ou un numéro de téléphone.",
+      });
+    }
+  });
+
+export type RegisterFormType = z.infer<typeof registerFormSchema>;
+
+export type LoginFormType = z.infer<typeof loginFormSchema>;

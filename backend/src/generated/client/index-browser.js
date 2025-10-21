@@ -124,7 +124,10 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   password: 'password',
+  phoneNumber: 'phoneNumber',
+  username: 'username',
   globalRole: 'globalRole',
+  isVerified: 'isVerified',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt',
@@ -138,7 +141,6 @@ exports.Prisma.ProfileScalarFieldEnum = {
   photo: 'photo',
   firstname: 'firstname',
   lastname: 'lastname',
-  phone: 'phone',
   gender: 'gender',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -301,9 +303,25 @@ exports.Prisma.AccountScalarFieldEnum = {
 };
 
 exports.Prisma.VerificationTokenScalarFieldEnum = {
-  identifier: 'identifier',
-  token: 'token',
-  expires: 'expires',
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  method: 'method',
+  type: 'type',
+  used: 'used',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.VerificationCodeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  method: 'method',
+  type: 'type',
+  used: 'used',
+  attempts: 'attempts',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt'
 };
 
@@ -398,6 +416,7 @@ exports.Prisma.ModelName = {
   Subscription: 'Subscription',
   Account: 'Account',
   VerificationToken: 'VerificationToken',
+  VerificationCode: 'VerificationCode',
   Session: 'Session',
   Teacher: 'Teacher',
   Staff: 'Staff'

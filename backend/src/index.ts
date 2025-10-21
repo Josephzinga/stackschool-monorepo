@@ -1,60 +1,134 @@
 import { config } from "dotenv";
-import createError from "http-errors";
 import express from "express";
-import path from "path";
 import cookieParser from "cookie-parser";
-
-import indexRouter from "./routes/route";
-import { PrismaClient } from "@prisma/client";
-import authRouter from "./routes/auth.routes";
+import passport from "passport";
+import { prisma } from "./lib/prisma";
 import cors from "cors";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as FacebookStrategy } from "passport-facebook";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import pg from "pg";
+import authRoutes from "./auth/routes";
+import { createClient, RedisClientType } from "redis";
+import helmet from "helmet";
+import handleOauthCallback from "./auth/passport-social";
+import setupLocalStrategy from "./lib/passport-local";
 
 config();
 
-const app = express();
+const PORT = Number(process.env.PORT) || 4000;
+const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:3000";
+const NODE_ENV = process.env.NODE_ENV || "development";
 
+const pgSession = connectPgSimple(session);
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const app = express();
+app.use(helmet());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: FRONTEND_ORIGIN,
     credentials: true,
   })
 );
 
-//app.locals.pluralize = require("pluralize");
-
-// view engine setup
-//app.set("views", path.join(__dirname, "views"));
-//app.set("view engine", "ejs");
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 
-//app.use("/", indexRouter);
+const SESSION_TTL = 1000 * 60 * 30; // 30 min
 
-app.use("/", authRouter);
+app.use(
+  session({
+    store: new pgSession({
+      pool: pgPool,
+      tableName: "Session",
+    }),
+    name: "sid",
+    secret: process.env.SESSION_SECRET || "mdmfsdfmdfmsdf",
+    resave: false,
+    saveUninitialized: false,
+
+    cookie: {
+      secure: NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: SESSION_TTL,
+      sameSite: "lax",
+    },
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: { profile: true, Account: true },
+    });
+    return done(null, user ?? null);
+  } catch (error) {
+    return done(error);
+  }
+});
+
+setupLocalStrategy();
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL!,
+    },
+    (accessToken, refreshToken, profile, done) =>
+      handleOauthCallback(accessToken, refreshToken, profile, done, "google")
+  )
+);
+
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+      callbackURL: process.env.FACEBOOK_CALLBACK_URL!,
+      enableProof: true,
+      profileFields: ["id", "displayName", "emails", "photos"],
+    },
+    (accessToken, refreshToken, profile, done) =>
+      handleOauthCallback(refreshToken, accessToken, profile, done, "facebook")
+  )
+);
+
+app.use("/api", authRoutes);
 
 app.get("/", (req, res) => {
   res.json("message serveur connecter");
 });
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
+const redisClient: RedisClientType = createClient({
+  url: process.env.REDIS_URL,
 });
 
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
+redisClient.on("error", (error: Error) => {
+  console.error("Erreur de connexion à redis:", error);
 });
 
-app.listen(4000, () => {
-  console.log("server is runign on port http://localhost:4000");
+async function connectToRedis() {
+  await redisClient.connect();
+  console.log("Redis connecté");
+}
+
+connectToRedis();
+
+app.listen(PORT, () => {
+  console.log(`server is runign on port http://localhost:${PORT}`);
 });

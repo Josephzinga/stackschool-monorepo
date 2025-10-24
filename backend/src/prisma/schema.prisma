@@ -56,10 +56,12 @@ model User {
   profileCompleted Boolean? @default(false)
   hasMembership    Boolean? @default(false)
 
-  profile     Profile?
-  memberships SchoolUser[]
-  sessions    Session[]
-  Account     Account[]
+  profile           Profile?
+  memberships       SchoolUser[]
+  sessions          Session[]
+  Account           Account[]
+  VerificationCode  VerificationCode[]
+  VerificationToken VerificationToken[]
 
   @@index([email])
 }
@@ -375,29 +377,33 @@ model Account {
 }
 
 model VerificationToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  tokenHash String   @unique
+  tokenHash String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  method    String    @default("email")
+  type      String    @default("password_reset")
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now())
   expiresAt DateTime
-  method    String   @default("email")
-  type      String   @default("password_reset")
-  used      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  updateAt  DateTime? @updatedAt
 
   @@index([userId])
   @@index([tokenHash])
 }
 
 model VerificationCode {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id])
   userId    String
   codeHash  String // hash du code 6-chiffres (recommandé)
-  method    String   @default("whatsapp") // "whatsapp" | "sms"
-  type      String   @default("password_reset")
-  used      Boolean  @default(false)
-  attempts  Int      @default(0)
+  method    String    @default("whatsapp") // "whatsapp" | "sms" | "email"
+  type      String    @default("password_reset")
+  used      Boolean   @default(false)
+  attempts  Int       @default(0)
   expiresAt DateTime
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  updateAt  DateTime? @updatedAt
 
   @@index([userId])
   @@index([codeHash])

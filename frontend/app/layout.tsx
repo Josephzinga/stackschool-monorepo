@@ -34,7 +34,7 @@ export default async function RootLayout({
           <Toaster
             position="top-center"
             className="!bg-sky-500 text-lg"
-            duration={3000}
+            duration={4000}
           />
           {children}
           <div className="absolute top-2 right-2">

@@ -1,21 +1,19 @@
 import twilio from "twilio";
 
-const accountSid = "ACde1cb7e9307892b3ef94241054cd0ae0";
-const authToken = "dd083bfa537bfd0351c34f9f6e7d2578";
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_ACCOUNT_TOKEN;
 
 const client = twilio(accountSid, authToken);
 
-export default async function sendWhatshAppMessage() {
+export default async function sendWhatshAppMessage(to: string, code: string) {
   try {
     const res = await client.messages.create({
       from: "whatsapp:+14155238886",
-      contentSid: "HXb5b62575e6e4ff6129ad7c8efe1f983e",
-      contentVariables: '{"1":"12/1","2":"3pm"}',
-      to: "whatsapp:+22395248106",
-      body: "ldldld",
+      to: `whatsapp:${to}`,
+      body: code,
     });
     console.log(res);
   } catch (error) {
-    console.error("Erreur d'envoie de message whatshapp");
+    console.error("Erreur d'envoie de message whatshapp:", error);
   }
 }

@@ -1,4 +1,3 @@
-import { DoneCallback } from "passport";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcryptjs";
 import { VerifyCallback } from "passport-google-oauth20";

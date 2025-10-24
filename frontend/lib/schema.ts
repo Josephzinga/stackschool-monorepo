@@ -82,6 +82,44 @@ export const registerFormSchema = z
     }
   });
 
+export const VerifyCodeSchema = z.object({
+  code: z
+    .string("Le code de vérification est requis.")
+    .min(6, "Le code doit contenir 6 chiffres.")
+    .max(6, "Le code doit contenir 6 chiffres."),
+});
+
+export const forgotPasswordSchema = z.object({
+  identifier: z
+    .string()
+    .min(1, "L'identifiant est requis")
+    .refine(
+      (value) => {
+        // Validation email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(value)) return true;
+
+        // Validation téléphone (format international accepté)
+        const phoneRegex = /^\+?[0-9]{8,15}$/;
+        if (phoneRegex.test(value.replace(/\s/g, ""))) return true;
+
+        // Validation username (alphanumérique + underscores, 3-20 caractères)
+        const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+        if (usernameRegex.test(value)) return true;
+
+        return false;
+      },
+      {
+        message:
+          "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)",
+      }
+    ),
+});
+
+export type FormDataType = z.infer<typeof forgotPasswordSchema>;
+
+export type VerifyCodeFormType = z.infer<typeof VerifyCodeSchema>;
+
 export type RegisterFormType = z.infer<typeof registerFormSchema>;
 
 export type LoginFormType = z.infer<typeof loginFormSchema>;

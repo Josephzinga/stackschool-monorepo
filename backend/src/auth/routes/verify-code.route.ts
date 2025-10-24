@@ -1,96 +1,159 @@
-import { Router } from "express";
-import { body } from "express-validator";
+import { Router, type Response, Request } from "express";
+import { body, validationResult } from "express-validator";
 import { prisma } from "../../lib/prisma";
 import { generateToken, hashCode, hashToken } from "../../lib/outils";
+import { consumeCode } from "../../utils/limiter";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET, RESET_TOKEN_EXP_MINUTES } from "../../constant/config";
 
 const router = Router();
 
 router.post(
   "/verify-code",
-  body("identifier").notEmpty(),
-  body("code").notEmpty(),
-  async (req, res) => {
+  [
+    body("code")
+      .notEmpty()
+      .withMessage("Le code est requis")
+      .isLength({ min: 6, max: 6 })
+      .withMessage("Le code doit contenir 6 chiffres")
+      .matches(/^\d+$/)
+      .withMessage("Le code doit contenir uniquement des chiffres"),
+    body("tempToken").notEmpty(),
+  ],
+  async (req: Request, res: Response) => {
     try {
-      const { identifier, code } = req.body as {
-        identifier: string;
+      try {
+        await consumeCode(req);
+      } catch (RateLimiterQueueError) {
+        return res.status(429).json({
+          ok: false,
+          message: "Trop de tentatives. Veuillez réessayer dans 15 minutes.",
+        });
+      }
+      const errors = validationResult(req);
+      if (!errors.isEmpty())
+        return res.status(400).json({ error: errors.array(), ok: false });
+
+      const { tempToken, code } = req.body as {
+        tempToken: string;
         code: string;
       };
 
-      const user = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { id: identifier },
-            { email: identifier },
-            { username: identifier },
-            { phoneNumber: identifier },
-          ],
-        },
-      });
+      if (!tempToken) {
+        return res.status(400).json({
+          ok: false,
+          message: "Identifiant ou token requis",
+        });
+      }
 
-      if (!user) {
-        // generic response
+      let userId: string;
+
+      try {
+        const decoded = jwt.verify(tempToken, JWT_SECRET) as any;
+        console.log("decoded:", decoded);
+
+        if (decoded?.type !== "resend_code") {
+          return res.status(400).json({ ok: false, message: "Token invalide" });
+        }
+
+        userId = decoded.userId;
+      } catch (jwtError) {
         return res
           .status(400)
-          .json({ ok: false, message: "Code invalide ou expiré" });
+          .json({ ok: false, message: "Token expiré ou invalide" });
       }
 
       const codeHash = hashCode(code);
       const now = new Date();
 
-      const v = await prisma.verificationCode.findFirst({
+      const verificationCode = await prisma.verificationCode.findFirst({
         where: {
-          userId: user.id,
+          userId,
           method: "whatsapp",
           type: "password_reset",
-          codeHash,
           expiresAt: { gt: now },
           used: false,
         },
         orderBy: { createdAt: "desc" },
       });
-      if (!v) {
-        await prisma.verificationCode.updateMany({
-          where: {
-            userId: user.id,
-            type: "password_reset",
-            method: "whatsapp",
-            used: false,
-            expiresAt: { gt: now },
-          },
-          data: { attempts: { increment: 1 } },
-        });
+      console.log("verificationCode:", verificationCode);
+      if (!verificationCode) {
         return res
           .status(404)
           .json({ ok: false, message: "Code invalide ou expiré" });
       }
-      await prisma.verificationCode.update({
-        where: { id: v.id },
-        data: { used: true },
+
+      // vérifier les tentatives
+      if (verificationCode.attempts >= 5) {
+        return res.status(400).json({
+          ok: false,
+          message: "Trop de tentatives. Veuillez demander un nouveau code.",
+        });
+      }
+
+      // vérifier les code
+      if (verificationCode.codeHash !== codeHash) {
+        // incrémenter le compteur de vérification
+        await prisma.verificationCode.update({
+          where: { id: verificationCode.id },
+          data: { attempts: { increment: 1 } },
+        });
+
+        const remainingAttempts = 5 - (verificationCode.attempts + 1);
+
+        return res.status(400).json({
+          ok: false,
+          message: `Code incorrect. ${remainingAttempts} tentative(s) restante(s).`,
+          remainingAttempts,
+        });
+      }
+
+      // code valide marquer comme utilisé et générer le token de reset
+      await prisma.$transaction(async (tx) => {
+        // marquer le code comme utiliser
+        tx.verificationCode.update({
+          where: { id: verificationCode.id },
+          data: { used: true, updateAt: new Date() },
+        });
+
+        // invalider les autre code non utiliser
+        await Promise.all([
+          tx.verificationCode.updateMany({
+            where: { userId, type: "password_reset", used: false },
+            data: { used: true },
+          }),
+        ]);
       });
+
       const rawToken = generateToken(16);
       const tokenHash = hashToken(rawToken);
-      const tokenExpiresAt = new Date(Date.now() + 1000 * 60 * 5); // 5 min
+      const tokenExpiresAt = new Date(
+        Date.now() + 1000 * 60 * RESET_TOKEN_EXP_MINUTES
+      );
 
       await prisma.verificationToken.create({
         data: {
-          userId: user.id,
+          userId,
           type: "password_reset",
           method: "whatsapp",
           expiresAt: tokenExpiresAt,
           used: false,
           tokenHash,
         },
-      }); // Return the raw token to the client (only now, once)
+      });
       return res.status(200).json({
         ok: true,
         message:
-          "Code vérifié. Vous pouvez maintenant réinitialiser votre mot de passe.",
-        resetToken: rawToken, // client uses this in /reset-password
-        expiresIn: 5 * 60, // seconds
+          "Code vérifié avec succès. Vous pouvez maintenant réinitialiser votre mot de passe.",
+        resetToken: rawToken,
+        expiresIn: 15 * 60, // 15 minutes en secondes
       });
     } catch (err) {
       console.error("verify-phone error:", err);
-      return res.status(500).json({ ok: false, message: "Erreur serveur" });
+      return res.status(500).json({
+        ok: false,
+        message: "Erreur lors de la vérification du code",
+      });
     }
   }
 );

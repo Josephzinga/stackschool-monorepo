@@ -27,7 +27,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerFormSchema, RegisterFormType } from "@/lib/schema";
 import { toast } from "sonner";
-
+import { Container } from "@/components/Container";
 
 export default function RegisterPage() {
   const [showpwd, setShowpwd] = useState(false);
@@ -66,7 +66,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full h-screen flex justify-center items-center ">
+    <Container>
       <Card className="max-w-lg w-[25rem] md:w-[28rem] bg-white/50 dark:bg-slate-700/50 py-4 gap-2">
         <CardHeader className="text-center mt-4">
           <CardTitle className="text-xl">Bienvenue</CardTitle>
@@ -218,6 +218,6 @@ export default function RegisterPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </Container>
   );
 }

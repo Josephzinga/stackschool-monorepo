@@ -1,6 +1,18 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import type { Request } from "express";
 
+const resendCodeLimiter = new RateLimiterMemory({
+  points: 5,
+  duration: 900,
+});
+
+export const consumeResendCode = (req: Request) => {
+  const ip = req.ip;
+  if (!ip) return Promise.reject(new Error("IP manquants dans resend_code"));
+
+  return resendCodeLimiter.consume(ip);
+};
+
 const verifiCodeLimiter = new RateLimiterMemory({
   points: 4,
   duration: 900,

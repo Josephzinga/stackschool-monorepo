@@ -11,10 +11,12 @@ import {
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { registerFormSchema, RegisterFormType } from "@/lib/schema";
+import { ResetPasswordType, resetPasswordSchema } from "@/lib/schema";
+import api from "@/services/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const ResetPasswordPage = () => {
   const search = useSearchParams();
@@ -25,13 +27,21 @@ const ResetPasswordPage = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormType>({
-    resolver: zodResolver(registerFormSchema),
+  } = useForm<ResetPasswordType>({
+    resolver: zodResolver(resetPasswordSchema),
     mode: "onBlur",
   });
 
-  const handleReset = ({ confirm, password }: RegisterFormType) => {
-    console.log(confirm, password);
+  const handleReset = async ({ password }: ResetPasswordType) => {
+    try {
+      const res = await api.post("/api/auth/reset-password", {
+        password,
+        token,
+      });
+      console.log(res);
+    } catch (error: any) {
+      toast.error(error?.response?.data.message);
+    }
   };
   return (
     <Container>

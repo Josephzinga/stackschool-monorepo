@@ -1,6 +1,6 @@
 import { Router, type Request, Response } from "express";
 import { body, validationResult } from "express-validator";
-import { consumeCode } from "../../utils/limiter";
+import { consumeResendCode } from "../../utils/limiter";
 import jwt from "jsonwebtoken";
 import { CODE_EXPIRES_MINUTES, JWT_SECRET } from "../../constant/config";
 import { prisma } from "../../lib/prisma";
@@ -15,7 +15,7 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       try {
-        await consumeCode(req);
+        await consumeResendCode(req);
       } catch (RateLimiterQueueError) {
         return res.status(429).json({
           ok: false,
@@ -32,8 +32,9 @@ router.post(
       let decoded;
       try {
         decoded = jwt.verify(tempToken, JWT_SECRET) as any;
+        console.log("decoded:", decoded);
 
-        if (decoded.type !== "resend-code") {
+        if (decoded.type !== "resend_code") {
           return res.status(400).json({
             ok: false,
             message: "Token invalide",
@@ -135,3 +136,5 @@ router.post(
     }
   }
 );
+
+export default router;

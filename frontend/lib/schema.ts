@@ -116,6 +116,31 @@ export const forgotPasswordSchema = z.object({
     ),
 });
 
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères.")
+      .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une majuscule.")
+      .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre.")
+      .regex(
+        /[^a-zA-Z0-9]/,
+        "Le mot de passe doit contenir au moins un caractère spécial."
+      ),
+    confirm: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirm) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confirm"],
+        message: "Les mots de passe ne correspondent pas.",
+      });
+    }
+  });
+
+export type ResetPasswordType = z.infer<typeof resetPasswordSchema>;
+
 export type FormDataType = z.infer<typeof forgotPasswordSchema>;
 
 export type VerifyCodeFormType = z.infer<typeof VerifyCodeSchema>;

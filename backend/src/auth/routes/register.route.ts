@@ -3,7 +3,7 @@ import { prisma } from "../../lib/prisma";
 import bcrypt from "bcryptjs";
 import { body, validationResult } from "express-validator";
 import { generateToken } from "../../lib/outils";
-import { registerValidator } from "../../lib/register_schema";
+import { registerValidator } from "../../lib/validation-schema";
 
 const router = Router();
 async function sendWhatsAppCode(phoneNumber: string, code: number) {

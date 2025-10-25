@@ -29,3 +29,17 @@ export const registerValidator = [
     .matches(/^\+?[0-9]{8,15}$/)
     .withMessage("Numéro de téléphone invalide."),
 ];
+export const resetPasswordValidation = [
+  body("token")
+    .notEmpty()
+    .withMessage("Le token de réinitialisation est requis")
+    .isLength({ min: 16 })
+    .withMessage("Token invalide"),
+  body("password")
+    .isLength({ min: 8 })
+    .withMessage("Le mot de passe doit contenir au moins 8 caractères")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    .withMessage(
+      "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre"
+    ),
+];

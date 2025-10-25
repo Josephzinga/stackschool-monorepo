@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, PhoneIcon } from "lucide-react";
 import { forgotPasswordSchema, FormDataType } from "@/lib/schema";
-import PhoneInput from "react-phone-number-input";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "../../../style/index.css";
 import {
@@ -67,6 +67,8 @@ export default function ForgotPasswordPage() {
     }
   };
   console.log(inputType);
+  console.log(isValidPhoneNumber(phoneValue));
+  console.log(isSubmitting);
 
   const getInputType = () => {
     return inputType === "phone"
@@ -116,93 +118,74 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit(handleIdentifier)}>
             <Field>
               <FieldLabel htmlFor="identifier">Identifiant *</FieldLabel>
-              {inputType === "phone" ? (
-                <div className="space-y-2">
-                  <PhoneInput
-                    international
-                    defaultCountry="ML"
-                    value={phoneValue}
-                    onChange={(value) => {
-                      setPhoneValue(value || "");
-                      setValue("identifier", value || "");
-                    }}
-                    onBlur={() => {
-                      if (phoneValue) {
-                        setValue("identifier", phoneValue);
-                      }
-                    }}
-                    placeholder="Entrez votre numéro"
-                    className="phone-input-custom"
-                  />
-                  {errors.identifier && (
-                    <FieldError id="error-identifier" className="flex gap-1">
-                      <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
-                      {errors.identifier.message}
-                    </FieldError>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValue("identifier", "");
-                      setInputType("any");
-                    }}
-                    className="text-sm text-blue-500 hover:underline">
-                    ← Utiliser un email ou nom d'utilisateur à la place
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Input
-                    id="identifier"
-                    type={getInputType()}
-                    {...register("identifier", {
-                      onChange: (e) => handleIdentifierChange(e.target.value),
-                    })}
-                  />
-                  {errors.identifier && (
-                    <FieldError id="error-identifier" className="flex gap-1">
-                      <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
-                      {errors.identifier.message}
-                    </FieldError>
-                  )}
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInputType("phone");
-                      setValue("identifier", "");
-                      setPhoneValue("");
-                    }}
-                    className="text-sm text-blue-500 hover:underline flex gap-2">
-                    <PhoneIcon size={18} /> Utiliser un numéro de téléphone à la
-                    place
-                  </button>
-                </div>
+              {inputType === "phone" ? (
+                <PhoneInput
+                  international
+                  defaultCountry="ML"
+                  value={phoneValue}
+                  onChange={(value) => {
+                    setPhoneValue(value || "");
+                    setValue("identifier", value || "");
+                  }}
+                  onBlur={() => {
+                    if (phoneValue) {
+                      setValue("identifier", phoneValue);
+                    }
+                  }}
+                  placeholder="Entrez votre numéro"
+                  className="phone-input-custom"
+                />
+              ) : (
+                <Input
+                  id="identifier"
+                  placeholder="example@gmail.com ou nom d'utilisateur"
+                  className="placeholder:text-sm"
+                  type="text"
+                  {...register("identifier", {
+                    onChange: (e) => handleIdentifierChange(e.target.value),
+                  })}
+                />
+              )}
+              {errors.identifier && (
+                <FieldError id="error-identifier" className="flex gap-1">
+                  <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
+                  {errors.identifier.message}
+                </FieldError>
               )}
 
-              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-200 mt-2 font-mono">
-                <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-                  <CollapsibleTrigger className="hover:underline hover:cursor-pointer hover:text-blue-400">
-                    Ex de formats acceptés :
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>Email : example@domaine.com</li>
-                      <li>Téléphone : +223 12 34 56 78 </li>
-                      <li>
-                        Nom d&apos;tilisateur : 3-20 caractères (lettres,
-                        chiffres, _)
-                      </li>
-                    </ul>
-                  </CollapsibleContent>
-                </Collapsible>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (inputType === "phone") {
+                    setValue("identifier", "");
+                    setInputType("any");
+                  } else {
+                    setInputType("phone");
+                    setValue("identifier", "");
+                    setPhoneValue("");
+                  }
+                }}
+                className="text-sm text-blue-500 hover:underline flex gap-1">
+                {inputType === "phone" ? (
+                  "← Utiliser un email ou nom d'utilisateur à la place"
+                ) : (
+                  <>
+                    <PhoneIcon size={17} /> Utiliser un numéro de téléphone à la
+                    place
+                  </>
+                )}
+              </button>
             </Field>
 
             <Button
               type="submit"
               className="w-full text-white mt-4 font-semibold"
-              disabled={isSubmitting}>
+              disabled={
+                isSubmitting || inputType === "phone"
+                  ? !isValidPhoneNumber(phoneValue)
+                  : false
+              }>
               {isSubmitting ? (
                 <>
                   <Spinner />

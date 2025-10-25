@@ -74,7 +74,7 @@ export default function VerifyCode() {
     try {
       const res = await api.post("/api/auth/resend-code", { tempToken });
       if (res.data?.ok) {
-        toast.success("Nouveau code envoyé");
+        toast.success(res.data?.message || "Nouveau code envoyé");
         setCountdown(60); // 60 secondes d'attente
       }
     } catch (error: any) {
@@ -84,7 +84,7 @@ export default function VerifyCode() {
 
   return (
     <Container>
-      <Card className="!w-100 bg-white/50 dark:bg-slate-700/50 max-w-md mx-auto">
+      <Card className="w-100! bg-white/50 dark:bg-slate-700/50 max-w-md mx-auto">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Vérification du code</CardTitle>
           <CardDescription>
@@ -117,7 +117,7 @@ export default function VerifyCode() {
                           <InputOTPSlot
                             key={index}
                             index={index}
-                            className="w-10 h-10 text-lg border-2"
+                            className="w-10 h-10 text-lg border"
                           />
                         ))}
                       </InputOTPGroup>

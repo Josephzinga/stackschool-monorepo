@@ -18,8 +18,11 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, PhoneIcon } from "lucide-react";
 import { forgotPasswordSchema, FormDataType } from "@/lib/schema";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import "../../../style/index.css";
 import {
   Collapsible,
   CollapsibleContent,
@@ -27,26 +30,60 @@ import {
 } from "@/components/ui/collapsible";
 import { useEffect, useState } from "react";
 
-interface Country {
-  code: string;
-  name: string;
-  dialCode: string;
-}
-
 export default function ForgotPasswordPage() {
   const [isOpen, setIsOpen] = useState(false);
+  const [inputType, setInputType] = useState<"any" | "phone" | "email">("any");
+  const [phoneValue, setPhoneValue] = useState<string>("");
 
   const router = useRouter();
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting, isValid },
   } = useForm<FormDataType>({
     resolver: zodResolver(forgotPasswordSchema),
     mode: "onBlur",
   });
 
-  const handleIdentifier = async ({ identifier }: FormDataType) => {
+  const detectInputType = (value: string) => {
+    if (value.includes("@") && value.includes(".")) {
+      return "email";
+    }
+    const numericValue = value.replace(/\D/g, "");
+    if (numericValue.length >= 8 && /^[\d\s+()-]+$/.test(value)) {
+      return "phone";
+    }
+    return "any";
+  };
+
+  const handleIdentifierChange = (value: string) => {
+    const detectedType = detectInputType(value);
+    setInputType(detectedType);
+    console.log("value", value);
+
+    if (detectedType === "phone") {
+      setPhoneValue(value);
+    }
+  };
+  console.log(inputType);
+
+  const getInputType = () => {
+    return inputType === "phone"
+      ? "tel"
+      : inputType === "email"
+      ? "email"
+      : "text";
+  };
+  console.log("identifier dehors");
+  const handleIdentifier = async (data: FormDataType) => {
+    let identifier = data.identifier;
+
+    // Si c'est un numéro, utiliser la version formatée du PhoneInput
+    if (inputType === "phone" && phoneValue) {
+      identifier = phoneValue;
+    }
+    console.log("identifier", identifier);
     try {
       const res = await api.post("/api/auth/forgot-password", { identifier });
       if (res.data?.ok) {
@@ -79,21 +116,68 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit(handleIdentifier)}>
             <Field>
               <FieldLabel htmlFor="identifier">Identifiant *</FieldLabel>
-              <Input
-                id="identifier"
-                type="text"
-                {...register("identifier")}
-                aria-invalid={!!errors.identifier}
-                aria-describedby={
-                  errors.identifier ? "error-identifier" : undefined
-                }
-              />
+              {inputType === "phone" ? (
+                <div className="space-y-2">
+                  <PhoneInput
+                    international
+                    defaultCountry="ML"
+                    value={phoneValue}
+                    onChange={(value) => {
+                      setPhoneValue(value || "");
+                      setValue("identifier", value || "");
+                    }}
+                    onBlur={() => {
+                      if (phoneValue) {
+                        setValue("identifier", phoneValue);
+                      }
+                    }}
+                    placeholder="Entrez votre numéro"
+                    className="phone-input-custom"
+                  />
+                  {errors.identifier && (
+                    <FieldError id="error-identifier" className="flex gap-1">
+                      <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
+                      {errors.identifier.message}
+                    </FieldError>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setValue("identifier", "");
+                      setInputType("any");
+                    }}
+                    className="text-sm text-blue-500 hover:underline">
+                    ← Utiliser un email ou nom d'utilisateur à la place
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Input
+                    id="identifier"
+                    type={getInputType()}
+                    {...register("identifier", {
+                      onChange: (e) => handleIdentifierChange(e.target.value),
+                    })}
+                  />
+                  {errors.identifier && (
+                    <FieldError id="error-identifier" className="flex gap-1">
+                      <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
+                      {errors.identifier.message}
+                    </FieldError>
+                  )}
 
-              {errors.identifier && (
-                <FieldError id="error-identifier" className="flex gap-1">
-                  <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
-                  {errors.identifier.message}
-                </FieldError>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputType("phone");
+                      setValue("identifier", "");
+                      setPhoneValue("");
+                    }}
+                    className="text-sm text-blue-500 hover:underline flex gap-2">
+                    <PhoneIcon size={18} /> Utiliser un numéro de téléphone à la
+                    place
+                  </button>
+                </div>
               )}
 
               <div className="text-xs md:text-sm text-gray-600 dark:text-gray-200 mt-2 font-mono">
@@ -104,7 +188,7 @@ export default function ForgotPasswordPage() {
                   <CollapsibleContent>
                     <ul className="list-disc list-inside space-y-1">
                       <li>Email : example@domaine.com</li>
-                      <li>Téléphone : +33 6 12 34 56 78 ou 0612345678</li>
+                      <li>Téléphone : +223 12 34 56 78 </li>
                       <li>
                         Nom d&apos;tilisateur : 3-20 caractères (lettres,
                         chiffres, _)

@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json", // Hérite des options globales
+  "compilerOptions": {
+    "outDir": "./dist", // Dossier de sortie pour les fichiers compilés
+    "rootDir": "./", // Racine des fichiers source
+    "declaration": true, // Génère les fichiers .d.ts pour les types
+    "declarationMap": true // Génère les fichiers .d.ts.map
+  },
+  "include": ["prisma/**/*.ts", "generated/**/*.ts", "index.ts"],
+  "exclude": ["node_modules", "dist"]
+}

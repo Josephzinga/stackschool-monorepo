@@ -1,28 +1,28 @@
-# Dockerfile.frontend (dev)
+# infra/docker/dockerfile.frontend
 FROM node:lts-slim
 
-# Créer le dossier de travail
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 WORKDIR /app
 
-# Copier uniquement les fichiers nécessaires pour l’installation
-COPY /../../frontend/package*.json ./
+# Manifests racine
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Installer les dépendances
-RUN npm install
+# Copier package.json des packages (cache)
+COPY packages/frontend/package.json ./packages/frontend/package.json
+COPY packages/backend/package.json ./packages/backend/package.json
+COPY packages/db/package.json ./packages/db/package.json
 
-# Copier le reste du code de l’application
-COPY /../../frontend ./
 
-# Désactiver la télémétrie Next.js
-ENV NODE_ENV=development
+
+# Copier le code complet du monorepo
+COPY packages ./packages
+RUN pnpm install --frozen-lockfile
+WORKDIR /app/packages/frontend
+
 ENV NEXT_TELEMETRY_DISABLED=1
-
-# Exposer le port Next.js
 EXPOSE 3000
 
-# Corriger les permissions (si tu veux exécuter en tant que node)
-RUN chown -R node:node /app
-USER node
-
-# Lancer le serveur Next.js
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "--filter", "@stackschool/frontend", "run", "dev"]

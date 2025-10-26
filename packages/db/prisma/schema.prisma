@@ -1,0 +1,460 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/client"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ENUMS
+enum SchoolRole {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+  STAFF
+}
+
+enum GlobalRole {
+  SUPER_ADMIN
+  USER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+/**
+ * * MODELS **
+ */
+
+model User {
+  id          String      @id @default(cuid())
+  email       String?     @unique
+  password    String?
+  phoneNumber String?     @unique
+  username    String?     @unique
+  globalRole  GlobalRole? @default(USER)
+  isVerified  Boolean?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  emailVerified DateTime?
+
+  profileCompleted Boolean? @default(false)
+  hasMembership    Boolean? @default(false)
+
+  profile           Profile?
+  memberships       SchoolUser[]
+  sessions          Session[]
+  Account           Account[]
+  VerificationCode  VerificationCode[]
+  VerificationToken VerificationToken[]
+
+  @@index([email])
+}
+
+model Profile {
+  id        String  @id @default(cuid())
+  photo     String?
+  firstname String?
+  lastname  String?
+
+  gender    Gender?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  ParentStudent ParentStudent[]
+  Student       Student[] // si un profil peut représenter plusieurs enregistrements d'élève (optionnel)
+}
+
+model School {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  address   String
+  code      String?   @unique
+  planId    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  classes       Class[]
+  students      Student[]
+  memberships   SchoolUser[]
+  subscriptions Subscription[]
+  Subject       Subject[]
+}
+
+/**
+ * pivot User <-> School
+ */
+model SchoolUser {
+  id String @id @default(cuid())
+
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  role      SchoolRole
+  isOwner   Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  subject      Subject[] // matières dont il est responsable (optionnel)
+  ClassTeacher ClassTeacher[] // pivot prof <-> classe (s'il enseigne plusieurs classes)
+  Class        Class[] // s'il est chef de classe (teacherId sur Class)
+  Teacher      Teacher?
+  Staff        Staff?
+
+  @@unique([schoolId, userId])
+  @@index([schoolId])
+  @@index([userId])
+  @@index([role])
+}
+
+/**
+ * Subject: utilise pivot ClassSubjects (explicit)
+ */
+model Subject {
+  id        String   @id @default(cuid())
+  name      String
+  code      String?
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId  String
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId String?
+
+  // pivot explicit many-to-many
+  ClassSubjects ClassSubjects[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  Exam         Exam[]
+  SchoolUser   SchoolUser? @relation(fields: [schoolUserId], references: [id])
+  schoolUserId String?
+
+  @@unique([code, schoolId])
+  @@index([schoolId])
+}
+
+/**
+ * Pivot explicit pour Class <-> Subject
+ */
+model ClassSubjects {
+  id        String  @id @default(cuid())
+  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId   String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId String
+
+  @@unique([classId, subjectId])
+  @@index([classId])
+  @@index([subjectId])
+}
+
+model Exam {
+  id        String   @id @default(cuid())
+  title     String
+  startDate DateTime
+  endDate   DateTime
+  class     Class    @relation(fields: [classId], references: [id])
+  classId   String
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  subjectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Result    Result[]
+
+  @@index([classId])
+  @@index([subjectId])
+}
+
+model Result {
+  id        String   @id @default(cuid())
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String
+  exam      Exam     @relation(fields: [examId], references: [id])
+  examId    String
+  score     Float
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, examId])
+}
+
+model Class {
+  id        String   @id @default(cuid())
+  name      String
+  level     String
+  section   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId String
+
+  // chef de classe (optionnel) - SchoolUser relation
+  teacher   SchoolUser? @relation(fields: [teacherId], references: [id])
+  teacherId String?
+
+  students Student[]
+  exam     Exam[]
+
+  // pivot explicit many-to-many
+  classSubjects ClassSubjects[]
+  ClassTeacher  ClassTeacher[]
+
+  @@index([schoolId])
+}
+
+/**
+ * Pivot Prof <-> Classe (nouveau)
+ */
+model ClassTeacher {
+  id            String @id @default(cuid())
+  class         Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId       String
+  staffMemberId String
+
+  teacher      Teacher     @relation(fields: [teacherId], references: [id])
+  teacherId    String
+  createdAt    DateTime    @default(now())
+  SchoolUser   SchoolUser? @relation(fields: [schoolUserId], references: [id])
+  schoolUserId String?
+
+  @@unique([classId, teacherId])
+  @@index([classId])
+  @@index([teacherId])
+}
+
+/**
+ * Etudiant
+ */
+model Student {
+  id             String   @id @default(cuid())
+  profile        Profile? @relation(fields: [profileId], references: [id])
+  profileId      String
+  matricule      String
+  enrollmentYear String
+  birthDate      DateTime
+  birthPlace     String
+  nationality    String
+  fatherName     String
+  motherName     String
+
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId String
+
+  // classId optionnel (un élève peut ne pas être encore affecté)
+  classId     String?
+  schoolClass Class?  @relation(fields: [classId], references: [id])
+
+  attendances Attendance[]
+  Result      Result[]
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  deletedAt     DateTime?
+  ParentStudent ParentStudent[]
+
+  @@unique([matricule, schoolId])
+  @@index([schoolId])
+}
+
+/**
+ * Parent - Student pivot
+ */
+model ParentStudent {
+  id              String   @id @default(cuid())
+  parentProfile   Profile  @relation(fields: [parentProfileId], references: [id])
+  parentProfileId String
+  student         Student  @relation(fields: [studentId], references: [id])
+  studentId       String
+  relationType    String?
+  createdAt       DateTime @default(now())
+
+  @@unique([parentProfileId, studentId])
+}
+
+/**
+ * Invite
+ */
+model Invite {
+  id        String     @id @default(cuid())
+  email     String
+  schoolId  String
+  studentId String?
+  token     String     @unique
+  relation  String?
+  createdAt DateTime   @default(now())
+  expiresAt DateTime
+  used      Boolean    @default(false)
+  role      SchoolRole
+
+  @@index([schoolId])
+  @@index([studentId])
+}
+
+/**
+ * Attendance
+ */
+model Attendance {
+  id        String           @id @default(cuid())
+  student   Student          @relation(fields: [studentId], references: [id])
+  studentId String
+  date      DateTime
+  status    AttendanceStatus
+
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, date])
+  @@index([studentId, date])
+}
+
+/**
+ * Billing
+ */
+model Plan {
+  id           String         @id @default(cuid())
+  name         String
+  stripeId     String?
+  priceCents   Int
+  features     String?
+  createdAt    DateTime       @default(now())
+  subscription Subscription[]
+}
+
+model Subscription {
+  id          String    @id @default(cuid())
+  school      School    @relation(fields: [schoolId], references: [id])
+  schoolId    String
+  plan        Plan      @relation(fields: [planId], references: [id])
+  planId      String
+  stripeSubId String?
+  status      String
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([schoolId])
+}
+
+/**
+ * * NextAuth required models **
+ */
+model Account {
+  id                String  @id @default(cuid())
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  type              String?
+  provider          String?
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model VerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  method    String    @default("email")
+  type      String    @default("password_reset")
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  updateAt  DateTime? @updatedAt
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model VerificationCode {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  codeHash  String // hash du code 6-chiffres (recommandé)
+  method    String    @default("whatsapp") // "whatsapp" | "sms" | "email"
+  type      String    @default("password_reset")
+  used      Boolean   @default(false)
+  attempts  Int       @default(0)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  updateAt  DateTime? @updatedAt
+
+  @@index([userId])
+  @@index([codeHash])
+}
+
+model Session {
+  id           String   @id @default(cuid()) @map("sid")
+  sessionToken String   @unique @map("sess")
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
+  expires      DateTime @map("expire")
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Teacher {
+  id             String     @id @default(cuid())
+  schoolUser     SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  schoolUserId   String     @unique
+  diploma        String?
+  experience     String?
+  hireDate       DateTime?
+  isActive       Boolean
+  salary         Float?
+  departement    String?
+  specialization String?
+
+  attendance   Attendance[]
+  classTeacher ClassTeacher[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Subject      Subject[]
+
+  @@map("Teachers")
+}
+
+model Staff {
+  id           String     @id @default(cuid())
+  schoolUser   SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  schoolUserId String     @unique
+  position     String
+  hireDate     DateTime?
+  salary       Float?
+  departement  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

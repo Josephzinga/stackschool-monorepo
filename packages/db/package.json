@@ -1,0 +1,13 @@
+{
+  "name": "@stackschool/db",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "generate": "prisma generate"
+  },
+  "devDependencies": {
+    "@prisma/client": "^6.18.0",
+    "prisma": "^6.18.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "stack-school-moi",
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:backend": "pnpm --filter @stackschool/backend run dev",
+    "dev:frontend": "pnpm --filter @stackschool/frontend run dev",
+    "generate": "pnpm --filter @stackschool/db run generate"
+  }
+}

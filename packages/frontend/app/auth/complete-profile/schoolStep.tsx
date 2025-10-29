@@ -9,6 +9,8 @@ import { CreateSchoolForm } from "@/components/complete-profile/school-step/crea
 import InvitationForm from "../../../components/complete-profile/school-step/invitation-form";
 import { CompleteProfileData } from "./page";
 import api from "@/services/api";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Search } from "lucide-react";
 
 // Étendre SchoolUser pour le rendre générique
 
@@ -20,12 +22,13 @@ export default function SchoolStep({
   const [mode, setMode] = useState<"join" | "create" | "invite">("join");
   const [schools, setSchools] = useState<School[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const searchDebounce = useDebounce(300, searchQuery.trim() || null);
+  console.log("searchDebounce", searchDebounce);
   // Recherche d'écoles
   useEffect(() => {
     const searchSchools = async () => {
       try {
-        const res = await api.get(`/api/schools?search=${searchQuery}`);
+        const res = await api.get(`/api/schools?search=${searchDebounce}`);
         setSchools(res.data?.schools || []);
         console.log(res);
       } catch (error: any) {
@@ -33,7 +36,7 @@ export default function SchoolStep({
       }
     };
     searchSchools();
-  }, [searchQuery]);
+  }, [searchDebounce]);
   console.log(mode);
   return (
     <div className="space-y-6">

@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { $Enums } from "../generated/client";
+import { $Enums } from "@stackschool/db";
 import { StrategyOptions, VerifyCallback } from "passport-google-oauth20";
 import { Profile } from "passport";
 

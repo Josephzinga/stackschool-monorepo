@@ -1,7 +1,7 @@
 // lib/passport-local.ts
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import handleLocalAuth from "../auth/passport-local"; // ta fonction
+import handleLocalAuth from "../controllers/passport-local"; // ta fonction
 
 export default function setupLocalStrategy() {
   passport.use(

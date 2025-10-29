@@ -2,25 +2,26 @@ import { Router } from "express";
 import passport from "passport";
 import { generateToken } from "../../lib/outils";
 import { prisma } from "../../lib/prisma";
-import { User } from "../../generated/client";
+import { User } from "@stackschool/db";
 
 const router = Router();
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:3000";
+
 router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["email", "profile"] })
+  "/facebook",
+  passport.authenticate("facebook", { scope: ["email", "public_profile"] })
 );
 
 router.get(
-  "/google/callback",
-  passport.authenticate("google", {
+  "/facebook/callback",
+  passport.authenticate("facebook", {
     failureRedirect: `${FRONTEND_ORIGIN}/auth/login`,
     session: true,
   }),
   async (req, res) => {
     try {
       const user = req.user as User;
-      console.log("user dans le callback:", user);
+      console.log("user dans le callback facebook");
       if (!user || !user.id) {
         res.redirect(`${FRONTEND_ORIGIN}/auth/login?error=auth`);
       }
@@ -31,8 +32,8 @@ router.get(
       await prisma.session.create({
         data: {
           sessionToken: refreshToken,
-          userId: user.id,
           expires,
+          userId: user.id,
         },
       });
 
@@ -44,10 +45,10 @@ router.get(
       });
 
       res.redirect(
-        `${FRONTEND_ORIGIN}/auth/finish?from=social&provider=google`
+        `${FRONTEND_ORIGIN}/auth/finish?from=social&provider=facebook`
       );
     } catch (err) {
-      console.error("Error get google callback", err);
+      console.log("Error get facebook callback", err);
       res.redirect(`${FRONTEND_ORIGIN}/auth/login?error=server`);
     }
   }

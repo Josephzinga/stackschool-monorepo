@@ -1,5 +1,5 @@
 import { Router, Response, Request } from "express";
-import { Profile, User } from "../../generated/client";
+
 const router = Router();
 
 router.get("/me", async (req: Request, res: Response) => {

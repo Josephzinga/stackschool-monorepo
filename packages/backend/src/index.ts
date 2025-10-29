@@ -9,11 +9,12 @@ import { Strategy as FacebookStrategy } from "passport-facebook";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import pg from "pg";
-import authRoutes from "./auth/routes";
+import authRoutes from "./routes/auth";
 import { createClient, RedisClientType } from "redis";
 import helmet from "helmet";
-import handleOauthCallback from "./auth/passport-social";
+import handleOauthCallback from "./controllers/passport-social";
 import setupLocalStrategy from "./lib/passport-local";
+import SeachSchool from "./routes/shools/search-school.route";
 
 config();
 
@@ -109,7 +110,7 @@ passport.use(
 );
 
 app.use("/api", authRoutes);
-
+app.use("/api", SeachSchool);
 app.get("/", (req, res) => {
   res.json("message serveur connecter");
 });

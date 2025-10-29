@@ -1,6 +1,12 @@
-import { prisma } from "../lib/prisma";
 import bcrypt from "bcryptjs";
 import { VerifyCallback } from "passport-google-oauth20";
+import { prisma } from "../lib/prisma";
+import { Prisma, User, Profile, Account } from "@stackschool/db";
+
+type UserWithRelations = User & {
+  profile?: Profile | null;
+  Account?: Account[];
+};
 
 export default async function handleLocalAuth(
   identifier: string,
@@ -9,16 +15,17 @@ export default async function handleLocalAuth(
 ) {
   const input = identifier || "";
   try {
-    const user = await prisma.user.findFirst({
+    const user: UserWithRelations | null = await prisma.user.findFirst({
       where: {
         OR: [
           { email: { equals: input, mode: "insensitive" } },
-          { username: { equals: input, mode: "insensitive" } },
           { phoneNumber: input },
+          { username: { equals: input, mode: "insensitive" } },
         ],
       },
       include: { profile: true, Account: true },
     });
+
     if (!user)
       return done(null, false, { message: "Utilisateur introuvalble" });
 

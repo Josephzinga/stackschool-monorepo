@@ -39,6 +39,7 @@ export default function LoginPage() {
       }
 
       toast.error(data?.message || "Erreur de connexion");
+      console.log(data.message);
     }
   };
   return (

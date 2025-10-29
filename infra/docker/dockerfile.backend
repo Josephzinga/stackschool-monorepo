@@ -1,43 +1,31 @@
-# infra/docker/dockerfile.backend
-FROM node:lts-slim AS builder
-
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-
-WORKDIR /app
-
-# --- Copier les manifests racine
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN apt-get update -y && apt-get install -y openssl
-
-# Copier uniquement les package.json des packages (pour le cache)
-COPY packages/db/package.json ./packages/db/package.json
-COPY packages/backend/package.json ./packages/backend/package.json
-COPY packages/frontend/package.json ./packages/frontend/package.json
-
-RUN pnpm install --frozen-lockfile
-
-# Copier le code complet du monorepo
-COPY packages ./packages
-
-
-
-# --- Génére le Prisma Client dans le package db
-RUN pnpm --filter @stackschool/db generate
-
-# Étape finale (dev)
+# Dockerfile for development (pnpm monorepo)
 FROM node:lts-slim
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+# Install dependencies needed for corepack, git, curl, etc.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends git ca-certificates curl \
+  && rm -rf /var/lib/apt/lists/*
+
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 
 WORKDIR /app
-COPY --from=builder /app /app
 
-WORKDIR /app/packages/backend
-ENV NODE_ENV=development
+RUN groupadd -r app && useradd -r -g app -m -d /home/app app
 
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY packages/db ./packages/db
+COPY packages/backend ./packages/backend
+
+RUN chown -R app:app /app
+
+USER root
+# i get this error here when installing depedancies
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @stackschool/db generate
+
+# backend ports used in docker-compose
 EXPOSE 4000 5555 3002
+
 CMD ["pnpm", "--filter", "@stackschool/backend", "run", "dev"]

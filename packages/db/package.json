@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev "
   },
   "devDependencies": {
     "@prisma/client": "^6.18.0",

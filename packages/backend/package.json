@@ -8,7 +8,6 @@
   "main": "dist/index.js",
   "dependencies": {
     "@sendgrid/mail": "^8.1.6",
-    "argon2": "^0.30.0",
     "bcryptjs": "^3.0.2",
     "bullmq": "^2.0.0",
     "connect-pg-simple": "^10.0.0",
@@ -30,7 +29,6 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
-    "prisma-redis-extension": "4.8.2",
     "rate-limiter-flexible": "^8.1.0",
     "socket.io": "^4.8.0",
     "twilio": "^5.10.3"

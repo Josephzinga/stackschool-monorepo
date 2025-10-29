@@ -4,31 +4,30 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import RoleStep from "./RoleStep";
+import {
+  SchoolRole,
+  Gender,
+  Staff,
+  Student,
+  School,
+  Teacher,
+  SchoolUser,
+  Profile,
+  User,
+} from "@stackschool/db";
+import SchoolStep from "./schoolStep";
+import { Container } from "@/components/Container";
 
 // Types basés sur votre schema
-type SchoolRole = "ADMIN" | "TEACHER" | "STUDENT" | "PARENT" | "STAFF";
-type Gender = "MALE" | "FEMALE" | "OTHER";
 
-interface CompleteProfileData {
+export type CompleteProfileData = {
   school: {
     schoolId?: string;
-    newSchool?: { name: string; address: string; code?: string };
+    newSchool?: School;
     invitationCode?: string;
   };
-  profile: {
-    firstname: string;
-    lastname: string;
-    gender: Gender;
-    photo?: string;
-  };
-  role: {
-    role: SchoolRole;
-    student?: Student;
-    teacher?: TeacherData;
-    parent?: ParentData;
-    staff?: StaffData;
-  };
-}
+};
 
 export default function CompleteProfile() {
   const [step, setStep] = useState(1);
@@ -61,7 +60,7 @@ export default function CompleteProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <Container>
       <div className="max-w-2xl w-full">
         {/* Progress Bar */}
         <div className="flex justify-between mb-8">
@@ -86,13 +85,13 @@ export default function CompleteProfile() {
           {step === 1 && (
             <SchoolStep
               onNext={(schoolData) => {
-                setValue("school", schoolData);
+                setValue("school", schoolData.school);
                 setStep(2);
               }}
             />
           )}
 
-          {step === 2 && (
+          {/*  {step === 2 && (
             <ProfileStep
               onNext={(profileData) => {
                 setValue("profile", profileData);
@@ -109,9 +108,9 @@ export default function CompleteProfile() {
               selectedRole={selectedRole}
               onRoleSelect={setSelectedRole}
             />
-          )}
+          )} */}
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

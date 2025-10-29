@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  output        = "../node_modules/.prisma/client"
+  output        = "../node_modules/generated"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -85,21 +85,26 @@ model Profile {
 }
 
 model School {
-  id        String    @id @default(cuid())
-  name      String
-  slug      String    @unique
-  address   String
-  code      String?   @unique
-  planId    String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id            String    @id @default(cuid())
+  name          String
+  slug          String?   @unique
+  address       String
+  code          String?   @unique
+  planId        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  logo          String?
+  motto         String?
+  inviationCode String?
+  description   String?
 
   classes       Class[]
   students      Student[]
   memberships   SchoolUser[]
   subscriptions Subscription[]
   Subject       Subject[]
+  Invite        Invite[]
 }
 
 /**
@@ -254,10 +259,10 @@ model Student {
   matricule      String
   enrollmentYear String
   birthDate      DateTime
-  birthPlace     String
-  nationality    String
-  fatherName     String
-  motherName     String
+  birthPlace     String?
+  nationality    String?
+  fatherName     String?
+  motherName     String?
 
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   schoolId String
@@ -273,6 +278,7 @@ model Student {
   updatedAt     DateTime        @updatedAt
   deletedAt     DateTime?
   ParentStudent ParentStudent[]
+  Invite        Invite[]
 
   @@unique([matricule, schoolId])
   @@index([schoolId])
@@ -296,20 +302,55 @@ model ParentStudent {
 /**
  * Invite
  */
+/**
+ * model Invite {
+ * id        String     @id @default(cuid())
+ * email     String
+ * schoolId  String
+ * message   String
+ * studentId String?
+ * token     String     @unique
+ * relation  String?
+ * createdAt DateTime   @default(now())
+ * expiresAt DateTime
+ * used      Boolean    @default(false)
+ * role      SchoolRole
+ * @@index([schoolId])
+ * @@index([studentId])
+ * }
+ */
+
+// Dans votre schema.prisma - étendre le modèle Invite
 model Invite {
-  id        String     @id @default(cuid())
-  email     String
-  schoolId  String
+  id          String     @id @default(cuid())
+  // Contact cible (email OU phoneNumber)
+  email       String?
+  phoneNumber String? // Format international: +223XXXXXXXX
+  // Méthode d'envoi
+  method      String     @default("email") // "email", "whatsapp", "sms"
+  // École et rôle
+  schoolId    String
+  school      School     @relation(fields: [schoolId], references: [id])
+  role        SchoolRole
+  // Token et dates
+  token       String     @unique
+  createdAt   DateTime   @default(now())
+  expiresAt   DateTime
+  // Utilisation
+  used        Boolean    @default(false)
+  usedAt      DateTime?
+  usedBy      String? // UserId qui a utilisé l'invitation
+
+  // Pour les invitations parents->élèves
   studentId String?
-  token     String     @unique
-  relation  String?
-  createdAt DateTime   @default(now())
-  expiresAt DateTime
-  used      Boolean    @default(false)
-  role      SchoolRole
+  student   Student? @relation(fields: [studentId], references: [id])
+  relation  String? // "parent", "tuteur", etc.
 
   @@index([schoolId])
-  @@index([studentId])
+  @@index([email])
+  @@index([phoneNumber])
+  @@index([token])
+  @@index([expiresAt])
 }
 
 /**

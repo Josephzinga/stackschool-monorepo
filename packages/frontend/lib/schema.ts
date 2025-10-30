@@ -1,5 +1,5 @@
 // users/schemas.ts
-import { z } from "zod";
+import { z } from "@stackschool/shared";
 
 export const loginFormSchema = z.object({
   identifier: z

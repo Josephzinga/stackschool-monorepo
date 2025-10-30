@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import { z } from "@stackschool/shared";
 
 export const registerValidator = [
   body("username")
@@ -46,3 +47,12 @@ export const resetPasswordValidation = [
     .isLength({ min: 8 })
     .withMessage("Le mot de passe doit contenir au moins 8 caractères."),
 ];
+
+export const loginSchema = z.object({
+  identifier: z
+    .string()
+    .min(3, "L'identifiant doit contenir au moins 3 caractères"),
+  password: z
+    .string()
+    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+});

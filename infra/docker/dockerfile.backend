@@ -16,6 +16,7 @@ RUN groupadd -r app && useradd -r -g app -m -d /home/app app
 
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/db ./packages/db
+COPY packages/shared ./packages/shared
 COPY packages/backend ./packages/backend
 
 RUN chown -R app:app /app

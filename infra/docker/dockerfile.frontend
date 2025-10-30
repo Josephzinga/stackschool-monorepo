@@ -1,76 +1,38 @@
-# infra/docker/dockerfile.frontend
-
-# --- Development image (default target) ---
-FROM node:lts-slim AS dev
-
-# Install small utilities
-
+# --- Development image ---
+FROM node:lts-slim
 
 # Enable corepack and activate pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# Copy only manifests to leverage Docker cache
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY packages ./packages
-
-# Install workspace dependencies and persist pnpm store to a directory
-RUN pnpm install --frozen-lockfile --store=/pnpm-store
-
-# Create a non-root user and switch to it
+# Crée un utilisateur non-root pour les opérations
 RUN groupadd -r app && useradd -r -g app -m app
-USER app
 
-# Expose Next.js dev server port
+# Copie les manifests de la racine et installe les dépendances
+# Ceci utilise le cache de Docker. Si pnpm-lock.yaml change, la couche est reconstruite.
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# Copie tous les packages (frontend, shared, db)
+# C'est la façon la plus simple de s'assurer que tous les fichiers sont présents
+COPY packages/db ./packages/db
+COPY packages/shared ./packages/shared
+COPY packages/frontend ./packages/frontend
+
+# Change le propriétaire des fichiers pour l'utilisateur non-root
+RUN chown -R app:app /app
+
+# Passe à l'utilisateur non-root pour l'installation et l'exécution
+USER root
+
+# Installe les dépendances (utilisant le pnpm-lock.yaml et les workspaces)
+RUN pnpm install --frozen-lockfile
+
+# Expose le port du serveur de développement Next.js
 EXPOSE 3000
 
-# Default command for development (overridable by docker-compose)
+# Définit la commande de démarrage
 CMD ["pnpm", "--filter", "@stackschool/frontend", "run", "dev"]
 
-
-# --- Production multi-stage build (optional) ---
-# Usage: docker build --target=builder -t frontend-builder .
-
-FROM node:lts-slim AS builder
-RUN corepack enable && corepack prepare pnpm@latest --activate
-WORKDIR /app
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY packages ./packages
-RUN pnpm install --frozen-lockfile --store=/pnpm-store
-
-# Build the frontend (assumes script `build` exists in the frontend package)
-RUN pnpm --filter @stackschool/frontend run build
-
-# Final runtime image
-FROM node:lts-slim AS runner
-RUN corepack enable && corepack prepare pnpm@latest --activate
-WORKDIR /app
-
-# Copy only the built output and minimal package manifest required to start
-# Adjust paths below depending on your package layout (example: packages/frontend)
-COPY --from=builder /app/packages/frontend/.next .next
-COPY --from=builder /app/packages/frontend/public public
-COPY --from=builder /app/packages/frontend/package.json package.json
-
-# Install only production deps (uses pnpm store from the builder stage if you mount a shared volume)
-RUN pnpm install --prod --frozen-lockfile --store=/pnpm-store
-
-EXPOSE 3000
-# Use a non-root user in production if desired
-RUN groupadd -r app && useradd -r -g app -m app
-USER app
-
-CMD ["pnpm", "--filter", "@stackschool/frontend", "run", "start"]
-
-
-# --- Notes ---
-# - Ce Dockerfile fournit deux usages : un target `dev` pour le développement (par défaut)
-#   et un flow multi-stage (`builder` -> `runner`) pour produire une image de production.
-# - Pour éviter les problèmes EBUSY : laisse pnpm-lock.yaml et les manifests copiés dans l'image
-#   au moment du `docker build` (ne pas les bind-monter depuis l'hôte).
-# - En dev, utilise les volumes dans docker-compose pour monter seulement `./packages` et des
-#   volumes nommés pour `node_modules` et `/pnpm-store` afin de conserver les caches.
-# - Adapte les chemins `packages/frontend` si ton monorepo a un autre chemin pour le package.
-# - Si tu veux, je peux ajuster la section `runner` pour une app Next.js avec `next start`
-#   ou pour servir une app statique (export) selon ton workflow.
+# --- Production multi-stage build (recommandé pour la prod) ---
+# ... (votre section de build de production)

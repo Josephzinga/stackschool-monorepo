@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".", // Définit la base pour les chemins relatifs
     "paths": {
-      "@stackschool/db/*": ["packages/db/*"] // Permet de résoudre les types du package db
+      "@stackschool/db/*": ["packages/db/*"],
+      " @stackschool/shared/*": ["packages/shared*"] // Permet de résoudre les types du package db
     },
     "composite": true, // Nécessaire pour les projets TypeScript multi-packages
     "declaration": true, // Génère les fichiers .d.ts pour le partage des types

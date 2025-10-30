@@ -8,5 +8,11 @@ export function isAuthenticated(
   if (req.isAuthenticated()) {
     return next();
   }
-  return res.status(401).json({ ok: false, message: "Non authentifié" });
+
+  return res
+    .status(401)
+    .json({
+      ok: false,
+      message: "Utilisateur non authentifié veillez vous connécter",
+    });
 }

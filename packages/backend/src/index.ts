@@ -29,12 +29,13 @@ const pgPool = new pg.Pool({
 
 const app = express();
 app.use(helmet());
-app.use(
+app.use(cors());
+/*app.use(
   cors({
-    origin: FRONTEND_ORIGIN,
+    origin: NODE_ENV ? "*" : FRONTEND_ORIGIN,
     credentials: true,
   })
-);
+);*/
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -131,5 +132,5 @@ async function connectToRedis() {
 connectToRedis();
 
 app.listen(PORT, () => {
-  console.log(`server is runign on port http://localhost:${PORT}`);
+  console.log(`server is runing on port http://localhost:${PORT}`);
 });

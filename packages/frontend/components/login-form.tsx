@@ -24,7 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { Spinner } from "./ui/spinner";
-import { LoginFormType, loginFormSchema } from "@/lib/schema";
+import { LoginFormType, loginFormSchema } from "@stackschool/shared";
 export function LoginForm({
   className,
   handleLogin,

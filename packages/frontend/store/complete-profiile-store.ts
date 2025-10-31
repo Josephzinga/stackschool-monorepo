@@ -1,35 +1,14 @@
 import api from "@/services/api";
-import {
-  GlobalRole,
-  ParentStudent,
-  Profile,
-  School,
-  Staff,
-  Student,
-  Teacher,
-} from "@stackschool/db";
+import { saveProgressToRedis } from "@/services/complete-profile";
+
+import { RoleData, SchoolData, Profile } from "@stackschool/shared";
+import { toast } from "sonner";
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-interface SchoolData {
-  type: "join" | "create" | "invite";
-  schoolId?: string;
-  newSchool?: School;
-  invitationCode?: string;
-  imposedRole?: string;
-}
-
-interface RoleData {
-  role: GlobalRole;
-  student?: Student;
-  teacher?: Teacher;
-  staff?: Staff;
-  parent?: ParentStudent;
-}
-
 interface CompleteProfileStep {
-  school?: SchoolData | null;
+  school: SchoolData | null;
   profile: Profile | null;
   role: RoleData | null;
   lastSavedAt: string | null;
@@ -51,7 +30,7 @@ interface CompleteProfileStep {
   currentStep: number;
 }
 
-export const completeProfileStore = create<CompleteProfileStep>()(
+export const UseCompleteProfileStore = create<CompleteProfileStep>()(
   persist(
     (set, get) => ({
       school: null,
@@ -90,17 +69,21 @@ export const completeProfileStore = create<CompleteProfileStep>()(
         }),
 
       saveToRedis: async () => {
-        const state = get();
         try {
-          const res = await api.post("/api/complete-profile/save-progress", {
+          const state = get();
+          const res = await saveProgressToRedis({
             school: state.school,
             profile: state.profile,
             role: state.role,
             currentStep: state.currentStep,
           });
-          if (res.data?.ok) set({ lastSavedAt: new Date().toISOString() });
+
+          if (res?.ok) {
+            set({ lastSavedAt: new Date().toISOString() });
+            toast.success(res.message);
+          }
         } catch (error) {
-          console.warn(
+          toast.warning(
             "Échec sauvegarde Redis, continuation avec localStorage"
           );
         }

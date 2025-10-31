@@ -9,12 +9,13 @@ import { Strategy as FacebookStrategy } from "passport-facebook";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import pg from "pg";
-import authRoutes from "./routes/auth";
+import routes from "./routes";
 import { createClient, RedisClientType } from "redis";
 import helmet from "helmet";
 import handleOauthCallback from "./controllers/passport-social";
 import setupLocalStrategy from "./lib/passport-local";
 import SeachSchool from "./routes/shools/search-school.route";
+import { User } from "@stackschool/db";
 
 config();
 
@@ -29,13 +30,13 @@ const pgPool = new pg.Pool({
 
 const app = express();
 app.use(helmet());
-app.use(cors());
-/*app.use(
+//app.use(cors());
+app.use(
   cors({
-    origin: NODE_ENV ? "*" : FRONTEND_ORIGIN,
+    origin: FRONTEND_ORIGIN,
     credentials: true,
   })
-);*/
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -110,7 +111,7 @@ passport.use(
   )
 );
 
-app.use("/api", authRoutes);
+app.use("/api", routes);
 app.use("/api", SeachSchool);
 app.get("/", (req, res) => {
   res.json("message serveur connecter");

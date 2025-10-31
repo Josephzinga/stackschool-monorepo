@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
 import { VerifyCallback } from "passport-google-oauth20";
 import { prisma } from "../lib/prisma";
-import { Prisma, User, Profile, Account } from "@stackschool/db";
+import { User, Profile, Account } from "@stackschool/db";
+import { validateBody, validateLogin } from "./validate";
+import { loginFormSchema } from "@stackschool/shared";
 
 type UserWithRelations = User & {
   profile?: Profile | null;
@@ -13,6 +15,11 @@ export default async function handleLocalAuth(
   password: string,
   done: VerifyCallback
 ) {
+  const errors = validateLogin({ identifier, password });
+
+  if (errors) {
+    return done(null, false, errors);
+  }
   const input = identifier || "";
   try {
     const user: UserWithRelations | null = await prisma.user.findFirst({

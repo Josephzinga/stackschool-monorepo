@@ -26,6 +26,7 @@ router.get(
           code: true,
           slug: true,
           address: true,
+          logo: true,
         },
         take: 10,
         orderBy: { name: "desc" },

@@ -9,7 +9,6 @@ import verifyCodeRoute from "./verify-code.route";
 import facebookRoutes from "./passport-facebook.route";
 import resendCodeRoute from "./resend-code.route";
 import resetPasswordRoute from "./reset-password.route";
-import completeProfileRoute from "../complete-profile/complete-profile.route";
 import { Router } from "express";
 
 const router = Router();
@@ -25,6 +24,5 @@ router.use("/auth", verifyCodeRoute);
 router.use("/auth", facebookRoutes);
 router.use("/auth", resendCodeRoute);
 router.use("/auth", resetPasswordRoute);
-router.use("/", completeProfileRoute);
 
 export default router;

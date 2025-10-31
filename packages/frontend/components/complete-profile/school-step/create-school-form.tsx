@@ -1,8 +1,14 @@
 // components/complete-profile/school-step/create-school-form.tsx
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z } from "@stackschool/shared";
 import { CompleteProfileData } from "@/app/auth/complete-profile/page";
+import { Input } from "@/components/ui/input";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { UseCompleteProfileStore } from "@/store/complete-profiile-store";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
 
 // Schéma de validation pour la création d'école
 const createSchoolSchema = z.object({
@@ -16,21 +22,13 @@ const createSchoolSchema = z.object({
     .max(200, "L'adresse est trop longue"),
   code: z
     .string()
-    .optional()
+
     .or(z.string().length(6, "Le code doit contenir 6 caractères")),
 });
 
 type CreateSchoolFormData = z.infer<typeof createSchoolSchema>;
 
-interface CreateSchoolFormProps {
-  onSuccess: (value: CompleteProfileData) => void;
-  onCancel?: () => void;
-}
-
-export function CreateSchoolForm({
-  onSuccess,
-  onCancel,
-}: CreateSchoolFormProps) {
+export function CreateSchoolForm() {
   const {
     register,
     handleSubmit,
@@ -40,7 +38,7 @@ export function CreateSchoolForm({
     resolver: zodResolver(createSchoolSchema),
     mode: "onChange",
   });
-
+  const { setSchoolData } = UseCompleteProfileStore();
   const nameValue = watch("name");
 
   const generateSchoolCode = () => {
@@ -48,7 +46,7 @@ export function CreateSchoolForm({
     const initials =
       nameValue
         ?.split(" ")
-        .map((word) => word.charAt(0))
+        .map((word: string) => word.charAt(0))
         .join("")
         .toUpperCase()
         .substring(0, 3) || "SCH";
@@ -60,67 +58,57 @@ export function CreateSchoolForm({
   const onSubmit = async (data: CreateSchoolFormData) => {
     // Si pas de code fourni, on en génère un
     const finalData = {
-      ...data,
+      address: data.address,
+      name: data.name,
+      inposedRole: "ADMIN",
       code: data.code || generateSchoolCode(),
     };
-
-    onSuccess({ newSchool: finalData });
+    setSchoolData({
+      type: "create",
+      newSchool: finalData,
+    });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Nom de l'école */}
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700 mb-1">
-            Nom de l'école *
-          </label>
-          <input
+        <Field>
+          <FieldLabel htmlFor="name">Nom de l'école *</FieldLabel>
+          <Input
             id="name"
             type="text"
             {...register("name")}
             placeholder="Ex: Groupe Scolaire Les Champions"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-          )}
-        </div>
+
+          <FieldError>{errors.name?.message}</FieldError>
+        </Field>
 
         {/* Adresse */}
-        <div>
-          <label
-            htmlFor="address"
-            className="block text-sm font-medium text-gray-700 mb-1">
-            Adresse complète *
-          </label>
-          <textarea
+        <Field>
+          <FieldLabel htmlFor="address">Adresse complète *</FieldLabel>
+          <Textarea
             id="address"
             rows={3}
             {...register("address")}
             placeholder="Ex: Quartier Hippodrome, Rue 234, Bamako, Mali"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           />
-          {errors.address && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.address.message}
-            </p>
-          )}
-        </div>
+
+          <FieldError>{errors.address?.message}</FieldError>
+        </Field>
 
         {/* Code de l'école */}
-        <div>
-          <label
-            htmlFor="code"
-            className="block text-sm font-medium text-gray-700 mb-1">
+        <Field>
+          <FieldLabel htmlFor="code">
             Code de l'école
             <span className="text-gray-500 text-sm font-normal ml-1">
               (optionnel - généré automatiquement si vide)
             </span>
-          </label>
-          <input
+          </FieldLabel>
+          <Input
             id="code"
             type="text"
             {...register("code")}
@@ -128,43 +116,47 @@ export function CreateSchoolForm({
             maxLength={6}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
           />
-          {errors.code && (
-            <p className="text-red-500 text-sm mt-1">{errors.code.message}</p>
-          )}
-          <p className="text-xs text-gray-500 mt-1">
+
+          <FieldError>{errors.code?.message}</FieldError>
+
+          <p className="text-xs dark:text-slate-300 text-gray-700 mt-1">
             Code suggéré: {generateSchoolCode()}
           </p>
-        </div>
-      </div>
+        </Field>
 
-      {/* Actions */}
-      <div className="flex gap-3 pt-4">
-        {onCancel && (
-          <button
+        {/* Actions */}
+        <div className="flex gap-3 pt-4">
+          <Button
             type="button"
-            onClick={onCancel}
             className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
             Annuler
-          </button>
-        )}
-        <button
-          type="submit"
-          disabled={!isValid || isSubmitting}
-          className="flex-1 px-4 py-2 text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
-          {isSubmitting ? "Création..." : "Créer l'école"}
-        </button>
-      </div>
+          </Button>
 
-      {/* Information */}
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-        <h4 className="text-sm font-medium text-blue-800 mb-1">
-          💡 Information importante
-        </h4>
-        <p className="text-sm text-blue-700">
-          En créant une école, vous en devenez automatiquement l'administrateur.
-          Vous pourrez inviter d'autres personnes (professeurs, élèves, parents)
-          par la suite.
-        </p>
+          <Button
+            type="submit"
+            disabled={!isValid || isSubmitting}
+            className="flex-1 text-white font-semibold disabled:cursor-not-allowed">
+            {isSubmitting ? (
+              <>
+                <Spinner /> Création...
+              </>
+            ) : (
+              "Créer l'école"
+            )}
+          </Button>
+        </div>
+
+        {/* Information */}
+        <div className="bg-blue-100 border border-blue-300 rounded-md p-4 text-xs md:text-sm ">
+          <h4 className="text-sm font-medium text-blue-800 mb-1 ">
+            💡 Information importante
+          </h4>
+          <p className=" text-blue-700">
+            En créant une école, vous en devenez automatiquement
+            l'administrateur. Vous pourrez inviter d'autres personnes
+            (professeurs, élèves, parents) par la suite.
+          </p>
+        </div>
       </div>
     </form>
   );

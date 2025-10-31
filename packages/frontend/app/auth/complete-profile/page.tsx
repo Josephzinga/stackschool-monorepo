@@ -16,8 +16,9 @@ import {
   Profile,
   User,
 } from "@stackschool/db";
-import SchoolStep from "./schoolStep";
+import SchoolStep from "../../../components/complete-profile/schoolStep";
 import { Container } from "@/components/Container";
+import { Card } from "@/components/ui/card";
 
 // Types basés sur votre schema
 
@@ -61,7 +62,7 @@ export default function CompleteProfile() {
 
   return (
     <Container>
-      <div className="max-w-2xl w-full">
+      <div className="max-w-2xl w-full ">
         {/* Progress Bar */}
         <div className="flex justify-between mb-8">
           {[1, 2, 3].map((stepNumber) => (
@@ -81,15 +82,8 @@ export default function CompleteProfile() {
           ))}
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          {step === 1 && (
-            <SchoolStep
-              onNext={(schoolData) => {
-                setValue("school", schoolData.school);
-                setStep(2);
-              }}
-            />
-          )}
+        <Card className="bg-white/50 dark:bg-slate-800/50 rounded-lg shadow-lg p-6">
+          {step === 1 && <SchoolStep />}
 
           {/*  {step === 2 && (
             <ProfileStep
@@ -109,7 +103,7 @@ export default function CompleteProfile() {
               onRoleSelect={setSelectedRole}
             />
           )} */}
-        </div>
+        </Card>
       </div>
     </Container>
   );

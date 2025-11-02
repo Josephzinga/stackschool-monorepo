@@ -7,6 +7,15 @@ node_modules
 style
 /.pnp
 .pnp.*
+# Ignorer les secrets
+.env
+*.env
+*.log
+node_modules/
+dist/
+build/
+tmp/
+
 .yarn/*
 !.yarn/patches
 !.yarn/plugins

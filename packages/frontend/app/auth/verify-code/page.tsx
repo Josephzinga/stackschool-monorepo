@@ -19,7 +19,7 @@ import {
 
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { VerifyCodeSchema, VerifyCodeFormType } from "@/lib/schema";
+import { VerifyCodeSchema, VerifyCodeFormType } from "@stackschool/shared";
 
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import Link from "next/link";
@@ -150,7 +150,11 @@ export default function VerifyCode() {
           <div className="text-center space-y-3">
             {countdown > 0 ? (
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Nouveau code disponible dans {countdown} secondes
+                Nouveau code sera disponible dans{" "}
+                <span className="text-emerald-400 font-medium">
+                  {countdown}
+                </span>{" "}
+                secondes
               </p>
             ) : (
               <button

@@ -29,17 +29,14 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`antialiased`}>
+      <body>
         <ThemeProvider attribute="class" enableSystem={false}>
+          {children}
           <Toaster
             position="top-center"
-            className="!bg-sky-500 text-lg"
+            className="bg-sky-500! text-lg"
             duration={4000}
           />
-          {children}
-          <div className="absolute top-2 right-2">
-            <ModeToggle />
-          </div>
         </ThemeProvider>
       </body>
     </html>

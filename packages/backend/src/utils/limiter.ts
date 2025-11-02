@@ -15,7 +15,7 @@ export const consumeResendCode = (req: Request) => {
 
 const verifiCodeLimiter = new RateLimiterMemory({
   points: 4,
-  duration: 900,
+  duration: 600,
 });
 
 export const consumeCode = (req: Request) => {

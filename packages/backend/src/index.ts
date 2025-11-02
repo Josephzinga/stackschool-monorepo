@@ -15,7 +15,7 @@ import helmet from "helmet";
 import handleOauthCallback from "./controllers/passport-social";
 import setupLocalStrategy from "./lib/passport-local";
 import SeachSchool from "./routes/shools/search-school.route";
-import { User } from "@stackschool/db";
+import { getUserFromRedis } from "./lib/handle-redis-user";
 
 config();
 
@@ -73,10 +73,7 @@ passport.serializeUser((user: any, done) => {
 
 passport.deserializeUser(async (id: string, done) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id },
-      include: { profile: true, Account: true },
-    });
+    const user = await getUserFromRedis(id);
     return done(null, user ?? null);
   } catch (error) {
     return done(error);

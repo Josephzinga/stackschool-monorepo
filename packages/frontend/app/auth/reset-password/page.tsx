@@ -12,7 +12,7 @@ import {
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { ResetPasswordType, resetPasswordSchema } from "@/lib/schema";
+import { ResetPasswordType, resetPasswordSchema } from "@stackschool/shared";
 import api from "@/services/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react";
@@ -218,11 +218,15 @@ export default function ResetPasswordPage() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full text-white font-semibold"
               disabled={isSubmitting || !isValid}>
-              {isSubmitting
-                ? "Réinitialisation..."
-                : "Réinitialiser le mot de passe"}
+              {isSubmitting ? (
+                <span className="flex text-slate-300 gap-3">
+                  <Spinner /> Réinitialisation...
+                </span>
+              ) : (
+                "Réinitialiser le mot de passe"
+              )}
             </Button>
           </form>
 

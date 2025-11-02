@@ -32,13 +32,6 @@ router.post(
   ],
   async (req: Request, res: Response) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ ok: false, errors: errors.array() });
-      }
-
-      const { identifier } = req.body as { identifier: string };
-
       try {
         await consumeIp(req);
         await consumeIdentifier(req);
@@ -48,6 +41,13 @@ router.post(
           message: "Trop de tentatives. Veuillez réessayer plus tard.",
         });
       }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ ok: false, errors: errors.array() });
+      }
+
+      const { identifier } = req.body as { identifier: string };
 
       const user = (await Promise.race([
         prisma.user.findFirst({
@@ -64,12 +64,12 @@ router.post(
             phoneNumber: true,
             username: true,
           },
-        }),
+        }), // la requête est envoyer qu'après 2 seconde
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error("Timeout")), 2000)
         ),
       ])) as any;
-
+      // pas de user on revenvoie un message avec un delai pour masquer le temps de requête des utilisateur non trouvé
       if (!user) {
         await new Promise((resolve) =>
           setTimeout(resolve, 500 + Math.random() * 500)
@@ -83,7 +83,7 @@ router.post(
 
       const now = new Date();
       const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000);
-
+      // verifie si le user a un message envoyer par email ou whatsapp
       const [existingToken, existingCode] = await Promise.all([
         prisma.verificationToken.findFirst({
           where: {
@@ -168,7 +168,7 @@ router.post(
             "Un lien de réinitialisation du mot de passe a été envoyé à votre email.",
         });
       }
-
+      // si le lien n'est pas envoyer par email et que le user a un numéro de téléphone
       if (!sent && user.phoneNumber) {
         const rawCode = generate6Code();
         const codeHash = hashCode(rawCode);

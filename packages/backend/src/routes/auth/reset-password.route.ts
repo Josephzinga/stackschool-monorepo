@@ -4,12 +4,14 @@ import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
 import { hashToken } from "../../lib/outils";
 import { resetPasswordValidation } from "../../lib/validation-schema";
+import { isAuthenticated } from "../../middlewares/auth";
 
 const router = Router();
 
 router.post(
   "/reset-password",
   resetPasswordValidation,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);

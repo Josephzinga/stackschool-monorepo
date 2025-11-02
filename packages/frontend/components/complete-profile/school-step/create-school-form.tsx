@@ -38,7 +38,8 @@ export function CreateSchoolForm() {
     resolver: zodResolver(createSchoolSchema),
     mode: "onChange",
   });
-  const { setSchoolData } = UseCompleteProfileStore();
+  const { setSchoolData, currentStep, setCurrentStep } =
+    UseCompleteProfileStore();
   const nameValue = watch("name");
 
   const generateSchoolCode = () => {
@@ -67,6 +68,7 @@ export function CreateSchoolForm() {
       type: "create",
       newSchool: finalData,
     });
+    setCurrentStep(Math.min(currentStep + 1, 3));
   };
 
   return (
@@ -81,9 +83,11 @@ export function CreateSchoolForm() {
             {...register("name")}
             placeholder="Ex: Groupe Scolaire Les Champions"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? "name-err" : undefined}
           />
 
-          <FieldError>{errors.name?.message}</FieldError>
+          <FieldError id="name-err">{errors.name?.message}</FieldError>
         </Field>
 
         {/* Adresse */}
@@ -95,9 +99,11 @@ export function CreateSchoolForm() {
             {...register("address")}
             placeholder="Ex: Quartier Hippodrome, Rue 234, Bamako, Mali"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            aria-invalid={!!errors.address}
+            aria-describedby={errors.address ? "address-err" : undefined}
           />
 
-          <FieldError>{errors.address?.message}</FieldError>
+          <FieldError id="address-err">{errors.address?.message}</FieldError>
         </Field>
 
         {/* Code de l'école */}
@@ -115,9 +121,11 @@ export function CreateSchoolForm() {
             placeholder="Ex: CHAMP24"
             maxLength={6}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+            aria-invalid={!!errors.code}
+            aria-describedby={errors.code ? "code-err" : undefined}
           />
 
-          <FieldError>{errors.code?.message}</FieldError>
+          <FieldError id="code-err">{errors.code?.message}</FieldError>
 
           <p className="text-xs dark:text-slate-300 text-gray-700 mt-1">
             Code suggéré: {generateSchoolCode()}
@@ -135,7 +143,7 @@ export function CreateSchoolForm() {
           <Button
             type="submit"
             disabled={!isValid || isSubmitting}
-            className="flex-1 text-white font-semibold disabled:cursor-not-allowed">
+            className="flex text-white font-semibold disabled:cursor-not-allowed">
             {isSubmitting ? (
               <>
                 <Spinner /> Création...

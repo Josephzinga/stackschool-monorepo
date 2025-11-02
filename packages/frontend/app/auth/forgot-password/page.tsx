@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, PhoneIcon } from "lucide-react";
-import { forgotPasswordSchema, FormDataType } from "@/lib/schema";
+import { forgotPasswordSchema, FormDataType } from "@stackschool/shared";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "../../../style/index.css";

@@ -50,7 +50,7 @@ router.post(
 
       const userId = decoded.userId;
       const now = new Date();
-      const delay = new Date(Date.now() - 2 * 60 * 1000);
+      const delay = 1000 * 60 * 2;
 
       // vérifier si un code à été envoyer récemment
       const recentCode = await prisma.verificationCode.findFirst({
@@ -58,16 +58,13 @@ router.post(
           userId,
           type: "password_reset",
           method: "whatsapp",
-          createdAt: { gt: delay },
+          createdAt: { gt: now },
         },
       });
 
       if (recentCode) {
         const timeLeft = Math.ceil(
-          (new Date(recentCode.createdAt).getTime() +
-            2 * 60 * 1000 -
-            Date.now()) /
-            1000
+          new Date(recentCode.createdAt).getTime() + delay
         );
         return res.status(400).json({
           ok: false,

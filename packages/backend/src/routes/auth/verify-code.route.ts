@@ -27,9 +27,10 @@ router.post(
       } catch (RateLimiterQueueError) {
         return res.status(429).json({
           ok: false,
-          message: "Trop de tentatives. Veuillez réessayer dans 15 minutes.",
+          message: "Trop de tentatives. Veuillez réessayer dans 10 minutes.",
         });
       }
+      // renvoyer les erreurs
       const errors = validationResult(req);
       if (!errors.isEmpty())
         return res.status(400).json({ error: errors.array(), ok: false });
@@ -50,7 +51,6 @@ router.post(
 
       try {
         const decoded = jwt.verify(tempToken, JWT_SECRET) as any;
-        console.log("decoded:", decoded);
 
         if (decoded?.type !== "resend_code") {
           return res.status(400).json({ ok: false, message: "Token invalide" });
@@ -76,7 +76,7 @@ router.post(
         },
         orderBy: { createdAt: "desc" },
       });
-      console.log("verificationCode:", verificationCode);
+
       if (!verificationCode) {
         return res
           .status(404)

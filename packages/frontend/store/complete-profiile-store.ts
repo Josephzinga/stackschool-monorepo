@@ -21,6 +21,7 @@ interface CompleteProfileStep {
   loadFromRedis: () => Promise<boolean | undefined>;
   clearAllData: () => Promise<void>;
   setCurrentStep: (step: number) => void;
+
   submitCompleteProfile: () => Promise<{
     success: boolean;
     error?: string | any;

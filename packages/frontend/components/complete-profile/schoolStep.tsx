@@ -37,8 +37,8 @@ export default function SchoolStep() {
     setCurrentStep(2);
   };
   return (
-    <div className="space-y-6">
-      <div className="text-center">
+    <div className="space-y-6 p-3 w-120 ">
+      <div className="text-center max-h-screen">
         <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
           Votre École
         </CardTitle>
@@ -48,14 +48,16 @@ export default function SchoolStep() {
       </div>
 
       <Tabs
-        className="w-full"
+        className="w-full flex justify-center"
         value={mode}
         onValueChange={(val) => setMode(val as any)}>
-        <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="join">Rejoindre</TabsTrigger>
-          <TabsTrigger value="create">Créer</TabsTrigger>
-          <TabsTrigger value="invite">Invitation</TabsTrigger>
-        </TabsList>
+        <div className="w-full flex justify-center">
+          <TabsList className="grid grid-cols-3 mb-6">
+            <TabsTrigger value="join">Rejoindre</TabsTrigger>
+            <TabsTrigger value="create">Créer</TabsTrigger>
+            <TabsTrigger value="invite">Invitation</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="join" className="space-y-4">
           <Field className="relative">

@@ -1,24 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import RoleStep from "./RoleStep";
-import {
-  SchoolRole,
-  Gender,
-  Staff,
-  Student,
-  School,
-  Teacher,
-  SchoolUser,
-  Profile,
-  User,
-} from "@stackschool/db";
 import SchoolStep from "../../../components/complete-profile/schoolStep";
 import { Container } from "@/components/Container";
 import { Card } from "@/components/ui/card";
+
+import { UseCompleteProfileStore } from "@/store/complete-profiile-store";
+import Stepper from "@/components/Stepper";
+import { School } from "@stackschool/db";
 
 // Types basés sur votre schema
 
@@ -31,79 +19,82 @@ export type CompleteProfileData = {
 };
 
 export default function CompleteProfile() {
-  const [step, setStep] = useState(1);
-  const [selectedRole, setSelectedRole] = useState<SchoolRole>();
-  const router = useRouter();
+  const { currentStep, setCurrentStep } = UseCompleteProfileStore();
+  const steps = ["école", "Profile", "Rôle"];
+  const totalSteps = steps.length;
 
-  const {
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { isSubmitting },
-  } = useForm<CompleteProfileData>();
+  const handleNext = () => {
+    setCurrentStep(Math.min(currentStep + 1, totalSteps));
+  };
 
-  const submitCompleteProfile = async (data: CompleteProfileData) => {
-    try {
-      const response = await fetch("/api/complete-profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+  const handleBack = () => {
+    setCurrentStep(Math.max(currentStep - 1, 1));
+  };
 
-      if (response.ok) {
-        router.push("/dashboard");
-      } else {
-        // Gérer les erreurs
-      }
-    } catch (error) {
-      console.error("Erreur:", error);
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return <SchoolStep />;
+      case 2:
+        return <div>ProfileStep</div>;
+      case 3:
+        return <div>Role step</div>;
+      case 4:
+        return <div>FianlStep</div>;
+      default:
+        null;
     }
   };
 
   return (
     <Container>
-      <div className="max-w-2xl w-full ">
-        {/* Progress Bar */}
-        <div className="flex justify-between mb-8">
-          {[1, 2, 3].map((stepNumber) => (
-            <div key={stepNumber} className="flex flex-col items-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  step >= stepNumber ? "bg-blue-600 text-white" : "bg-gray-300"
-                }`}>
-                {stepNumber}
+      {/* Modifications principales ici */}
+      <div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10">
+        {/* Partie guide - fixe */}
+        <div className="w-full h-fit md:sticky md:top-0 md:h-screen flex flex-col justify-between bg-slate-700/40 p-4 md:p-6">
+          <div className="flex-1">
+            <Stepper
+              className="w-full"
+              currentStep={
+                currentStep > totalSteps ? totalSteps + 1 : currentStep
+              }
+              steps={steps}
+            />
+          </div>
+
+          <div className="mt-6 md:mt-8">
+            {currentStep <= totalSteps ? (
+              <div className="flex justify-between w-full">
+                <button
+                  onClick={handleBack}
+                  disabled={currentStep === 1}
+                  className="px-6 py-2 text-blue-600 bg-transparent border border-blue-600 rounded-md font-semibold hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300">
+                  Précédent
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-2 text-white bg-blue-600 rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300">
+                  {currentStep === totalSteps ? "Terminer" : "Suivant"}
+                </button>
               </div>
-              <span className="text-sm mt-2">
-                {stepNumber === 1 && "École"}
-                {stepNumber === 2 && "Profil"}
-                {stepNumber === 3 && "Rôle"}
-              </span>
-            </div>
-          ))}
+            ) : (
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setCurrentStep(1)}
+                  className="px-6 py-2 text-white bg-green-600 rounded-md font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-300">
+                  Recommencer
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        <Card className="bg-white/50 dark:bg-slate-800/50 rounded-lg shadow-lg p-6">
-          {step === 1 && <SchoolStep />}
-
-          {/*  {step === 2 && (
-            <ProfileStep
-              onNext={(profileData) => {
-                setValue("profile", profileData);
-                setStep(3);
-              }}
-              onBack={() => setStep(1)}
-            />
-          )}
-
-          {step === 3 && (
-            <RoleStep
-              onComplete={submitCompleteProfile}
-              onBack={() => setStep(2)}
-              selectedRole={selectedRole}
-              onRoleSelect={setSelectedRole}
-            />
-          )} */}
-        </Card>
+        {/* Partie formulaire - scrollable */}
+        <div className="w-full flex justify-center py-8 md:py-12">
+          <div className="w-full max-w-2xl h-full max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <Card className="min-h-full w-ful p-6">{renderStepContent()}</Card>
+          </div>
+        </div>
       </div>
     </Container>
   );

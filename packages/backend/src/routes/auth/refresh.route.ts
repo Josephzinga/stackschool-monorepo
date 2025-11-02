@@ -1,9 +1,10 @@
 import { generateToken } from "../../lib/outils";
 import { Router } from "express";
 import { prisma } from "../../lib/prisma";
+import { isAuthenticated } from "../../middlewares/auth";
 
 const router = Router();
-router.post("/refresh", async (req, res) => {
+router.post("/refresh", isAuthenticated, async (req, res) => {
   try {
     const refreshToken = req.cookies["refresh_token"]; // recupére le cookie dans le headers
 

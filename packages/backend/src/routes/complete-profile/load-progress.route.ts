@@ -6,7 +6,7 @@ import { success } from "@stackschool/shared";
 
 const router = Router();
 
-router.post("/load-progress", isAuthenticated, async (req, res) => {
+router.get("/load-progress", isAuthenticated, async (req, res) => {
   try {
     const user = req.user as User;
     const userId = user.id;
@@ -23,7 +23,7 @@ router.post("/load-progress", isAuthenticated, async (req, res) => {
     }
 
     const dataParsed = JSON.parse(saveData);
-
+    console.log("dataParsed:", dataParsed);
     if (dataParsed.userId !== userId) {
       await redisClient.del(redisKey);
       return res.status(400).json({

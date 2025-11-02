@@ -3,6 +3,8 @@
 # dependencies
 node_modules
 .env.local
+.next
+style
 /.pnp
 .pnp.*
 .yarn/*

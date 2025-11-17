@@ -1,10 +1,14 @@
 import {
+  Account,
+  Gender,
   GlobalRole,
   ParentStudent,
+  Profile,
   School,
   Staff,
   Student,
   Teacher,
+  User,
 } from "@stackschool/db";
 import { StringLiteralLike } from "typescript";
 
@@ -39,3 +43,17 @@ export interface RoleData {
   staff?: Staff;
   parent?: ParentStudent;
 }
+
+export interface ProfileData {
+  firstname: string;
+  lastname: string;
+  gender: Gender;
+  photo?: string | undefined;
+  email?: string | undefined;
+  phoneNumber?: string | undefined;
+}
+
+export type UserInMe = User & {
+  profile: Profile;
+  account: Account;
+};

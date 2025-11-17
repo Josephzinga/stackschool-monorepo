@@ -17,5 +17,6 @@ export const getUserFromRedis = async (userId: string) => {
   });
 
   await redisClient.setEx(redisKey, 12 * 60 * 60, JSON.stringify(user));
+
   return user;
 };

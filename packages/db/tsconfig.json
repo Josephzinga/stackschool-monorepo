@@ -1,11 +1,18 @@
 {
-  "extends": "../../tsconfig.json", // Hérite des options globales
   "compilerOptions": {
-    "outDir": "./dist", // Dossier de sortie pour les fichiers compilés
-    "rootDir": "./", // Racine des fichiers source
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
     "declaration": true, // Génère les fichiers .d.ts pour les types
     "declarationMap": true // Génère les fichiers .d.ts.map
   },
-  "include": ["prisma/**/*.ts", "generated/**/*.ts", "index.ts"],
+  "include": ["src/**/*", "src/index.ts", "src/prisma/seed.ts"],
   "exclude": ["node_modules", "dist"]
 }

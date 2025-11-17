@@ -3,6 +3,7 @@
 import { Container } from "@/components/Container";
 import { Spinner } from "@/components/ui/spinner";
 import api from "@/services/api";
+import { getMeData } from "@/services/getMe";
 import { error } from "console";
 import { LucideOctagonX } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,8 +23,7 @@ export default function AuthFinish() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await api.get("/api/auth/me");
-        const data = res?.data;
+        const data = await getMeData();
         // si connecté
         if (data?.user) {
           const profile = data.user?.profile;
@@ -37,12 +37,11 @@ export default function AuthFinish() {
           router.replace("/dashboard");
           return;
         }
-        // pas de user tente le rafrechisement de session
-        const refresh = await api.post("/api/auth/refresh");
+        // sin non connecté, on tente de rafrechire la session
+        const refresh = await api.post("/auth/refresh");
         // si le rafrechisement reuissi
         if (refresh.data?.ok) {
-          const res2 = await api.get("/api/auth/me");
-          const data2 = res2.data;
+          const data2 = await getMeData();
 
           if (data2?.user) {
             if (!data2?.user.profile || !data2.user?.profile.fistname) {

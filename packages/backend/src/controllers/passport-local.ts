@@ -2,8 +2,7 @@ import bcrypt from "bcryptjs";
 import { VerifyCallback } from "passport-google-oauth20";
 import { prisma } from "../lib/prisma";
 import { User, Profile, Account } from "@stackschool/db";
-import { validateBody, validateLogin } from "./validate";
-import { loginFormSchema } from "@stackschool/shared";
+import { validateLogin } from "./validate";
 
 type UserWithRelations = User & {
   profile?: Profile | null;
@@ -16,12 +15,11 @@ export default async function handleLocalAuth(
   done: VerifyCallback
 ) {
   const errors = validateLogin({ identifier, password });
+  if (errors) return done(errors);
 
-  if (errors) {
-    return done(null, false, errors);
-  }
-  const input = identifier || "";
   try {
+    const input = identifier || "";
+
     const user: UserWithRelations | null = await prisma.user.findFirst({
       where: {
         OR: [
@@ -33,23 +31,28 @@ export default async function handleLocalAuth(
       include: { profile: true, Account: true },
     });
 
-    if (!user)
-      return done(null, false, { message: "Utilisateur introuvalble" });
+    if (!user) return done(null, false, { message: "Utilisateur introuvable" });
 
-    const hasPassword = !!user.password;
+    const providers = user.Account
+      ? user.Account.map((acc) => acc.provider).filter((p) => p !== "local")
+      : [];
 
-    const socialProvider = user.Account?.map((acc) => acc.provider);
+    const hasPassword =
+      typeof user.password === "string" && user.password.length > 0;
 
-    if (!hasPassword)
+    if (!hasPassword) {
       return done(null, false, {
-        message: "Compte crée via google ou facebook",
+        message: `Ce compte utilise : ${providers.join(
+          ", "
+        )} veilleuz vous connecter avec .`,
         isSocialOnly: true,
-        providers: socialProvider,
+        providers,
       });
+    }
 
-    const match = await bcrypt.compare(password, user?.password as string);
+    const match = await bcrypt.compare(password, user.password as string);
+    if (!match) return done(null, false, { message: "Identifiants invalides" });
 
-    if (!match) return done(null, false, { message: "Indentifiant invalides" });
     return done(null, user);
   } catch (error) {
     return done(error);

@@ -56,7 +56,7 @@ export default function VerifyCode() {
 
   const handleCode = async ({ code }: VerifyCodeFormType) => {
     try {
-      const res = await api.post("/api/auth/verify-code", { code, tempToken });
+      const res = await api.post("/auth/verify-code", { code, tempToken });
       toast.success(res?.data.message);
       if (res?.data.resetToken) {
         router.push(`/auth/reset-password?token=${res.data.resetToken}`);
@@ -72,7 +72,7 @@ export default function VerifyCode() {
 
   const handleResendCode = async () => {
     try {
-      const res = await api.post("/api/auth/resend-code", { tempToken });
+      const res = await api.post("/auth/resend-code", { tempToken });
       if (res.data?.ok) {
         toast.success(res.data?.message || "Nouveau code envoyé");
         setCountdown(60); // 60 secondes d'attente

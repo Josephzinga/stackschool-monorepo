@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { body, validationResult } from "express-validator";
 import { generateToken } from "../../lib/outils";
 import { registerValidator } from "../../lib/validation-schema";
+import { connect } from "http2";
 
 const router = Router();
 async function sendWhatsAppCode(phoneNumber: string, code: number) {
@@ -101,13 +102,22 @@ router.post(
         const refreshToken = generateToken(32);
         const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 25);
 
-        await prisma.session.create({
-          data: {
-            sessionToken: refreshToken,
-            userId: user.id,
-            expires,
-          },
-        });
+        await Promise.all([
+          prisma.session.create({
+            data: {
+              sessionToken: refreshToken,
+              userId: user.id,
+              expires,
+            },
+          }),
+          prisma.account.create({
+            data: {
+              provider: "local",
+              providerAccountId: user.id,
+              userId: user.id,
+            },
+          }),
+        ]);
 
         res.cookie("refresh_token", refreshToken, {
           httpOnly: true,

@@ -8,12 +8,14 @@ const router = Router();
 
 router.get("/load-progress", isAuthenticated, async (req, res) => {
   try {
-    const user = req.user as User;
-    const userId = user.id;
+    const user = req.user;
+    const userId = user?.id;
     const redisKey = `complete_profile:${userId}`;
+    const pathKey = `pendingPhoto${userId}`;
 
     const saveData = await redisClient.get(redisKey);
-
+    const picturePath = await redisClient.get(pathKey);
+    console.log("picturePath in redis", picturePath);
     if (!saveData) {
       return res.status(400).json({
         success: true,

@@ -51,7 +51,7 @@ export default function ResetPasswordPage() {
     }
 
     try {
-      const res = await api.post("/api/auth/reset-password", {
+      const res = await api.post("/auth/reset-password", {
         token,
         password: data.password,
       });

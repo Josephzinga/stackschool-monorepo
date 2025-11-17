@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "strict": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true, // Génère les fichiers .d.ts pour les types

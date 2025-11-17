@@ -37,6 +37,9 @@ export default async function RootLayout({
             className="bg-sky-500! text-lg"
             duration={4000}
           />
+          <div className="absolute right-4 top-4">
+            <ModeToggle />
+          </div>
         </ThemeProvider>
       </body>
     </html>

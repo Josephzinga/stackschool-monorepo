@@ -14,17 +14,30 @@ type UserWithProfile = User & {
 router.post("/login", (req, res, next) => {
   passport.authenticate(
     "local",
+    {
+      failureRedirect: `${FRONTEND_ORIGIN}/auth/login`,
+    },
     (err: any, user: UserWithProfile, info: any) => {
-      console.log("user dans login (auth callback) =>", user, "info=>", info);
+      console.log(
+        "user dans login (auth callback) =>",
+        user,
+        "info=>",
+        info,
+        "erreur=>",
+        err
+      );
 
       if (info) {
-        return res.status(400).json({ info });
+        return res.status(400).json({
+          message: info.message,
+          isSocialOnly: info.isSocialOnly,
+          provider: info.provider,
+        });
       }
+      console.log("error login", err);
       try {
         if (err) {
-          if (req.headers.accept?.includes("application/json")) {
-            return res.status(500).json({ ok: false, message: "Server error" });
-          }
+          console.error("Error login:", err);
           return res.redirect(`${FRONTEND_ORIGIN}/auth/login?error=server`);
         }
 
@@ -93,14 +106,7 @@ router.post("/login", (req, res, next) => {
             maxAge: 1000 * 60 * 60 * 24 * 25,
           });
 
-          const profileComplete = Boolean(
-            user.profile &&
-              user.username &&
-              user.profile.firstname &&
-              user.profile.lastname
-          );
-
-          const redirectUrl = profileComplete
+          const redirectUrl = user.profileCompleted
             ? `${FRONTEND_ORIGIN}/dashboard`
             : `${FRONTEND_ORIGIN}/auth/finish?from=local&complete=false`;
 

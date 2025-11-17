@@ -2,7 +2,6 @@ import { config } from "dotenv";
 import express from "express";
 import cookieParser from "cookie-parser";
 import passport from "passport";
-import { prisma } from "./lib/prisma";
 import cors from "cors";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
@@ -16,6 +15,9 @@ import handleOauthCallback from "./controllers/passport-social";
 import setupLocalStrategy from "./lib/passport-local";
 import SeachSchool from "./routes/shools/search-school.route";
 import { getUserFromRedis } from "./lib/handle-redis-user";
+import multer from "multer";
+import path from "path";
+import { UserInMe } from "@stackschool/shared";
 
 config();
 
@@ -74,6 +76,7 @@ passport.serializeUser((user: any, done) => {
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await getUserFromRedis(id);
+
     return done(null, user ?? null);
   } catch (error) {
     return done(error);
@@ -110,9 +113,12 @@ passport.use(
 
 app.use("/api", routes);
 app.use("/api", SeachSchool);
+
 app.get("/", (req, res) => {
   res.json("message serveur connecter");
 });
+
+app.use(express.static(path.resolve(process.cwd(), "public")));
 
 const redisClient: RedisClientType = createClient({
   url: process.env.REDIS_URL,

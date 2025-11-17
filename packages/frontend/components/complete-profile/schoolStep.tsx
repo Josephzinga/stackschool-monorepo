@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { School } from "@stackschool/db";
 import { useEffect, useState } from "react";
-import { CreateSchoolForm } from "@/components/complete-profile/school-step/create-school-form";
-import InvitationForm from "./school-step/invitation-form";
+import { CreateSchoolForm } from "@/components/complete-profile/create-school-form";
+import InvitationForm from "./invitation-form";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Loader2, Search } from "lucide-react";
 import { searchSchools } from "@/services/complete-profile";
@@ -37,7 +37,7 @@ export default function SchoolStep() {
     setCurrentStep(2);
   };
   return (
-    <div className="space-y-6 p-3 w-120 ">
+    <div className="space-y-6 p-3 w-full h-full">
       <div className="text-center max-h-screen">
         <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
           Votre École
@@ -48,11 +48,11 @@ export default function SchoolStep() {
       </div>
 
       <Tabs
-        className="w-full flex justify-center"
+        className="w-full flex justify-center mx-auto"
         value={mode}
         onValueChange={(val) => setMode(val as any)}>
         <div className="w-full flex justify-center">
-          <TabsList className="grid grid-cols-3 mb-6">
+          <TabsList className="grid grid-cols-3 mb-6 gap-2 h-10">
             <TabsTrigger value="join">Rejoindre</TabsTrigger>
             <TabsTrigger value="create">Créer</TabsTrigger>
             <TabsTrigger value="invite">Invitation</TabsTrigger>
@@ -79,7 +79,7 @@ export default function SchoolStep() {
               )}
             </span>
           </Field>
-          <ItemGroup className="space-y-2 max-h-60 overflow-y-auto">
+          <ItemGroup className="space-y-2 max-h-60 overflow-y">
             {schools.map((school) => (
               <Item
                 key={school.id}
@@ -117,7 +117,7 @@ export default function SchoolStep() {
           </ItemGroup>
         </TabsContent>
 
-        <TabsContent value="create" className="space-y-4">
+        <TabsContent value="create" className="space-y-4 h-full">
           <CreateSchoolForm />
         </TabsContent>
 

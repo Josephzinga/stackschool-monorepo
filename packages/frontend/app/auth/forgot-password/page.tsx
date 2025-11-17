@@ -22,13 +22,8 @@ import { AlertCircle, PhoneIcon } from "lucide-react";
 import { forgotPasswordSchema, FormDataType } from "@stackschool/shared";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import "../../../style/index.css";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 
 export default function ForgotPasswordPage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +82,7 @@ export default function ForgotPasswordPage() {
     }
     console.log("identifier", identifier);
     try {
-      const res = await api.post("/api/auth/forgot-password", { identifier });
+      const res = await api.post("/auth/forgot-password", { identifier });
       if (res.data?.ok) {
         toast.success(res.data.message);
         const tempToken = res.data.tempToken;

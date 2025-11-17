@@ -11,7 +11,7 @@ const router = Router();
 router.post(
   "/reset-password",
   resetPasswordValidation,
-  isAuthenticated,
+
   async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);

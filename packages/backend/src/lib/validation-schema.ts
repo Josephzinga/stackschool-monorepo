@@ -56,3 +56,8 @@ export const loginSchema = z.object({
     .string()
     .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
 });
+
+export const validateUserFieldSchema = z.object({
+  email: z.string().email().optional(),
+  phoneNumber: z.string().min(8, "Numéro invalide").optional(),
+});

@@ -153,18 +153,6 @@ export function CreateSchoolForm() {
             )}
           </Button>
         </div>
-
-        {/* Information */}
-        <div className="bg-blue-100 border border-blue-300 rounded-md p-4 text-xs md:text-sm ">
-          <h4 className="text-sm font-medium text-blue-800 mb-1 ">
-            💡 Information importante
-          </h4>
-          <p className=" text-blue-700">
-            En créant une école, vous en devenez automatiquement
-            l'administrateur. Vous pourrez inviter d'autres personnes
-            (professeurs, élèves, parents) par la suite.
-          </p>
-        </div>
       </div>
     </form>
   );

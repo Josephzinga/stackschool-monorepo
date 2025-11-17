@@ -25,9 +25,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerFormSchema, RegisterFormType } from "@/lib/schema";
+import { registerFormSchema, RegisterFormType } from "@stackschool/shared";
 import { toast } from "sonner";
 import { Container } from "@/components/Container";
+import { ButtonSocial } from "@/components/button-social";
 
 export default function RegisterPage() {
   const [showpwd, setShowpwd] = useState(false);
@@ -46,7 +47,7 @@ export default function RegisterPage() {
     password,
   }: RegisterFormType) {
     try {
-      const res = await api.post("/api/auth/register", {
+      const res = await api.post("/auth/register", {
         username,
         phoneNumber,
         email,
@@ -61,7 +62,7 @@ export default function RegisterPage() {
 
       // if (res.ok) router.replace("/dashboard");
     } catch (err: any) {
-      toast.error(err.response?.data?.error);
+      toast.error(err.response?.data?.error || "Erreur réseaux");
     }
   }
 
@@ -77,19 +78,9 @@ export default function RegisterPage() {
         <CardContent>
           <form onSubmit={handleSubmit(handleRegister)} className="mt-0">
             <FieldGroup className="gap-1.5 md:gap-2 text-sm md:text-base">
-              <Field className=" gap-1 ">
-                <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`}
-                  className="w-full">
-                  <Button variant="outline" type="button" className="w-full">
-                    <GoogleIcon />
-                    Connectez vous avec Google
-                  </Button>
-                </a>
-                <Button variant="outline" type="button">
-                  <FacebookIcon />
-                  Connectez vous avec Facebook
-                </Button>
+              <Field className="gap-1.5">
+                <ButtonSocial provider="google" icon={<GoogleIcon />} />
+                <ButtonSocial provider="facebook" icon={<FacebookIcon />} />
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 <span className="font-medium text-slate-700 dark:text-slate-300">

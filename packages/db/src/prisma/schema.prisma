@@ -1,7 +1,7 @@
 generator client {
-  provider      = "prisma-client-js"
-  output        = "../node_modules/generated"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider = "prisma-client-js"
+  output   = "../node_modules/generated"
+  // binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -79,7 +79,7 @@ model SchoolUser {
   Class        Class[]
   ClassTeacher ClassTeacher[]
   school       School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  user         User           @relation(fields: [userId], references: [id])
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   Staff        Staff?
   subject      Subject[]
   Teacher      Teacher?
@@ -324,7 +324,7 @@ model VerificationToken {
   used      Boolean   @default(false)
   userId    String
   updateAt  DateTime? @updatedAt
-  user      User      @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([tokenHash])
@@ -341,7 +341,7 @@ model VerificationCode {
   type      String    @default("password_reset")
   used      Boolean   @default(false)
   updateAt  DateTime? @updatedAt
-  user      User      @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([codeHash])
@@ -353,7 +353,7 @@ model Session {
   expires      DateTime @map("expire")
   sessionToken String   @unique @map("sess")
   id           String   @id @default(cuid()) @map("sid")
-  user         User?    @relation(fields: [userId], references: [id])
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

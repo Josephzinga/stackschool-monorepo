@@ -1,7 +1,7 @@
 import api from "@/services/api";
 import { saveProgressToRedis } from "@/services/complete-profile";
 
-import { RoleData, SchoolData, Profile } from "@stackschool/shared";
+import { RoleData, SchoolData, ProfileData } from "@stackschool/shared";
 import { toast } from "sonner";
 
 import { create } from "zustand";
@@ -9,12 +9,12 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 interface CompleteProfileStep {
   school: SchoolData | null;
-  profile: Profile | null;
+  profile: ProfileData | null;
   role: RoleData | null;
   lastSavedAt: string | null;
 
   setSchoolData: (school: SchoolData) => void;
-  setProfileData: (profile: Profile) => void;
+  setProfileData: (profileData: ProfileData) => void;
   setRole: (role: RoleData) => void;
   reset: () => void;
   saveToRedis: () => Promise<void>;
@@ -45,14 +45,13 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
         set({ school: data });
         await get().saveToRedis();
       },
-      setProfileData: async (data) => {
-        set({ profile: data });
+      setProfileData: async (profileData) => {
+        set({ profile: profileData });
         await get().saveToRedis();
       },
 
       setCurrentStep: async (step) => {
         set({ currentStep: step });
-        await get().saveToRedis();
       },
 
       setRole: async (role: RoleData) => {
@@ -92,7 +91,7 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
 
       loadFromRedis: async () => {
         try {
-          const res = await api.get("/api/complete-profile/load-progress");
+          const res = await api.get("/complete-profile/load-progress");
           if (res.data?.ok) {
             const { data } = res;
             if (data && data.currentStep) {
@@ -116,7 +115,7 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
         get().reset();
 
         try {
-          await api.post("/api/complete-profile/clear-progress");
+          await api.post("/complete-profile/clear-progress");
         } catch (error) {}
       },
 
@@ -129,7 +128,7 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
         set({ isSubmitting: true });
 
         try {
-          const res = await api.post("/api/complete-profile", {
+          const res = await api.post("/complete-profile", {
             school,
             role,
             profile,

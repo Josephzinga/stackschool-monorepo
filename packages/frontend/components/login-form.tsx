@@ -25,6 +25,7 @@ import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { Spinner } from "./ui/spinner";
 import { LoginFormType, loginFormSchema } from "@stackschool/shared";
+import { ButtonSocial } from "./button-social";
 export function LoginForm({
   className,
   handleLogin,
@@ -45,7 +46,7 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6  ", className)}>
-      <Card className="w-[25rem] max-w-lg bg-white/50 dark:bg-slate-700/50">
+      <Card className="w-100 max-w-lg bg-white/50 dark:bg-slate-700/50">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Bienvenue</CardTitle>
           <CardDescription>
@@ -56,22 +57,8 @@ export function LoginForm({
           <form onSubmit={handleSubmit(handleLogin)}>
             <FieldGroup className="gap-3">
               <Field>
-                <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`}
-                  className="w-full">
-                  <Button variant="outline" type="button" className="w-full">
-                    <GoogleIcon />
-                    Connectez vous avec Google
-                  </Button>
-                </a>
-                <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/facebook`}
-                  className="w-full">
-                  <Button variant="outline" type="button" className="w-full">
-                    <FacebookIcon />
-                    Connectez vous avec Facebook
-                  </Button>
-                </a>
+                <ButtonSocial provider="google" icon={<GoogleIcon />} />
+                <ButtonSocial provider="facebook" icon={<FacebookIcon />} />
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 <span className="font-medium text-slate-700 dark:text-slate-300">

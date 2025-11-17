@@ -1,5 +1,10 @@
 import api from "@/services/api";
-import { SchoolData, RoleData, Profile } from "@stackschool/shared";
+import {
+  SchoolData,
+  RoleData,
+  Profile,
+  ProfileData,
+} from "@stackschool/shared";
 import { toast } from "sonner";
 
 export async function searchSchools(
@@ -8,7 +13,7 @@ export async function searchSchools(
 ) {
   try {
     onLoading(true);
-    const res = await api.get("/api/schools", { params: { search: query } });
+    const res = await api.get("/schools", { params: { search: query } });
     return res.data.schools;
   } catch (error) {
     console.error("Erreur réseau ", error);
@@ -21,21 +26,21 @@ export async function searchSchools(
 
 export async function saveProgressToRedis(data: {
   school: SchoolData | null;
-  profile: Profile | null;
+  profile: ProfileData | null;
   role: RoleData | null;
   currentStep: number;
 }) {
-  const res = await api.post("/api/complete-profile/save-progress", data);
+  const res = await api.post("/complete-profile/save-progress", data);
   return res.data;
 }
 
 export async function loadProgressFromRedis() {
-  const res = await api.get("/api/complete-profile/load-progress");
+  const res = await api.get("/complete-profile/load-progress");
   return res.data;
 }
 
 export async function clearProgressFromRedis() {
-  await api.post("/api/complete-profile/clear-progress");
+  await api.post("/complete-profile/clear-progress");
 }
 
 export async function submitCompleteProfile(data: {
@@ -43,6 +48,6 @@ export async function submitCompleteProfile(data: {
   role: RoleData;
   profile: Profile;
 }) {
-  const res = await api.post("/api/complete-profile", data);
+  const res = await api.post("/complete-profile", data);
   return res.data;
 }

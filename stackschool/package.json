@@ -1,0 +1,46 @@
+{
+  "private": true,
+  "name": "@stackschool/root",
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "pnpm --filter @stackschool/api run dev",
+    "dev:web": "pnpm --filter @stackschool/web run dev",
+    "dev:mobile": "pnpm --filter @stackschool/mobile run start",
+    "db:generate": "pnpm --filter @stackschool/db run generate"
+  },
+  "devDependencies": {
+   "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.0",
+    "typescript": "^5.9.3",
+    "tsx": "^4.20.6",
+    "@types/node": "^20",
+    "eslint": "^9",
+    "prisma": "^6.17.1",
+    "@babel/core": "^7.20.0",
+    "@eslint/eslintrc": "^3"
+  },
+   "dependencies": {
+    "react": "19.1.0",
+    "ts-node-dev": "^2.0.0",
+    "react-dom": "19.1.0"
+  },
+ "pnpm": {
+    "overrides": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    },
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "msgpackr-extract",
+      "ngrok",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}

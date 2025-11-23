@@ -1,0 +1,38 @@
+# --- Development image ---
+FROM node:lts-slim
+
+# Enable corepack and activate pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+# Crée un utilisateur non-root pour les opérations
+RUN groupadd -r app && useradd -r -g app -m app
+
+# Copie les manifests de la racine et installe les dépendances
+# Ceci utilise le cache de Docker. Si pnpm-lock.yaml change, la couche est reconstruite.
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# Copie tous les packages (frontend, shared, db)
+# C'est la façon la plus simple de s'assurer que tous les fichiers sont présents
+COPY packages/db ./packages/db
+COPY packages/shared ./packages/shared
+COPY packages/frontend ./packages/frontend
+
+# Change le propriétaire des fichiers pour l'utilisateur non-root
+RUN chown -R app:app /app
+
+# Passe à l'utilisateur non-root pour l'installation et l'exécution
+USER root
+
+# Installe les dépendances (utilisant le pnpm-lock.yaml et les workspaces)
+RUN pnpm install --frozen-lockfile
+
+# Expose le port du serveur de développement Next.js
+EXPOSE 3000
+
+# Définit la commande de démarrage
+CMD ["pnpm", "--filter", "@stackschool/frontend", "run", "dev"]
+
+# --- Production multi-stage build (recommandé pour la prod) ---
+# ... (votre section de build de production)

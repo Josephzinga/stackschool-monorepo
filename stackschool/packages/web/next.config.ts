@@ -1,0 +1,17 @@
+import { NextConfig } from "next";
+
+const nextConfig = {
+  reactStrictMode: true,
+  async rewrites() {
+    return [
+      {
+        // Si une requête commence par /images
+        source: "/images/:path*",
+        // Redirigez-la vers le serveur Express (qui sert les fichiers statiques)
+        destination: "http://backend:4000/images/:path*",
+      },
+    ];
+  },
+} as NextConfig;
+
+module.exports = nextConfig;

@@ -1,0 +1,17 @@
+ {
+  "name": "@stackschool/db",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev ",
+    "seed": "node src/prisma/seed.js"
+  },
+  "devDependencies": {
+    "@prisma/client": "^6.18.0",
+    "prisma": "^6.19.0",
+    "@prisma/extension-accelerate": "^2.0.2"
+   
+  }
+ 
+}

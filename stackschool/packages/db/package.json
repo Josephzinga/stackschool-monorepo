@@ -1,4 +1,4 @@
- {
+{
   "name": "@stackschool/db",
   "version": "1.0.0",
   "main": "src/index.ts",
@@ -8,10 +8,13 @@
     "seed": "node src/prisma/seed.js"
   },
   "devDependencies": {
-    "@prisma/client": "^6.18.0",
-    "prisma": "^6.19.0",
-    "@prisma/extension-accelerate": "^2.0.2"
-   
+    "@stackschool/shared": "workspace:*",
+    "@prisma/adapter-pg": "^7.0.1",
+    "@prisma/client": "^7.0.1",
+    "@prisma/extension-accelerate": "^2.0.2",
+    "prisma": "^7.0.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.85.0"
   }
- 
 }

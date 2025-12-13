@@ -10,12 +10,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-
   "dependencies": {
     "zod": "^4.1.12",
     "@stackschool/db": "workspace:*",
     "dotenv": "^17.2.3",
     "date-fns": "^4.1.0",
-   "axios": "^1.12.2"
+    "axios": "^1.12.2"
   }
 }

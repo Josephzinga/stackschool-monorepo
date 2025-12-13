@@ -5,25 +5,21 @@ export const loginFormSchema = z.object({
   identifier: z
     .string()
     .min(3, "L'identifiant est requis")
-    .refine(
-      (value) => {
-        // Validation email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailRegex.test(value)) return true;
+    .refine((value) => {
+      // Validation email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailRegex.test(value)) return true;
 
-        // Validation téléphone (format international accepté)
-        const phoneRegex = /^\+?[0-9]{8,15}$/;
-        if (phoneRegex.test(value.replace(/\s/g, ""))) return true;
+      // Validation téléphone (format international accepté)
+      const phoneRegex = /^\+?[0-9]{8,15}$/;
+      if (phoneRegex.test(value.replace(/\s/g, ""))) return true;
 
-        // Validation username (alphanumérique + underscores, 3-20 caractères)
-        const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-        if (usernameRegex.test(value)) return true;
+      // Validation username (alphanumérique + underscores, 3-20 caractères)
+      const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+      if (usernameRegex.test(value)) return true;
 
-        return false;
-      },
-
-      "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)"
-    ),
+      return false;
+    }, "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)"),
 
   password: z
     .string()
@@ -38,10 +34,28 @@ export const loginFormSchema = z.object({
 
 export const registerFormSchema = z
   .object({
-    username: z
+    identifier: z
       .string()
-      .min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères.")
-      .max(30, "Le nom d'utilisateur ne peut pas dépasser 30 caractères."),
+      .min(3, "L'identifiant est requis")
+      .refine(
+        (value) => {
+          // Validation email
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (emailRegex.test(value)) return true;
+
+          // Validation téléphone (format international accepté)
+          const phoneRegex = /^\+?[0-9]{8,15}$/;
+          if (phoneRegex.test(value.replace(/\s/g, ""))) return true;
+
+          // Validation username (alphanumérique + underscores, 3-20 caractères)
+          const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+          if (usernameRegex.test(value)) return true;
+
+          return false;
+        },
+
+        "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)"
+      ),
 
     password: z
       .string()

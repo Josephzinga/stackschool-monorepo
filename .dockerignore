@@ -1,0 +1,13 @@
+# .dockerignore
+
+node_modules \*_/node_modules
+dist
+.build
+.env
+.env.local
+.vscode
+.idea
+.git
+.gitignore
+Dockerfile_
+README.md

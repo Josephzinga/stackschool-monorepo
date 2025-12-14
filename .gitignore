@@ -1,0 +1,10 @@
+.env
+packages/ui/node_modules
+packages/ui/.env
+packages/api/node_modules
+packages/api/.env
+packages/web/node_modules
+packages/web/.env
+node_modules
+
+.vscode

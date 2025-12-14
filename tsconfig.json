@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".", // Définit la base pour les chemins relatifs
+    "paths": {
+      "@stackschool/db/*": ["packages/db/*"],
+      " @stackschool/shared/*": ["packages/shared*"] // Permet de résoudre les types du package db
+    },
+    "composite": true, // Nécessaire pour les projets TypeScript multi-packages
+    "declaration": true, // Génère les fichiers .d.ts pour le partage des types
+    "declarationMap": true, // Génère les fichiers .d.ts.map pour le débogage
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "target": "ESNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["packages/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,9 @@
+packages:
+  - packages/*
+
+onlyBuiltDependencies:
+  - esbuild
+  - msgpackr-extract
+  - prisma
+  - sharp
+  - unrs-resolver

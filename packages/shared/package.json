@@ -1,0 +1,20 @@
+{
+  "name": "@stackschool/shared",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "zod": "^4.1.12",
+    "@stackschool/db": "workspace:*",
+    "dotenv": "^17.2.3",
+    "date-fns": "^4.1.0",
+    "axios": "^1.12.2"
+  }
+}

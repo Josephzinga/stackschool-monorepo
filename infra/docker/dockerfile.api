@@ -1,0 +1,18 @@
+
+FROM node:lts-slim
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+
+WORKDIR /app
+
+COPY package.json pnpm-workspace.yaml ./
+
+COPY packages/db ./packages/db
+COPY packages/shared ./packages/shared
+COPY packages/api ./packages/api
+
+RUN pnpm install --no-frozen-lockfile
+EXPOSE 4000 5555 3002
+
+CMD ["pnpm", "--filter", "@stackschool/api", "run", "dev"]

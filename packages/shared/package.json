@@ -10,10 +10,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.19.0",
   "dependencies": {
     "zod": "^4.1.12",
-    "typescript": "^5.9.3",
-    "@stackschool/db": "workspace:*"
+    "@stackschool/db": "workspace:*",
+    "dotenv": "^17.2.3",
+    "date-fns": "^4.1.0",
+    "axios": "^1.12.2"
   }
 }

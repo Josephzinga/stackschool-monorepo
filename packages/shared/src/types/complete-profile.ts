@@ -1,16 +1,27 @@
+<<<<<<< HEAD
 import {
+=======
+import type {
+>>>>>>> master
   Account,
   Gender,
   GlobalRole,
   ParentStudent,
   Profile,
+<<<<<<< HEAD
   School,
+=======
+>>>>>>> master
   Staff,
   Student,
   Teacher,
   User,
 } from "@stackschool/db";
+<<<<<<< HEAD
 import { StringLiteralLike } from "typescript";
+=======
+
+>>>>>>> master
 
 type CreateSchoolPayload = {
   type: "create";

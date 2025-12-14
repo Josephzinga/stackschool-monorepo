@@ -1,11 +1,15 @@
-import path from "node:path";
-import { defineConfig } from "prisma/config";
+import { defineConfig, env } from "prisma/config";
+import { config } from "@stackschool/shared";
+
+config();
 
 export default defineConfig({
-  schema: path.join("src", "prisma", "schema.prisma"),
+  schema: "./src/prisma/schema.prisma",
   migrations: {
-    // Si vos migration"s ne sont pas à la racine, vous pouvez spécifier le chemin ici
-    path: path.join("src", "prisma", "migrations"),
+    seed: "ts-node ./src/prisma/seed.ts",
+    path: "./src/prisma/migrations",
   },
-  seed: "ts-node ./src/prisma/seed.ts",
+  datasource: {
+    url: process.env.DATABASE_URL!,
+  },
 });

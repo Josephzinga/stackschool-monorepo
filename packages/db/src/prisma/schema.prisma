@@ -1,21 +1,11 @@
 generator client {
-<<<<<<< HEAD
-  provider = "prisma-client-js"
-  output   = "../node_modules/generated"
-  // binaryTargets = ["native", "debian-openssl-3.0.x"]
-=======
   provider      = "prisma-client-js"
   output        = "./client/generated"
   binaryTargets = ["native", "windows"]
->>>>>>> master
 }
 
 datasource db {
   provider = "postgresql"
-<<<<<<< HEAD
-  url      = env("DATABASE_URL")
-=======
->>>>>>> master
 }
 
 model User {

@@ -54,6 +54,7 @@ services:
       NEXT_PUBLIC_API_URL: "http://api:4000"
     depends_on:
       - api
+    command: pnpm --filter @stackschool/web run dev
 
 volumes:
   db_data:

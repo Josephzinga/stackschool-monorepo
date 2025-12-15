@@ -19,7 +19,7 @@ export const authService = {
     return res.data;
   },
 
-  register: async (data: Omit<RegisterFormType, "confirm">) => {
+  register: async (data: RegisterFormType) => {
     const res = await api.post("/auth/register", data);
     return res.data;
   },

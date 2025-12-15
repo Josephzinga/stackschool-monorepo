@@ -1,10 +1,6 @@
 {
   "private": true,
-<<<<<<< HEAD
-  "name": "stack-school-moi",
-=======
   "name": "@stackschool/root",
->>>>>>> master
   "version": "1.0.0",
   "workspaces": [
     "packages/*"
@@ -23,7 +19,6 @@
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.0",
     "eslint": "^9",
-    "tailwindcss": "^4.1.18",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
@@ -38,9 +33,9 @@
       "react-dom": "$react-dom"
     },
     "onlyBuiltDependencies": [
+      "@prisma/engines",
       "esbuild",
       "msgpackr-extract",
-      "ngrok",
       "prisma",
       "sharp",
       "unrs-resolver"

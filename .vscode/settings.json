@@ -4,20 +4,11 @@
       "ssh": "Disabled",
       "previewLimit": 50,
       "server": "localhost",
-      "port": 5433,
+      "port": 5432,
+      "askForPassword": true,
       "driver": "PostgreSQL",
       "name": "stackschool",
-      "database": "postgres",
-      "username": "joseph"
-    },
-    {
-      "ssh": "Disabled",
-      "previewLimit": 50,
-      "server": "localhost",
-      "port": 5433,
-      "driver": "PostgreSQL",
-      "name": "joseph",
-      "database": "stackschool",
+      "database": "postgres_db",
       "username": "joseph"
     }
   ]

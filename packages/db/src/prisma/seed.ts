@@ -1,15 +1,9 @@
-import { PrismaClient } from "generated/client";
+import { prisma } from ".";
 
-const prisma = new PrismaClient();
 async function main() {
   try {
-    await prisma.account.create({
-      data: {
-        providerAccountId: "mdmdmdmdm",
-        provider: "joseph",
-        userId: "cmguqndya0000qmlr7kzbovv3",
-      },
-    });
+    const user = await prisma.user.findMany();
+    console.log("Utilisateurs existants:", user);
   } catch (error) {
     console.error("Erreur lors de la création de l'utilisateur:", error);
   }

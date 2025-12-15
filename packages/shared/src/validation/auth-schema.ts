@@ -1,31 +1,11 @@
 // users/schemas.ts
+import path from "path";
 import { z } from "zod";
 
 export const loginFormSchema = z.object({
   identifier: z
     .string()
     .min(3, "L'identifiant est requis")
-<<<<<<< HEAD
-    .refine(
-      (value) => {
-        // Validation email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailRegex.test(value)) return true;
-
-        // Validation téléphone (format international accepté)
-        const phoneRegex = /^\+?[0-9]{8,15}$/;
-        if (phoneRegex.test(value.replace(/\s/g, ""))) return true;
-
-        // Validation username (alphanumérique + underscores, 3-20 caractères)
-        const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-        if (usernameRegex.test(value)) return true;
-
-        return false;
-      },
-
-      "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)"
-    ),
-=======
     .refine((value) => {
       // Validation email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,7 +21,6 @@ export const loginFormSchema = z.object({
 
       return false;
     }, "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)"),
->>>>>>> master
 
   password: z
     .string()
@@ -56,15 +35,10 @@ export const loginFormSchema = z.object({
 
 export const registerFormSchema = z
   .object({
-<<<<<<< HEAD
     username: z
       .string()
       .min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères.")
-      .max(30, "Le nom d'utilisateur ne peut pas dépasser 30 caractères."),
-=======
-    identifier: z
-      .string()
-      .min(3, "L'identifiant est requis")
+      .max(20, "Le nom d'utilisateur ne peut pas dépasser 20 caractères.")
       .refine(
         (value) => {
           // Validation email
@@ -84,7 +58,6 @@ export const registerFormSchema = z
 
         "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)"
       ),
->>>>>>> master
 
     password: z
       .string()
@@ -119,8 +92,8 @@ export const registerFormSchema = z
     // Vérifie la correspondance des mots de passe
     if (data.password !== data.confirm) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
         path: ["confirm"],
+        code: z.ZodIssueCode.custom,
         message: "Les mots de passe ne correspondent pas.",
       });
     }

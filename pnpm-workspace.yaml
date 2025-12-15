@@ -1,6 +1,7 @@
 packages:
   - packages/*
-
+  - apps/*
+hosted: true
 onlyBuiltDependencies:
   - esbuild
   - msgpackr-extract

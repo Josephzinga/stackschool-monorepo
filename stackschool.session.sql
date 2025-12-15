@@ -1,1 +1,2 @@
-SELECT VERSION()
+
+SELECT * FROM public."User";

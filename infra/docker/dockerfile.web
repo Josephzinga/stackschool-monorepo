@@ -5,19 +5,18 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-
 COPY package.json pnpm-workspace.yaml ./
-
 
 COPY packages/shared ./packages/shared
 COPY packages/db ./packages/db
 COPY packages/ui ./packages/ui
-COPY packages/web ./packages/web
 
-RUN pnpm install --no-frozen-lockfile
+COPY apps/web ./apps/web
 
+RUN pnpm install  --no-frozen-lockfile
 
 EXPOSE 3000
 
 
-CMD ["pnpm", "--filter", "@stackschool/web", "run", "dev"]
+# ... autres instructions ...
+CMD ["pnpm", "--workspace-root", "--filter", "@stackschool/web", "run", "dev"]

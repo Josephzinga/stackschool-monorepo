@@ -5,10 +5,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configuration.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/docker/dockerfile.web" beforeDir="false" afterPath="$PROJECT_DIR$/infra/docker/dockerfile.web" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/.prettierrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/App.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/_layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/auth/_layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/auth/complete-profile.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/auth/finish.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/auth/forgot-password.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/auth/login.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/auth/register.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/auth/reset-password.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/auth/verify-code.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/global.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/app/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/assets/adaptive-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/assets/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/assets/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/assets/splash-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/babel.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/components.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/metro.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/nativewind-env.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/postcss.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/tailwind.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/mobile/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/auth-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/auth-schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/ui" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/.npmrc" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/.prettierrc" beforeDir="false" />
@@ -34,260 +66,120 @@
       <change beforePath="$PROJECT_DIR$/packages/ui/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/tailwind.config.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/.devcontainer/devcontainer.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/.dockerignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/infra/docker/dockerfile.backend" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/infra/docker/dockerfile.frontend" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/.dockerignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/prisma.config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmhz90r1a0005qusjquva0nc8-1763383933556-561001242.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763348367902-762213107.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763351876156-537305184.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763352655714-20803686.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763386127368-7741805.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763386484389-422039811.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763386792338-981413473.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763386856989-135786347.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763387444899-827405100.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763388364553-247686516.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/public/images/cmi2jgdt90000lk1l7jxcxjhs-1763389145485-574213355.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/constant/config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/controllers/passport-local.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/controllers/passport-social.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/controllers/validate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/explication.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/lib/handle-redis-user.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/lib/outils.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/lib/passport-local.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/lib/passport-social.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/lib/prisma.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/lib/redis.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/lib/validation-schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/middlewares/auth.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/middlewares/validate-profile-picture.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/forgot-password.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/get-profile.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/login.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/logout.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/me.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/passport-facebook.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/passport-google.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/refresh.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/register.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/resend-code.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/reset-password.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/auth/verify-code.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/complete-profile/clear-progress.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/complete-profile/complete-profile.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/complete-profile/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/complete-profile/load-progress.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/complete-profile/save-progress.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/complete-profile/upload-profile.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/shools/search-school.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/users/profile.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/routes/validationField.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/services/auth.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/services/node_mail.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/services/twilio-whatshapp.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/types/global.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/types/index.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/utils/limiter.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/src/validations/upload-profile-picture.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/api/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/.dockerignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/prisma.config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251013160744_init/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251013202523_ajouter_le_model_teacher_et_staff_pour_les_information_specifique/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251013220313_init/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251014125558_init/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251014125954_change_de_photo_en_image_dans_le_model_profile/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251014130300_ajout_de_phone_dans_la_table_profile/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251015014629_init/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251015034606_update_user_model/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251015123434_rendre_lastname_et_firstname_optionnel/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251016114609_rendre_password_optionnel_dans_user_pour_la_connexion_avec_google/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251016115630_rendre_type_optionnel_dans_le_model_account/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251016115848_rendre_provider_optionnel_dans_le_model_account/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251017093800_j_ai_mapper_le_nom_de_colonne_du_model_session_pour_qu_il_puisse_correspondre_avec_pg_store/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251017094055_rendre_la_colonne_user_et_user_id_du_model_session_optionnel/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251019030855_ajouter_username_dans_le_model_user/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251019031005_rendre_email_optinnel_dans_le_model_user/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251020024023_ajouter_is_verified_dans_le_model_user_pour_whathsapp/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251020024659_ajouter_le_model_pour_la_verification_whatsapp/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251020030528_rendre_code_de_type_number_dans_verificaton_code/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251020033103_deblacer_le_phone_number_dans_user/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251020114744_changement_de_la_table_verification_code_et_email/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251023160529_ajouter_update_at_dans_le_model_de_verification/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251026193119_test/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251027020427_ajouter_la_colone_message_pour_le_message_d_invitation_et_rendre_slug_optionnel_dans_le_model_school/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/20251114175627_changement_de_constraint_des_table_en_relation_avec_user/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/migrations/migration_lock.toml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/schema.prisma" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/schéma-architecture.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/seed.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/src/prisma/seed.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/db/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/App.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/_layout.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/auth/complete-profile.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/auth/finish.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/auth/forgot-password.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/auth/login.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/auth/register.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/auth/reset-password.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/auth/verify-code.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/global.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/app/index.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/assets/adaptive-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/assets/favicon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/assets/icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/assets/splash-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/babel.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/metro.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/nativewind-env.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/tailwind.config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/mobile/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/shared/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/shared/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/shared/src/auth/auth-service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/shared/src/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/shared/src/lib/api.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/shared/src/types/complete-profile.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/shared/src/validation/auth-schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/shared/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/ui/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/ui/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/.dockerignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/(dashborad)/admin/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/(dashborad)/layout.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/(dashborad)/parent/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/(dashborad)/student/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/(dashborad)/teacher/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/complete-profile/RoleStep.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/complete-profile/StudentForm.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/complete-profile/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/complete-profile/steper.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/essai/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/finish/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/forgot-password/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/login/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/register/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/reset-password/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/auth/verify-code/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/dashboard/data.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/dashboard/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/favicon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/globals.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/layout.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/app/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/AppSidebar.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/Container.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/DropMenu.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/Header.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/LightModeBackgound.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/Navbar.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/Stepper.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/app-sidebar.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/button-social.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/chart-area-interactive.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/complete-profile/create-school-form.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/complete-profile/invitation-form.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/complete-profile/profile-step.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/complete-profile/schoolStep.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/data-table.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/icons.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/login-form.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/nav-documents.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/nav-main.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/nav-secondary.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/nav-user.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/profile-avatar.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/profile-upload.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/protected-route.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/section-cards.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/site-header.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/ThemeProvider.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/accordion.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/alert-dialog.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/alert.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/avatar.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/badge.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/breadcrumb.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/button.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/calendar.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/card.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/chart.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/checkbox.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/collapsible.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/drawer.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/dropdown-menu.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/empty.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/field.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/input-group.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/input-otp.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/input.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/item.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/label.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/native-select.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/select.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/separator.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/sheet.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/sidebar.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/skeleton.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/sonner.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/spinner.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/table.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/tabs.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/textarea.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/toggle-group.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/toggle.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/components/ui/tooltip.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/eslint.config.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/hooks/use-mobile.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/hooks/useDebounce.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/lib/check-profile-filed.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/lib/data.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/lib/prisma.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/lib/schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/lib/utils.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/next.config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/postcss.config.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/public/7304.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/public/bg-dark.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/public/bg-light.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/public/favicon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/public/logo-bg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/public/logo.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/services/api.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/services/complete-profile.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/services/getMe.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/store/complete-profiile-store.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/store/user-store.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/packages/web/validators/validateUserField.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/pnpm-lock.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/pnpm-workspace.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stackschool/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/(dashborad)/admin/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/(dashborad)/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/(dashborad)/parent/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/(dashborad)/student/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/(dashborad)/teacher/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/complete-profile/RoleStep.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/complete-profile/StudentForm.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/complete-profile/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/complete-profile/steper.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/essai/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/finish/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/forgot-password/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/login/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/register/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/reset-password/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/auth/verify-code/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/dashboard/data.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/dashboard/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/globals.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/app/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/AppSidebar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/Container.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/DropMenu.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/Header.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/LightModeBackgound.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/Navbar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/Stepper.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/app-sidebar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/button-social.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/chart-area-interactive.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/complete-profile/create-school-form.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/complete-profile/invitation-form.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/complete-profile/profile-step.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/complete-profile/schoolStep.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/data-table.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/icons.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/login-form.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/nav-documents.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/nav-main.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/nav-secondary.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/nav-user.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/profile-avatar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/profile-upload.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/protected-route.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/section-cards.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/site-header.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/ThemeProvider.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/accordion.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/alert-dialog.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/alert.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/avatar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/badge.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/breadcrumb.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/button.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/calendar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/card.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/chart.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/checkbox.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/collapsible.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/drawer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/dropdown-menu.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/empty.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/field.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/input-group.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/input-otp.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/input.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/item.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/label.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/native-select.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/select.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/separator.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/sheet.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/sidebar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/skeleton.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/sonner.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/spinner.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/table.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/tabs.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/textarea.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/toggle-group.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/toggle.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/components/ui/tooltip.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/eslint.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/hooks/use-mobile.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/hooks/useDebounce.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/lib/check-profile-filed.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/lib/data.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/lib/prisma.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/lib/schema.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/lib/utils.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/next.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/postcss.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/public/7304.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/public/bg-dark.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/public/bg-light.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/public/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/public/logo-bg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/public/logo.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/services/complete-profile.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/services/getMe.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/store/complete-profiile-store.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/store/user-store.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/web/validators/validateUserField.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-workspace.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-workspace.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stackschool.session.sql" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -305,27 +197,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/HP/stackschool-monorepo&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\HP\\stackschool-monorepo\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/HP/stackschool-monorepo",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.sourceCode",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Users\\HP\\stackschool-monorepo\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -343,6 +235,7 @@
       <workItem from="1765712267683" duration="3950000" />
       <workItem from="1765736208316" duration="1879000" />
       <workItem from="1765746148265" duration="2421000" />
+      <workItem from="1765789192714" duration="135000" />
     </task>
     <servers />
   </component>

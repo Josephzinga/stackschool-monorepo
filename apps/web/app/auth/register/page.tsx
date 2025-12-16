@@ -1,7 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authService, parseAxiosError } from "@stackschool/shared";
+import {
+  authService,
+  parseAxiosError,
+  ServiceError,
+} from "@stackschool/shared";
 import {
   Field,
   FieldDescription,
@@ -55,17 +59,17 @@ export default function RegisterPage() {
         password,
         confirm,
       });
-      if (res.data.ok) {
-        router.replace("/auth/finish");
-      }
-      if (res.data?.message) {
-        return toast.success(res.data?.message);
-      }
 
-      // if (res.ok) router.replace("/dashboard");
+      toast.success(res.message);
+
+      if (res.requireVerification) {
+        router.replace(`/auth/verify-code?userId=${res.user.id}`);
+      } else if (res.redirect) {
+        router.replace(res.redirect);
+      }
     } catch (err: any) {
-      const errors = parseAxiosError(err);
-      toast.error(errors.message || "Erreur réseaux");
+      const error = parseAxiosError(err);
+      toast.error(error.message || "Une erreur est survenue.");
     }
   }
 

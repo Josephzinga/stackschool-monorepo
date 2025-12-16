@@ -1,30 +1,35 @@
-import { Router } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { prisma } from "../../lib/prisma";
 
 const router = Router();
 
-router.post("/logout", async (req, res) => {
-  try {
-    const refreshToken = req.cookies["refresh_token"];
-    if (refreshToken) {
-      await prisma.session.deleteMany({
-        where: { sessionToken: refreshToken },
+router.post(
+  "/logout",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refreshToken = req.cookies["refresh_token"];
+      if (refreshToken) {
+        await prisma.session.deleteMany({
+          where: { sessionToken: refreshToken },
+        });
+        res.clearCookie("refresh_token");
+      }
+
+      req.logout((err) => {
+        if (err) {
+          return next(err);
+        }
+
+        req.session.destroy((destroyErr) => {
+          if (destroyErr) return next(destroyErr);
+          res.clearCookie("sid");
+          res.json({ ok: true });
+        });
       });
-      res.clearCookie("refresh_token");
+    } catch (err) {
+      next(err);
     }
-
-    req.logout((err) => {
-      if (err) console.error("Erreur logout:", err);
-
-      req.session?.destroy(() => {
-        res.clearCookie("sid");
-        res.json({ ok: true });
-      });
-    });
-  } catch (err) {
-    console.error("Erreur server logout");
-    res.status(500).json({ error: "Erreur serveur" });
   }
-});
+);
 
 export default router;

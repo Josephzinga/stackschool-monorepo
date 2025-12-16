@@ -17,6 +17,4 @@ RUN pnpm install  --no-frozen-lockfile
 
 EXPOSE 3000
 
-
-# ... autres instructions ...
 CMD ["pnpm", "--workspace-root", "--filter", "@stackschool/web", "run", "dev"]

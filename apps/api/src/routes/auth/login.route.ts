@@ -1,6 +1,7 @@
-import { Router } from "express";
+import { Router, NextFunction, Request, Response } from "express";
 import passport from "passport";
 import { Profile, User } from "@stackschool/db";
+import { createServiceError } from "../../utils/api-response";
 import { prisma } from "../../lib/prisma";
 import { generateToken } from "../../lib/outils";
 
@@ -11,34 +12,23 @@ type UserWithProfile = User & {
   profile: Profile;
 };
 
-router.post("/login", (req, res, next) => {
+router.post("/login", (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate(
     "local",
-    {
-      failureRedirect: `${FRONTEND_ORIGIN}/auth/login`,
-    },
     (err: any, user: UserWithProfile, info: any) => {
-      console.log(
-        "user dans login (auth callback) =>",
-        user,
-        "info=>",
-        info,
-        "erreur=>",
-        err
-      );
-
-      if (info) {
-        return res.status(400).json({
-          message: info.message,
-          isSocialOnly: info.isSocialOnly,
-          provider: info.provider,
-        });
-      }
-      console.log("error login", err);
       try {
         if (err) {
-          console.error("Error login:", err);
-          return res.redirect(`${FRONTEND_ORIGIN}/auth/login?error=server`);
+          return next(err); // Passe l'erreur au gestionnaire centralisé
+        }
+
+        if (info) {
+          // Les messages d'info de Passport sont des erreurs d'authentification (401)
+          return next(
+            createServiceError(info.message, 401, {
+              isSocialOnly: info.isSocialOnly,
+              provider: info.provider,
+            })
+          );
         }
 
         if (info?.isSocialOnly) {
@@ -50,43 +40,28 @@ router.post("/login", (req, res, next) => {
             providers
           )}`;
 
-          if (req.headers.accept?.includes("application/json")) {
-            console.log("joseph");
-            return res.status(403).json({
-              ok: false,
-              isSocialOnly: true,
-              redirectUrl,
-              providers,
-              message: "Compte social uniquement — complétez votre profil.",
-            });
-          }
-
-          return res.redirect(redirectUrl);
+          return res.status(403).json({
+            ok: false,
+            isSocialOnly: true,
+            redirectUrl,
+            providers,
+            message: "Compte social uniquement — complétez votre profil.",
+          });
         }
 
         if (!user) {
           const msg = info?.message || "Identifiants invalides";
-          if (req.headers.accept?.includes("application/json")) {
-            return res.status(401).json({ ok: false, message: msg });
-          }
-          return res.redirect(
-            `${FRONTEND_ORIGIN}/auth/login?error=${encodeURIComponent(msg)}`
-          );
+          return next(createServiceError(msg, 401));
         }
 
-        // IMPORTANT : si on utilise un callback personnalisé, on doit appeler req.login
         req.login(user, async (loginErr: any) => {
           if (loginErr) {
             console.error("req.login error:", loginErr);
-            if (req.headers.accept?.includes("application/json")) {
-              return res
-                .status(500)
-                .json({ ok: false, message: "Login failed" });
-            }
-            return res.redirect(`${FRONTEND_ORIGIN}/auth/login?error=server`);
+            return next(
+              createServiceError("La connexion a échoué", 500, loginErr)
+            );
           }
 
-          // création du refresh token dans ta table session
           const refreshToken = generateToken(32);
           const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 25);
 
@@ -106,32 +81,21 @@ router.post("/login", (req, res, next) => {
             maxAge: 1000 * 60 * 60 * 24 * 25,
           });
 
-          const redirectUrl = user.profileCompleted
-            ? `${FRONTEND_ORIGIN}/dashboard`
-            : `${FRONTEND_ORIGIN}/auth/finish?from=local&complete=false`;
-
-          // Réponse JSON si fetch/axios, sinon redirect
-          if (req.headers.accept?.includes("application/json")) {
-            return res.json({
-              ok: true,
-              user: {
-                id: user.id,
-                email: user.email,
-                username: user.username,
-                phoneNumber: user.phoneNumber,
-              },
-              redirectUrl,
-            });
-          }
-
-          return res.redirect(redirectUrl);
+          // Toujours répondre avec du JSON
+          return res.json({
+            ok: true,
+            user: {
+              id: user.id,
+              email: user.email,
+              username: user.username,
+              phoneNumber: user.phoneNumber,
+              profileCompleted: user.profileCompleted,
+            },
+          });
         });
-      } catch (e) {
-        console.error("Error in local login callback:", e);
-        if (req.headers.accept?.includes("application/json")) {
-          return res.status(500).json({ ok: false, message: "Server error" });
-        }
-        return res.redirect(`${FRONTEND_ORIGIN}/auth/login?error=server`);
+      } catch (error: any) {
+        console.error("Error in local login callback:", error);
+        return next(error);
       }
     }
   )(req, res, next);

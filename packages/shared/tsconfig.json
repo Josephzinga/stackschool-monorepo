@@ -7,7 +7,12 @@
     "declaration": true, // Génère les fichiers .d.ts pour les types
     "declarationMap": true // Génère les fichiers .d.ts.map
   },
-  "include": ["index.ts", "src/**/*"],
+  "include": [
+    "index.ts",
+    "src/**/*",
+    "src/types/api-response.ts",
+    "../../apps/api/src/utils/api-response.ts"
+  ],
   "exclude": ["node_modules", "dist"],
   "references": []
 }

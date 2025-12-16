@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { generateToken } from "./outils";
 import { prisma } from "../lib/prisma";
-import { User } from "@stackschool/db";
 
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:3000";
 
@@ -11,7 +10,8 @@ export default async function handleSocialRoutes(
   provider: string
 ) {
   try {
-    const user = req.user as User;
+    console.log(`Handling social route for provider: ${provider}`);
+    const user = req.user;
     console.log("user in socilaRoutes", user);
 
     if (!user || !user.id) {
@@ -25,7 +25,7 @@ export default async function handleSocialRoutes(
       data: {
         sessionToken: refreshToken,
         expires,
-        userId: user.id,
+        userId: user?.id,
       },
     });
 

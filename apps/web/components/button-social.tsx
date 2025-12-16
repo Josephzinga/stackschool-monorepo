@@ -11,7 +11,8 @@ export const ButtonSocial = ({
     <>
       <a
         href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/${provider}`}
-        className="w-full">
+        className="w-full"
+      >
         <Button variant="outline" type="button" className="w-full">
           {icon}
           Connectez vous avec{" "}

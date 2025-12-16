@@ -10,6 +10,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*", "types/**/*.d.ts"],
+  "include": [
+    "src/**/*",
+    "types/**/*.d.ts",
+    "../../packages/shared/src/types/api-response.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

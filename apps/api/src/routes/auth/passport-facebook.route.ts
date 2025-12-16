@@ -1,8 +1,5 @@
 import { Router } from "express";
 import passport from "passport";
-import { generateToken } from "../../lib/outils";
-import { prisma } from "../../lib/prisma";
-import { User } from "@stackschool/db";
 import handleSocialRoutes from "../../lib/passport-social";
 const router = Router();
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:3000";

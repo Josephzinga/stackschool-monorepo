@@ -1,6 +1,6 @@
 "use client";
 
-import {authService} from "@stackschool/shared";
+import { authService } from "@stackschool/shared";
 import { LoginForm } from "@/components/login-form";
 import { SubmitHandler } from "@stackschool/ui";
 import { useRouter } from "next/navigation";
@@ -19,17 +19,12 @@ export default function LoginPage() {
     password,
   }) => {
     try {
-      const res = await api.post("/auth/login", {
+      const res = await authService.login({
         identifier,
         password,
       });
-      const data = res.data;
-      if (res.data?.isSocialOnly && res.data?.redirectUrl) {
-        window.location.href = res.data.redirectUrl;
-        return;
-      }
-      if (data?.ok && data?.redirectUrl) {
-        router.push(data.redirectUrl);
+      if (res.ok) {
+        router.push("/auth/finish?from=");
       }
     } catch (err: any) {
       const data = err?.response?.data;
@@ -41,7 +36,7 @@ export default function LoginPage() {
   };
   return (
     <Container>
-      <LoginForm handleLogin={handleLogin} />
+      <LoginForm handleLogin={handleLogin} className="w" />
     </Container>
   );
 }

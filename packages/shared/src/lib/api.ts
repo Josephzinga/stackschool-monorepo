@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ApiErrorPayload } from "../types";
 
 const URL = process.env.NEXT_PUBLIC_API_URL! || "http://localhost:4000";
 console.log("API URL:", URL);
@@ -12,30 +13,6 @@ export function setApiBaseUrl(baseUrl: string) {
   api.defaults.baseURL = `${cleaned}/api`;
 }
 
-export type ApiErrorPayload = {
-  status?: number | null;
-  message: string;
-  data?: any;
-  ok: boolean;
-};
-
-export type ApiResponse<T> = {
-  data: T;
-  status: number;
-  ok: boolean;
-};
-
-export class ApiSuccessResponse<T> implements ApiResponse<T> {
-  data: T;
-  status: number;
-  ok: boolean;
-
-  constructor(payload: ApiResponse<T>) {
-    this.data = payload.data;
-    this.status = payload.status;
-    this.ok = payload.ok;
-  }
-}
 export class ApiError extends Error {
   status?: number | null;
   data?: any;

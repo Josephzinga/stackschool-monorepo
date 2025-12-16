@@ -45,10 +45,10 @@ export function LoginForm({
   });
 
   return (
-    <div className={cn("flex flex-col gap-6  ", className)}>
-      <Card className="w-100 max-w-lg bg-white/50 dark:bg-slate-700/50">
+    <>
+      <Card className="max-w-lg w-100 md:w-md xl:w-lg bg-white/50 dark:bg-slate-700/50 py-4 gap-2 ">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Bienvenue</CardTitle>
+          <CardTitle className="text-xl lg:text-2xl!">Bienvenue</CardTitle>
           <CardDescription>
             Connecter vous à votre compte Google ou Facebook
           </CardDescription>
@@ -90,17 +90,20 @@ export function LoginForm({
                   <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
                   <Link
                     href="/auth/forgot-password"
-                    className="ml-auto text-sm underline-offset-4 hover:underline">
+                    className="ml-auto text-sm underline-offset-4 hover:underline"
+                  >
                     Mot de passe oublier
                   </Link>
                   <button
                     type="button"
                     onClick={() => setShowpwd(!showpwd)}
-                    className="absolute right-3 top-10 text-gray-600 dark:text-gray-400">
+                    className="absolute right-3 top-10 text-gray-600 dark:text-gray-400"
+                  >
                     {showpwd ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
                 </div>
                 <Input
+                  ispassword={true}
                   {...register("password")}
                   id="password"
                   type={showpwd ? "text" : "password"}
@@ -123,7 +126,8 @@ export function LoginForm({
                   className={cn(
                     "font-semibold text-white",
                     isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
-                  )}>
+                  )}
+                >
                   {isSubmitting ? (
                     <>
                       <Spinner /> Connection en cours...
@@ -141,6 +145,6 @@ export function LoginForm({
           </form>
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 }

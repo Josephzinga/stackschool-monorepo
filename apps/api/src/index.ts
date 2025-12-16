@@ -15,6 +15,7 @@ import setupLocalStrategy from "./lib/passport-local";
 import SeachSchool from "./routes/shools/search-school.route";
 import { getUserFromRedis } from "./lib/handle-redis-user";
 import path from "path";
+import { errorHandler } from "./middlewares/errorHandler";
 
 config();
 
@@ -116,6 +117,9 @@ app.get("/", (req, res) => {
 });
 
 app.use(express.static(path.resolve(process.cwd(), "public")));
+
+// gestion des erreurs centralisée
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`server is runing on port http://localhost:${PORT}`);

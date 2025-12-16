@@ -2,9 +2,6 @@ import api, { setApiBaseUrl } from "../lib/api";
 import {
   LoginFormType,
   RegisterFormType,
-  FormDataType,
-  VerifyCodeFormType,
-  ResetPasswordType,
   ProfileType,
 } from "../validation/auth-schema";
 

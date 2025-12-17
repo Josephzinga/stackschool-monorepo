@@ -1,4 +1,4 @@
-import api from "@/services/api";
+import api from "@stackschool/shared/src/lib/api";
 
 // lib/check-profile-field.ts
 export async function checkField(field: string, value: string) {

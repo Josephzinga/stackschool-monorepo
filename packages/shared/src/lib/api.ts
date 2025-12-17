@@ -2,7 +2,7 @@ import axios from "axios";
 import { ApiErrorPayload } from "../types";
 
 const URL = process.env.NEXT_PUBLIC_API_URL! || "http://localhost:4000";
-console.log("API URL:", URL);
+
 const api = axios.create({
   baseURL: `${URL.replace(/\/$/, "")}/api`,
   withCredentials: true,
@@ -12,7 +12,10 @@ export function setApiBaseUrl(baseUrl: string) {
   const cleaned = baseUrl.replace(/\/$/, "");
   api.defaults.baseURL = `${cleaned}/api`;
 }
-
+export function getApiBaseUrl() {
+  return api.defaults.baseURL;
+}
+console.log("API URL:", api.defaults.baseURL);
 export class ApiError extends Error {
   status?: number | null;
   data?: any;

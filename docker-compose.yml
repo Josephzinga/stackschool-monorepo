@@ -23,9 +23,12 @@ services:
       dockerfile: infra/docker/dockerfile.api
     container_name: stackschool-api
     volumes:
-      - ./packages:/app/packages
+      - ./apps/api:/app/apps/api
+      - ./packages/shared:/app/packages/shared
+      - ./packages/db:/app/packages/db
       - api_node_modules:/app/node_modules
-      - pnpm_store:/pnpm-store
+      - pnpm_store:/root/.local/share/pnpm/store
+
     ports:
       - "4000:4000"
       - "5555:5555"
@@ -37,7 +40,6 @@ services:
     depends_on:
       - db
       - redis
-    command: pnpm --filter @stackschool/api run dev
 
   web:
     build:
@@ -45,16 +47,18 @@ services:
       dockerfile: infra/docker/dockerfile.web
     container_name: stackschool-web
     volumes:
-      - ./packages:/app/packages
+      - ./apps/web:/app/apps/web
+      - ./packages/shared:/app/packages/shared
+      - ./packages/ui:/app/packages/ui
+      - ./packages/db:/app/packages/db
       - web_node_modules:/app/node_modules
-      - pnpm_store:/pnpm-store
+      - pnpm_store:/root/.local/share/pnpm/store
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: "http://api:4000"
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL}"
     depends_on:
       - api
-    command: pnpm --filter @stackschool/web run dev
 
 volumes:
   db_data:

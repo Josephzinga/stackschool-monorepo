@@ -1,20 +1,20 @@
-# --- Development image ---
 FROM node:lts-slim
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-COPY package.json pnpm-workspace.yaml ./
+COPY package.json pnpm-workspace.yaml* ./
 
 COPY packages/shared ./packages/shared
-COPY packages/db ./packages/db
 COPY packages/ui ./packages/ui
-
+COPY packages/db ./packages/db
 COPY apps/web ./apps/web
 
-RUN pnpm install  --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 EXPOSE 3000
 
-CMD ["pnpm", "--workspace-root", "--filter", "@stackschool/web", "run", "dev"]
+# Solution simple et fiable
+WORKDIR /app/apps/web
+CMD ["pnpm", "run", "dev"]

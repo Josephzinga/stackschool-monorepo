@@ -1,4 +1,4 @@
-import api from "@/services/api";
+import { schoolService } from "@stackschool/shared";
 import {
   SchoolData,
   RoleData,
@@ -8,13 +8,12 @@ import {
 import { toast } from "sonner";
 
 export async function searchSchools(
-  query: string,
+  query: string | null,
   onLoading: (value: boolean) => void
 ) {
   try {
     onLoading(true);
-    const res = await api.get("/schools", { params: { search: query } });
-    return res.data.schools;
+    return await schoolService.searchSchools(query);
   } catch (error) {
     console.error("Erreur réseau ", error);
     toast.error("Erreur de chargement des écoles");

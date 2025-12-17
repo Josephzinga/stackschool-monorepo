@@ -22,7 +22,7 @@ import { useState } from "react";
 import { useForm } from "@stackschool/ui";
 import { zodResolver } from "@stackschool/ui";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Spinner } from "./ui/spinner";
 import { LoginFormType, loginFormSchema } from "@stackschool/shared";
 import { ButtonSocial } from "./button-social";
@@ -70,6 +70,7 @@ export function LoginForm({
                   Email ou nom d&apos;utilisateur
                 </FieldLabel>
                 <Input
+                  icon={Mail}
                   id="email"
                   type="text"
                   required
@@ -94,27 +95,30 @@ export function LoginForm({
                   >
                     Mot de passe oublier
                   </Link>
+                </div>
+                <div className="relative">
+                  <Input
+                    icon={Lock}
+                    {...register("password")}
+                    id="password"
+                    type={showpwd ? "text" : "password"}
+                    required
+                    autoComplete="current-password"
+                    aria-invalid={!!errors.password}
+                    aria-describedby={
+                      errors.password ? "password-error" : undefined
+                    }
+                  />
                   <button
+                    aria-label="Toggle password visibility"
                     type="button"
-                    onClick={() => setShowpwd(!showpwd)}
-                    className="absolute right-3 top-10 text-gray-600 dark:text-gray-400"
+                    tabIndex={-1}
+                    onClick={() => setShowpwd((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 dark:text-gray-400 cursor-pointer"
                   >
                     {showpwd ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
                 </div>
-                <Input
-                  ispassword={true}
-                  {...register("password")}
-                  id="password"
-                  type={showpwd ? "text" : "password"}
-                  required
-                  autoComplete="current-password"
-                  aria-invalid={!!errors.password}
-                  aria-describedby={
-                    errors.password ? "password-error" : undefined
-                  }
-                />
-
                 <FieldError id="password-error">
                   {errors.password?.message}
                 </FieldError>

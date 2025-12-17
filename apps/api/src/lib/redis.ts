@@ -1,5 +1,5 @@
 import { createClient } from "redis";
-import { config } from "@stackschool/shared";
+import { config } from "dotenv";
 
 config();
 

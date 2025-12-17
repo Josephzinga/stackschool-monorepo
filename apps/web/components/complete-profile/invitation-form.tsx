@@ -1,10 +1,10 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "@stackschool/ui";
+import { zodResolver } from "@stackschool/ui";
 import { z } from "@stackschool/shared";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { UseCompleteProfileStore } from "@/store/complete-profiile-store";
+import { UseCompleteProfileStore } from "@stackschool/ui";
 import { Spinner } from "@/components/ui/spinner";
 
 const invitationSchema = z.object({
@@ -49,7 +49,8 @@ export default function InvitationForm() {
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="flex! w-full text-white font-semibold">
+        className="flex! w-full text-white font-semibold"
+      >
         {isSubmitting ? (
           <>
             <Spinner /> Vérification...

@@ -1,6 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./client/generated";
-import { config } from "@stackschool/shared";
+import { config } from "dotenv";
 
 config();
 

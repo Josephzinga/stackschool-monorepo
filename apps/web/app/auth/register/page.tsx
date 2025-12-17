@@ -28,7 +28,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { useForm } from "@stackschool/ui";
-import { zodResolver } from "@stackschool/ui";
+import { zodResolver } from "@stackschool/ui/";
 import { registerFormSchema, RegisterFormType } from "@stackschool/shared";
 import { toast } from "sonner";
 import { Container } from "@/components/Container";
@@ -64,8 +64,9 @@ export default function RegisterPage() {
 
       if (res.requireVerification) {
         router.replace(`/auth/verify-code?userId=${res.user.id}`);
-      } else if (res.redirect) {
-        router.replace(res.redirect);
+      }
+      if (res.profileCompleted) {
+        console.log("profileCompleted", res.profileCompleted);
       }
     } catch (err: any) {
       const error = parseAxiosError(err);

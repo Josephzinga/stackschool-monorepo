@@ -26,7 +26,7 @@ export default function AuthFinish() {
         if (data?.user) {
           const profile = data.user?.profile;
           // si le profile est manquant
-          if (!profile || !profile.username || !profile.username) {
+          if (!profile || profile.firstname === "" || profile.lastname === "") {
             setStatus("need_onboar");
             router.replace(`/auth/complete-profile?provider=${provider}`);
             return;

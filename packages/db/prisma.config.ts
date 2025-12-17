@@ -1,5 +1,5 @@
 import { defineConfig, env } from "prisma/config";
-import { config } from "@stackschool/shared";
+import { config } from "dotenv";
 
 config();
 

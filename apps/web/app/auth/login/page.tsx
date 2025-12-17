@@ -1,23 +1,19 @@
 "use client";
 
-import { authService } from "@stackschool/shared";
+import {
+  authService,
+  LoginFormType,
+  parseAxiosError,
+} from "@stackschool/shared";
 import { LoginForm } from "@/components/login-form";
-import { SubmitHandler } from "@stackschool/ui";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Container } from "@/components/Container";
 
-interface IFormInput {
-  identifier: string;
-  password: string;
-}
 export default function LoginPage() {
   const router = useRouter();
 
-  const handleLogin: SubmitHandler<IFormInput> = async ({
-    identifier,
-    password,
-  }) => {
+  const handleLogin = async ({ identifier, password }: LoginFormType) => {
     try {
       const res = await authService.login({
         identifier,

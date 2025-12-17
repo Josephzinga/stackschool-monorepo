@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { registerFormSchema } from "@stackschool/shared";
 import { generate6Code, generateToken, hashCode } from "../../lib/outils";
 import { createServiceError } from "../../utils/api-response";
+import { profile } from "console";
 
 const router = Router();
 
@@ -75,12 +76,11 @@ router.post(
           phoneNumber: safePhone,
         },
       });
-      console.log("hashed password", hashed);
 
       if (phoneNumber) {
         const code = generate6Code();
         const codeHash = hashCode(code);
-        const expiresAt = new Date(Date.now() + 1000 * 60 * 10);
+        const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15min
         await prisma.verificationCode.deleteMany({
           where: {
             userId: user.id,
@@ -142,8 +142,7 @@ router.post(
 
         if (phoneNumber) {
           return sendApiResponse(res, 201, {
-            message:
-              "Inscription réussie. Un code de vérification a été envoyé sur WhatsApp.",
+            message: "Inscription réussie. Vérifiez votre numéro de téléphone.",
             user: {
               id: user.id,
               username: user.username,
@@ -157,9 +156,7 @@ router.post(
         return sendApiResponse(res, 201, {
           message: "Inscription réussie",
           user: { id: user.id, username: user.username, email: user.email },
-          redirect: user.profileCompleted
-            ? "/dashboard"
-            : "/auth/finish?from=local&complete=false",
+          profileCompleted: user.profileCompleted,
         });
       });
     } catch (err) {

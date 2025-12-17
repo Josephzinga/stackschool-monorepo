@@ -1,8 +1,7 @@
 // components/complete-profile/profile-step.tsx
 "use client";
 import { useState } from "react";
-import { UseCompleteProfileStore } from "../../store/complete-profiile-store";
-import api from "@/services/api";
+import { UseCompleteProfileStore } from "@stackschool/ui";
 import {
   Select,
   SelectContent,
@@ -13,18 +12,20 @@ import {
   SelectValue,
 } from "../ui/select";
 import { toast } from "sonner";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm } from "@stackschool/ui";
 import PhoneInput from "react-phone-number-input";
-import { profileSchema, ProfileType } from "@stackschool/shared";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { authService, profileSchema, ProfileType } from "@stackschool/shared";
+import { zodResolver } from "@stackschool/ui";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
-import { useUserStore } from "@/store/user-store";
+import { useUserStore } from "@stackschool/ui";
 import "react-phone-number-input/style.css";
-import { checkField } from "@/lib/check-profile-filed";
+import { checkField } from "@/lib/check-profile-field";
 import ProfileUpload from "../profile-upload";
+import api from "@stackschool/shared/src/lib/api";
+
 export function ProfileStep() {
   const { user } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -102,13 +103,13 @@ export function ProfileStep() {
         }
       }
 
-      const res = await api.put("/profile", data);
+      const res = await authService.updateProfile(data);
 
-      if (res.data?.ok) {
+      if (res.ok) {
         setProfileData(data);
         setCurrentStep(3);
       } else {
-        throw new Error(res.data?.message || "Erreur inconnue");
+        throw new Error(res.message || "Erreur inconnue");
       }
     } catch (error) {
       console.error("Erreur sauvegarde profil:", error);
@@ -301,13 +302,15 @@ export function ProfileStep() {
           <Button
             type="button"
             onClick={() => setCurrentStep(1)}
-            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
             ← Retour
           </Button>{" "}
           <Button
             type="submit"
             disabled={isSubmitting}
-            className=" disabled:opacity-50 disabled:cursor-not-allowed text-white">
+            className=" disabled:opacity-50 disabled:cursor-not-allowed text-white"
+          >
             {isSubmitting ? (
               <span className="flex items-center justify-center">
                 <Spinner className="mr-2" />

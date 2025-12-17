@@ -1,4 +1,4 @@
-import { config } from "@stackschool/shared";
+import { config } from "dotenv";
 import express from "express";
 import cookieParser from "cookie-parser";
 import passport from "passport";
@@ -16,6 +16,7 @@ import SeachSchool from "./routes/shools/search-school.route";
 import { getUserFromRedis } from "./lib/handle-redis-user";
 import path from "path";
 import { errorHandler } from "./middlewares/errorHandler";
+import { IP_ADDRESS } from "@stackschool/shared";
 
 config();
 
@@ -30,13 +31,19 @@ const pgPool = new pg.Pool({
 
 const app = express();
 app.use(helmet());
-//app.use(cors());
-app.use(
-  cors({
-    origin: FRONTEND_ORIGIN,
-    credentials: true,
-  })
-);
+
+const allowedOrigins = ["exp://192.168.101.135:8081", FRONTEND_ORIGIN];
+const corsOptions = {
+  origin: (origin: any, callback: any) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

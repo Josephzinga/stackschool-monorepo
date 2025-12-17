@@ -22,6 +22,7 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) => {
         }
 
         if (info) {
+          console.log("info:", info);
           // Les messages d'info de Passport sont des erreurs d'authentification (401)
           return next(
             createServiceError(info.message, 401, {
@@ -36,14 +37,9 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) => {
             ? info.providers.join(",")
             : info.providers || "";
 
-          const redirectUrl = `${FRONTEND_ORIGIN}/auth/finish?from=social&providers=${encodeURIComponent(
-            providers
-          )}`;
-
           return res.status(403).json({
             ok: false,
             isSocialOnly: true,
-            redirectUrl,
             providers,
             message: "Compte social uniquement — complétez votre profil.",
           });

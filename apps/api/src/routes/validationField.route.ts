@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma";
 import { validateUserFieldSchema } from "../lib/validation-schema";
-import { UserInMe } from "@stackschool/shared";
+import { isAuthenticated } from "../middlewares/auth";
 
 const router = Router();
 
-router.get("/user-field", async (req, res) => {
+router.get("/user-field", isAuthenticated, async (req, res) => {
   try {
-    const user = req.user as UserInMe;
+    const user = req.user;
     const parseResult = validateUserFieldSchema.safeParse(req.query);
 
     if (!parseResult.success) {
@@ -22,7 +22,7 @@ router.get("/user-field", async (req, res) => {
     console.log("email in validate=>", email);
 
     // check email uniqueness
-    if (email && user.email !== email) {
+    if (email && user?.email !== email) {
       const user = await prisma.user.findUnique({ where: { email } });
 
       if (user) {
@@ -35,7 +35,7 @@ router.get("/user-field", async (req, res) => {
       }
     }
 
-    if (phoneNumber && user.phoneNumber !== phoneNumber) {
+    if (phoneNumber && user?.phoneNumber !== phoneNumber) {
       const user = await prisma.user.findUnique({ where: { phoneNumber } });
 
       if (user) {

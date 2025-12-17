@@ -53,5 +53,5 @@ export interface ProfileData {
 
 export type UserInMe = User & {
   profile: Profile;
-  account: Account;
+  Account: Account[];
 };

@@ -2,7 +2,7 @@
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { School } from "@stackschool/db";
+import { School } from "@stackschool/shared";
 import { useEffect, useState } from "react";
 import { CreateSchoolForm } from "@/components/complete-profile/create-school-form";
 import InvitationForm from "./invitation-form";
@@ -10,7 +10,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { Loader2, Search } from "lucide-react";
 import { searchSchools } from "@/services/complete-profile";
 import { Field, FieldLabel } from "../ui/field";
-import { UseCompleteProfileStore } from "@/store/complete-profiile-store";
+import { UseCompleteProfileStore } from "@stackschool/ui";
 import { toast } from "sonner";
 import { Item, ItemGroup, ItemMedia, ItemTitle } from "../ui/item";
 import { AvatarName } from "../profile-avatar";
@@ -25,8 +25,11 @@ export default function SchoolStep() {
   // Recherche d'écoles
   useEffect(() => {
     if (!searchDebounce) return setSchools([]);
-
-    searchSchools(searchDebounce, setIsLoading).then(setSchools);
+    async function fetchSchools() {
+      const { schools } = await searchSchools(searchDebounce, setIsLoading);
+      setSchools(schools);
+    }
+    fetchSchools();
   }, [searchDebounce]);
 
   const handleClick = (schoolId: string) => {
@@ -50,7 +53,8 @@ export default function SchoolStep() {
       <Tabs
         className="w-full flex justify-center mx-auto"
         value={mode}
-        onValueChange={(val) => setMode(val as any)}>
+        onValueChange={(val) => setMode(val as any)}
+      >
         <div className="w-full flex justify-center">
           <TabsList className="grid grid-cols-3 mb-6 gap-2 h-10">
             <TabsTrigger value="join">Rejoindre</TabsTrigger>
@@ -89,7 +93,8 @@ export default function SchoolStep() {
                     `vous avez selectionner l'ecole ${school.name}`
                   );
                 }}
-                className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700  transition-colors ">
+                className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700  transition-colors "
+              >
                 <div className="flex justify-between items-center w-full pr-4">
                   <div className="flex flex-col gap-2">
                     <ItemTitle className="font-semibold text-foreground">

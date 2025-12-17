@@ -3,7 +3,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useUserStore } from "@/store/user-store";
+import { useUserStore } from "@stackschool/ui";
 
 export default function ProtectedRoute({
   children,
@@ -19,12 +19,12 @@ export default function ProtectedRoute({
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      console.log("User is not authenticated. Redirect to login page.");
-      router.replace("/auth/login");
+      console.log("User is not authenticated. Redirect to login page.", user);
+      //router.replace("/auth/login");
     }
   }, [loading, isAuthenticated, router]);
 
-  if (loading) {
+  if (!loading) {
     return (
       <div className="flex justify-center items-center py-12">
         <div className="animate-spin h-10 w-10 rounded-full border-2 border-blue-500 border-t-transparent" />
@@ -32,5 +32,5 @@ export default function ProtectedRoute({
     );
   }
 
-  return isAuthenticated ? <>{children}</> : null;
+  return <>{children}</>;
 }

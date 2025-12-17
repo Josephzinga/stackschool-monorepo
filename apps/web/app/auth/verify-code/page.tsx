@@ -17,14 +17,14 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Controller } from "@stackschool/ui/src/store";
+import { zodResolver } from "@stackschool/ui/src/store";
 import { VerifyCodeSchema, VerifyCodeFormType } from "@stackschool/shared";
 
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
-import api from "@/services/api";
+import { authService } from "@stackschool/shared";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -56,7 +56,7 @@ export default function VerifyCode() {
 
   const handleCode = async ({ code }: VerifyCodeFormType) => {
     try {
-      const res = await api.post("/auth/verify-code", { code, tempToken });
+      const res = await authService.verifyCode(code, tempToken);
       toast.success(res?.data.message);
       if (res?.data.resetToken) {
         router.push(`/auth/reset-password?token=${res.data.resetToken}`);
@@ -72,7 +72,7 @@ export default function VerifyCode() {
 
   const handleResendCode = async () => {
     try {
-      const res = await api.post("/auth/resend-code", { tempToken });
+      const res = await authService.resendCode(tempToken);
       if (res.data?.ok) {
         toast.success(res.data?.message || "Nouveau code envoyé");
         setCountdown(60); // 60 secondes d'attente
@@ -111,7 +111,8 @@ export default function VerifyCode() {
                       pattern={REGEXP_ONLY_DIGITS}
                       aria-invalid={!!errors.code}
                       aria-describedby={errors.code ? "code-error" : undefined}
-                      className="justify-center">
+                      className="justify-center"
+                    >
                       <InputOTPGroup className="gap-2">
                         {[...Array(6)].map((_, index) => (
                           <InputOTPSlot
@@ -134,7 +135,8 @@ export default function VerifyCode() {
             <Button
               type="submit"
               className="w-full text-white font-semibold"
-              disabled={isSubmitting}>
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <>
                   <Spinner className="mr-2" />
@@ -160,7 +162,8 @@ export default function VerifyCode() {
               <button
                 type="button"
                 onClick={handleResendCode}
-                className="text-blue-600 hover:underline text-sm">
+                className="text-blue-600 hover:underline text-sm"
+              >
                 Renvoyer le code
               </button>
             )}
@@ -168,7 +171,8 @@ export default function VerifyCode() {
             <div className="pt-4 border-t">
               <Link
                 href="/auth/login"
-                className="text-blue-600 hover:underline text-sm">
+                className="text-blue-600 hover:underline text-sm"
+              >
                 ← Retour à la connexion
               </Link>
             </div>

@@ -1,11 +1,11 @@
 // components/complete-profile/school-step/create-school-form.tsx
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "@stackschool/ui";
+import { zodResolver } from "@stackschool/ui";
 import { z } from "@stackschool/shared";
 import { CompleteProfileData } from "@/app/auth/complete-profile/page";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { UseCompleteProfileStore } from "@/store/complete-profiile-store";
+import { UseCompleteProfileStore } from "@stackschool/ui";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -136,14 +136,16 @@ export function CreateSchoolForm() {
         <div className="flex gap-3 pt-4">
           <Button
             type="button"
-            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
             Annuler
           </Button>
 
           <Button
             type="submit"
             disabled={!isValid || isSubmitting}
-            className="flex text-white font-semibold disabled:cursor-not-allowed">
+            className="flex text-white font-semibold disabled:cursor-not-allowed"
+          >
             {isSubmitting ? (
               <>
                 <Spinner /> Création...

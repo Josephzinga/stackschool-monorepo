@@ -1,13 +1,18 @@
-import api, { setApiBaseUrl } from "../lib/api";
+import { get } from "http";
+import api, { getApiBaseUrl, setApiBaseUrl } from "../../lib/api";
 import {
   LoginFormType,
   RegisterFormType,
   ProfileType,
-} from "../validation/auth-schema";
+} from "../../validation/auth-schema";
 
 export const authService = {
   setBaseUrl: (url: string) => {
     setApiBaseUrl(url);
+  },
+
+  getApiBaseUrl: () => {
+    return getApiBaseUrl();
   },
 
   // auth routes
@@ -37,12 +42,12 @@ export const authService = {
     return res.data;
   },
 
-  resendCode: async (tempToken: string) => {
+  resendCode: async (tempToken: string | null) => {
     const res = await api.post("/auth/resend-code", { tempToken });
     return res.data;
   },
 
-  verifyCode: async (code: string, tempToken?: string) => {
+  verifyCode: async (code: string, tempToken: string | null) => {
     const res = await api.post("/auth/verify-code", { code, tempToken });
     return res.data;
   },
@@ -67,6 +72,18 @@ export const authService = {
   // social (get redirect url)
   socialRedirect: async (provider: string) => {
     const res = await api.get(`/auth/${provider}`);
+    return res.data;
+  },
+  checkField: async (field: string, value: string) => {
+    const res = await api.get("/validate/user-field", {
+      params: {
+        [field]: value,
+      },
+    });
+    return res.data;
+  },
+  completeProfile: async (data: any) => {
+    const res = await api.post("/complete-profile", data);
     return res.data;
   },
 };

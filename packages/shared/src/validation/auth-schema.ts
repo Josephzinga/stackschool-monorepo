@@ -1,6 +1,5 @@
 // users/schemas.ts
-import path from "path";
-import { z } from "zod";
+import {z} from "zod";
 
 export const loginFormSchema = z.object({
   identifier: z
@@ -16,7 +15,7 @@ export const loginFormSchema = z.object({
       if (phoneRegex.test(value.replace(/\s/g, ""))) return true;
 
       // Validation username (alphanumérique + underscores, 3-20 caractères)
-      const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+      const usernameRegex = /^[a-zA-Z 0-9_]{3,20}$/;
       if (usernameRegex.test(value)) return true;
 
       return false;

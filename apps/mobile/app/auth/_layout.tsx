@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function AuthLayout() {
   return (
-    <Stack>
+    <Stack initialRouteName="login" screenOptions={{ headerShown: true }}>
       <StatusBar style="auto" />
       <Stack.Screen name="login" options={{ title: 'Login' }} />
       <Stack.Screen name="register" options={{ title: 'Register' }} />

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import { uploadedImageSchema } from "../validations/upload-profile-picture";
+import { createServiceError } from "../utils/api-response";
 export function validateUploadedImage(
   req: Request,
   res: Response,
@@ -14,7 +15,7 @@ export function validateUploadedImage(
 
   const result = uploadedImageSchema.safeParse(req.file);
   if (!result.success) {
-    return res.status(400).json({ ok: false, errors: result.error.flatten() });
+    createServiceError(result.error.message, 401, result.error.issues);
   }
 
   next();

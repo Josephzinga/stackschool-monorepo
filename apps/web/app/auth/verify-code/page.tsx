@@ -1,35 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Container } from "@/components/Container";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+import {Container} from "@/components/Container";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Field, FieldError, FieldLabel} from "@/components/ui/field";
+import {InputOTP, InputOTPGroup, InputOTPSlot,} from "@/components/ui/input-otp";
 
-import { useForm, Controller } from "@stackschool/ui/src/store";
-import { zodResolver } from "@stackschool/ui/src/store";
-import { VerifyCodeSchema, VerifyCodeFormType } from "@stackschool/shared";
+import {Controller, useForm, zodResolver} from "@stackschool/ui";
+import {authService, parseAxiosError, VerifyCodeFormType, VerifyCodeSchema} from "@stackschool/shared";
 
-import { REGEXP_ONLY_DIGITS } from "input-otp";
+import {REGEXP_ONLY_DIGITS} from "input-otp";
 import Link from "next/link";
-import { Spinner } from "@/components/ui/spinner";
-import { authService } from "@stackschool/shared";
-import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import {Spinner} from "@/components/ui/spinner";
+import {useRouter, useSearchParams} from "next/navigation";
+import {toast} from "sonner";
 
-import { useState, useEffect } from "react";
+import {useEffect, useState} from "react";
 
 export default function VerifyCode() {
   const search = useSearchParams();
@@ -57,15 +44,14 @@ export default function VerifyCode() {
   const handleCode = async ({ code }: VerifyCodeFormType) => {
     try {
       const res = await authService.verifyCode(code, tempToken);
-      toast.success(res?.data.message);
-      if (res?.data.resetToken) {
-        router.push(`/auth/reset-password?token=${res.data.resetToken}`);
+      toast.success(res.message);
+      if (res.resetToken) {
+        router.push(`/auth/reset-password?token=${res.resetToken}`);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Code invalide";
-      toast.error(errorMessage);
-
-      // Focus automatique sur le champ OTP en cas d'erreur
+      const {message} = parseAxiosError(error)
+      toast.error(message || "Code invalide ou éxpiré");
+      
       document.getElementById("code")?.focus();
     }
   };

@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma";
-import { $Enums } from "@stackschool/db";
-import { StrategyOptions, VerifyCallback } from "passport-google-oauth20";
+import { VerifyCallback } from "passport-google-oauth20";
 import { Profile } from "passport";
+import { clearUserFromRedis } from "../lib/handle-redis-user";
 
 export default async function handleOauthCallback(
   accessToken: string,
@@ -49,6 +49,8 @@ export default async function handleOauthCallback(
       });
       // si le user avec l'email trouvé on crée un compte
       if (user) {
+        // supprimer le user dans redis
+        clearUserFromRedis(user.id);
         // créer l'Account lié à ce user (si déjà lié, on ignore)
         await prisma.account.create({
           data: {
@@ -110,6 +112,7 @@ export default async function handleOauthCallback(
             providerAccountId,
             access_token: accessToken,
             refresh_token: refreshToken,
+
           },
         },
       },

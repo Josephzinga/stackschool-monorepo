@@ -1,30 +1,77 @@
 import { cn } from '@/lib/utils';
-import { Platform, TextInput, type TextInputProps } from 'react-native';
-import React from 'react';
+import { Text } from './text';
+import { Platform, TextInput, View, type TextInputProps, TouchableOpacity } from 'react-native';
+import React, { forwardRef } from 'react';
+import { type LucideIcon, Eye, EyeOff } from 'lucide-react-native';
 
-function Input({ className, ...props }: TextInputProps & React.RefAttributes<TextInput>) {
-  return (
-    <TextInput
-      className={cn(
-        'flex h-10 w-full min-w-0 flex-row items-center rounded-md border border-input bg-background px-3 py-1 text-base leading-5 text-foreground shadow-sm shadow-black/5 dark:bg-input/30 sm:h-9',
-        props.editable === false &&
-          cn(
-            'opacity-50',
-            Platform.select({ web: 'disabled:pointer-events-none disabled:cursor-not-allowed' })
-          ),
-        Platform.select({
-          web: cn(
-            'outline-none transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground md:text-sm',
-            'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive'
-          ),
-          native: 'placeholder:text-muted-foreground/50',
-        }),
-        className
-      )}
-      {...props}
-    />
-  );
+export interface InputProps extends TextInputProps, React.RefAttributes<TextInput> {
+  Icon?: LucideIcon;
+  RightIcon?: LucideIcon;
+  isPassword?: boolean;
+  showPassword?: boolean;
+  togglePassword?: (value: boolean) => void;
 }
+
+const Input = forwardRef<TextInput, InputProps>(
+  ({ className, Icon, RightIcon, isPassword, showPassword, togglePassword, ...props }, ref) => {
+    const PasswordIcon = showPassword ? EyeOff : Eye;
+    const FinalRightIcon = isPassword ? PasswordIcon : RightIcon;
+
+    const handlePress = () => {
+      if (isPassword && togglePassword) {
+        togglePassword(!showPassword);
+      }
+    };
+
+    return (
+      <View className="relative">
+        {Icon && (
+          <View className="absolute left-3 top-1/2 z-10 -translate-y-1/2">
+            <Icon size={16} color="gray" />
+          </View>
+        )}
+        <TextInput
+          ref={ref}
+          className={cn(
+            Icon ? 'pl-10' : 'pl-3',
+            FinalRightIcon ? 'pr-10' : 'pr-3',
+            'flex h-10 w-full min-w-0 flex-row items-center rounded-md border border-input bg-background py-1 text-base leading-5 text-foreground shadow-sm shadow-black/5 dark:bg-input/30 sm:h-9',
+            props.editable === false &&
+              cn(
+                'opacity-50',
+                Platform.select({
+                  web: 'disabled:pointer-events-none disabled:cursor-not-allowed',
+                })
+              ),
+            Platform.select({
+              web: cn(
+                'outline-none transition-[color,box-shadow] selection:bg-primary placeholder:text-muted-foreground md:text-sm',
+                'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive'
+              ),
+              native: 'placeholder:text-muted-foreground/50',
+            }),
+            className
+          )}
+          secureTextEntry={isPassword ? !showPassword : props.secureTextEntry}
+          {...props}
+        />
+        {FinalRightIcon && (
+          <View className="absolute right-3 top-1/2 z-10 -translate-y-1/2">
+            {isPassword ? (
+              <TouchableOpacity onPress={handlePress}>
+                <FinalRightIcon size={16} className="text-blue-600 dark:text-slate-400" />
+              </TouchableOpacity>
+            ) : (
+              <FinalRightIcon size={16} className="text-blue-600 dark:text-slate-400" />
+            )}
+          </View>
+        )}
+      </View>
+    );
+  }
+);
+
+Input.displayName = 'Input';
 
 export { Input };

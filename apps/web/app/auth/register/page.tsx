@@ -1,72 +1,48 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  authService,
-  parseAxiosError,
-  ServiceError,
-} from "@stackschool/shared";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
+import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {authService, parseAxiosError, registerFormSchema, RegisterFormType,} from "@stackschool/shared";
+import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator,} from "@/components/ui/field";
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { FacebookIcon, GoogleIcon } from "@/components/icons";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
-import { Eye, EyeOff } from "lucide-react";
-import { Button } from "../../../components/ui/button";
-import { useForm } from "@stackschool/ui";
-import { zodResolver } from "@stackschool/ui/";
-import { registerFormSchema, RegisterFormType } from "@stackschool/shared";
-import { toast } from "sonner";
-import { Container } from "@/components/Container";
-import { ButtonSocial } from "@/components/button-social";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {FacebookIcon, GoogleIcon} from "@/components/icons";
+import {Input} from "@/components/ui/input";
+import {Spinner} from "@/components/ui/spinner";
+import {Eye, EyeOff, Lock, Mail, User} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Controller, useForm, zodResolver} from "@stackschool/ui";
+import {toast} from "sonner";
+import {Container} from "@/components/Container";
+import {ButtonSocial} from "@/components/button-social";
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
 
 export default function RegisterPage() {
-  const [showpwd, setShowpwd] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
   const router = useRouter();
 
   const {
     handleSubmit,
     register,
+    control,
     formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(registerFormSchema), mode: "onBlur" });
+  } = useForm<RegisterFormType>({
+    resolver: zodResolver(registerFormSchema),
+    mode: "onBlur",
+  });
 
-  async function handleRegister({
-    username,
-    phoneNumber,
-    email,
-    password,
-    confirm,
-  }: RegisterFormType) {
+  async function handleRegister(data: RegisterFormType) {
     try {
-      const res = await authService.register({
-        username,
-        phoneNumber,
-        email,
-        password,
-        confirm,
-      });
-
-      toast.success(res.message);
+      const res = await authService.register(data);
+      if (res.ok) {
+        toast.success(res.message);
+     }
 
       if (res.requireVerification) {
-        router.replace(`/auth/verify-code?userId=${res.user.id}`);
+      //  router.replace(`/auth/verify-code?userId=${res.user.id}`);
       }
-      if (res.profileCompleted) {
-        console.log("profileCompleted", res.profileCompleted);
+      if (res.user.profileCompleted) {
+        router.replace("/auth/complete-profile")
       }
     } catch (err: any) {
       const error = parseAxiosError(err);
@@ -80,7 +56,7 @@ export default function RegisterPage() {
         <CardHeader className="text-center mt-4">
           <CardTitle className="text-xl">Bienvenue</CardTitle>
           <CardDescription>
-            Connecter vous à votre compte Google ou Facebook
+            Connectez-vous à votre compte Google ou Facebook
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -103,13 +79,14 @@ export default function RegisterPage() {
                   id="username"
                   type="text"
                   required
+                  icon={User}
                   autoComplete="name"
+                  placeholder="John Doe"
                   aria-invalid={!!errors.username}
                   aria-describedby={
                     errors.username ? "username-error" : undefined
                   }
                   {...register("username")}
-                  className="h-9 text-sm py-1 px-2"
                 />
 
                 <FieldError id="username-error">
@@ -119,8 +96,10 @@ export default function RegisterPage() {
               <Field className="gap-1 text-sm">
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
+                  icon={Mail}
                   id="email"
                   type="email"
+                  placeholder="john.doe@example.com"
                   {...register("email")}
                   autoComplete="email"
                   aria-invalid={!!errors.email}
@@ -131,16 +110,20 @@ export default function RegisterPage() {
                 </FieldError>
               </Field>
               <Field className="gap-1 ">
-                <FieldLabel htmlFor="phoneNumber">Numéro whatsApp</FieldLabel>
-                <Input
-                  id="phoneNumber"
-                  type="tel"
-                  {...register("phoneNumber")}
-                  autoComplete="tel"
-                  aria-invalid={!!errors.phoneNumber}
-                  aria-describedby={
-                    errors.phoneNumber ? "error-phone" : undefined
-                  }
+                <FieldLabel htmlFor="phoneNumber">Numéro WhatsApp</FieldLabel>
+                <Controller
+                  name="phoneNumber"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput
+                      {...field}
+                      defaultContry="ML"
+                      id="phoneNumber"
+                      placeholder="+223 07 12 34 56 78"
+                      defaultCountry="CI"
+                      className="phone-input-custom"
+                    />
+                  )}
                 />
 
                 <FieldError id="error-phone">
@@ -148,35 +131,36 @@ export default function RegisterPage() {
                 </FieldError>
               </Field>
               <Field className="gap-1">
-                <div className="flex items-center relative">
+
                   <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowpwd(!showpwd)}
-                    aria-label={
-                      showpwd
-                        ? "Cacher le mot de passe"
-                        : "Afficher le mot de passe"
-                    }
-                    className="absolute right-3 top-8 text-gray-600 dark:text-gray-400"
-                  >
-                    {showpwd ? <Eye size={18} /> : <EyeOff size={18} />}
-                  </button>
-                </div>
+                  <div className="relative">
                 <Input
+                  icon={Lock}
                   {...register("password")}
                   id="password"
-                  type={showpwd ? "text" : "password"}
+                  type={showPwd ? "text" : "password"}
                   required
+                  placeholder="********"
                   autoComplete="current-password"
                   aria-invalid={!!errors.password}
                   aria-describedby={
                     errors.password ? "password-error" : undefined
                   }
-                  className="h-9 text-sm py-1 px-2 pr-10"
                 />
-
+                    <button
+                        type="button"
+                        onClick={() => setShowPwd(!showPwd)}
+                        aria-label={
+                          showPwd
+                              ? "Cacher le mot de passe"
+                              : "Afficher le mot de passe"
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 dark:text-gray-400 cursor-pointer"
+                    >
+                      {showPwd ? <Eye size={18} /> : <EyeOff size={18} />}
+                    </button>
+                  </div>
                 <FieldError id="password-error">
                   {errors.password?.message}{" "}
                 </FieldError>
@@ -189,6 +173,8 @@ export default function RegisterPage() {
                   id="confirm"
                   autoComplete="current-password webauthn"
                   type="password"
+                  icon={Lock}
+                  placeholder="********"
                   {...register("confirm")}
                   aria-invalid={!!errors.confirm}
                   aria-describedby={

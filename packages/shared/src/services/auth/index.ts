@@ -1,10 +1,5 @@
-import { get } from "http";
-import api, { getApiBaseUrl, setApiBaseUrl } from "../../lib/api";
-import {
-  LoginFormType,
-  RegisterFormType,
-  ProfileType,
-} from "../../validation/auth-schema";
+import api, {getApiBaseUrl, setApiBaseUrl} from "../../lib/api";
+import {LoginFormType, ProfileType, RegisterFormType,} from "../../validation/auth-schema";
 
 export const authService = {
   setBaseUrl: (url: string) => {
@@ -59,13 +54,13 @@ export const authService = {
 
   // profile
   updateProfile: async (data: ProfileType) => {
-    const res = await api.put("/auth/profile", data);
+    const res = await api.put("/profile", data);
     return res.data;
   },
 
   // refresh token or get new session
   refresh: async () => {
-    const res = await api.get("/auth/refresh");
+    const res = await api.post("/auth/refresh");
     return res.data;
   },
 

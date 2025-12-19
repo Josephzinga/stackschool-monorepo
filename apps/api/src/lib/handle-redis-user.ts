@@ -20,3 +20,8 @@ export const getUserFromRedis = async (userId: string) => {
 
   return user;
 };
+
+export const clearUserFromRedis = (userId: string) => {
+  const redisKey = `user_profile:${userId}`;
+  redisClient.del(redisKey);
+};

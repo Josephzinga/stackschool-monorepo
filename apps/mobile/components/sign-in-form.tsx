@@ -1,4 +1,4 @@
-import { zodResolver, useForm, Controller } from '@stackschool/ui';
+import { Controller, useForm, zodResolver } from '@stackschool/ui';
 import { SocialConnections } from '@/components/social-connections';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,10 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
 import * as React from 'react';
-import { Pressable, View, type TextInput } from 'react-native';
+import { Pressable, type TextInput, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { authService, loginFormSchema, LoginFormType, parseAxiosError } from '@stackschool/shared';
 import Toast from 'react-native-toast-message';
+import { FieldError } from './field';
+import { Lock, Mail } from 'lucide-react-native';
 
 export function SignInForm() {
   const {
@@ -21,28 +23,32 @@ export function SignInForm() {
   const router = useRouter();
 
   const passwordInputRef = React.useRef<TextInput>(null);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   function onEmailSubmitEditing() {
+    console.log('onEmailSubmitEditing');
     passwordInputRef.current?.focus();
   }
 
   async function onSubmit(data: LoginFormType) {
+    console.log('unsubmit');
     try {
       const res = await authService.login(data);
-
-      Toast.show({
-        type: 'success',
-        text1: 'Login Successful',
-        text2: 'Welcome back!',
-      });
-      router.replace('/');
+      if (res.ok) {
+        Toast.show({
+          type: 'success',
+          text1: res.message,
+        });
+        // router.replace("/dashboard");
+      }
     } catch (err: any) {
       const { data, message, status } = parseAxiosError(err);
+      console.log(err);
       console.log("erreur d'axios", message, data, status);
       Toast.show({
         type: 'error',
-        text1: 'Login Failed',
-        text2: message || data?.message || 'Erreur réseau',
+        text1: 'Connexion echoué',
+        text2: message || 'Erreur réseau',
       });
     }
   }
@@ -51,20 +57,30 @@ export function SignInForm() {
     <View className="gap-6">
       <Card className="border-border/0 shadow-none sm:border-border sm:shadow-sm sm:shadow-black/5">
         <CardHeader>
-          <CardTitle className="text-center text-xl sm:text-left">Sign in to your app</CardTitle>
+          <CardTitle className="text-center text-xl sm:text-left">
+            Connecter vous à voutre application
+          </CardTitle>
           <CardDescription className="text-center sm:text-left">
-            Welcome back! Please sign in to continue
+            Connecter vous à votre compte Google ou Facebook
           </CardDescription>
+          <Separator className="flex-1" />
+          <SocialConnections />
+          <View className="flex-row items-center">
+            <Separator className="flex-1" />
+            <Text className="px-4 text-sm text-muted-foreground">Ou continuer avec </Text>
+            <Separator className="flex-1" />
+          </View>
         </CardHeader>
         <CardContent className="gap-6">
           <View className="gap-6">
             <View className="gap-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email ou nom d'utilisateur</Label>
               <Controller
                 name="identifier"
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
+                    Icon={Mail}
                     id="identifier"
                     placeholder="m@example.com"
                     keyboardType="email-address"
@@ -78,13 +94,11 @@ export function SignInForm() {
                   />
                 )}
               />
-              {errors.identifier && (
-                <Text className="text-destructive">{errors.identifier.message}</Text>
-              )}
+              <FieldError>{errors.identifier?.message}</FieldError>
             </View>
             <View className="gap-1.5">
               <View className="flex-row items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Mot de passe</Label>
                 <Button
                   variant="link"
                   size="sm"
@@ -92,7 +106,7 @@ export function SignInForm() {
                   onPress={() => {
                     router.push('/auth/forgot-password');
                   }}>
-                  <Text className="font-normal leading-4">Forgot your password?</Text>
+                  <Text className="font-normal leading-4">Mot de passe oublier?</Text>
                 </Button>
               </View>
               <Controller
@@ -100,10 +114,13 @@ export function SignInForm() {
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
+                    isPassword
+                    showPassword={showPassword}
+                    togglePassword={setShowPassword}
+                    Icon={Lock}
                     ref={passwordInputRef}
                     id="password"
                     placeholder="********"
-                    secureTextEntry
                     returnKeyType="send"
                     onSubmitEditing={handleSubmit(onSubmit)}
                     onBlur={onBlur}
@@ -112,29 +129,23 @@ export function SignInForm() {
                   />
                 )}
               />
-              {errors.password && (
-                <Text className="text-destructive">{errors.password.message}</Text>
-              )}
+              <FieldError>{errors.password?.message}</FieldError>
             </View>
             <Button className="w-full" onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
-              {isSubmitting ? <Text>Signing in...</Text> : <Text>Continue</Text>}
+              {isSubmitting ? <Text>Connexion en cours...</Text> : <Text>Se connecter</Text>}
             </Button>
           </View>
-          <Text className="text-center text-sm">
-            Don&apos;t have an account?{' '}
+          <View className="flex items-center text-center text-sm">
+            <Text className="text-sm">Pas de compte ? </Text>
             <Pressable
               onPress={() => {
                 router.push('/auth/register');
               }}>
-              <Text className="text-sm underline underline-offset-4">Sign up</Text>
+              <Text className="font-medium text-blue-500 underline underline-offset-4">
+                Crée un compte
+              </Text>
             </Pressable>
-          </Text>
-          <View className="flex-row items-center">
-            <Separator className="flex-1" />
-            <Text className="px-4 text-sm text-muted-foreground">or</Text>
-            <Separator className="flex-1" />
           </View>
-          <SocialConnections />
         </CardContent>
       </Card>
     </View>

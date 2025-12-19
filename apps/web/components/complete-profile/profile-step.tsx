@@ -1,37 +1,27 @@
 // components/complete-profile/profile-step.tsx
 "use client";
-import { useState } from "react";
-import { UseCompleteProfileStore } from "@stackschool/ui";
-import {
-  Select,
-  SelectContent,
-  SelectTrigger,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectValue,
-} from "../ui/select";
-import { toast } from "sonner";
-import { Controller, useForm } from "@stackschool/ui";
+import {useState} from "react";
+import {Controller, UseCompleteProfileStore, useForm, useUserStore, zodResolver} from "@stackschool/ui";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "../ui/select";
+import {toast} from "sonner";
 import PhoneInput from "react-phone-number-input";
-import { authService, profileSchema, ProfileType } from "@stackschool/shared";
-import { zodResolver } from "@stackschool/ui";
-import { Field, FieldError, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Spinner } from "../ui/spinner";
-import { useUserStore } from "@stackschool/ui";
+import {authService, profileSchema, ProfileType} from "@stackschool/shared";
+import {Field, FieldError, FieldLabel} from "../ui/field";
+import {Input} from "../ui/input";
+import {Button} from "../ui/button";
+import {Spinner} from "../ui/spinner";
 import "react-phone-number-input/style.css";
-import { checkField } from "@/lib/check-profile-field";
+import {checkField} from "@/lib/check-profile-field";
 import ProfileUpload from "../profile-upload";
-import api from "@stackschool/shared/src/lib/api";
+import api, {parseAxiosError} from "@stackschool/shared/src/lib/api";
 
 export function ProfileStep() {
-  const { user } = useUserStore();
+  const { user , fetchUser} = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const [picture, setPicture] = useState<string | null>(
     user?.profile?.photo || null
   );
+
   const [phoneValue, setPhoneValue] = useState<string>("");
 
   const { setCurrentStep, setProfileData } = UseCompleteProfileStore();
@@ -56,7 +46,7 @@ export function ProfileStep() {
     mode: "onBlur",
   });
 
-  console.log(user);
+  console.log("user dans complete profile",user);
 
   // Fonction de validation améliorée
   const validateField = async (fieldName: keyof ProfileType, value: string) => {
@@ -83,7 +73,6 @@ export function ProfileStep() {
 
   const handleProfile = async (data: ProfileType) => {
     try {
-      // Validation finale avant soumission
       if (data.email) {
         const emailCheck = await checkField("email", data.email);
         if (!emailCheck.valid) {
@@ -108,12 +97,11 @@ export function ProfileStep() {
       if (res.ok) {
         setProfileData(data);
         setCurrentStep(3);
-      } else {
-        throw new Error(res.message || "Erreur inconnue");
       }
     } catch (error) {
-      console.error("Erreur sauvegarde profil:", error);
-      toast.error("Erreur lors de la sauvegarde du profil");
+      const {message} = parseAxiosError(error)
+      console.error("Erreur sauvegarde profil:", message);
+      toast.error(message || "Erreur lors de la sauvegarde du profil");
     }
   };
 
@@ -136,7 +124,6 @@ export function ProfileStep() {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    console.log(file);
 
     if (!file.type.startsWith("image/")) {
       toast.warning("Veuillez sélectionner une image");
@@ -158,7 +145,6 @@ export function ProfileStep() {
       const data = res.data;
 
       if (data.ok) {
-        //  setFormData(prev => ({ ...prev, photo: data.url }));
         setPicture(data.path);
         toast.success(
           `${res.data.message}` || "Photo de profil téléchargée avec succès !"
@@ -168,12 +154,9 @@ export function ProfileStep() {
       }
     } catch (error: any) {
       setIsLoading(false);
+      const { message, status, data } = parseAxiosError(error);
       console.error("Erreur upload photo:", error);
-      toast.error(
-        error.response.data.message ||
-          error.response.data.error ||
-          "Erreur lors du téléchargement de la photo"
-      );
+      toast.error(data?.errors || "Erreur lors du téléchargement de la photo");
     } finally {
       setIsLoading(false);
     }
@@ -251,7 +234,7 @@ export function ProfileStep() {
             />
             <FieldError>{errors.email?.message}</FieldError>
           </Field>
-          {/* Numéro de téléphone - CORRIGÉ */}
+        
           <Field>
             <FieldLabel htmlFor="phoneNumber">Numéro de téléphone</FieldLabel>
             <Controller
@@ -262,8 +245,8 @@ export function ProfileStep() {
                   international
                   defaultCountry="ML"
                   value={phoneValue}
-                  onChange={handlePhoneChange} // Utiliser la fonction corrigée
-                  onBlur={handlePhoneBlur} // Utiliser la fonction corrigée
+                  onChange={handlePhoneChange} 
+                  onBlur={handlePhoneBlur} 
                   placeholder="Entrez votre numéro"
                   className="phone-input-custom"
                 />

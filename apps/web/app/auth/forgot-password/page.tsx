@@ -1,29 +1,21 @@
 "use client";
 
-import { Container } from "@/components/Container";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
-import api from "@/services/api";
+import {Container} from "@/components/Container";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Field, FieldError, FieldLabel} from "@/components/ui/field";
+import {Input} from "@/components/ui/input";
+import {Spinner} from "@/components/ui/spinner";
+import {authService, forgotPasswordSchema, FormDataType, parseAxiosError} from "@stackschool/shared";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, PhoneIcon } from "lucide-react";
-import { forgotPasswordSchema, FormDataType } from "@stackschool/shared";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import {useRouter} from "next/navigation";
+import {useForm, zodResolver} from "@stackschool/ui";
+import {toast} from "sonner";
+import {AlertCircle, PhoneIcon} from "lucide-react";
+import PhoneInput, {isValidPhoneNumber} from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
-import { useState } from "react";
+import {useState} from "react";
 
 export default function ForgotPasswordPage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -82,17 +74,18 @@ export default function ForgotPasswordPage() {
     }
     console.log("identifier", identifier);
     try {
-      const res = await api.post("/auth/forgot-password", { identifier });
-      if (res.data?.ok) {
-        toast.success(res.data.message);
-        const tempToken = res.data.tempToken;
+      const res = await authService.forgotPassword(identifier);
+      if (res.ok) {
+        toast.success(res.message);
+        const tempToken = res.tempToken;
 
         if (tempToken) {
           router.push(`/auth/verify-code?token=${tempToken}`);
         }
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erreur réseau");
+      const {message} = parseAxiosError(error)
+      toast.error(message || "Erreur réseau");
     }
   };
 
@@ -128,8 +121,8 @@ export default function ForgotPasswordPage() {
                       setValue("identifier", phoneValue);
                     }
                   }}
-                  placeholder="Entrez votre numéro"
-                  className="phone-input-custom"
+                  placeholder="+223 07 12 34 56 78"
+
                 />
               ) : (
                 <Input
@@ -161,7 +154,8 @@ export default function ForgotPasswordPage() {
                     setPhoneValue("");
                   }
                 }}
-                className="text-sm text-blue-500 hover:underline flex gap-1">
+                className="text-sm text-blue-500 hover:underline flex gap-1"
+              >
                 {inputType === "phone" ? (
                   "← Utiliser un email ou nom d'utilisateur à la place"
                 ) : (
@@ -180,7 +174,8 @@ export default function ForgotPasswordPage() {
                 isSubmitting || inputType === "phone"
                   ? !isValidPhoneNumber(phoneValue)
                   : false
-              }>
+              }
+            >
               {isSubmitting ? (
                 <>
                   <Spinner />
@@ -195,7 +190,8 @@ export default function ForgotPasswordPage() {
           <div className="text-center space-y-3">
             <Link
               href="/auth/login"
-              className="text-blue-500 hover:underline hover:text-blue-700 block">
+              className="text-blue-500 hover:underline hover:text-blue-700 block"
+            >
               ← Retour à la connexion
             </Link>
 

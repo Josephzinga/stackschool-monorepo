@@ -12,8 +12,8 @@ COPY apps/api ./apps/api
 
 RUN pnpm install --no-frozen-lockfile
 
-EXPOSE 4000 5555 3002
-
+EXPOSE 4000 51212
+ 
 # Solution simple et fiable
 WORKDIR /app/apps/api
 CMD ["pnpm", "run", "dev"]

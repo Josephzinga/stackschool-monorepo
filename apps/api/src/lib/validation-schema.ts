@@ -58,6 +58,12 @@ export const loginSchema = z.object({
 });
 
 export const validateUserFieldSchema = z.object({
-  email: z.string().email().optional(),
-  phoneNumber: z.string().min(8, "Numéro invalide").optional(),
+  email: z.string().email("Veuillez entrer un email valide.").optional(),
+  phoneNumber: z
+    .string()
+    .trim()
+    .regex(/^\+?[0-9]{8,15}$/, {
+      message: "Numéro invalide (format international recommandé, ex: +223...)",
+    })
+    .optional(),
 });

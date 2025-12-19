@@ -16,6 +16,8 @@ import {
   RegisterFormType,
 } from '@stackschool/shared';
 import { useRouter } from 'expo-router';
+import { FieldError } from './field';
+import { Mail, Phone, User, Lock } from 'lucide-react-native';
 
 export function SignUpForm() {
   const {
@@ -29,6 +31,7 @@ export function SignUpForm() {
   const emailInputRef = React.useRef<TextInput>(null);
   const passwordInputRef = React.useRef<TextInput>(null);
   const confirmPasswordInputRef = React.useRef<TextInput>(null);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   function onUsernameSubmitEditing() {
     phoneNumberInputRef.current?.focus();
@@ -74,20 +77,22 @@ export function SignUpForm() {
     <View className="gap-6">
       <Card className="border-border/0 shadow-none sm:border-border sm:shadow-sm sm:shadow-black/5">
         <CardHeader>
-          <CardTitle className="text-center text-xl sm:text-left">Create an account</CardTitle>
+          <CardTitle className="text-center text-xl sm:text-left">Crée un compte</CardTitle>
           <CardDescription className="text-center sm:text-left">
-            Enter your details below to create your account
+            Connecter vous à votre compte Google ou Facebook
           </CardDescription>
+          <SocialConnections />
         </CardHeader>
         <CardContent className="gap-6">
           <View className="gap-6">
             <View className="gap-1.5">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">Nom d'utilisateur</Label>
               <Controller
                 name="username"
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
+                    Icon={User}
                     id="username"
                     placeholder="John Doe"
                     autoCapitalize="words"
@@ -99,17 +104,17 @@ export function SignUpForm() {
                   />
                 )}
               />
-              {errors.username && (
-                <Text className="text-destructive">{errors.username.message}</Text>
-              )}
+
+              <FieldError>{errors.username?.message}</FieldError>
             </View>
             <View className="gap-1.5">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Label htmlFor="phoneNumber">Numéro de télephone</Label>
               <Controller
                 name="phoneNumber"
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
+                    Icon={Phone}
                     ref={phoneNumberInputRef}
                     id="phoneNumber"
                     placeholder="+1 234 567 890"
@@ -123,9 +128,7 @@ export function SignUpForm() {
                   />
                 )}
               />
-              {errors.phoneNumber && (
-                <Text className="text-destructive">{errors.phoneNumber.message}</Text>
-              )}
+              <FieldError>{errors.phoneNumber?.message}</FieldError>
             </View>
             <View className="gap-1.5">
               <Label htmlFor="email">Email</Label>
@@ -134,6 +137,7 @@ export function SignUpForm() {
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
+                    Icon={Mail}
                     ref={emailInputRef}
                     id="email"
                     placeholder="m@example.com"
@@ -151,15 +155,18 @@ export function SignUpForm() {
               {errors.email && <Text className="text-destructive">{errors.email.message}</Text>}
             </View>
             <View className="gap-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mot de passe</Label>
               <Controller
                 name="password"
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
+                    Icon={Lock}
+                    isPassword
+                    togglePassword={setShowPassword}
+                    showPassword={showPassword}
                     ref={passwordInputRef}
                     id="password"
-                    secureTextEntry
                     placeholder="********"
                     onSubmitEditing={() => confirmPasswordInputRef.current?.focus()}
                     returnKeyType="next"
@@ -169,18 +176,20 @@ export function SignUpForm() {
                   />
                 )}
               />
-              {errors.password && (
-                <Text className="text-destructive">{errors.password.message}</Text>
-              )}
+              <FieldError>{errors.password?.message}</FieldError>
             </View>
             <View className="gap-1.5">
-              <Label htmlFor="confirm">Confirm Password</Label>
+              <Label htmlFor="confirm">Confirmer le mot de passe</Label>
               <Controller
                 name="confirm"
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
                     ref={confirmPasswordInputRef}
+                    Icon={Lock}
+                    isPassword
+                    togglePassword={setShowPassword}
+                    showPassword={showPassword}
                     id="confirm"
                     secureTextEntry
                     placeholder="********"
@@ -192,14 +201,14 @@ export function SignUpForm() {
                   />
                 )}
               />
-              {errors.confirm && <Text className="text-destructive">{errors.confirm.message}</Text>}
+              <FieldError>{errors.confirm?.message}</FieldError>
             </View>
             <Button className="w-full" onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
-              {isSubmitting ? <Text>Creating account...</Text> : <Text>Create account</Text>}
+              {isSubmitting ? <Text>Inscription en cours...</Text> : <Text>S&apos;inscrire</Text>}
             </Button>
           </View>
           <Text className="text-center text-sm">
-            Already have an account?{' '}
+            Déjà un compte?{' '}
             <Pressable
               onPress={() => {
                 if (router.canGoBack()) {
@@ -208,7 +217,7 @@ export function SignUpForm() {
                   router.replace('/auth/sign-in');
                 }
               }}>
-              <Text className="text-sm underline underline-offset-4">Sign in</Text>
+              <Text className="text-sm underline underline-offset-4">Connexion</Text>
             </Pressable>
           </Text>
           <View className="flex-row items-center">
@@ -216,7 +225,6 @@ export function SignUpForm() {
             <Text className="px-4 text-sm text-muted-foreground">or</Text>
             <Separator className="flex-1" />
           </View>
-          <SocialConnections />
         </CardContent>
       </Card>
     </View>

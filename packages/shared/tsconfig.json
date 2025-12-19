@@ -11,7 +11,8 @@
     "index.ts",
     "src/**/*",
     "src/types/api-response.ts",
-    "../../apps/api/src/utils/api-response.ts"
+    "../../apps/api/src/utils/api-response.ts",
+    "../ui/src/lib/index.ts"
   ],
   "exclude": ["node_modules", "dist"],
   "references": []

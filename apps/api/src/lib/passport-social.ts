@@ -1,13 +1,8 @@
 import type { Request, Response } from "express";
 import { generateToken } from "./outils";
 import { prisma } from "../lib/prisma";
-import { User } from "@stackschool/db";
-
-const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:3000";
-
-type UserWithProfile = User & {
-  profileCompleted?: boolean;
-};
+import { parseState } from "../utils/deep.link";
+import { createServiceError } from "../utils/api-response";
 
 export default async function handleSocialRoutes(
   req: Request,
@@ -15,15 +10,22 @@ export default async function handleSocialRoutes(
   provider: string
 ) {
   try {
-    const user = req.user as UserWithProfile | undefined;
+    const { plateform } = parseState(req.query.state as string);
+
+    const WEB_URL = process.env.FRONTEND_URL!;
+    const MOBILE_URL = process.env.MOBILE_DEEPLINK_URL!;
+
+    const baseUrl = plateform === "mobile" ? MOBILE_URL : WEB_URL;
+
+    const user = req.user;
     console.log("user ", user);
     if (!user || !user.id) {
-      res.redirect(`${FRONTEND_ORIGIN}/auth/login?error=auth`);
+      res.redirect(`${baseUrl}/auth/login?error=auth`);
       return;
     }
 
     const refreshToken = generateToken(32);
-    const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 25);
+    const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 25); // 25 jours
 
     await prisma.session.create({
       data: {
@@ -40,15 +42,12 @@ export default async function handleSocialRoutes(
       maxAge: 1000 * 60 * 60 * 24 * 25,
     });
 
-    if (user.profileCompleted) {
-      // Le profil est complet, on redirige vers le tableau de bord
-      res.redirect(`${FRONTEND_ORIGIN}/dashboard`);
+    if (!user.profileCompleted) {
+      res.redirect(`${baseUrl}/auth/complete-profile`);
     } else {
-      // Le profil est incomplet, on redirige pour le compléter
-      res.redirect(`${FRONTEND_ORIGIN}/auth/complete-profile`);
+      res.redirect(`${baseUrl}/dashboard`);
     }
   } catch (err) {
-    console.log(`Error get ${provider} callback`, err);
-    res.redirect(`${FRONTEND_ORIGIN}/auth/login?error=server`);
+    createServiceError(`Error get ${provider} callback`, 500, err);
   }
 }

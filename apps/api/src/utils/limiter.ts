@@ -1,5 +1,5 @@
-import { RateLimiterMemory } from "rate-limiter-flexible";
-import type { Request } from "express";
+import {RateLimiterMemory} from "rate-limiter-flexible";
+import type {Request} from "express";
 
 const resendCodeLimiter = new RateLimiterMemory({
   points: 5,
@@ -36,7 +36,7 @@ export const consumeIp = (req: Request) => {
 };
 // Rate limiting par identifiant
 const identifierLimiter = new RateLimiterMemory({
-  points: 4, // 4 tentatives
+  points: 5, // 4 tentatives
   duration: 600, // 10 minutes
 });
 

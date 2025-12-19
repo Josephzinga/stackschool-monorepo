@@ -9,12 +9,13 @@ router.get("/user-field", isAuthenticated, async (req, res) => {
   try {
     const user = req.user;
     const parseResult = validateUserFieldSchema.safeParse(req.query);
-
+    console.log("request query", req.query);
+    console.log(parseResult, "parse data");
     if (!parseResult.success) {
       return res.status(400).json({
         ok: false,
         valid: false,
-        message: "Format invalide",
+        message: parseResult.error.issues.map((issue) => issue.message),
       });
     }
 
@@ -23,27 +24,27 @@ router.get("/user-field", isAuthenticated, async (req, res) => {
 
     // check email uniqueness
     if (email && user?.email !== email) {
-      const user = await prisma.user.findUnique({ where: { email } });
+      const existingUser = await prisma.user.findUnique({ where: { email } });
 
-      if (user) {
+      if (existingUser) {
         return res.json({
           ok: true,
           valid: false,
           field: "email",
-          message: "Cet email est déjà utilisé.",
+          message: "Cette valeur est déjà utilisée.",
         });
       }
     }
 
     if (phoneNumber && user?.phoneNumber !== phoneNumber) {
-      const user = await prisma.user.findUnique({ where: { phoneNumber } });
+      const existingUser = await prisma.user.findUnique({ where: { phoneNumber } });
 
-      if (user) {
+      if (existingUser) {
         return res.json({
           ok: true,
           valid: false,
           field: "phone",
-          message: "Ce numéro est déjà utilisé.",
+          message: "Cette valeur est déjà utilisée.",
         });
       }
     }

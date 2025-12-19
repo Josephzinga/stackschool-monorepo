@@ -11,8 +11,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep, steps, className }) => {
   const numberOfSteps = steps.length;
 
   return (
-    <div
-      className={cn("w-full max-w-lg mx-auto md:ml-10 px-2 py-3", className)}>
+    <div className={cn("w-full max-w-lg mx-auto px-2 py-3", className)}>
       <div className="relative flex items-center justify-between">
         {/* Ligne de progression */}
         <div className="absolute left-0 top-[calc(50% - 13px)] -translate-y-1/2 h-3 rounded-lg w-full bg-gray-200" />
@@ -44,19 +43,22 @@ const Stepper: React.FC<StepperProps> = ({ currentStep, steps, className }) => {
                       ? "bg-white border-2 border-gray-300 text-gray-400"
                       : ""
                   }
-                `}>
+                `}
+              >
                 {isCompleted ? (
                   <svg
                     className="w-6 h-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      d="M5 13l4 4L19 7"></path>
+                      d="M5 13l4 4L19 7"
+                    ></path>
                   </svg>
                 ) : (
                   stepNumber
@@ -65,7 +67,8 @@ const Stepper: React.FC<StepperProps> = ({ currentStep, steps, className }) => {
               <p
                 className={`mt-2 text-sm text-center font-medium transition-colors duration-300 w-24
                 ${isCurrent ? "text-blue-600" : "text-gray-500"}
-              `}>
+              `}
+              >
                 {title}
               </p>
             </div>

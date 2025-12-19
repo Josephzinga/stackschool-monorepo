@@ -8,7 +8,7 @@ const nextConfig = {
         // Si une requête commence par /images
         source: "/images/:path*",
         // Redirigez-la vers le serveur Express (qui sert les fichiers statiques)
-        destination: "http://backend:4000/images/:path*",
+        destination: "http://localhost:4000/images/:path*",
       },
     ];
   },

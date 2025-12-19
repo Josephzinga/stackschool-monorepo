@@ -56,7 +56,7 @@ export default function CompleteProfile() {
         <div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10">
           {/* Partie guide - fixe */}
           <div className="w-full h-fit md:sticky md:top-0 md:h-screen flex flex-col justify-between bg-slate-700/40 p-4 md:p-6">
-            <div className="flex-1">
+            <div className="flex justify-center w-full">
               <Stepper
                 className="w-full"
                 currentStep={

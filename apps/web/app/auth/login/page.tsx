@@ -22,12 +22,13 @@ export default function LoginPage() {
       if (res.ok) {
         router.push("/auth/finish?from=");
       }
+      toast.success(res.message || "Connexion réussie");
     } catch (err: any) {
-      const data = err?.response?.data;
+      const { message, data, status } = parseAxiosError(err);
       if (data?.isSocialOnly) {
         return toast.warning(data.message);
       }
-      toast.error(data?.message || "Erreur de connexion");
+      toast.error(message || "Erreur de connexion");
     }
   };
   return (

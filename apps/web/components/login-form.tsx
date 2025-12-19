@@ -70,6 +70,7 @@ export function LoginForm({
                   Email ou nom d&apos;utilisateur
                 </FieldLabel>
                 <Input
+                    placeholder="exmple@example.com"
                   icon={Mail}
                   id="email"
                   type="text"
@@ -91,9 +92,9 @@ export function LoginForm({
                   <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
                   <Link
                     href="/auth/forgot-password"
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
+                    className="ml-auto text-sm font-semibold hover:underline "
                   >
-                    Mot de passe oublier
+                    Mot de passe oublier?
                   </Link>
                 </div>
                 <div className="relative">

@@ -2,7 +2,6 @@
 import { useForm } from "@stackschool/ui";
 import { zodResolver } from "@stackschool/ui";
 import { z } from "@stackschool/shared";
-import { CompleteProfileData } from "@/app/auth/complete-profile/page";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { UseCompleteProfileStore } from "@stackschool/ui";

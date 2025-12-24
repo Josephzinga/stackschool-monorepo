@@ -4,7 +4,43 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="" />
+    <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.npmrc" beforeDir="false" afterPath="$PROJECT_DIR$/.npmrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.prettierrc" beforeDir="false" afterPath="$PROJECT_DIR$/.prettierrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/constant/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/constant/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-social.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-social.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/handle-upster-user.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/passport-social.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/middlewares/errorHandler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/middlewares/errorHandler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-facebook.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-facebook.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-google.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-google.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app.confg.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/assets/android-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/assets/android-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/facebook-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/facebook-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/google-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/google-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/sign-in-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/sign-in-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/social-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/social-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/social-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/social-section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/eas.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/eas.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/google-services.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/google-services.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/edge.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index-browser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/query_compiler_bg.wasm" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/query_compiler_bg.wasm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/query_compiler_bg.wasm-base64.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/query_compiler_bg.wasm-base64.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/client.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/wasm-compiler-edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/wasm-compiler-edge.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,6 +54,9 @@
   </component>
   <component name="OptimizeOnSaveOptions">
     <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/apps/api/package.json" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -55,7 +94,7 @@
     "nodejs_package_manager_path": "npm",
     "prettierjs.PrettierConfiguration.Package": "/home/joseph/Projects/stackschool-monorepo/apps/mobile/node_modules/prettier",
     "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "settings.editor.selected.configurable": "preferences.keymap",
     "to.speed.mode.migration.done": "true",
     "ts.external.directory.path": "/home/joseph/Projects/stackschool-monorepo/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
@@ -88,6 +127,7 @@
       <workItem from="1766142495861" duration="1562000" />
       <workItem from="1766327158261" duration="558000" />
       <workItem from="1766498948421" duration="1324000" />
+      <workItem from="1766605505369" duration="11164000" />
     </task>
     <servers />
   </component>

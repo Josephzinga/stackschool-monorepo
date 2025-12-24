@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import api, { parseAxiosError } from '@stackschool/shared/src/lib/api';
 import { SocialButton, SocialStrategy } from './social-button';
+import { saveSession } from '@/lib/token-storage';
 
 const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
 console.log('GOOGLE_WEB_CLIENT_ID', GOOGLE_WEB_CLIENT_ID);
-
 
 export default function GoogleLoginButton() {
   useEffect(() => {
@@ -41,11 +41,12 @@ export default function GoogleLoginButton() {
       }
 
       // 4. Envoi à ton API Node/Express
-      console.log('Envoi du token à l’API...');
+      console.log('Envoi du token à l’API...', idToken);
       const res = await api.post('/auth/google', { idToken });
 
       console.log('Réponse API:', res.data);
-      // Gérer ici la suite (Stockage du JWT, redirection, etc.)
+      console.log('Session', res.data.session);
+      await saveSession(res.data.session);
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('Utilisateur a annulé la connexion');

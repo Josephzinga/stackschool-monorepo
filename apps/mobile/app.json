@@ -1,8 +1,11 @@
 {
   "expo": {
-    "entryPoint": "app.config.ts",
-    "android": {
-      "package": "com.josephzinga.stackschoolmobile"
+    "entryPoint": "./app.config.ts",
+    "extra": {
+      "googleWebClientId": "558639383173-q2fcjdl2dqh9f0cjutj1p7s0vm513hr5.apps.googleusercontent.com",
+      "eas": {
+        "projectId": "4c496482-24f8-4c34-bb44-3de042051dbb"
+      }
     }
   }
 }

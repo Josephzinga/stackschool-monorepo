@@ -578,8 +578,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.1.0
-   * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
+   * Prisma Client JS version: 7.2.0
+   * Query Engine version: 0c8ef2ce45c83248ab3df073180d5eda9e8be7a3
    */
   export type PrismaVersion = {
     client: string
@@ -3339,7 +3339,8 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
-    emailVerified: Date | null
+    emailVerifiedAt: Date | null
+    emailVerified: boolean | null
     hasMembership: boolean | null
     profileCompleted: boolean | null
     username: string | null
@@ -3355,7 +3356,8 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
-    emailVerified: Date | null
+    emailVerifiedAt: Date | null
+    emailVerified: boolean | null
     hasMembership: boolean | null
     profileCompleted: boolean | null
     username: string | null
@@ -3371,6 +3373,7 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     deletedAt: number
+    emailVerifiedAt: number
     emailVerified: number
     hasMembership: number
     profileCompleted: number
@@ -3389,6 +3392,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
+    emailVerifiedAt?: true
     emailVerified?: true
     hasMembership?: true
     profileCompleted?: true
@@ -3405,6 +3409,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
+    emailVerifiedAt?: true
     emailVerified?: true
     hasMembership?: true
     profileCompleted?: true
@@ -3421,6 +3426,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
+    emailVerifiedAt?: true
     emailVerified?: true
     hasMembership?: true
     profileCompleted?: true
@@ -3510,7 +3516,8 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
-    emailVerified: Date | null
+    emailVerifiedAt: Date | null
+    emailVerified: boolean | null
     hasMembership: boolean | null
     profileCompleted: boolean | null
     username: string | null
@@ -3543,6 +3550,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
+    emailVerifiedAt?: boolean
     emailVerified?: boolean
     hasMembership?: boolean
     profileCompleted?: boolean
@@ -3566,6 +3574,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
+    emailVerifiedAt?: boolean
     emailVerified?: boolean
     hasMembership?: boolean
     profileCompleted?: boolean
@@ -3582,6 +3591,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
+    emailVerifiedAt?: boolean
     emailVerified?: boolean
     hasMembership?: boolean
     profileCompleted?: boolean
@@ -3598,6 +3608,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
+    emailVerifiedAt?: boolean
     emailVerified?: boolean
     hasMembership?: boolean
     profileCompleted?: boolean
@@ -3606,7 +3617,7 @@ export namespace Prisma {
     phoneNumber?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "globalRole" | "createdAt" | "updatedAt" | "deletedAt" | "emailVerified" | "hasMembership" | "profileCompleted" | "username" | "isVerified" | "phoneNumber", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "globalRole" | "createdAt" | "updatedAt" | "deletedAt" | "emailVerifiedAt" | "emailVerified" | "hasMembership" | "profileCompleted" | "username" | "isVerified" | "phoneNumber", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Account?: boolean | User$AccountArgs<ExtArgs>
     profile?: boolean | User$profileArgs<ExtArgs>
@@ -3637,7 +3648,8 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       deletedAt: Date | null
-      emailVerified: Date | null
+      emailVerifiedAt: Date | null
+      emailVerified: boolean | null
       hasMembership: boolean | null
       profileCompleted: boolean | null
       username: string | null
@@ -4079,7 +4091,8 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly deletedAt: FieldRef<"User", 'DateTime'>
-    readonly emailVerified: FieldRef<"User", 'DateTime'>
+    readonly emailVerifiedAt: FieldRef<"User", 'DateTime'>
+    readonly emailVerified: FieldRef<"User", 'Boolean'>
     readonly hasMembership: FieldRef<"User", 'Boolean'>
     readonly profileCompleted: FieldRef<"User", 'Boolean'>
     readonly username: FieldRef<"User", 'String'>
@@ -28788,6 +28801,7 @@ export namespace Prisma {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt',
+    emailVerifiedAt: 'emailVerifiedAt',
     emailVerified: 'emailVerified',
     hasMembership: 'hasMembership',
     profileCompleted: 'profileCompleted',
@@ -29256,7 +29270,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
-    emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    emailVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    emailVerified?: BoolNullableFilter<"User"> | boolean | null
     hasMembership?: BoolNullableFilter<"User"> | boolean | null
     profileCompleted?: BoolNullableFilter<"User"> | boolean | null
     username?: StringNullableFilter<"User"> | string | null
@@ -29278,6 +29293,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
+    emailVerifiedAt?: SortOrderInput | SortOrder
     emailVerified?: SortOrderInput | SortOrder
     hasMembership?: SortOrderInput | SortOrder
     profileCompleted?: SortOrderInput | SortOrder
@@ -29305,7 +29321,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
-    emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    emailVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    emailVerified?: BoolNullableFilter<"User"> | boolean | null
     hasMembership?: BoolNullableFilter<"User"> | boolean | null
     profileCompleted?: BoolNullableFilter<"User"> | boolean | null
     isVerified?: BoolNullableFilter<"User"> | boolean | null
@@ -29325,6 +29342,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
+    emailVerifiedAt?: SortOrderInput | SortOrder
     emailVerified?: SortOrderInput | SortOrder
     hasMembership?: SortOrderInput | SortOrder
     profileCompleted?: SortOrderInput | SortOrder
@@ -29347,7 +29365,8 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     deletedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-    emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    emailVerifiedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    emailVerified?: BoolNullableWithAggregatesFilter<"User"> | boolean | null
     hasMembership?: BoolNullableWithAggregatesFilter<"User"> | boolean | null
     profileCompleted?: BoolNullableWithAggregatesFilter<"User"> | boolean | null
     username?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -30970,7 +30989,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -30992,7 +31012,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -31014,7 +31035,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31036,7 +31058,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31058,7 +31081,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -31074,7 +31098,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31090,7 +31115,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32926,6 +32952,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
+    emailVerifiedAt?: SortOrder
     emailVerified?: SortOrder
     hasMembership?: SortOrder
     profileCompleted?: SortOrder
@@ -32942,6 +32969,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
+    emailVerifiedAt?: SortOrder
     emailVerified?: SortOrder
     hasMembership?: SortOrder
     profileCompleted?: SortOrder
@@ -32958,6 +32986,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
+    emailVerifiedAt?: SortOrder
     emailVerified?: SortOrder
     hasMembership?: SortOrder
     profileCompleted?: SortOrder
@@ -36758,7 +36787,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -36779,7 +36809,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -36891,7 +36922,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36912,7 +36944,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37384,7 +37417,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -37405,7 +37439,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -37631,7 +37666,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37652,7 +37688,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40035,7 +40072,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -40056,7 +40094,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -40093,7 +40132,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40114,7 +40154,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40135,7 +40176,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -40156,7 +40198,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -40193,7 +40236,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40214,7 +40258,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40235,7 +40280,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -40256,7 +40302,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -40293,7 +40340,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40314,7 +40362,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40335,7 +40384,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -40356,7 +40406,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    emailVerified?: Date | string | null
+    emailVerifiedAt?: Date | string | null
+    emailVerified?: boolean | null
     hasMembership?: boolean | null
     profileCompleted?: boolean | null
     username?: string | null
@@ -40393,7 +40444,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40414,7 +40466,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailVerified?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasMembership?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profileCompleted?: NullableBoolFieldUpdateOperationsInput | boolean | null
     username?: NullableStringFieldUpdateOperationsInput | string | null

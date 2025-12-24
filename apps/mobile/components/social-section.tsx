@@ -4,7 +4,8 @@ import GoogleLoginButton from './google-button';
 import FacebookLoginButton from './facebook-button';
 
 export const SocialSections = () => (
-  <View className="mt-6 space-y-4">
+  <View className="flex flex-col gap-5">
     <GoogleLoginButton />
+     <FacebookLoginButton />
   </View>
 );

@@ -1,20 +1,21 @@
-import { Router, NextFunction, Request, Response } from "express";
-import passport from "passport";
-import { Profile, User } from "@stackschool/db";
-import { createServiceError } from "../../utils/api-response";
-import { prisma } from "../../lib/prisma";
-import { generateToken } from "../../lib/outils";
+import { Router, NextFunction, Request, Response } from 'express';
+import passport from 'passport';
+import { Profile, User } from '@stackschool/db';
+import { createServiceError } from '../../utils/api-response';
+import { prisma } from '../../lib/prisma';
+import { generateToken } from '../../lib/outils';
+import { loginFormSchema, LoginFormType } from '@stackschool/shared';
 
 const router = Router();
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
 type UserWithProfile = User & {
   profile: Profile;
 };
 
-router.post("/login", (req: Request, res: Response, next: NextFunction) => {
+router.post('/login', (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate(
-    "local",
+    'local',
     (err: any, user: UserWithProfile, info: any) => {
       try {
         if (err) {
@@ -22,39 +23,39 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) => {
         }
 
         if (info) {
-          console.log("info:", info);
+          console.log('info:', info);
           // Les messages d'info de Passport sont des erreurs d'authentification (401)
           return next(
             createServiceError(info.message, 401, {
               isSocialOnly: info.isSocialOnly,
               provider: info.provider,
-            })
+            }),
           );
         }
 
         if (info?.isSocialOnly) {
           const providers = Array.isArray(info.providers)
-            ? info.providers.join(",")
-            : info.providers || "";
+            ? info.providers.join(',')
+            : info.providers || '';
 
           return res.status(403).json({
             ok: false,
             isSocialOnly: true,
             providers,
-            message: "Compte social uniquement — complétez votre profil.",
+            message: 'Compte social uniquement — complétez votre profil.',
           });
         }
 
         if (!user) {
-          const msg = info?.message || "Identifiants invalides";
+          const msg = info?.message || 'Identifiants invalides';
           return next(createServiceError(msg, 401));
         }
 
         req.login(user, async (loginErr: any) => {
           if (loginErr) {
-            console.error("req.login error:", loginErr);
+            console.error('req.login error:', loginErr);
             return next(
-              createServiceError("La connexion a échoué", 500, loginErr)
+              createServiceError('La connexion a échoué', 500, loginErr),
             );
           }
 
@@ -70,10 +71,10 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) => {
           });
 
           // cookie (même options que ton code précédent)
-          res.cookie("refresh_token", refreshToken, {
+          res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
             maxAge: 1000 * 60 * 60 * 24 * 25,
           });
 
@@ -90,10 +91,10 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) => {
           });
         });
       } catch (error: any) {
-        console.error("Error in local login callback:", error);
+        console.error('Error in local login callback:', error);
         return next(error);
       }
-    }
+    },
   )(req, res, next);
 });
 export default router;

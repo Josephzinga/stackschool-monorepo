@@ -1,7 +1,8 @@
 import React from 'react';
-import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
+import { AccessToken, LoginManager } from 'react-native-fbsdk-next';
 import api, { parseAxiosError } from '@stackschool/shared/src/lib/api';
 import { SocialButton, SocialStrategy } from './social-button';
+import { saveSession } from '@/lib/token-storage';
 
 export default function FacebookLoginButton() {
   const strategy: SocialStrategy = {
@@ -27,11 +28,13 @@ export default function FacebookLoginButton() {
       }
 
       const accessToken = data.accessToken.toString();
-
+      console.log('Access Token', accessToken);
       // 3. Envoyer à ton API Node/Express
       console.log('Envoi du token Facebook à l’API...');
       const res = await api.post('/auth/facebook', { accessToken });
-
+      if (res.data.ok) {
+        await saveSession(res.data.session);
+      }
       console.log('Réponse API:', res.data);
     } catch (error) {
       const { message } = parseAxiosError(error);

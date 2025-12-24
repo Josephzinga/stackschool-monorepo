@@ -22,8 +22,8 @@ export function SocialButton({ strategy, onPress, className }: SocialButtonProps
   const { colorScheme } = useColorScheme();
 
   return (
-  <View className="gap-2 sm:flex-row sm:gap-3">
-      <Button variant="outline" size="sm" className="sm:flex-1" onPress={onPress}>
+  <View className="gap-2 sm:flex-row sm:gap-3 sm:h-fit">
+      <Button variant="outline" size="lg" className="sm:flex-1" onPress={onPress}>
         <Image
           className={cn(
             'size-4',

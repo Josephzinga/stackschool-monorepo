@@ -1,6 +1,5 @@
-import { Request, Response, NextFunction } from 'express'
-import { ServiceError } from '@stackschool/shared'
-import { ZodError } from '@stackschool/shared'
+import { NextFunction, Request, Response } from 'express';
+import { ServiceError, ZodError } from '@stackschool/shared';
 
 export function sendApiResponse(
   res: Response,
@@ -12,7 +11,7 @@ export function sendApiResponse(
   return res.status(statusCode).json({
     ok,
     ...data,
-  })
+  });
 }
 
 export function errorHandler(
@@ -21,21 +20,21 @@ export function errorHandler(
   res: Response,
   next: NextFunction,
 ) {
-  console.error(err)
-
+  console.error(err);
+  console.log(err?.message);
   if (err instanceof ServiceError) {
     return sendApiResponse(res, err.satusCode, {
       message: err.message,
       details: err.details,
-    })
+    });
   }
 
   if (err instanceof ZodError) {
     return sendApiResponse(res, 400, {
       message: "Données d'entrée non valides",
       issues: err.issues,
-    })
+    });
   }
 
-  return sendApiResponse(res, 500, { message: 'Erreur interne du serveur' })
+  return sendApiResponse(res, 500, { message: 'Erreur interne du serveur' });
 }

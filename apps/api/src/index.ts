@@ -1,54 +1,55 @@
-import {config} from 'dotenv'
-import express from 'express'
-import cookieParser from 'cookie-parser'
-import passport from 'passport'
-import cors from 'cors'
-import {Strategy as GoogleStrategy} from 'passport-google-oauth20'
-import session from 'express-session'
-import connectPgSimple from 'connect-pg-simple'
-import pg from 'pg'
-import routes from './routes'
-import helmet from 'helmet'
-import handleOauthCallback from './controllers/passport-social'
-import setupLocalStrategy from './lib/passport-local'
-import SeachSchool from './routes/shools/search-school.route'
-import {getUserFromRedis} from './lib/handle-redis-user'
-import path from 'path'
-import {errorHandler} from './middlewares/errorHandler'
+import { config } from 'dotenv';
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import passport from 'passport';
+import cors from 'cors';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
+import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
+import pg from 'pg';
+import routes from './routes';
+import helmet from 'helmet';
+import handleOauthCallback from './controllers/passport-social';
+import setupLocalStrategy from './lib/passport-local';
+import SeachSchool from './routes/shools/search-school.route';
+import { getUserFromRedis } from './lib/handle-redis-user';
+import path from 'path';
+import { errorHandler } from './middlewares/errorHandler';
 
-config()
+config();
 
-const PORT = Number(process.env.PORT) || 4000
-const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000'
-const MOBILE_ORIGIN = process.env.MOBILE_DEEPLINK_URL
-const NODE_ENV = process.env.NODE_ENV || 'development'
+const PORT = Number(process.env.PORT) || 4000;
+const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
+const MOBILE_ORIGIN = process.env.MOBILE_DEEPLINK_URL;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
-const pgSession = connectPgSimple(session)
+const pgSession = connectPgSimple(session);
 const pgPool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-})
+});
 
-const app = express()
-app.use(helmet())
-const allowedOrigins = [FRONTEND_ORIGIN, `*`]
+const app = express();
+app.use(helmet());
+const allowedOrigins = [FRONTEND_ORIGIN, `*`];
 
 const corsOptions = {
   origin: (origin: any, callback: any) => {
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
+      callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'))
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-}
+};
 
-app.use(cors(corsOptions))
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
-app.use(cookieParser())
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-const SESSION_TTL = 1000 * 60 * 30 // 30 min
+const SESSION_TTL = 1000 * 60 * 30; // 30 min
 
 app.use(
   session({
@@ -68,26 +69,26 @@ app.use(
       sameSite: 'lax',
     },
   }),
-)
+);
 
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(passport.initialize());
+app.use(passport.session());
 
 passport.serializeUser((user: any, done) => {
-  done(null, user.id)
-})
+  done(null, user.id);
+});
 
 passport.deserializeUser(async (id: string, done) => {
   try {
-    const user = await getUserFromRedis(id)
-    if (!user) return done(null, false)
-    return done(null, user)
+    const user = await getUserFromRedis(id);
+    if (!user) return done(null, false);
+    return done(null, user);
   } catch (error) {
-    return done(error)
+    return done(error);
   }
-})
+});
 
-setupLocalStrategy()
+setupLocalStrategy();
 
 passport.use(
   new GoogleStrategy(
@@ -99,34 +100,34 @@ passport.use(
     (accessToken, refreshToken, profile, done) =>
       handleOauthCallback(accessToken, refreshToken, profile, done, 'google'),
   ),
-)
+);
 
-/*passport.use(
+passport.use(
   new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_CLIENT_ID!,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
       callbackURL: process.env.FACEBOOK_CALLBACK_URL!,
       enableProof: true,
-      profileFields: ["id", "displayName", "emails", "photos"],
+      profileFields: ['id', 'displayName', 'emails', 'photos'],
     },
     (accessToken, refreshToken, profile, done) =>
-      handleOauthCallback(refreshToken, accessToken, profile, done, "facebook")
-  )
-);*/
+      handleOauthCallback(refreshToken, accessToken, profile, done, 'facebook'),
+  ),
+);
 
-app.use('/api', routes)
-app.use('/api', SeachSchool)
+app.use('/api', routes);
+app.use('/api', SeachSchool);
 
 app.get('/', (req, res) => {
-  res.json('message serveur connecter')
-})
+  res.json('message serveur connecter');
+});
 
-app.use(express.static(path.resolve(process.cwd(), 'public')))
+app.use(express.static(path.resolve(process.cwd(), 'public')));
 
 // gestion des erreurs centralisée
-app.use(errorHandler)
+app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`server is runing on port http://localhost:${PORT}`)
-})
+  console.log(`server is runing on port http://localhost:${PORT}`);
+});

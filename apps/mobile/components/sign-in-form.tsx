@@ -115,8 +115,8 @@ export function SignInForm() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
                     isPassword
-                    showPassword={showPassword}
-                    togglePassword={setShowPassword}
+                   
+          
                     Icon={Lock}
                     ref={passwordInputRef}
                     id="password"

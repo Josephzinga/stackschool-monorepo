@@ -1,15 +1,14 @@
 import { ExpoConfig, ConfigContext } from 'expo/config';
-import * as dotenv from 'dotenv';
-import path from 'path';
+/*import * as dotenv from "dotenv"
+import path from "path"
 
-// Force le chargement du .env depuis la racine de l'app mobile
-dotenv.config({ path: path.join(__dirname, '.env') });
-
+dotenv.config({path: path.resolve(__dirname, ".env")})
+*/
 const FACEBOOK_APP_ID = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
 const FACEBOOK_CLIENT_TOKEN = process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN;
 
 if (!FACEBOOK_APP_ID || !FACEBOOK_CLIENT_TOKEN) {
-  throw new Error("❌ Erreur : Les variables d'environnement Facebook sont manquantes !");
+  console.log("❌ Erreur : Les variables d'environnement Facebook sont manquantes !");
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -34,7 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
     bundleIdentifier: 'com.stackschool.app',
     // N'oublie pas de mettre ton vrai code iOS ici si tu build pour iOS plus tard
-    googleServicesFile: './GoogleService-Info.plist',
+   // googleServicesFile: './GoogleService-Info.plist',
   },
 
   android: {
@@ -62,8 +61,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 
   plugins: [
     'expo-web-browser',
-    'expo-updates',
-    'expo-tracking-transparency',
     [
       '@react-native-google-signin/google-signin',
       {
@@ -81,9 +78,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'react-native-fbsdk-next',
       {
-        appID: FACEBOOK_APP_ID,
+        appID: FACEBOOK_APP_ID  || "1557139691952110",
         clientToken: FACEBOOK_CLIENT_TOKEN,
-        scheme: `fb${FACEBOOK_APP_ID}`,
+        scheme: `fb${FACEBOOK_APP_ID || "1557139691952110"}`,
         displayName: 'StackSchool',
         advertiserIDCollectionEnabled: false,
         autoLogAppEventsEnabled: false,
@@ -97,6 +94,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     // On expose les IDs ici pour pouvoir les utiliser dans le code React avec Constants.expoConfig.extra
     googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    eas: {
+      projectId: "4c496482-24f8-4c34-bb44-3de042051dbb"
+    }
   },
 
   updates: {

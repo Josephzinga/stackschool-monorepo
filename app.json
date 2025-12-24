@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.josephzinga.stackschoolroot"
+  },
+  "ios": {
+    "bundleIdentifier": "com.josephzinga.stackschoolroot"
+  }
+}

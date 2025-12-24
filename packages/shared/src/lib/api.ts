@@ -1,50 +1,50 @@
-import axios from "axios";
-import { ApiErrorPayload } from "../types";
+import axios from 'axios'
+import { ApiErrorPayload } from '../types'
 
-const URL = process.env.NEXT_PUBLIC_API_URL! || "http://localhost:4000";
+const URL = process.env.NEXT_PUBLIC_API_URL! || 'http://localhost:4000'
 
-const api = axios.create({
-  baseURL: `${URL.replace(/\/$/, "")}/api`,
+export const api = axios.create({
+  baseURL: `${URL.replace(/\/$/, '')}/api`,
   withCredentials: true,
-});
+})
 
 export function setApiBaseUrl(baseUrl: string) {
-  const cleaned = baseUrl.replace(/\/$/, "");
-  api.defaults.baseURL = `${cleaned}/api`;
+  const cleaned = baseUrl.replace(/\/$/, '')
+  api.defaults.baseURL = `${cleaned}/api`
 }
 export function getApiBaseUrl() {
-  return api.defaults.baseURL;
+  return api.defaults.baseURL
 }
-console.log("API URL:", api.defaults.baseURL);
+console.log('API URL:', api.defaults.baseURL)
 export class ApiError extends Error {
-  status?: number | null;
-  data?: any;
-  ok: boolean;
+  status?: number | null
+  data?: any
+  ok: boolean
 
   constructor(payload: ApiErrorPayload) {
-    super(payload.message);
-    this.name = "ApiError";
-    this.status = payload.status ?? null;
-    this.data = payload.data;
-    this.ok = payload.ok ?? false;
-    Object.setPrototypeOf(this, ApiError.prototype);
+    super(payload.message)
+    this.name = 'ApiError'
+    this.status = payload.status ?? null
+    this.data = payload.data
+    this.ok = payload.ok ?? false
+    Object.setPrototypeOf(this, ApiError.prototype)
   }
 }
 
 export function parseAxiosError(err: any): ApiError {
   // Axios error shape
-  const status = err?.response?.status ?? null;
-  const data = err?.response?.data ?? null;
-  const message = data?.message || err?.message || "Erreur réseau";
-  return new ApiError({ status, message, data, ok: false });
+  const status = err?.response?.status ?? null
+  const data = err?.response?.data ?? null
+  const message = data?.message || err?.message || 'Erreur réseau'
+  return new ApiError({ status, message, data, ok: false })
 }
 
 // Interceptor: normalize errors so callers always receive ApiError
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    return Promise.reject(parseAxiosError(err));
-  }
-);
+    return Promise.reject(parseAxiosError(err))
+  },
+)
 
-export default api;
+export default api

@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "566016400912",
+    "project_id": "stackschool-68218",
+    "storage_bucket": "stackschool-68218.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566016400912:android:5b7882f24fdbf757d33495",
+        "android_client_info": {
+          "package_name": "com.stackschool.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "558639383173-35ubtv9s25gh7pd5fqprpkg600geqivq.apps.googleusercontent.com",
+          "client_type": 1
+        },
+        {
+          "client_id": "558639383173-q2fcjdl2dqh9f0cjutj1p7s0vm513hr5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPyBkCclh9cYtBgGA-KWx_2bgS3-zoLho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

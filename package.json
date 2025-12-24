@@ -3,8 +3,15 @@
   "name": "@stackschool/root",
   "version": "1.0.0",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
+  "resolutions": {
+    "react": "^19.1.0"
+  },
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "dev:api": "pnpm --filter @stackschool/api run dev",
     "dev:web": "pnpm --filter @stackschool/web run dev",

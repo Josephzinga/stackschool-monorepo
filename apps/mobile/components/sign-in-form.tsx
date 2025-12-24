@@ -1,5 +1,4 @@
 import { Controller, useForm, zodResolver } from '@stackschool/ui';
-import { SocialConnections } from '@/components/social-connections';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,7 @@ import { authService, loginFormSchema, LoginFormType, parseAxiosError } from '@s
 import Toast from 'react-native-toast-message';
 import { FieldError } from './field';
 import { Lock, Mail } from 'lucide-react-native';
+import { SocialSections } from './social-section';
 
 export function SignInForm() {
   const {
@@ -64,7 +64,7 @@ export function SignInForm() {
             Connecter vous à votre compte Google ou Facebook
           </CardDescription>
           <Separator className="flex-1" />
-          <SocialConnections />
+          <SocialSections />
           <View className="flex-row items-center">
             <Separator className="flex-1" />
             <Text className="px-4 text-sm text-muted-foreground">Ou continuer avec </Text>

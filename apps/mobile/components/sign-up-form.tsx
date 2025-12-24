@@ -1,4 +1,3 @@
-import { SocialConnections } from '@/components/social-connections';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,7 @@ import {
 import { useRouter } from 'expo-router';
 import { FieldError } from './field';
 import { Mail, Phone, User, Lock } from 'lucide-react-native';
+import { SocialSections } from './social-section';
 
 export function SignUpForm() {
   const {
@@ -31,7 +31,6 @@ export function SignUpForm() {
   const emailInputRef = React.useRef<TextInput>(null);
   const passwordInputRef = React.useRef<TextInput>(null);
   const confirmPasswordInputRef = React.useRef<TextInput>(null);
-  const [showPassword, setShowPassword] = React.useState(false);
 
   function onUsernameSubmitEditing() {
     phoneNumberInputRef.current?.focus();
@@ -81,7 +80,7 @@ export function SignUpForm() {
           <CardDescription className="text-center sm:text-left">
             Connecter vous à votre compte Google ou Facebook
           </CardDescription>
-          <SocialConnections />
+          <SocialSections />
         </CardHeader>
         <CardContent className="gap-6">
           <View className="gap-6">
@@ -163,8 +162,6 @@ export function SignUpForm() {
                   <Input
                     Icon={Lock}
                     isPassword
-                    togglePassword={setShowPassword}
-                    showPassword={showPassword}
                     ref={passwordInputRef}
                     id="password"
                     placeholder="********"
@@ -188,8 +185,6 @@ export function SignUpForm() {
                     ref={confirmPasswordInputRef}
                     Icon={Lock}
                     isPassword
-                    togglePassword={setShowPassword}
-                    showPassword={showPassword}
                     id="confirm"
                     secureTextEntry
                     placeholder="********"

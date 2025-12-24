@@ -1,25 +1,25 @@
 import { cn } from '@/lib/utils';
 import { Text } from './text';
 import { Platform, TextInput, View, type TextInputProps, TouchableOpacity } from 'react-native';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { type LucideIcon, Eye, EyeOff } from 'lucide-react-native';
 
 export interface InputProps extends TextInputProps, React.RefAttributes<TextInput> {
   Icon?: LucideIcon;
   RightIcon?: LucideIcon;
   isPassword?: boolean;
-  showPassword?: boolean;
-  togglePassword?: (value: boolean) => void;
+  isValid?: boolean;
 }
 
 const Input = forwardRef<TextInput, InputProps>(
-  ({ className, Icon, RightIcon, isPassword, showPassword, togglePassword, ...props }, ref) => {
+  ({ className, Icon, RightIcon, isPassword, isValid, onBlur, onFocus, ...props }, ref) => {
+    const [showPassword, setShowPassword] = useState(false);
     const PasswordIcon = showPassword ? EyeOff : Eye;
     const FinalRightIcon = isPassword ? PasswordIcon : RightIcon;
 
     const handlePress = () => {
-      if (isPassword && togglePassword) {
-        togglePassword(!showPassword);
+      if (isPassword) {
+        setShowPassword(!showPassword);
       }
     };
 
@@ -36,6 +36,7 @@ const Input = forwardRef<TextInput, InputProps>(
             Icon ? 'pl-10' : 'pl-3',
             FinalRightIcon ? 'pr-10' : 'pr-3',
             'flex h-10 w-full min-w-0 flex-row items-center rounded-md border border-input bg-background py-1 text-base leading-5 text-foreground shadow-sm shadow-black/5 dark:bg-input/30 sm:h-9',
+            isValid === false && 'border-destructive',
             props.editable === false &&
               cn(
                 'opacity-50',
@@ -54,6 +55,8 @@ const Input = forwardRef<TextInput, InputProps>(
             className
           )}
           secureTextEntry={isPassword ? !showPassword : props.secureTextEntry}
+          onBlur={onBlur}
+          onFocus={onFocus}
           {...props}
         />
         {FinalRightIcon && (

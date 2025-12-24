@@ -6,5 +6,8 @@ packages/api/.env
 packages/web/node_modules
 packages/web/.env
 node_modules
+.idea
+.vscode
+.devcontainer
 
 .vscode

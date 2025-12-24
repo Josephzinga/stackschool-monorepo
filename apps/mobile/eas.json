@@ -1,0 +1,32 @@
+{
+  "cli": {
+    "version": ">= 16.28.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "environment": "development",
+      "pnpm": "10.26.1",
+      "env": {
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "558639383173-q2fcjdl2dqh9f0cjutj1p7s0vm513hr5.apps.googleusercontent.com"
+      }
+    },
+    "preview": {
+      "channel": "staging",
+      "distribution": "internal",
+      "environment": "production"
+    },
+    "production": {
+      "channel": "production",
+      "distribution": "internal",
+      "environment": "production",
+      "autoIncrement": true
+    }
+  },
+
+  "submit": {
+    "production": {}
+  }
+}

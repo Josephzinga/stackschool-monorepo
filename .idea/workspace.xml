@@ -6,40 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.npmrc" beforeDir="false" afterPath="$PROJECT_DIR$/.npmrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.prettierrc" beforeDir="false" afterPath="$PROJECT_DIR$/.prettierrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/constant/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/constant/config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-social.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-social.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/handle-upster-user.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/passport-social.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/middlewares/errorHandler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/middlewares/errorHandler.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-facebook.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-facebook.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-google.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-google.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/app.confg.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/assets/android-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/assets/android-icon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/components/facebook-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/facebook-button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/components/google-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/google-button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/components/sign-in-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/sign-in-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/components/social-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/social-button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/components/social-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/social-section.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/eas.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/eas.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/google-services.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/google-services.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/edge.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index-browser.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/query_compiler_bg.wasm" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/query_compiler_bg.wasm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/query_compiler_bg.wasm-base64.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/query_compiler_bg.wasm-base64.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/client.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/wasm-compiler-edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/wasm-compiler-edge.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app/auth/register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/auth/register.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/sign-up-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/sign-up-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/ui/input.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,40 +35,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "javascript.preferred.runtime.type.id": "node",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/joseph/Projects/stackschool-monorepo",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.standard": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.standard": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "/usr/local/lib/nodejs/bin/node",
-    "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "/home/joseph/Projects/stackschool-monorepo/apps/mobile/node_modules/prettier",
-    "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "/home/joseph/Projects/stackschool-monorepo/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;/usr/local/lib/nodejs/bin/node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/apps/mobile/node_modules/prettier&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -127,7 +96,8 @@
       <workItem from="1766142495861" duration="1562000" />
       <workItem from="1766327158261" duration="558000" />
       <workItem from="1766498948421" duration="1324000" />
-      <workItem from="1766605505369" duration="11164000" />
+      <workItem from="1766605505369" duration="13201000" />
+      <workItem from="1766623921988" duration="1380000" />
     </task>
     <servers />
   </component>

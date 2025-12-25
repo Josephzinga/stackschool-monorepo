@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { View, ScrollView } from 'react-native';
+import React from 'react';
 import { SignUpForm } from '@/components/sign-up-form';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 

@@ -1,8 +1,8 @@
 import { cn } from '@/lib/utils';
-import { Text } from './text';
-import { Platform, TextInput, View, type TextInputProps, TouchableOpacity } from 'react-native';
+import { Platform, TextInput, type TextInputProps, TouchableOpacity, View } from 'react-native';
 import React, { forwardRef, useState } from 'react';
-import { type LucideIcon, Eye, EyeOff } from 'lucide-react-native';
+import { Eye, EyeOff, type LucideIcon } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 
 export interface InputProps extends TextInputProps, React.RefAttributes<TextInput> {
   Icon?: LucideIcon;
@@ -13,6 +13,7 @@ export interface InputProps extends TextInputProps, React.RefAttributes<TextInpu
 
 const Input = forwardRef<TextInput, InputProps>(
   ({ className, Icon, RightIcon, isPassword, isValid, onBlur, onFocus, ...props }, ref) => {
+  
     const [showPassword, setShowPassword] = useState(false);
     const PasswordIcon = showPassword ? EyeOff : Eye;
     const FinalRightIcon = isPassword ? PasswordIcon : RightIcon;
@@ -63,7 +64,7 @@ const Input = forwardRef<TextInput, InputProps>(
           <View className="absolute right-3 top-1/2 z-10 -translate-y-1/2">
             {isPassword ? (
               <TouchableOpacity onPress={handlePress}>
-                <FinalRightIcon size={16} className="text-blue-600 dark:text-slate-400" />
+                <FinalRightIcon size={16} color={'gray'} />
               </TouchableOpacity>
             ) : (
               <FinalRightIcon size={16} className="text-blue-600 dark:text-slate-400" />

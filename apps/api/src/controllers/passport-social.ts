@@ -1,6 +1,6 @@
-import { VerifyCallback, Profile } from 'passport-google-oauth20';
+import { Profile, VerifyCallback } from 'passport-google-oauth20';
 
-import { UpsertOauthUser, upsertOauthUser } from '../services/auth-social';
+import { UpsertOauthUser, upsertOauthUser } from '../services/UpsertOauthUser';
 import { createUserSession } from '../services/session.service';
 
 export default async function handleOauthCallback(

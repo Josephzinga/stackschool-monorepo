@@ -1,6 +1,9 @@
 // routes/auth/google.post.ts (Express)
 import { OAuth2Client } from 'google-auth-library';
-import { UpsertOauthUser, upsertOauthUser } from '../../services/auth-social';
+import {
+  UpsertOauthUser,
+  upsertOauthUser,
+} from '../../services/UpsertOauthUser';
 import { Router } from 'express';
 import { sendApiResponse } from '../../middlewares/errorHandler';
 import { createServiceError } from '../../utils/api-response';
@@ -55,6 +58,7 @@ router.post('/google', async (req, res) => {
     });
 
     // création du JWT et session selon ta stratégie mobile
+    console.log('User revonyer par UpsertOauthUser', user);
     const session = await createMobileSession(user);
     console.log('session', session);
     return sendApiResponse(res, 201, {

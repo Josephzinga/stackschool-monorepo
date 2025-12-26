@@ -1,4 +1,4 @@
-import { ExpoConfig, ConfigContext } from 'expo/config';
+import { ConfigContext, ExpoConfig } from 'expo/config';
 /*import * as dotenv from "dotenv"
 import path from "path"
 
@@ -33,7 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
     bundleIdentifier: 'com.stackschool.app',
     // N'oublie pas de mettre ton vrai code iOS ici si tu build pour iOS plus tard
-   // googleServicesFile: './GoogleService-Info.plist',
+    // googleServicesFile: './GoogleService-Info.plist',
   },
 
   android: {
@@ -78,9 +78,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'react-native-fbsdk-next',
       {
-        appID: FACEBOOK_APP_ID  || "1557139691952110",
+        appID: FACEBOOK_APP_ID || '1557139691952110',
         clientToken: FACEBOOK_CLIENT_TOKEN,
-        scheme: `fb${FACEBOOK_APP_ID || "1557139691952110"}`,
+        scheme: `fb${FACEBOOK_APP_ID || '1557139691952110'}`,
         displayName: 'StackSchool',
         advertiserIDCollectionEnabled: false,
         autoLogAppEventsEnabled: false,
@@ -95,8 +95,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // On expose les IDs ici pour pouvoir les utiliser dans le code React avec Constants.expoConfig.extra
     googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     eas: {
-      projectId: "4c496482-24f8-4c34-bb44-3de042051dbb"
-    }
+      projectId: '4c496482-24f8-4c34-bb44-3de042051dbb',
+    },
   },
 
   updates: {

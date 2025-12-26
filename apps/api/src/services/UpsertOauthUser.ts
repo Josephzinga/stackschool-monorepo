@@ -30,6 +30,7 @@ export async function upsertOauthUser({
   try {
     const existingAccount = await prisma.account.findUnique({
       where: { provider_providerAccountId: { provider, providerAccountId } },
+      include: { user: { include: { profile: true } } },
     });
 
     if (existingAccount) {
@@ -41,7 +42,7 @@ export async function upsertOauthUser({
         },
       });
 
-      return existingAccount;
+      return excludeField(existingAccount.user);
     }
 
     if (email) {
@@ -90,7 +91,7 @@ export async function upsertOauthUser({
           where: { id: user.id },
           include: { profile: true },
         });
-        return fresh ?? user;
+        return excludeField(fresh ?? user);
       }
     }
 
@@ -120,7 +121,7 @@ export async function upsertOauthUser({
       include: { profile: true, Account: true },
     });
 
-    return newUser;
+    return excludeField(newUser);
   } catch (err: any) {
     if (err?.code === 'P2002') {
       // tenter de récupérer l'utilisateur par providerAccountId ou email
@@ -136,7 +137,7 @@ export async function upsertOauthUser({
           include: { user: { include: { profile: true } } },
         });
 
-        if (found) return found.user;
+        if (found) return excludeField(found.user);
       } catch (e) {
         createServiceError(
           "Echec de la récupération de l'utilisateur dans le P2002",
@@ -145,4 +146,10 @@ export async function upsertOauthUser({
     }
     return null;
   }
+}
+
+function excludeField(user: any) {
+  if (!user) return user;
+  const { password, ...userWithoutPassword } = user;
+  return userWithoutPassword;
 }

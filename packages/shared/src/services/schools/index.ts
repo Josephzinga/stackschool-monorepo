@@ -1,8 +1,8 @@
-import api from "../../lib/api";
+import api from '../../lib/api';
 
 export const schoolService = {
-  searchSchools: async (search: string) => {
-    const res = await api.get("/schools", {
+  searchSchools: async (search: string | null) => {
+    const res = await api.get('/schools', {
       params: { search },
     });
     return res.data;

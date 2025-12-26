@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useColorScheme } from 'nativewind';
-import { Image, Linking, Platform, View } from 'react-native';
+import { Image, Platform, View } from 'react-native';
 
 import React from 'react';
 import { Text } from './ui/text';
@@ -22,8 +22,8 @@ export function SocialButton({ strategy, onPress, className }: SocialButtonProps
   const { colorScheme } = useColorScheme();
 
   return (
-  <View className="gap-2 sm:flex-row sm:gap-3 sm:h-fit">
-      <Button variant="outline" size="lg" className="sm:flex-1" onPress={onPress}>
+    <View className="gap-2 sm:h-fit sm:flex-row sm:gap-3">
+      <Button variant="outline" size="lg" className="rouded-lg h-12 sm:flex-1" onPress={onPress}>
         <Image
           className={cn(
             'size-4',
@@ -35,7 +35,7 @@ export function SocialButton({ strategy, onPress, className }: SocialButtonProps
           })}
           source={strategy.source}
         />
-        <Text>Connecter vous avec {strategy.provider}</Text>
+        <Text className="text-accent-foreground">Connecter vous avec {strategy.provider}</Text>
       </Button>
     </View>
   );

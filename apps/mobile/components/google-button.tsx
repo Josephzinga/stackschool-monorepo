@@ -3,17 +3,16 @@ import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-si
 import api, { parseAxiosError } from '@stackschool/shared/src/lib/api';
 import { SocialButton, SocialStrategy } from './social-button';
 import { saveSession } from '@/lib/token-storage';
+import { router } from 'expo-router';
+import Toast from 'react-native-toast-message';
 
 const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
-console.log('GOOGLE_WEB_CLIENT_ID', GOOGLE_WEB_CLIENT_ID);
-
 export default function GoogleLoginButton() {
   useEffect(() => {
-    // Initialisation de la configuration Google
     GoogleSignin.configure({
       // ID Client de type "Application Web" (crucial pour l'idToken)
-      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      webClientId: GOOGLE_WEB_CLIENT_ID,
       offlineAccess: true, // Permet de récupérer un code pour le backend si besoin
     });
   }, []);
@@ -46,7 +45,20 @@ export default function GoogleLoginButton() {
 
       console.log('Réponse API:', res.data);
       console.log('Session', res.data.session);
+      const { data } = res;
       await saveSession(res.data.session);
+
+      if (data.ok) {
+        Toast.show({
+          type: 'success',
+          text1: data.message || 'Authentification réuissi avec succé!',
+          text1Style: { color: 'green' },
+        });
+
+        if (data.user.completeProfiled) {
+          router.push('/auth/complete-profile');
+        }
+      }
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('Utilisateur a annulé la connexion');

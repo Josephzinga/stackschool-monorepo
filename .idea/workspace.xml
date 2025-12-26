@@ -5,10 +5,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.npmrc" beforeDir="false" afterPath="$PROJECT_DIR$/.npmrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-social.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-social.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/social-web.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/social-web.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/mobile-session.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/mobile-session.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/outils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/outils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/facebook-post.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/facebook-post.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/google-post.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/google-post.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/auth-social.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/session.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/session.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app/auth/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/auth/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app/auth/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/auth/login.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/mobile/app/auth/register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/auth/register.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/components/sign-up-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/sign-up-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/google-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/google-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/sign-in-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/sign-in-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/social-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/social-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/ui/card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/ui/card.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/mobile/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/ui/input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/tailwind.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/tailwind.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/services/complete-profile.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/services/schools/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/services/schools/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +73,7 @@
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;mobile&quot;,
     &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo&quot;,
@@ -61,14 +85,27 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_interpreter_path&quot;: &quot;/usr/local/lib/nodejs/bin/node&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.mobile &gt; typecheck.executor&quot;: &quot;Run&quot;,
     &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/apps/mobile/node_modules/prettier&quot;,
     &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RunManager">
+    <configuration name="mobile &gt; typecheck" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/apps/mobile/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="typecheck" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -98,6 +135,8 @@
       <workItem from="1766498948421" duration="1324000" />
       <workItem from="1766605505369" duration="13201000" />
       <workItem from="1766623921988" duration="1380000" />
+      <workItem from="1766672169250" duration="5262000" />
+      <workItem from="1766766722757" duration="5865000" />
     </task>
     <servers />
   </component>

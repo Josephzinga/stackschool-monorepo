@@ -31,6 +31,6 @@ export async function handleSocialWebCallback(
 
     return res.redirect(`${baseUrl}/dashboard`);
   } catch (error) {
-    createServiceError(`Error get ${provider} callback: `, 500, error);
+    //createServiceError(`Error get ${provider} callback: `, 500, error);
   }
 }

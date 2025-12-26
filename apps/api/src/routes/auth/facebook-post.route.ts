@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { createServiceError } from '../../utils/api-response';
 import { verifyFacebookToken } from '../../services/verifiy-token-facebook';
-import { upsertOauthUser } from '../../services/auth-social';
+import { upsertOauthUser } from '../../services/UpsertOauthUser';
 import { createMobileSession } from '../../lib/mobile-session';
 import { sendApiResponse } from '../../middlewares/errorHandler';
 

@@ -16,7 +16,7 @@ export default function RootLayout() {
     console.log(authService.getApiBaseUrl());
   }, [IP_ADDRESS, API_PORT]);
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme.get() ?? 'light']}>
+    <ThemeProvider value={NAV_THEME[colorScheme.get() ?? 'dark']}>
       <Stack>
         <Stack.Screen name="index" options={{ title: 'Home' }} />
         <Stack.Screen name="auth" options={{ headerShown: false }} />

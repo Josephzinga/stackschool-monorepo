@@ -6,13 +6,15 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
 import * as React from 'react';
-import { Pressable, type TextInput, TouchableOpacity, View } from 'react-native';
+import { Pressable, type TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { authService, loginFormSchema, LoginFormType, parseAxiosError } from '@stackschool/shared';
 import Toast from 'react-native-toast-message';
 import { FieldError } from './field';
 import { Lock, Mail } from 'lucide-react-native';
 import { SocialSections } from './social-section';
+import { ToggleTheme } from '@/components/toggle-theme';
+import Logo from './Logo';
 
 export function SignInForm() {
   const {
@@ -40,31 +42,34 @@ export function SignInForm() {
           text1: res.message,
         });
         // router.replace("/dashboard");
+        if (res.complteProfile) {
+          router.push('/auth/complete-profile');
+        }
       }
     } catch (err: any) {
       const { data, message, status } = parseAxiosError(err);
-      console.log(err);
       console.log("erreur d'axios", message, data, status);
       Toast.show({
         type: 'error',
-        text1: 'Connexion echoué',
-        text2: message || 'Erreur réseau',
+        text1: message || 'Erreur réseau',
       });
     }
   }
 
   return (
     <View className="gap-6">
-      <Card className="border-border/0 shadow-none sm:border-border sm:shadow-sm sm:shadow-black/5">
+      <Card className="  ">
         <CardHeader>
-          <CardTitle className="text-center text-xl sm:text-left">
-            Connecter vous à voutre application
-          </CardTitle>
+          <Logo />
+          <CardTitle className="text-card! text-center text-xl sm:text-left">Bienvenue</CardTitle>
           <CardDescription className="text-center sm:text-left">
-            Connecter vous à votre compte Google ou Facebook
+            Accédez à votre espace scolaire pour communiquer, suivre et gérer les informations en
+            temps réel.
           </CardDescription>
           <Separator className="flex-1" />
+
           <SocialSections />
+
           <View className="flex-row items-center">
             <Separator className="flex-1" />
             <Text className="px-4 text-sm text-muted-foreground">Ou continuer avec </Text>
@@ -80,6 +85,7 @@ export function SignInForm() {
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
+                    isValid={!!errors.identifier}
                     Icon={Mail}
                     id="identifier"
                     placeholder="m@example.com"
@@ -94,7 +100,7 @@ export function SignInForm() {
                   />
                 )}
               />
-              <FieldError>{errors.identifier?.message}</FieldError>
+              {errors.identifier && <FieldError>{errors.identifier?.message}</FieldError>}
             </View>
             <View className="gap-1.5">
               <View className="flex-row items-center">
@@ -114,9 +120,8 @@ export function SignInForm() {
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
+                    isValid={!!errors.password}
                     isPassword
-                   
-          
                     Icon={Lock}
                     ref={passwordInputRef}
                     id="password"
@@ -129,21 +134,19 @@ export function SignInForm() {
                   />
                 )}
               />
-              <FieldError>{errors.password?.message}</FieldError>
+              {errors.password && <FieldError>{errors.password?.message}</FieldError>}
             </View>
             <Button className="w-full" onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
               {isSubmitting ? <Text>Connexion en cours...</Text> : <Text>Se connecter</Text>}
             </Button>
           </View>
-          <View className="flex items-center text-center text-sm">
+          <View className="flex flex-row items-center justify-center  text-center text-sm">
             <Text className="text-sm">Pas de compte ? </Text>
             <Pressable
               onPress={() => {
                 router.push('/auth/register');
               }}>
-              <Text className="font-medium text-blue-500 underline underline-offset-4">
-                Crée un compte
-              </Text>
+              <Text className="font-medium  underline underline-offset-4">Crée un compte</Text>
             </Pressable>
           </View>
         </CardContent>

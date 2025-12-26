@@ -1,8 +1,10 @@
-export { authService } from './services/auth'
-export * from './lib/api'
-export { z, ZodError } from 'zod'
-export * from './types'
-export type * from '@stackschool/db'
-export * from './validation/auth-schema'
-export const IP_ADDRESS = '10.0.2.2'
+export { authService } from './services/auth';
+export { schoolService } from './services/schools';
+export { RedisService } from './services/redis/redisService';
+export * from './lib/api';
+export { z, ZodError } from 'zod';
+export * from './types';
+export type * from '@stackschool/db';
+export * from './validation/auth-schema';
+export const IP_ADDRESS = '10.0.2.2';
 //export * from './services/schools'

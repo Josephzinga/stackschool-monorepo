@@ -7,7 +7,7 @@ export async function createUserSession(userId: string) {
   const expires = new Date(
     Date.now() + 1000 * 60 * 60 * 24 * SESSION_EXPIRES_DAY,
   );
-
+  console.log('UserId in createUserSession:', userId);
   const session = await prisma.session.create({
     data: {
       userId,
@@ -15,6 +15,8 @@ export async function createUserSession(userId: string) {
       expires,
     },
   });
+
+  console.log('Session created:', session);
 
   return { refreshToken, expires, session };
 }

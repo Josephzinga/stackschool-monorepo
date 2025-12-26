@@ -2,7 +2,6 @@ import { cn } from '@/lib/utils';
 import { Platform, TextInput, type TextInputProps, TouchableOpacity, View } from 'react-native';
 import React, { forwardRef, useState } from 'react';
 import { Eye, EyeOff, type LucideIcon } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
 
 export interface InputProps extends TextInputProps, React.RefAttributes<TextInput> {
   Icon?: LucideIcon;
@@ -13,7 +12,6 @@ export interface InputProps extends TextInputProps, React.RefAttributes<TextInpu
 
 const Input = forwardRef<TextInput, InputProps>(
   ({ className, Icon, RightIcon, isPassword, isValid, onBlur, onFocus, ...props }, ref) => {
-  
     const [showPassword, setShowPassword] = useState(false);
     const PasswordIcon = showPassword ? EyeOff : Eye;
     const FinalRightIcon = isPassword ? PasswordIcon : RightIcon;
@@ -37,7 +35,7 @@ const Input = forwardRef<TextInput, InputProps>(
             Icon ? 'pl-10' : 'pl-3',
             FinalRightIcon ? 'pr-10' : 'pr-3',
             'flex h-10 w-full min-w-0 flex-row items-center rounded-md border border-input bg-background py-1 text-base leading-5 text-foreground shadow-sm shadow-black/5 dark:bg-input/30 sm:h-9',
-            isValid === false && 'border-destructive',
+            isValid && 'border-destructive',
             props.editable === false &&
               cn(
                 'opacity-50',

@@ -6,7 +6,7 @@ export default function Register() {
   return (
     <KeyboardAwareScrollView
       keyboardShouldPersistTaps="handled"
-      contentContainerClassName="sm:flex-1 items-center justify-center p-4 py-8 sm:py-4 sm:p-6 mt-safe"
+      contentContainerClassName="bg-card"
       keyboardDismissMode="interactive"
       enableAutomaticScroll={true}
       enableOnAndroid={true}

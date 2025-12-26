@@ -1,0 +1,222 @@
+[33mcommit 00845460c78f03ff434a75d9ab2929401fa2d941[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Thu Dec 25 01:21:17 2025 +0000
+
+    petit modification
+
+[33mcommit a24be6eb852f2df3e2da321afdc162df0e3fac95[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Dec 24 23:12:17 2025 +0000
+
+    finalisation de l'authentification facebook et google
+
+[33mcommit d20ac342baa49e9bf75c2bf8a46ead83e371068e[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Dec 24 01:55:53 2025 +0000
+
+    setup authentification google et facebook sur mobile
+
+[33mcommit efa4c61b5928583ec527cba5c7d8b1cb82e09777[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Tue Dec 23 16:57:04 2025 +0000
+
+    configuration après suppresion
+
+[33mcommit 5956ebf35b12a71886321fe0b6b257fdb22f86af[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Fri Dec 19 17:44:07 2025 +0000
+
+    préparation du build expo
+
+[33mcommit f633e64cc42926b9bdd31cdef95b94d3939054c9[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Dec 17 22:20:52 2025 +0000
+
+    centraliser le store zunstand et correction de erreur dans l'api
+
+[33mcommit d330ec054e95d246161f470e245f1c3ea8557dec[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Tue Dec 16 22:02:53 2025 +0000
+
+    centralisation des getios des erreur api
+
+[33mcommit 1550eb459f23d92afa956bb555394ca03d08ab94[m
+Author: josephZinga <futizingajoseph@gmail.com>
+Date:   Mon Dec 15 16:02:57 2025 +0000
+
+    installation de package ui dans mobile
+
+[33mcommit f9a748cf8e314c594b33ec478b8d26aa0ee9fc97[m
+Merge: f8b0701 605f5d1
+Author: josephZinga <futizingajoseph@gmail.com>
+Date:   Sun Dec 14 23:46:32 2025 +0000
+
+    Merge branch 'master'
+
+[33mcommit 605f5d179de04e63da7fb85a338acc3869c85fd2[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Author: josephZinga <futizingajoseph@gmail.com>
+Date:   Sun Dec 14 23:22:42 2025 +0000
+
+    debaugage et misse à jour de dependances
+
+[33mcommit 4343476aa3019f381ff09c9736060aa1009abf4d[m
+Author: josephZinga <futizingajoseph@gmail.com>
+Date:   Sat Dec 13 22:06:49 2025 +0000
+
+    creation des pages auth mobile
+
+[33mcommit 0f5cccbf4ff09b0b8b978f2eafc84f0ab1a75fd1[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sun Nov 23 01:55:49 2025 +0000
+
+    Ajout du projet stackschool nettoyé
+
+[33mcommit 95df28c816d2cd38c4b5528aabc8cf00c11dfe9b[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sun Nov 23 01:45:10 2025 +0000
+
+    Ajout du dossier stackschool
+
+[33mcommit f8b0701ed79b0a2562410894f49e901c7ddc9dfd[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Mon Nov 17 14:37:59 2025 +0000
+
+    finalisation de l'etape profile et le upload du photo
+
+[33mcommit 2a2815d71af13c5b0fe94b92fae7d0c4ab3f4e11[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Tue Nov 4 23:47:47 2025 +0000
+
+    preparation du push dans docker hub
+
+[33mcommit c12bc8fcdbe9bb765962d152ee58bd90eebd56b4[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sun Nov 2 12:25:10 2025 +0000
+
+    Add .gitignore to ignore sensitive files
+
+[33mcommit 7e9af0f1240cb32c08d5d6898d8c51612adff712[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sun Nov 2 12:17:29 2025 +0000
+
+    ajouter le gitignore dans d'autre dossier
+
+[33mcommit 02c99e9eb62c9ff9676a9b90d5b7b78e97724c40[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sun Nov 2 11:37:55 2025 +0000
+
+    supprimer le fichier inutile
+
+[33mcommit dd81c1ddf9e4984dc1d9663a5684294554adb426[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sun Nov 2 11:26:45 2025 +0000
+
+    configuration
+
+[33mcommit 920fe9e53b4ea671fcf0565dd309efcf98d73bfd[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sun Nov 2 10:54:06 2025 +0000
+
+    petit changement
+
+[33mcommit f96f8a0aa808f4621af0fd6f6cf42ebd0c589c75[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Fri Oct 31 18:50:48 2025 +0000
+
+    finalisation du premier étape de la completion du profile
+
+[33mcommit bfa80089c53ba294f2923e04c0311b8ca42ce292[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Thu Oct 30 12:34:47 2025 +0000
+
+    correction des erreur docker et pnpm
+
+[33mcommit 72dfc19176559acc187488b3abd783ef0cf24790[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Oct 29 21:06:02 2025 +0000
+
+    finalisation du store zunstand pour la completion du profile
+
+[33mcommit 61eb05a2d9f92d295b08871d0295dfa3e296fdb9[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Oct 29 18:52:48 2025 +0000
+
+    après le monopepo
+
+[33mcommit c9bd1e116b40837a83030a97e2bf053e6dab1017[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Oct 29 00:56:16 2025 +0000
+
+    correction des erreur docker et pnpm pour le monorepo
+
+[33mcommit 041f8017fd436e3a587957bbd2c188bed6bb21c5[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sun Oct 26 11:51:30 2025 +0000
+
+    rebuild du container en monorepo
+
+[33mcommit ceacb1284b68c0e1a5a6e68d0691aa4cd587a3cd[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sat Oct 25 20:00:21 2025 +0000
+
+    finalisation de l'authentification et la recupération de mot de passe
+
+[33mcommit 6839dedde6f1630bd3caf194f5ee90576214c1a5[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Sat Oct 25 18:03:52 2025 +0000
+
+    petit changement d'interface
+
+[33mcommit 53bf77efbfd03ac30c434c35d30d49d0a0d47cae[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Fri Oct 24 21:57:43 2025 +0000
+
+    migration de nextjs 15 à 16
+
+[33mcommit 8921573ca5513a3c1bd8aee6795f42b0fc8d59a2[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Tue Oct 21 22:02:58 2025 +0000
+
+    finalisation de l'authentification avec google et facebook
+
+[33mcommit fa0262b74e4691f10b08791a0f6a80e732980f15[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Thu Oct 16 11:50:22 2025 +0000
+
+    configuration de passport.js
+
+[33mcommit f0ea5b5a22395fc1873d111990259867993f61e3[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Thu Oct 16 11:47:29 2025 +0000
+
+    [200~rendre password optionnel dans user pour la connexion avec google
+
+[33mcommit 9546450965dee2b2b4b591cecc105a0cafed317b[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Oct 15 18:10:33 2025 +0000
+
+    intégration de possport comme middlware pour gérer les providers externe    . j'utiliser avant Auth.js/express
+
+[33mcommit 8454441be148de6e9cf232a505452a20e3052190[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Mon Oct 13 18:59:42 2025 +0000
+
+    changement de chéma pour ajouter les information spécifique sur les professeur et saff
+
+[33mcommit 0a3a23febefaecbb73db58bc82d3e42d0061df19[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Oct 8 10:01:17 2025 +0000
+
+    petit teste
+
+[33mcommit f518e028f21551d4722eef783616b74066b08b16[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Wed Oct 8 09:52:41 2025 +0000
+
+    Fix: remove git submodule and integrate frontend into main repo
+
+[33mcommit 388fd3c7264d49be837839397afec9c6130444bf[m
+Author: josephzinga <futizingajoseph@gmail.com>
+Date:   Fri Oct 3 12:26:29 2025 +0000
+
+    Initial commit from Create Next App

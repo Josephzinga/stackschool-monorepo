@@ -2,10 +2,12 @@ import React from 'react';
 import { SignInForm } from '@/components/sign-in-form';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useColorScheme } from 'nativewind';
+import { ToggleTheme } from '@/components/toggle-theme';
 import { cn } from '@/lib/utils';
 
 export default function Login() {
   const { colorScheme } = useColorScheme();
+  console.log(colorScheme);
 
   return (
     <KeyboardAwareScrollView
@@ -14,8 +16,9 @@ export default function Login() {
       enableAutomaticScroll={true}
       enableOnAndroid={true}
       extraHeight={20}
-      contentContainerClassName={cn('mt-4', colorScheme === 'dark' && 'bg-slate-900')}>
+      contentContainerClassName={cn('bg-card')}>
       <SignInForm />
+      <ToggleTheme />
     </KeyboardAwareScrollView>
   );
 }

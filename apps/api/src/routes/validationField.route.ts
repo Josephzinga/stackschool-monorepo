@@ -1,16 +1,16 @@
-import { Router } from "express";
-import { prisma } from "../lib/prisma";
-import { validateUserFieldSchema } from "../lib/validation-schema";
-import { isAuthenticated } from "../middlewares/auth";
+import { Router } from 'express';
+import { prisma } from '../lib/prisma';
+import { validateUserFieldSchema } from '../validations/validation-schema';
+import { isAuthenticated } from '../middlewares/auth';
 
 const router = Router();
 
-router.get("/user-field", isAuthenticated, async (req, res) => {
+router.get('/user-field', isAuthenticated, async (req, res) => {
   try {
     const user = req.user;
     const parseResult = validateUserFieldSchema.safeParse(req.query);
-    console.log("request query", req.query);
-    console.log(parseResult, "parse data");
+    console.log('request query', req.query);
+    console.log(parseResult, 'parse data');
     if (!parseResult.success) {
       return res.status(400).json({
         ok: false,
@@ -20,7 +20,7 @@ router.get("/user-field", isAuthenticated, async (req, res) => {
     }
 
     const { email, phoneNumber } = parseResult.data;
-    console.log("email in validate=>", email);
+    console.log('email in validate=>', email);
 
     // check email uniqueness
     if (email && user?.email !== email) {
@@ -30,21 +30,23 @@ router.get("/user-field", isAuthenticated, async (req, res) => {
         return res.json({
           ok: true,
           valid: false,
-          field: "email",
-          message: "Cette valeur est déjà utilisée.",
+          field: 'email',
+          message: 'Cette valeur est déjà utilisée.',
         });
       }
     }
 
     if (phoneNumber && user?.phoneNumber !== phoneNumber) {
-      const existingUser = await prisma.user.findUnique({ where: { phoneNumber } });
+      const existingUser = await prisma.user.findUnique({
+        where: { phoneNumber },
+      });
 
       if (existingUser) {
         return res.json({
           ok: true,
           valid: false,
-          field: "phone",
-          message: "Cette valeur est déjà utilisée.",
+          field: 'phone',
+          message: 'Cette valeur est déjà utilisée.',
         });
       }
     }
@@ -55,10 +57,10 @@ router.get("/user-field", isAuthenticated, async (req, res) => {
       valid: true,
     });
   } catch (err) {
-    console.error("validate user field error:", err);
+    console.error('validate user field error:', err);
     return res.status(500).json({
       ok: false,
-      message: "Internal server error",
+      message: 'Internal server error',
     });
   }
 });

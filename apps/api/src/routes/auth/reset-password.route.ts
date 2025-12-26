@@ -1,15 +1,14 @@
-import { Router, type Request, Response } from "express";
-import { body, validationResult } from "express-validator";
-import bcrypt from "bcryptjs";
-import { prisma } from "../../lib/prisma";
-import { hashToken } from "../../lib/outils";
-import { resetPasswordValidation } from "../../lib/validation-schema";
-import { isAuthenticated } from "../../middlewares/auth";
+import { type Request, Response, Router } from 'express';
+import { validationResult } from 'express-validator';
+import bcrypt from 'bcryptjs';
+import { prisma } from '../../lib/prisma';
+import { hashToken } from '../../lib/outils';
+import { resetPasswordValidation } from '../../validations/validation-schema';
 
 const router = Router();
 
 router.post(
-  "/reset-password",
+  '/reset-password',
   resetPasswordValidation,
 
   async (req: Request, res: Response) => {
@@ -36,7 +35,7 @@ router.post(
       const verificationToken = await prisma.verificationToken.findFirst({
         where: {
           tokenHash,
-          type: "password_reset",
+          type: 'password_reset',
           used: false,
           expiresAt: {
             gt: now, // Vérifie que le token n'est pas expiré
@@ -56,7 +55,7 @@ router.post(
       if (!verificationToken) {
         return res.status(400).json({
           ok: false,
-          message: "Token invalide, expiré ou déjà utilisé",
+          message: 'Token invalide, expiré ou déjà utilisé',
         });
       }
 
@@ -64,7 +63,7 @@ router.post(
       if (!verificationToken.user) {
         return res.status(400).json({
           ok: false,
-          message: "Utilisateur non trouvé",
+          message: 'Utilisateur non trouvé',
         });
       }
 
@@ -99,7 +98,7 @@ router.post(
         await tx.verificationToken.updateMany({
           where: {
             userId: verificationToken.user.id,
-            type: "password_reset",
+            type: 'password_reset',
             used: false,
           },
           data: {
@@ -111,7 +110,7 @@ router.post(
         await tx.verificationCode.updateMany({
           where: {
             userId: verificationToken.user.id,
-            type: "password_reset",
+            type: 'password_reset',
             used: false,
           },
           data: {
@@ -124,18 +123,18 @@ router.post(
       return res.status(200).json({
         ok: true,
         message:
-          "Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+          'Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.',
       });
     } catch (err) {
-      console.error("reset-password error:", err);
+      console.error('reset-password error:', err);
 
       // 9️⃣ GESTION D'ERREUR SÉCURISÉE
       return res.status(500).json({
         ok: false,
-        message: "Erreur lors de la réinitialisation du mot de passe",
+        message: 'Erreur lors de la réinitialisation du mot de passe',
       });
     }
-  }
+  },
 );
 
 export default router;

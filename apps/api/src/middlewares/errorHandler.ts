@@ -4,7 +4,7 @@ import { ServiceError, ZodError } from '@stackschool/shared';
 export function sendApiResponse(
   res: Response,
   statusCode: number,
-  data: object,
+  data: any = {},
 
   ok: boolean = false,
 ) {
@@ -20,14 +20,16 @@ export function errorHandler(
   res: Response,
   next: NextFunction,
 ) {
-  console.error(err);
-  console.log(err?.message);
+  console.error('Erreur dans le middleware', err);
+  console.log("Message d'erreur dans le middleware handleError", err?.message);
   if (err instanceof ServiceError) {
     return sendApiResponse(res, err.satusCode, {
       message: err.message,
       details: err.details,
     });
   }
+
+  sendApiResponse(res, 400, { error: err.message });
 
   if (err instanceof ZodError) {
     return sendApiResponse(res, 400, {

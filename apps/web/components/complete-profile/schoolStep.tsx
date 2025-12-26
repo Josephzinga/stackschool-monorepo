@@ -1,24 +1,23 @@
-"use client";
-import { CardDescription, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { School } from "@stackschool/shared";
-import { useEffect, useState } from "react";
-import { CreateSchoolForm } from "@/components/complete-profile/create-school-form";
-import InvitationForm from "./invitation-form";
-import { useDebounce } from "@/hooks/useDebounce";
-import { Loader2, Search } from "lucide-react";
-import { searchSchools } from "@/services/complete-profile";
-import { Field, FieldLabel } from "../ui/field";
-import { UseCompleteProfileStore } from "@stackschool/ui";
-import { toast } from "sonner";
-import { Item, ItemGroup, ItemMedia, ItemTitle } from "../ui/item";
-import { AvatarName } from "../profile-avatar";
+'use client';
+import { CardDescription, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { School } from '@stackschool/shared';
+import { useEffect, useState } from 'react';
+import { CreateSchoolForm } from '@/components/complete-profile/create-school-form';
+import InvitationForm from './invitation-form';
+import { useDebounce } from '@/hooks/useDebounce';
+import { Loader2, Search } from 'lucide-react';
+import { searchSchools, UseCompleteProfileStore } from '@stackschool/ui';
+import { Field, FieldLabel } from '../ui/field';
+import { toast } from 'sonner';
+import { Item, ItemGroup, ItemMedia, ItemTitle } from '../ui/item';
+import { AvatarName } from '../profile-avatar';
 
 export default function SchoolStep() {
-  const [mode, setMode] = useState<"join" | "create" | "invite">("join");
+  const [mode, setMode] = useState<'join' | 'create' | 'invite'>('join');
   const [schools, setSchools] = useState<School[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const searchDebounce = useDebounce(400, searchQuery.trim() || null);
   const { setSchoolData, setCurrentStep } = UseCompleteProfileStore();
@@ -34,7 +33,7 @@ export default function SchoolStep() {
 
   const handleClick = (schoolId: string) => {
     setSchoolData({
-      type: "join",
+      type: 'join',
       schoolId,
     });
     setCurrentStep(2);
@@ -90,7 +89,7 @@ export default function SchoolStep() {
                 onClick={() => {
                   handleClick(school.id);
                   toast.success(
-                    `vous avez selectionner l'ecole ${school.name}`
+                    `vous avez selectionner l'ecole ${school.name}`,
                   );
                 }}
                 className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700  transition-colors "

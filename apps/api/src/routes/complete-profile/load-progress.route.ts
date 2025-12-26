@@ -1,12 +1,10 @@
-import { Router } from "express";
-import { isAuthenticated } from "../../middlewares/auth";
-import { User } from "@stackschool/db";
-import { redisClient } from "../../lib/redis";
-import { success } from "@stackschool/shared";
+import { Router } from 'express';
+import { isAuthenticated } from '../../middlewares/auth';
+import { redisClient } from '../../lib/redis';
 
 const router = Router();
 
-router.get("/load-progress", isAuthenticated, async (req, res) => {
+router.get('/load-progress', isAuthenticated, async (req, res) => {
   try {
     const user = req.user;
     const userId = user?.id;
@@ -15,28 +13,28 @@ router.get("/load-progress", isAuthenticated, async (req, res) => {
 
     const saveData = await redisClient.get(redisKey);
     const picturePath = await redisClient.get(pathKey);
-    console.log("picturePath in redis", picturePath);
+    console.log('picturePath in redis', picturePath);
     if (!saveData) {
       return res.status(400).json({
-        success: true,
+        ok: true,
         data: null,
-        message: "Aucune progression sauvegardée",
+        message: 'Aucune progression sauvegardée',
       });
     }
 
     const dataParsed = JSON.parse(saveData);
-    console.log("dataParsed:", dataParsed);
+    console.log('dataParsed:', dataParsed);
     if (dataParsed.userId !== userId) {
       await redisClient.del(redisKey);
       return res.status(400).json({
-        success: true,
+        ok: true,
         data: null,
-        message: "Données de progression invalides",
+        message: 'Données de progression invalides',
       });
     }
 
     return res.status(200).json({
-      success: true,
+      ok: true,
       data: {
         school: dataParsed.school,
         profile: dataParsed.profle,
@@ -46,8 +44,8 @@ router.get("/load-progress", isAuthenticated, async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Erreur chargement progression:", error);
-    return res.status(500).json({ error: "Erreur lors du chargement" });
+    console.error('Erreur chargement progression:', error);
+    return res.status(500).json({ error: 'Erreur lors du chargement' });
   }
 });
 

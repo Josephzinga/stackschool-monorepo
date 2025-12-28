@@ -1,13 +1,10 @@
 import React from 'react';
-import { SignInForm } from '@/components/sign-in-form';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useColorScheme } from 'nativewind';
-import { ToggleTheme } from '@/components/toggle-theme';
-import { cn } from '@/lib/utils';
+import {SignInForm} from '@/components/sign-in-form';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useColorScheme} from 'nativewind';
 
 export default function Login() {
   const { colorScheme } = useColorScheme();
-  console.log(colorScheme);
 
   return (
     <KeyboardAwareScrollView
@@ -15,10 +12,10 @@ export default function Login() {
       keyboardDismissMode="interactive"
       enableAutomaticScroll={true}
       enableOnAndroid={true}
-      extraHeight={20}
-      contentContainerClassName={cn('bg-card')}>
-      <SignInForm />
-      <ToggleTheme />
+      extraHeight={75}
+      contentContainerClassName={'w-full h-full'}>
+
+        <SignInForm />
     </KeyboardAwareScrollView>
   );
 }

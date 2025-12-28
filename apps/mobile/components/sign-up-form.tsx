@@ -1,22 +1,17 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Text } from '@/components/ui/text';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Text} from '@/components/ui/text';
 import * as React from 'react';
-import { Pressable, type TextInput, View } from 'react-native';
-import { Controller, useForm, zodResolver } from '@stackschool/ui';
+import {Pressable, type TextInput, View} from 'react-native';
+import {Controller, useForm, zodResolver} from '@stackschool/ui';
 import Toast from 'react-native-toast-message';
-import {
-  authService,
-  parseAxiosError,
-  registerFormSchema,
-  RegisterFormType,
-} from '@stackschool/shared';
-import { useRouter } from 'expo-router';
-import { FieldError } from './field';
-import { Lock, Mail, Phone, User } from 'lucide-react-native';
-import { SocialSections } from './social-section';
+import {authService, parseAxiosError, registerFormSchema, RegisterFormType,} from '@stackschool/shared';
+import {useRouter} from 'expo-router';
+import {FieldError} from './field';
+import {Lock, Mail, Phone, User} from 'lucide-react-native';
+import {CustomButton} from '@/components/CustomButton';
+import Logo from '@/components/Logo';
 
 export function SignUpForm() {
   const {
@@ -70,17 +65,17 @@ export function SignUpForm() {
   }
 
   return (
-    <Card className="mb-8 rounded-none border-border/0 shadow-none sm:border-border sm:shadow-sm sm:shadow-black/5">
-      <CardHeader className="pt-0">
+    <Card className=" h-full py-4">
+      <CardHeader className="">
+        <Logo />
         <CardTitle className=" text-center text-xl sm:text-left">Crée un compte</CardTitle>
         <CardDescription className="text-center sm:text-left">
           Connecter vous à votre compte Google ou Facebook
         </CardDescription>
-        <SocialSections />
       </CardHeader>
-      <CardContent className="h-ful gap-6">
-        <View className="gap-5">
-          <View className="gap-1.5">
+      <CardContent className="h-full gap-4">
+        <View className="gap-4">
+          <View className="gap-1">
             <Label htmlFor="username">Nom d'utilisateur</Label>
             <Controller
               name="username"
@@ -102,7 +97,7 @@ export function SignUpForm() {
 
             {errors.username && <FieldError>{errors.username?.message}</FieldError>}
           </View>
-          <View className="gap-1.5">
+          <View className="gap-1">
             <Label htmlFor="phoneNumber">Numéro de télephone</Label>
             <Controller
               name="phoneNumber"
@@ -125,7 +120,7 @@ export function SignUpForm() {
             />
             {errors.phoneNumber && <FieldError>{errors.phoneNumber?.message}</FieldError>}
           </View>
-          <View className="gap-1.5">
+          <View className="gap-1">
             <Label htmlFor="email">Email</Label>
             <Controller
               name="email"
@@ -151,7 +146,7 @@ export function SignUpForm() {
               <FieldError className="text-destructive">{errors.email.message}</FieldError>
             )}
           </View>
-          <View className="gap-1.5">
+          <View className="gap-1">
             <Label htmlFor="password">Mot de passe</Label>
             <Controller
               name="password"
@@ -173,7 +168,7 @@ export function SignUpForm() {
             />
             {errors.password && <FieldError>{errors.password?.message}</FieldError>}
           </View>
-          <View className="gap-1.5">
+          <View className="gap-1">
             <Label htmlFor="confirm">Confirmer le mot de passe</Label>
             <Controller
               name="confirm"
@@ -196,12 +191,19 @@ export function SignUpForm() {
             />
             {errors.confirm && <FieldError>{errors.confirm?.message}</FieldError>}
           </View>
-          <Button className="w-full" onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
-            {isSubmitting ? <Text>Inscription en cours...</Text> : <Text>S&apos;inscrire</Text>}
-          </Button>
+          <CustomButton
+            className="w-full"
+            onPress={handleSubmit(onSubmit)}
+            isSubmitting={isSubmitting}>
+            {isSubmitting ? 'Inscription en cours...' : "S'inscrire"}
+          </CustomButton>
         </View>
+
         <View className="flex flex-row justify-center gap-1 text-sm">
-          <Text> Déjà un compte?</Text>
+          <Text className="font-inter-semibold text-sm text-muted-foreground">
+            {' '}
+            Déjà un compte?
+          </Text>
           <Pressable
             onPress={() => {
               if (router.canGoBack()) {
@@ -210,7 +212,9 @@ export function SignUpForm() {
                 router.replace('/auth/sign-in');
               }
             }}>
-            <Text className="text-sm underline underline-offset-4">Connexion</Text>
+            <Text className="font-inter-semibold text-sm text-blue-700 underline underline-offset-4">
+              Connexion
+            </Text>
           </Pressable>
         </View>
       </CardContent>

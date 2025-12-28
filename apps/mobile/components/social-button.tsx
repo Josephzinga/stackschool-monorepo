@@ -1,10 +1,8 @@
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { useColorScheme } from 'nativewind';
-import { Image, Platform, View } from 'react-native';
+import {useColorScheme} from 'nativewind';
+import {Image, Text, TouchableOpacity} from 'react-native';
 
 import React from 'react';
-import { Text } from './ui/text';
+import {cn} from "@/lib/utils";
 
 export type SocialStrategy = {
   provider: 'google' | 'facebook';
@@ -22,21 +20,21 @@ export function SocialButton({ strategy, onPress, className }: SocialButtonProps
   const { colorScheme } = useColorScheme();
 
   return (
-    <View className="gap-2 sm:h-fit sm:flex-row sm:gap-3">
-      <Button variant="outline" size="lg" className="rouded-lg h-12 sm:flex-1" onPress={onPress}>
+
+      <TouchableOpacity style={{width: '50%'}} className="flex h-[50px] flex-row justify-center gap-3  border border-border rounded-full items-center bg-card shadow-sm " onPress={onPress}>
         <Image
+
           className={cn(
             'size-4',
-            strategy.useTint && Platform.select({ web: 'dark:invert' }),
             className
           )}
-          tintColor={Platform.select({
-            native: strategy.useTint ? (colorScheme === 'dark' ? 'white' : 'black') : undefined,
-          })}
+          tintColor={strategy.useTint ? (colorScheme === 'dark' ? 'white' : 'black') : undefined}
+          resizeMode="contain"
           source={strategy.source}
         />
-        <Text className="text-accent-foreground">Connecter vous avec {strategy.provider}</Text>
-      </Button>
-    </View>
+
+        <Text className="font-jost-semibold font-semibold text-blue-700">{strategy.provider}</Text>
+      </TouchableOpacity>
+
   );
 }

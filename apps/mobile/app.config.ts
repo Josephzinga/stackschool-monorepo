@@ -20,6 +20,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './assets/android-icon.png',
   userInterfaceStyle: 'automatic',
+  scheme: 'com.stackschool.app',
 
   splash: {
     image: './assets/android-icon.png',

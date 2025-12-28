@@ -1,20 +1,19 @@
-import { Controller, useForm, zodResolver } from '@stackschool/ui';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Text } from '@/components/ui/text';
+import {Controller, useForm, zodResolver} from '@stackschool/ui';
+import {Button} from '@/components/ui/button';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Text} from '@/components/ui/text';
 import * as React from 'react';
-import { Pressable, type TextInput, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { authService, loginFormSchema, LoginFormType, parseAxiosError } from '@stackschool/shared';
+import {Pressable, type TextInput, View} from 'react-native';
+import {useRouter} from 'expo-router';
+import {authService, loginFormSchema, LoginFormType, parseAxiosError} from '@stackschool/shared';
 import Toast from 'react-native-toast-message';
-import { FieldError } from './field';
-import { Lock, Mail } from 'lucide-react-native';
-import { SocialSections } from './social-section';
-import { ToggleTheme } from '@/components/toggle-theme';
+import {FieldError} from './field';
+import {Lock, Mail} from 'lucide-react-native';
+import {SocialSections} from './social-section';
 import Logo from './Logo';
+import {CustomButton} from '@/components/CustomButton';
 
 export function SignInForm() {
   const {
@@ -48,7 +47,6 @@ export function SignInForm() {
       }
     } catch (err: any) {
       const { data, message, status } = parseAxiosError(err);
-      console.log("erreur d'axios", message, data, status);
       Toast.show({
         type: 'error',
         text1: message || 'Erreur réseau',
@@ -57,100 +55,106 @@ export function SignInForm() {
   }
 
   return (
-    <View className="gap-6">
-      <Card className="  ">
-        <CardHeader>
-          <Logo />
-          <CardTitle className="text-card! text-center text-xl sm:text-left">Bienvenue</CardTitle>
-          <CardDescription className="text-center sm:text-left">
-            Accédez à votre espace scolaire pour communiquer, suivre et gérer les informations en
-            temps réel.
-          </CardDescription>
-          <Separator className="flex-1" />
+    <Card className="bg-slate-50 dark:bg-blue-900 h-full py-4">
+      <CardHeader>
+        <Logo />
+        <CardTitle className="text-card! text-center font-inter-bold text-xl sm:text-left">
+          Bienvenue
+        </CardTitle>
+        <CardDescription className="text-center sm:text-left">
+          Accédez à votre espace scolaire pour communiquer, suivre et gérer les informations en
+          temps réel.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className=" gap-4">
+        <View className="gap-3 ">
+          <View className="gap-1.5">
+            <Label htmlFor="email">Email ou nom d'utilisateur</Label>
+            <Controller
+              name="identifier"
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  error={!!errors.identifier}
+                  Icon={Mail}
+                  id="identifier"
+                  placeholder="m@example.com"
+                  keyboardType="email-address"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  onSubmitEditing={onEmailSubmitEditing}
+                  returnKeyType="next"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
+            {errors.identifier && <FieldError>{errors.identifier?.message}</FieldError>}
+          </View>
+          <View className="gap-1.5">
+            <View className="flex-row items-center">
+              <Label htmlFor="password">Mot de passe</Label>
+              <Button
+                variant="link"
+                size="sm"
+                className="ml-auto h-4 px-1 py-0 web:h-fit sm:h-4"
+                onPress={() => {
+                  router.push('/auth/forgot-password');
+                }}>
+                <Text className="font-inter-medium text-sm leading-4 text-blue-700">
+                  Mot de passe oublier?
+                </Text>
+              </Button>
+            </View>
+            <Controller
+              name="password"
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  error={!!errors.password}
+                  isPassword
+                  Icon={Lock}
+                  ref={passwordInputRef}
+                  id="password"
+                  placeholder="********"
+                  returnKeyType="send"
+                  onSubmitEditing={handleSubmit(onSubmit)}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
+            {errors.password && <FieldError>{errors.password.message}</FieldError>}
+          </View>
+          <CustomButton
+            className=" w-full mt-1"
+            onPress={handleSubmit(onSubmit)}
+            isSubmitting={isSubmitting}>
+            {isSubmitting ? 'Connexion en cours...' : 'Connexion'}
+          </CustomButton>
+        </View>
+        <View className="flex gap-6 px-4">
+          <Text className=" text-md w-full text-center font-jost-medium text-muted-foreground">
+            Ou continuer avec
+          </Text>
 
           <SocialSections />
-
-          <View className="flex-row items-center">
-            <Separator className="flex-1" />
-            <Text className="px-4 text-sm text-muted-foreground">Ou continuer avec </Text>
-            <Separator className="flex-1" />
-          </View>
-        </CardHeader>
-        <CardContent className="gap-6">
-          <View className="gap-6">
-            <View className="gap-1.5">
-              <Label htmlFor="email">Email ou nom d'utilisateur</Label>
-              <Controller
-                name="identifier"
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    isValid={!!errors.identifier}
-                    Icon={Mail}
-                    id="identifier"
-                    placeholder="m@example.com"
-                    keyboardType="email-address"
-                    autoComplete="email"
-                    autoCapitalize="none"
-                    onSubmitEditing={onEmailSubmitEditing}
-                    returnKeyType="next"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                )}
-              />
-              {errors.identifier && <FieldError>{errors.identifier?.message}</FieldError>}
-            </View>
-            <View className="gap-1.5">
-              <View className="flex-row items-center">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="ml-auto h-4 px-1 py-0 web:h-fit sm:h-4"
-                  onPress={() => {
-                    router.push('/auth/forgot-password');
-                  }}>
-                  <Text className="font-normal leading-4">Mot de passe oublier?</Text>
-                </Button>
-              </View>
-              <Controller
-                name="password"
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    isValid={!!errors.password}
-                    isPassword
-                    Icon={Lock}
-                    ref={passwordInputRef}
-                    id="password"
-                    placeholder="********"
-                    returnKeyType="send"
-                    onSubmitEditing={handleSubmit(onSubmit)}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                )}
-              />
-              {errors.password && <FieldError>{errors.password?.message}</FieldError>}
-            </View>
-            <Button className="w-full" onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
-              {isSubmitting ? <Text>Connexion en cours...</Text> : <Text>Se connecter</Text>}
-            </Button>
-          </View>
-          <View className="flex flex-row items-center justify-center  text-center text-sm">
-            <Text className="text-sm">Pas de compte ? </Text>
+          <View className=" flex w-full flex-row items-center justify-center  text-center text-sm">
+            <Text className="font-inter-meduim text-sm">Pas de compte? </Text>
             <Pressable
-              onPress={() => {
-                router.push('/auth/register');
-              }}>
-              <Text className="font-medium  underline underline-offset-4">Crée un compte</Text>
+                onPress={() => {
+                  router.push('/auth/register');
+                }}>
+              <Text className="font-inter-semibold text-sm text-blue-700 underline underline-offset-4">
+                Crée un compte
+              </Text>
             </Pressable>
           </View>
-        </CardContent>
-      </Card>
-    </View>
+        </View>
+
+      </CardContent>
+    </Card>
   );
 }

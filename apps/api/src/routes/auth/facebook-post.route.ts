@@ -11,12 +11,9 @@ router.post('/facebook', async (req, res) => {
   try {
     const { accessToken } = req.body;
     if (!accessToken) return createServiceError('Access Token missing', 400);
-    console.log('Access Token ', accessToken);
-
     const profile = await verifyFacebookToken(accessToken);
 
-    console.log('profile', profile);
-    const user = upsertOauthUser({
+    const user = await upsertOauthUser({
       provider: 'facebook',
       providerAccountId: profile.id,
       email: profile.email ?? null,

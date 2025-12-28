@@ -1,6 +1,6 @@
-import { Text, TextClassContext } from '@/components/ui/text';
-import { cn } from '@/lib/utils';
-import { View, type ViewProps } from 'react-native';
+import {Text, TextClassContext} from '@/components/ui/text';
+import {cn} from '@/lib/utils';
+import {View, type ViewProps} from 'react-native';
 import React from 'react';
 
 function Card({ className, ...props }: ViewProps & React.RefAttributes<View>) {
@@ -39,7 +39,15 @@ function CardDescription({
   className,
   ...props
 }: React.ComponentProps<typeof Text> & React.RefAttributes<Text>) {
-  return <Text className={cn('text-sm text-muted-foreground', className)} {...props} />;
+  return (
+    <Text
+      className={cn(
+        'px-2 text-center font-inter-semibold text-sm text-muted-foreground',
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
 function CardContent({ className, ...props }: ViewProps & React.RefAttributes<View>) {

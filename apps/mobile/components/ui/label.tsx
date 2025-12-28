@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import * as LabelPrimitive from '@rn-primitives/label';
 import { Platform } from 'react-native';
+import React from 'react';
 
 function Label({
   className,
@@ -27,8 +28,8 @@ function Label({
       disabled={disabled}>
       <LabelPrimitive.Text
         className={cn(
-          'text-foreground text-sm font-medium',
-          Platform.select({ web: 'leading-none' }),
+          'font-inter-medium text-sm tracking-tight text-foreground',
+
           className
         )}
         {...props}

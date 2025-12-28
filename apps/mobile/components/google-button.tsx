@@ -54,8 +54,7 @@ export default function GoogleLoginButton() {
           text1: data.message || 'Authentification réuissi avec succé!',
           text1Style: { color: 'green' },
         });
-
-        if (data.user.completeProfiled) {
+        if (!data.user.profileCompleted) {
           router.push('/auth/complete-profile');
         }
       }

@@ -1,17 +1,17 @@
-import { Router, type Request, Response } from "express";
-import { body, validationResult } from "express-validator";
-import { consumeResendCode } from "../../utils/limiter";
-import jwt from "jsonwebtoken";
-import { CODE_EXPIRES_MINUTES, JWT_SECRET } from "../../constant/config";
-import { prisma } from "../../lib/prisma";
-import { generate6Code, hashCode } from "../../lib/outils";
-import sendWhatshAppMessage from "../../services/twilio-whatshapp";
+import { type Request, Response, Router } from 'express';
+import { body, validationResult } from 'express-validator';
+import { consumeResendCode } from '../../utils/limiter';
+import jwt from 'jsonwebtoken';
+import { CODE_EXPIRES_MINUTES, JWT_SECRET } from '../../constant/config';
+import { prisma } from '../../lib/prisma';
+import { generate6Code, hashCode } from '../../lib/outils';
+import sendWhatshAppMessage from '../../services/whatsapp.service';
 
 const router = Router();
 
 router.post(
-  "/resend-code",
-  body("tempToken").notEmpty().withMessage("Token temporaire requis"),
+  '/resend-code',
+  body('tempToken').notEmpty().withMessage('Token temporaire requis'),
   async (req: Request, res: Response) => {
     try {
       try {
@@ -19,7 +19,7 @@ router.post(
       } catch (RateLimiterQueueError) {
         return res.status(429).json({
           ok: false,
-          message: "Trop de demandes de renvoi. Veuillez réessayer plus tard.",
+          message: 'Trop de demandes de renvoi. Veuillez réessayer plus tard.',
         });
       }
 
@@ -32,19 +32,19 @@ router.post(
       let decoded;
       try {
         decoded = jwt.verify(tempToken, JWT_SECRET) as any;
-        console.log("decoded:", decoded);
+        console.log('decoded:', decoded);
 
-        if (decoded.type !== "resend_code") {
+        if (decoded.type !== 'resend_code') {
           return res.status(400).json({
             ok: false,
-            message: "Token invalide",
+            message: 'Token invalide',
           });
         }
       } catch (jwtError) {
         return res.status(400).json({
           ok: false,
           message:
-            "Token expiré ou invalide. Veuillez refaire une demande de réinitialisation.",
+            'Token expiré ou invalide. Veuillez refaire une demande de réinitialisation.',
         });
       }
 
@@ -56,15 +56,15 @@ router.post(
       const recentCode = await prisma.verificationCode.findFirst({
         where: {
           userId,
-          type: "password_reset",
-          method: "whatsapp",
+          type: 'password_reset',
+          method: 'whatsapp',
           createdAt: { gt: now },
         },
       });
 
       if (recentCode) {
         const timeLeft = Math.ceil(
-          new Date(recentCode.createdAt).getTime() + delay
+          new Date(recentCode.createdAt).getTime() + delay,
         );
         return res.status(400).json({
           ok: false,
@@ -82,13 +82,13 @@ router.post(
         return res.status(400).json({
           ok: false,
           message:
-            "Utilisateur non trouvé ou numéro de téléphone indisponible.",
+            'Utilisateur non trouvé ou numéro de téléphone indisponible.',
         });
       }
 
       // invalider les ancien code
       await prisma.verificationCode.updateMany({
-        where: { userId, type: "password_reset", used: false },
+        where: { userId, type: 'password_reset', used: false },
         data: { used: true },
       });
 
@@ -100,8 +100,8 @@ router.post(
       await prisma.verificationCode.create({
         data: {
           userId,
-          type: "password_reset",
-          method: "whatsapp",
+          type: 'password_reset',
+          method: 'whatsapp',
           attempts: 0,
           expiresAt,
           codeHash,
@@ -111,7 +111,7 @@ router.post(
       try {
         await sendWhatshAppMessage(user.phoneNumber, rawCode);
       } catch (err) {
-        console.error("Erreur WhatsApp lors du renvoi:", err);
+        console.error('Erreur WhatsApp lors du renvoi:', err);
         return res.status(500).json({
           ok: false,
           message: "Erreur lors de l'envoi du message. Veuillez réessayer.",
@@ -120,18 +120,18 @@ router.post(
 
       return res.status(200).json({
         ok: true,
-        message: "Un nouveau code a été envoyé par WhatsApp.",
+        message: 'Un nouveau code a été envoyé par WhatsApp.',
         // Optionnel: renvoyer un nouveau tempToken si nécessaire
         // tempToken: generateNewTempToken(userId)
       });
     } catch (error) {
-      console.error("resend-code error:", error);
+      console.error('resend-code error:', error);
       return res.status(500).json({
         ok: false,
-        message: "Erreur lors du renvoi du code",
+        message: 'Erreur lors du renvoi du code',
       });
     }
-  }
+  },
 );
 
 export default router;

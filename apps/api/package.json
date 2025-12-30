@@ -1,11 +1,11 @@
 {
-  "name": "@stackschool/backend",
+  "name": "@stackschool/api",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "start": "node dist/server.ts",
     "build": "tsc"
   },
-  "main": "src/index.js",
+  "main": "src/server.ts",
   "dependencies": {
     "@sendgrid/mail": "^8.1.6",
     "@stackschool/db": "workspace:*",

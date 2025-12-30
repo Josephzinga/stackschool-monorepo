@@ -1,28 +1,42 @@
 // components/complete-profile/profile-step.tsx
-"use client";
-import {useState} from "react";
-import {Controller, UseCompleteProfileStore, useForm, useUserStore, zodResolver} from "@stackschool/ui";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "../ui/select";
-import {toast} from "sonner";
-import PhoneInput from "react-phone-number-input";
-import {authService, profileSchema, ProfileType} from "@stackschool/shared";
-import {Field, FieldError, FieldLabel} from "../ui/field";
-import {Input} from "../ui/input";
-import {Button} from "../ui/button";
-import {Spinner} from "../ui/spinner";
-import "react-phone-number-input/style.css";
-import {checkField} from "@/lib/check-profile-field";
-import ProfileUpload from "../profile-upload";
-import api, {parseAxiosError} from "@stackschool/shared/src/lib/api";
+'use client';
+import { useState } from 'react';
+import {
+  Controller,
+  UseCompleteProfileStore,
+  useForm,
+  useUserStore,
+  zodResolver,
+} from '@stackschool/ui';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+import { toast } from 'sonner';
+import PhoneInput from 'react-phone-number-input';
+import { authService, profileSchema, ProfileType } from '@stackschool/shared';
+import { Field, FieldError, FieldLabel } from '../ui/field';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Spinner } from '../ui/spinner';
+import 'react-phone-number-input/style.css';
+import { checkField } from '@/lib/check-profile-field';
+import ProfileUpload from '../profile-upload';
+import api, { parseAxiosError } from '@stackschool/shared/src/lib/api';
 
 export function ProfileStep() {
-  const { user , fetchUser} = useUserStore();
+  const { user, fetchUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const [picture, setPicture] = useState<string | null>(
-    user?.profile?.photo || null
+    user?.profile?.photo || null,
   );
 
-  const [phoneValue, setPhoneValue] = useState<string>("");
+  const [phoneValue, setPhoneValue] = useState<string>('');
 
   const { setCurrentStep, setProfileData } = UseCompleteProfileStore();
 
@@ -37,30 +51,29 @@ export function ProfileStep() {
   } = useForm<ProfileType>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstname: user?.profile?.firstname || "",
-      lastname: user?.profile?.lastname || "",
-      phoneNumber: user?.phoneNumber || "",
-      email: user?.email || "",
+      firstname: user?.profile?.firstname || '',
+      lastname: user?.profile?.lastname || '',
+      phoneNumber: user?.phoneNumber || '',
+      email: user?.email || '',
       gender: undefined,
     },
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
-  console.log("user dans complete profile",user);
+  console.log('user dans complete profile', user);
 
   // Fonction de validation améliorée
   const validateField = async (fieldName: keyof ProfileType, value: string) => {
     if (!value) return;
-
     try {
       const { valid, message, field } = await checkField(
         fieldName as string,
-        value
+        value,
       );
 
       if (!valid && message) {
         setError(fieldName, {
-          type: "manual",
+          type: 'manual',
           message: message,
         });
       } else {
@@ -74,18 +87,18 @@ export function ProfileStep() {
   const handleProfile = async (data: ProfileType) => {
     try {
       if (data.email) {
-        const emailCheck = await checkField("email", data.email);
+        const emailCheck = await checkField('email', data.email);
         if (!emailCheck.valid) {
-          setError("email", { type: "manual", message: emailCheck.message });
+          setError('email', { type: 'manual', message: emailCheck.message });
           return;
         }
       }
 
       if (data.phoneNumber) {
-        const phoneCheck = await checkField("phoneNumber", data.phoneNumber);
+        const phoneCheck = await checkField('phoneNumber', data.phoneNumber);
         if (!phoneCheck.valid) {
-          setError("phoneNumber", {
-            type: "manual",
+          setError('phoneNumber', {
+            type: 'manual',
             message: phoneCheck.message,
           });
           return;
@@ -93,40 +106,40 @@ export function ProfileStep() {
       }
 
       const res = await authService.updateProfile(data);
-
       if (res.ok) {
         setProfileData(data);
         setCurrentStep(3);
       }
     } catch (error) {
-      const {message} = parseAxiosError(error)
-      console.error("Erreur sauvegarde profil:", message);
-      toast.error(message || "Erreur lors de la sauvegarde du profil");
+      const { message } = parseAxiosError(error);
+      console.error('Erreur sauvegarde profil:', message);
+      toast.error(message || 'Erreur lors de la sauvegarde du profil');
     }
   };
 
   // Gestionnaire pour le téléphone
-  const handlePhoneChange = (value: string = "") => {
+  const handlePhoneChange = (value: string = '') => {
     setPhoneValue(value);
-    setValue("phoneNumber", value, { shouldValidate: true });
+    setValue('phoneNumber', value, { shouldValidate: true });
   };
 
   // Gestionnaire de blur pour le téléphone
   const handlePhoneBlur = () => {
-    validateField("phoneNumber", phoneValue);
+    validateField('phoneNumber', phoneValue);
   };
 
   const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    validateField("email", e.target.value);
+    validateField('email', e.target.value);
   };
+
   const handlePhotoUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.warning("Veuillez sélectionner une image");
+    if (!file.type.startsWith('image/')) {
+      toast.warning('Veuillez sélectionner une image');
       return;
     }
 
@@ -138,16 +151,16 @@ export function ProfileStep() {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("profilePicture", file);
+      formData.append('profilePicture', file);
 
-      const res = await api.post("/upload/profile-picture", formData);
+      const res = await api.post('/upload/profile-picture', formData);
 
       const data = res.data;
 
       if (data.ok) {
         setPicture(data.path);
         toast.success(
-          `${res.data.message}` || "Photo de profil téléchargée avec succès !"
+          `${res.data.message}` || 'Photo de profil téléchargée avec succès !',
         );
       } else {
         throw new Error(data.message);
@@ -155,8 +168,8 @@ export function ProfileStep() {
     } catch (error: any) {
       setIsLoading(false);
       const { message, status, data } = parseAxiosError(error);
-      console.error("Erreur upload photo:", error);
-      toast.error(data?.errors || "Erreur lors du téléchargement de la photo");
+      console.error('Erreur upload photo:', error);
+      toast.error(data?.errors || 'Erreur lors du téléchargement de la photo');
     } finally {
       setIsLoading(false);
     }
@@ -200,7 +213,7 @@ export function ProfileStep() {
             <Input
               id="firstname"
               type="text"
-              {...register("firstname")}
+              {...register('firstname')}
               aria-invalid={!!errors.firstname}
               placeholder="Votre prénom"
               required
@@ -213,7 +226,7 @@ export function ProfileStep() {
             <Input
               id="lastname"
               type="text"
-              {...register("lastname")}
+              {...register('lastname')}
               aria-invalid={!!errors.lastname}
               placeholder="Votre nom de famille"
               required
@@ -226,7 +239,7 @@ export function ProfileStep() {
             <Input
               id="email"
               type="email"
-              {...register("email")}
+              {...register('email')}
               onBlur={handleEmailBlur}
               aria-invalid={!!errors.email}
               placeholder="Votre email"
@@ -234,7 +247,7 @@ export function ProfileStep() {
             />
             <FieldError>{errors.email?.message}</FieldError>
           </Field>
-        
+
           <Field>
             <FieldLabel htmlFor="phoneNumber">Numéro de téléphone</FieldLabel>
             <Controller
@@ -245,8 +258,8 @@ export function ProfileStep() {
                   international
                   defaultCountry="ML"
                   value={phoneValue}
-                  onChange={handlePhoneChange} 
-                  onBlur={handlePhoneBlur} 
+                  onChange={handlePhoneChange}
+                  onBlur={handlePhoneBlur}
                   placeholder="Entrez votre numéro"
                   className="phone-input-custom"
                 />
@@ -288,7 +301,7 @@ export function ProfileStep() {
             className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             ← Retour
-          </Button>{" "}
+          </Button>{' '}
           <Button
             type="submit"
             disabled={isSubmitting}
@@ -300,18 +313,11 @@ export function ProfileStep() {
                 Sauvegarde...
               </span>
             ) : (
-              "Continuer →"
+              'Continuer →'
             )}
           </Button>
         </div>
       </form>
-
-      <div className="text-center">
-        <p className="text-xs text-gray-500">
-          Vos informations sont sauvegardées automatiquement à chaque
-          modification
-        </p>
-      </div>
     </div>
   );
 }

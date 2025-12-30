@@ -6,6 +6,13 @@ const resendCodeLimiter = new RateLimiterMemory({
   duration: 900,
 });
 
+/**
+ * Consomme un point de limite pour le renvoi de code de vérification.
+ * Limite : 5 tentatives par 15 minutes par IP.
+ *
+ * @param {Request} req - La requête Express contenant l'IP.
+ * @returns {Promise<RateLimiterRes>} Promesse résolue si autorisé, rejetée si limite atteinte ou IP manquante.
+ */
 export const consumeResendCode = (req: Request) => {
   const ip = req.ip;
   if (!ip) return Promise.reject(new Error("IP manquants dans resend_code"));
@@ -18,6 +25,13 @@ const verifiCodeLimiter = new RateLimiterMemory({
   duration: 600,
 });
 
+/**
+ * Consomme un point de limite pour la vérification de code.
+ * Limite : 4 tentatives par 10 minutes par IP.
+ *
+ * @param {Request} req - La requête Express contenant l'IP.
+ * @returns {Promise<RateLimiterRes>} Promesse résolue si autorisé, rejetée si limite atteinte ou IP manquante.
+ */
 export const consumeCode = (req: Request) => {
   const ip = req.ip;
   if (!ip) return Promise.reject(new Error("IP manquants"));
@@ -29,17 +43,32 @@ const rateLimiter = new RateLimiterMemory({
   duration: 900, // 15 minutes
 });
 
+/**
+ * Consomme un point de limite générique par IP (ex: login).
+ * Limite : 3 tentatives par 15 minutes par IP.
+ *
+ * @param {Request} req - La requête Express contenant l'IP.
+ * @returns {Promise<RateLimiterRes>} Promesse résolue si autorisé, rejetée si limite atteinte ou IP manquante.
+ */
 export const consumeIp = (req: Request) => {
   const ip = req.ip;
   if (!ip) return Promise.reject(new Error("Missing IP"));
   return rateLimiter.consume(ip);
 };
+
 // Rate limiting par identifiant
 const identifierLimiter = new RateLimiterMemory({
-  points: 5, // 4 tentatives
+  points: 5, // 5 tentatives (commentaire disait 4, code dit 5)
   duration: 600, // 10 minutes
 });
 
+/**
+ * Consomme un point de limite par identifiant (ex: email ou username dans le body).
+ * Limite : 5 tentatives par 10 minutes par identifiant.
+ *
+ * @param {Request} req - La requête Express contenant l'identifiant dans le body.
+ * @returns {Promise<RateLimiterRes>} Promesse résolue si autorisé, rejetée si limite atteinte ou identifiant manquant.
+ */
 export const consumeIdentifier = (req: Request) => {
   const identifier = req.body?.identifier;
   if (!identifier) return Promise.reject(new Error("Missing identifier"));

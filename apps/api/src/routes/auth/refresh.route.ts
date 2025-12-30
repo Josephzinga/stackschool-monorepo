@@ -1,17 +1,17 @@
-import { generateToken } from "../../lib/outils";
-import { Router, Request, Response, NextFunction } from "express";
-import { prisma } from "../../lib/prisma";
-import { createServiceError } from "../../utils/api-response";
+import { generateToken } from '../../lib/outils';
+import { Router, Request, Response, NextFunction } from 'express';
+import { prisma } from '../../lib/prisma';
+import { createServiceError } from '../../utils/api-errors';
 
 const router = Router();
 router.post(
-  "/refresh",
+  '/refresh',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const refreshToken = req.cookies["refresh_token"]; // recupére le cookie dans le headers
+      const refreshToken = req.cookies['refresh_token']; // recupére le cookie dans le headers
 
       if (!refreshToken)
-        throw createServiceError("Aucun token de rafraîchissement.", 401);
+        throw createServiceError('Aucun token de rafraîchissement.', 401);
       // recupére la session conrrespante
       const dbSession = await prisma.session.findUnique({
         where: { sessionToken: refreshToken },
@@ -24,10 +24,10 @@ router.post(
             where: { id: dbSession.id },
           });
         }
-        res.clearCookie("refresh_token");
+        res.clearCookie('refresh_token');
         throw createServiceError(
-          "Token de rafraîchissement invalide ou expiré.",
-          401
+          'Token de rafraîchissement invalide ou expiré.',
+          401,
         );
       }
       // recherche l'utilisateur avec cette session et son profile inclut
@@ -40,8 +40,8 @@ router.post(
         await prisma.session.delete({
           where: { id: dbSession.id },
         });
-        res.clearCookie("refresh_token");
-        throw createServiceError("Utilisateur non trouvé.", 401);
+        res.clearCookie('refresh_token');
+        throw createServiceError('Utilisateur non trouvé.', 401);
       }
 
       await new Promise<void>((resolve, reject) => {
@@ -66,10 +66,10 @@ router.post(
         },
       });
 
-      res.cookie("refresh_token", newRefreshToken, {
+      res.cookie('refresh_token', newRefreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 1000 * 60 * 60 * 24 * 25,
       });
 
@@ -77,7 +77,7 @@ router.post(
     } catch (error) {
       next(error);
     }
-  }
+  },
 );
 
 export default router;

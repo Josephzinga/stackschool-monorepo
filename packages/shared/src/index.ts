@@ -6,5 +6,3 @@ export { z, ZodError } from 'zod';
 export * from './types';
 export type * from '@stackschool/db';
 export * from './validation/auth-schema';
-export const IP_ADDRESS = '10.0.2.2';
-//export * from './services/schools'

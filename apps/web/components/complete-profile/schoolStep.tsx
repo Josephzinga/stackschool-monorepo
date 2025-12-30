@@ -41,10 +41,8 @@ export default function SchoolStep() {
   return (
     <div className="space-y-6 p-3 w-full h-full">
       <div className="text-center max-h-screen">
-        <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-          Votre École
-        </CardTitle>
-        <CardDescription className="text-gray-600 dark:text-slate-200">
+        <CardTitle className="text-2xl font-bold ">Votre École</CardTitle>
+        <CardDescription className="">
           Rejoignez votre établissement scolaire
         </CardDescription>
       </div>
@@ -68,7 +66,7 @@ export default function SchoolStep() {
             <Input
               id="search"
               placeholder="Nom de l'école ou code..."
-              className="h-10"
+              className="h-10 border-border"
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);

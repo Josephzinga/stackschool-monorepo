@@ -1,13 +1,13 @@
-"use client";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+'use client';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Field,
   FieldDescription,
@@ -15,17 +15,17 @@ import {
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { FacebookIcon, GoogleIcon } from "./icons";
-import { useState } from "react";
-import { useForm } from "@stackschool/ui";
-import { zodResolver } from "@stackschool/ui";
-import Link from "next/link";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
-import { Spinner } from "./ui/spinner";
-import { LoginFormType, loginFormSchema } from "@stackschool/shared";
-import { ButtonSocial } from "./button-social";
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { FacebookIcon, GoogleIcon } from './icons';
+import { useState } from 'react';
+import { useForm, zodResolver } from '@stackschool/ui';
+import Link from 'next/link';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Spinner } from './ui/spinner';
+import { loginFormSchema, LoginFormType } from '@stackschool/shared';
+import { ButtonSocial } from './button-social';
+
 export function LoginForm({
   className,
   handleLogin,
@@ -41,12 +41,12 @@ export function LoginForm({
     formState: { errors, isSubmitting },
   } = useForm<LoginFormType>({
     resolver: zodResolver(loginFormSchema),
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
   return (
     <>
-      <Card className="max-w-lg w-100 md:w-md xl:w-lg bg-white/50 dark:bg-slate-700/50 py-4 gap-2 ">
+      <Card className="max-w-lg w-100 md:w-md xl:w-lg py-4 gap-2 font-inter-local">
         <CardHeader className="text-center">
           <CardTitle className="text-xl lg:text-2xl!">Bienvenue</CardTitle>
           <CardDescription>
@@ -70,21 +70,21 @@ export function LoginForm({
                   Email ou nom d&apos;utilisateur
                 </FieldLabel>
                 <Input
-                    placeholder="exmple@example.com"
+                  placeholder="exmple@example.com"
                   icon={Mail}
                   id="email"
                   type="text"
                   required
                   autoComplete="name"
-                  {...register("identifier")}
+                  {...register('identifier')}
                   aria-describedby={
-                    errors.identifier ? "identifier-error" : undefined
+                    errors.identifier ? 'identifier-error' : undefined
                   }
                   aria-invalid={!!errors.identifier}
                 />
 
                 <FieldError id="identifier-error">
-                  {errors.identifier?.message}{" "}
+                  {errors.identifier?.message}{' '}
                 </FieldError>
               </Field>
               <Field>
@@ -92,7 +92,7 @@ export function LoginForm({
                   <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
                   <Link
                     href="/auth/forgot-password"
-                    className="ml-auto text-sm font-semibold hover:underline "
+                    className="ml-auto text-sm font-semibold hover:underline hover:text-primary/50"
                   >
                     Mot de passe oublier?
                   </Link>
@@ -100,14 +100,15 @@ export function LoginForm({
                 <div className="relative">
                   <Input
                     icon={Lock}
-                    {...register("password")}
+                    {...register('password')}
                     id="password"
-                    type={showpwd ? "text" : "password"}
+                    type={showpwd ? 'text' : 'password'}
                     required
+                    placeholder="********"
                     autoComplete="current-password"
                     aria-invalid={!!errors.password}
                     aria-describedby={
-                      errors.password ? "password-error" : undefined
+                      errors.password ? 'password-error' : undefined
                     }
                   />
                   <button
@@ -129,8 +130,8 @@ export function LoginForm({
                   disabled={isSubmitting}
                   type="submit"
                   className={cn(
-                    "font-semibold text-white",
-                    isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+                    'font-semibold',
+                    isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer',
                   )}
                 >
                   {isSubmitting ? (
@@ -138,11 +139,11 @@ export function LoginForm({
                       <Spinner /> Connection en cours...
                     </>
                   ) : (
-                    <span>Se connecter</span>
+                    'Connexion'
                   )}
                 </Button>
                 <FieldDescription className="text-center">
-                  Pas de compte ?{" "}
+                  Pas de compte ?{' '}
                   <Link href="/auth/register">Creé un compte</Link>
                 </FieldDescription>
               </Field>

@@ -14,13 +14,13 @@ export type ApiResponse<T> = {
 };
 
 export class ServiceError extends Error {
-  satusCode: number;
+  statusCode: number;
   details?: any;
 
   constructor(message: string, statusCode: number = 500, details?: any) {
     super(message);
-    this.name = "ServiceError";
-    this.satusCode = statusCode;
+    this.name = 'ServiceError';
+    this.statusCode = statusCode;
     this.details = details;
     Object.setPrototypeOf(this, ServiceError.prototype);
   }

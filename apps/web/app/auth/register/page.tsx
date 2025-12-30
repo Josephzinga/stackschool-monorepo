@@ -1,21 +1,39 @@
-"use client";
-import {useState} from "react";
-import {useRouter} from "next/navigation";
-import {authService, parseAxiosError, registerFormSchema, RegisterFormType,} from "@stackschool/shared";
-import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator,} from "@/components/ui/field";
-import Link from "next/link";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
-import {FacebookIcon, GoogleIcon} from "@/components/icons";
-import {Input} from "@/components/ui/input";
-import {Spinner} from "@/components/ui/spinner";
-import {Eye, EyeOff, Lock, Mail, User} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Controller, useForm, zodResolver} from "@stackschool/ui";
-import {toast} from "sonner";
-import {Container} from "@/components/Container";
-import {ButtonSocial} from "@/components/button-social";
-import "react-phone-number-input/style.css";
-import PhoneInput from "react-phone-number-input";
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  authService,
+  parseAxiosError,
+  registerFormSchema,
+  RegisterFormType,
+} from '@stackschool/shared';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from '@/components/ui/field';
+import Link from 'next/link';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { FacebookIcon, GoogleIcon } from '@/components/icons';
+import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import { Lock, Mail, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Controller, useForm, zodResolver } from '@stackschool/ui';
+import { toast } from 'sonner';
+import { Container } from '@/components/Container';
+import { ButtonSocial } from '@/components/button-social';
+import 'react-phone-number-input/style.css';
+import PhoneInput from 'react-phone-number-input';
 
 export default function RegisterPage() {
   const [showPwd, setShowPwd] = useState(false);
@@ -28,7 +46,7 @@ export default function RegisterPage() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormType>({
     resolver: zodResolver(registerFormSchema),
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
   async function handleRegister(data: RegisterFormType) {
@@ -36,23 +54,17 @@ export default function RegisterPage() {
       const res = await authService.register(data);
       if (res.ok) {
         toast.success(res.message);
-     }
-
-      if (res.requireVerification) {
-      //  router.replace(`/auth/verify-code?userId=${res.user.id}`);
-      }
-      if (res.user.profileCompleted) {
-        router.replace("/auth/complete-profile")
+        router.push(`/auth/finish?from=${res.user.provider}`);
       }
     } catch (err: any) {
       const error = parseAxiosError(err);
-      toast.error(error.message || "Une erreur est survenue.");
+      toast.error(error.message || 'Une erreur est survenue.');
     }
   }
 
   return (
     <Container>
-      <Card className="max-w-lg w-100 md:w-md bg-white/50 dark:bg-slate-700/50 py-4 gap-2">
+      <Card className="max-w-lg w-100 md:w-md gap-4">
         <CardHeader className="text-center mt-4">
           <CardTitle className="text-xl">Bienvenue</CardTitle>
           <CardDescription>
@@ -66,12 +78,12 @@ export default function RegisterPage() {
                 <ButtonSocial provider="google" icon={<GoogleIcon />} />
                 <ButtonSocial provider="facebook" icon={<FacebookIcon />} />
               </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                <span className="font-medium text-slate-700 dark:text-slate-300">
+              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card mt-1">
+                <span className="font-medium font-jost text-sm ">
                   Ou continuer avec
                 </span>
               </FieldSeparator>
-              <Field className="gap-1 text-sm">
+              <Field className="gap-1.5 text-sm mt-3">
                 <FieldLabel htmlFor="username">
                   Nom d&apos;utilisateur
                 </FieldLabel>
@@ -84,32 +96,32 @@ export default function RegisterPage() {
                   placeholder="John Doe"
                   aria-invalid={!!errors.username}
                   aria-describedby={
-                    errors.username ? "username-error" : undefined
+                    errors.username ? 'username-error' : undefined
                   }
-                  {...register("username")}
+                  {...register('username')}
                 />
 
                 <FieldError id="username-error">
-                  {errors.username?.message}{" "}
+                  {errors.username?.message}{' '}
                 </FieldError>
               </Field>
-              <Field className="gap-1 text-sm">
+              <Field className="gap-1.5 text-sm">
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   icon={Mail}
                   id="email"
                   type="email"
                   placeholder="john.doe@example.com"
-                  {...register("email")}
+                  {...register('email')}
                   autoComplete="email"
                   aria-invalid={!!errors.email}
-                  aria-describedby={errors.email ? "email-error" : undefined}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 <FieldError id="email-error">
-                  {errors.email?.message}{" "}
+                  {errors.email?.message}{' '}
                 </FieldError>
               </Field>
-              <Field className="gap-1 ">
+              <Field className="gap-1.5 ">
                 <FieldLabel htmlFor="phoneNumber">Numéro WhatsApp</FieldLabel>
                 <Controller
                   name="phoneNumber"
@@ -117,7 +129,7 @@ export default function RegisterPage() {
                   render={({ field }) => (
                     <PhoneInput
                       {...field}
-                      defaultContry="ML"
+                      defaultcontry="ML"
                       id="phoneNumber"
                       placeholder="+223 07 12 34 56 78"
                       defaultCountry="CI"
@@ -127,58 +139,46 @@ export default function RegisterPage() {
                 />
 
                 <FieldError id="error-phone">
-                  {errors.phoneNumber?.message}{" "}
+                  {errors.phoneNumber?.message}{' '}
                 </FieldError>
               </Field>
-              <Field className="gap-1">
+              <Field className="gap-1.5">
+                <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
 
-                  <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
-
-                  <div className="relative">
                 <Input
+                  isPassword
                   icon={Lock}
-                  {...register("password")}
+                  {...register('password')}
                   id="password"
-                  type={showPwd ? "text" : "password"}
+                  type={showPwd ? 'text' : 'password'}
                   required
                   placeholder="********"
                   autoComplete="current-password"
                   aria-invalid={!!errors.password}
                   aria-describedby={
-                    errors.password ? "password-error" : undefined
+                    errors.password ? 'password-error' : undefined
                   }
                 />
-                    <button
-                        type="button"
-                        onClick={() => setShowPwd(!showPwd)}
-                        aria-label={
-                          showPwd
-                              ? "Cacher le mot de passe"
-                              : "Afficher le mot de passe"
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 dark:text-gray-400 cursor-pointer"
-                    >
-                      {showPwd ? <Eye size={18} /> : <EyeOff size={18} />}
-                    </button>
-                  </div>
+
                 <FieldError id="password-error">
-                  {errors.password?.message}{" "}
+                  {errors.password?.message}{' '}
                 </FieldError>
               </Field>
-              <Field className="gap-1 ">
+              <Field className="gap-1.5 ">
                 <FieldLabel htmlFor="confirm">
                   Confirmer le mot de passe
                 </FieldLabel>
                 <Input
+                  isPassword
                   id="confirm"
                   autoComplete="current-password webauthn"
                   type="password"
                   icon={Lock}
                   placeholder="********"
-                  {...register("confirm")}
+                  {...register('confirm')}
                   aria-invalid={!!errors.confirm}
                   aria-describedby={
-                    errors.confirm ? "confirm-error" : undefined
+                    errors.confirm ? 'confirm-error' : undefined
                   }
                 />
                 <FieldError id="confirm-error">
@@ -186,7 +186,7 @@ export default function RegisterPage() {
                 </FieldError>
               </Field>
 
-              <Field className="gap-1">
+              <Field className="gap-1.5">
                 <Button type="submit" className="font-semibold text-white mt-2">
                   {isSubmitting ? (
                     <>

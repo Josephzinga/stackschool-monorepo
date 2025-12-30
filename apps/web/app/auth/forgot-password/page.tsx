@@ -1,26 +1,37 @@
-"use client";
+'use client';
 
-import {Container} from "@/components/Container";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Field, FieldError, FieldLabel} from "@/components/ui/field";
-import {Input} from "@/components/ui/input";
-import {Spinner} from "@/components/ui/spinner";
-import {authService, forgotPasswordSchema, FormDataType, parseAxiosError} from "@stackschool/shared";
-import Link from "next/link";
-import {useRouter} from "next/navigation";
-import {useForm, zodResolver} from "@stackschool/ui";
-import {toast} from "sonner";
-import {AlertCircle, PhoneIcon} from "lucide-react";
-import PhoneInput, {isValidPhoneNumber} from "react-phone-number-input";
-import "react-phone-number-input/style.css";
+import { Container } from '@/components/Container';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import {
+  authService,
+  forgotPasswordSchema,
+  FormDataType,
+  parseAxiosError,
+} from '@stackschool/shared';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm, zodResolver } from '@stackschool/ui';
+import { toast } from 'sonner';
+import { AlertCircle, PhoneIcon } from 'lucide-react';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
-import {useState} from "react";
+import { useState } from 'react';
 
 export default function ForgotPasswordPage() {
   const [isOpen, setIsOpen] = useState(false);
-  const [inputType, setInputType] = useState<"any" | "phone" | "email">("any");
-  const [phoneValue, setPhoneValue] = useState<string>("");
+  const [inputType, setInputType] = useState<'any' | 'phone' | 'email'>('any');
+  const [phoneValue, setPhoneValue] = useState<string>('');
 
   const router = useRouter();
   const {
@@ -30,26 +41,26 @@ export default function ForgotPasswordPage() {
     formState: { errors, isSubmitting, isValid },
   } = useForm<FormDataType>({
     resolver: zodResolver(forgotPasswordSchema),
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
   const detectInputType = (value: string) => {
-    if (value.includes("@") && value.includes(".")) {
-      return "email";
+    if (value.includes('@') && value.includes('.')) {
+      return 'email';
     }
-    const numericValue = value.replace(/\D/g, "");
+    const numericValue = value.replace(/\D/g, '');
     if (numericValue.length >= 8 && /^[\d\s+()-]+$/.test(value)) {
-      return "phone";
+      return 'phone';
     }
-    return "any";
+    return 'any';
   };
 
   const handleIdentifierChange = (value: string) => {
     const detectedType = detectInputType(value);
     setInputType(detectedType);
-    console.log("value", value);
+    console.log('value', value);
 
-    if (detectedType === "phone") {
+    if (detectedType === 'phone') {
       setPhoneValue(value);
     }
   };
@@ -58,21 +69,21 @@ export default function ForgotPasswordPage() {
   console.log(isSubmitting);
 
   const getInputType = () => {
-    return inputType === "phone"
-      ? "tel"
-      : inputType === "email"
-      ? "email"
-      : "text";
+    return inputType === 'phone'
+      ? 'tel'
+      : inputType === 'email'
+        ? 'email'
+        : 'text';
   };
-  console.log("identifier dehors");
+  console.log('identifier dehors');
   const handleIdentifier = async (data: FormDataType) => {
     let identifier = data.identifier;
 
     // Si c'est un numéro, utiliser la version formatée du PhoneInput
-    if (inputType === "phone" && phoneValue) {
+    if (inputType === 'phone' && phoneValue) {
       identifier = phoneValue;
     }
-    console.log("identifier", identifier);
+
     try {
       const res = await authService.forgotPassword(identifier);
       if (res.ok) {
@@ -84,16 +95,16 @@ export default function ForgotPasswordPage() {
         }
       }
     } catch (error: any) {
-      const {message} = parseAxiosError(error)
-      toast.error(message || "Erreur réseau");
+      const { message } = parseAxiosError(error);
+      toast.error(message || 'Erreur réseau');
     }
   };
 
   return (
     <Container>
-      <Card className="dark:bg-slate-700/50 bg-white/50 backdrop-sm w-110 transition duration-150 ">
+      <Card className="backdrop-sm w-110  ">
         <CardHeader>
-          <CardTitle className="text-center text-white">
+          <CardTitle className="text-center ">
             Récupération de mot de passe
           </CardTitle>
           <CardDescription className="text-center">
@@ -103,34 +114,36 @@ export default function ForgotPasswordPage() {
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
-          <form onSubmit={handleSubmit(handleIdentifier)}>
+          <form onSubmit={handleSubmit(handleIdentifier)} className="space-y-3">
             <Field>
-              <FieldLabel htmlFor="identifier">Identifiant *</FieldLabel>
+              <FieldLabel htmlFor="identifier">
+                Entrez votre email, nom complet ou numéro
+              </FieldLabel>
 
-              {inputType === "phone" ? (
+              {inputType === 'phone' ? (
                 <PhoneInput
                   international
                   defaultCountry="ML"
+                  className="phone-input-custom"
                   value={phoneValue}
                   onChange={(value) => {
-                    setPhoneValue(value || "");
-                    setValue("identifier", value || "");
+                    setPhoneValue(value || '');
+                    setValue('identifier', value || '');
                   }}
                   onBlur={() => {
                     if (phoneValue) {
-                      setValue("identifier", phoneValue);
+                      setValue('identifier', phoneValue);
                     }
                   }}
                   placeholder="+223 07 12 34 56 78"
-
                 />
               ) : (
                 <Input
                   id="identifier"
-                  placeholder="example@gmail.com ou nom d'utilisateur"
                   className="placeholder:text-sm"
+                  aria-invalid={!!errors.identifier}
                   type="text"
-                  {...register("identifier", {
+                  {...register('identifier', {
                     onChange: (e) => handleIdentifierChange(e.target.value),
                   })}
                 />
@@ -145,18 +158,18 @@ export default function ForgotPasswordPage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (inputType === "phone") {
-                    setValue("identifier", "");
-                    setInputType("any");
+                  if (inputType === 'phone') {
+                    setValue('identifier', '');
+                    setInputType('any');
                   } else {
-                    setInputType("phone");
-                    setValue("identifier", "");
-                    setPhoneValue("");
+                    setInputType('phone');
+                    setValue('identifier', '');
+                    setPhoneValue('');
                   }
                 }}
-                className="text-sm text-blue-500 hover:underline flex gap-1"
+                className="text-sm text-primary hover:underline flex gap-1"
               >
-                {inputType === "phone" ? (
+                {inputType === 'phone' ? (
                   "← Utiliser un email ou nom d'utilisateur à la place"
                 ) : (
                   <>
@@ -169,12 +182,8 @@ export default function ForgotPasswordPage() {
 
             <Button
               type="submit"
-              className="w-full text-white mt-4 font-semibold"
-              disabled={
-                isSubmitting || inputType === "phone"
-                  ? !isValidPhoneNumber(phoneValue)
-                  : false
-              }
+              className="w-full  mt-4 font-semibold font-inter"
+              disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <>
@@ -182,7 +191,7 @@ export default function ForgotPasswordPage() {
                   Envoi en cours...
                 </>
               ) : (
-                <>Recevoir le code de réinitialisation</>
+                'Recevoir le code de réinitialisation'
               )}
             </Button>
           </form>
@@ -190,15 +199,15 @@ export default function ForgotPasswordPage() {
           <div className="text-center space-y-3">
             <Link
               href="/auth/login"
-              className="text-blue-500 hover:underline hover:text-blue-700 block"
+              className="hover:underline block text-sm text-primary/90 font-inter "
             >
               ← Retour à la connexion
             </Link>
 
-            <div className="text-sm text-gray-500 dark:text-gray-100">
-              <p>Vous recevrez un lien par email ou un code WhatsApp</p>
-              <p>Valable pendant 15 minutes</p>
-            </div>
+            <p className="text-sm font-jost text-foreground/85 tracking-tight">
+              Vous recevrez un lien par email ou un code WhatsApp Valable
+              pendant 15 minutes
+            </p>
           </div>
         </CardContent>
       </Card>

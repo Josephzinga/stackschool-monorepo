@@ -1,4 +1,4 @@
-import { ConfigContext, ExpoConfig } from 'expo/config';
+import {ConfigContext, ExpoConfig} from 'expo/config';
 /*import * as dotenv from "dotenv"
 import path from "path"
 
@@ -33,7 +33,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.stackschool.app',
-    // N'oublie pas de mettre ton vrai code iOS ici si tu build pour iOS plus tard
     // googleServicesFile: './GoogleService-Info.plist',
   },
 

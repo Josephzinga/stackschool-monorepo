@@ -1,10 +1,9 @@
-import { Router, Request, Response, NextFunction } from "express";
-import { prisma } from "../../lib/prisma";
-import bcrypt from "bcryptjs";
-import { registerFormSchema } from "@stackschool/shared";
-import { generate6Code, generateToken, hashCode } from "../../lib/outils";
-import { createServiceError } from "../../utils/api-response";
-import { profile } from "console";
+import { NextFunction, Request, Response, Router } from 'express';
+import { prisma } from '../../lib/prisma';
+import bcrypt from 'bcryptjs';
+import { generate6Code, generateToken, hashCode } from '../../lib/outils';
+import { createServiceError } from '../../utils/api-errors';
+import { registerFormSchema } from '@stackschool/shared';
 
 const router = Router();
 
@@ -26,14 +25,15 @@ async function sendWhatsAppCode(phoneNumber: string, code: string) {
   console.log(`code: ${code} numéro: ${phoneNumber} `);
 }
 router.post(
-  "/register",
+  '/register',
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log('Request Body', req.body);
     try {
       const parseResult = registerFormSchema.safeParse(req.body);
-
       if (!parseResult.success) {
         // Lève une erreur Zod qui sera attrapée par le gestionnaire d'erreurs
-        throw parseResult.error;
+        next(parseResult.error);
+        return;
       }
 
       const { email, password, username, phoneNumber } = parseResult.data;
@@ -49,20 +49,14 @@ router.post(
 
       if (existing) {
         if (safeEmail && existing?.email === safeEmail) {
-          throw createServiceError("Email déjà utilisé", 409);
+          throw createServiceError('Email déjà utilisé', 409);
         }
         if (existing?.username === username) {
           throw createServiceError("Nom d'utilisateur déjà utilisé", 409);
         }
         if (safePhone && existing.phoneNumber === safePhone) {
-          throw createServiceError("Numéro de téléphone déjà utilisé", 409);
+          throw createServiceError('Numéro de téléphone déjà utilisé', 409);
         }
-
-        // Ce cas est probablement redondant mais gardé pour la sécurité
-        throw createServiceError(
-          "Un utilisateur avec ces informations existe déjà",
-          409
-        );
       }
 
       const hashed = await bcrypt.hash(password, 12);
@@ -72,9 +66,10 @@ router.post(
           email: safeEmail,
           password: hashed,
           username,
-          isVerified: phoneNumber ? false : true,
+          isVerified: false,
           phoneNumber: safePhone,
         },
+        include: { profile: true, Account: true },
       });
 
       if (phoneNumber) {
@@ -97,7 +92,7 @@ router.post(
         try {
           await sendWhatsAppCode(phoneNumber, code);
         } catch (sendErr) {
-          console.error("Erreur envoi WhatsApp:", sendErr);
+          console.error('Erreur envoi WhatsApp:', sendErr);
           // ne bloque pas la création, mais informe le client
         }
       }
@@ -108,8 +103,8 @@ router.post(
             createServiceError(
               "La connexion après l'inscription a échoué",
               500,
-              err
-            )
+              err,
+            ),
           );
         }
 
@@ -126,43 +121,50 @@ router.post(
           }),
           prisma.account.create({
             data: {
-              provider: "local",
+              provider: 'local',
               providerAccountId: user.id,
               userId: user.id,
             },
           }),
         ]);
 
-        res.cookie("refresh_token", refreshToken, {
+        res.cookie('refresh_token', refreshToken, {
           httpOnly: true,
           maxAge: 1000 * 60 * 60 * 24 * 25,
-          sameSite: "lax",
-          secure: process.env.NODE_ENV === "production",
+          sameSite: 'lax',
+          secure: process.env.NODE_ENV === 'production',
         });
 
         if (phoneNumber) {
           return sendApiResponse(res, 201, {
-            message: "Inscription réussie. Vérifiez votre numéro de téléphone.",
+            message: 'Inscription réussie. Vérifiez votre numéro de téléphone.',
             user: {
               id: user.id,
               username: user.username,
               email: user.email,
               phoneNumber: user.phoneNumber,
+              profileCompleted: user.profileCompleted,
+              provider: 'local',
             },
             requireVerification: true,
           });
         }
 
         return sendApiResponse(res, 201, {
-          message: "Inscription réussie",
-          user: { id: user.id, username: user.username, email: user.email },
+          message: 'Inscription réussie',
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            provider: 'local',
+          },
           profileCompleted: user.profileCompleted,
         });
       });
     } catch (err) {
       next(err); // Passe l'erreur au gestionnaire centralisé
     }
-  }
+  },
 );
 
 export default router;

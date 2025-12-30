@@ -2,6 +2,7 @@ import { Router } from 'express';
 import passport from 'passport';
 import { getPlateForm } from '../../utils/deep.link';
 import { handleSocialWebCallback } from '../../controllers/social-web.controller';
+
 const router = Router();
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
 

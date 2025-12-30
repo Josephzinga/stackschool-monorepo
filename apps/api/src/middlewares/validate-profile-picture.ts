@@ -1,16 +1,16 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
-import { uploadedImageSchema } from "../validations/upload-profile-picture";
-import { createServiceError } from "../utils/api-response";
+import { uploadedImageSchema } from '../validations/upload-profile-picture';
+import { createServiceError } from '../utils/api-errors';
 export function validateUploadedImage(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   if (!req.file) {
     return res
       .status(400)
-      .json({ ok: false, message: "Aucun fichier uploadé" });
+      .json({ ok: false, message: 'Aucun fichier uploadé' });
   }
 
   const result = uploadedImageSchema.safeParse(req.file);

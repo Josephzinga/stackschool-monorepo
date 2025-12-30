@@ -3,10 +3,10 @@ import { OAuth2Client } from 'google-auth-library';
 import {
   UpsertOauthUser,
   upsertOauthUser,
-} from '../../services/UpsertOauthUser';
+} from '../../services/auth-user.service';
 import { Router } from 'express';
 import { sendApiResponse } from '../../middlewares/errorHandler';
-import { createServiceError } from '../../utils/api-response';
+import { createServiceError } from '../../utils/api-errors';
 import { createMobileSession } from '../../lib/mobile-session';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;

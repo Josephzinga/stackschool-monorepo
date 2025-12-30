@@ -1,20 +1,18 @@
 // components/complete-profile/school-step/create-school-form.tsx
-import { useForm } from "@stackschool/ui";
-import { zodResolver } from "@stackschool/ui";
-import { z } from "@stackschool/shared";
-import { Input } from "@/components/ui/input";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { UseCompleteProfileStore } from "@stackschool/ui";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
+import { UseCompleteProfileStore, useForm, zodResolver } from '@stackschool/ui';
+import { z } from '@stackschool/shared';
+import { Input } from '@/components/ui/input';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
 
 // Schéma de validation pour la création d'école
 const createSchoolSchema = z.object({
   name: z
     .string()
     .min(3, "Le nom de l'école doit contenir au moins 3 caractères")
-    .max(100, "Le nom est trop long"),
+    .max(100, 'Le nom est trop long'),
   address: z
     .string()
     .min(5, "L'adresse doit être plus précise")
@@ -22,7 +20,7 @@ const createSchoolSchema = z.object({
   code: z
     .string()
 
-    .or(z.string().length(6, "Le code doit contenir 6 caractères")),
+    .or(z.string().length(6, 'Le code doit contenir 6 caractères')),
 });
 
 type CreateSchoolFormData = z.infer<typeof createSchoolSchema>;
@@ -35,21 +33,21 @@ export function CreateSchoolForm() {
     watch,
   } = useForm<CreateSchoolFormData>({
     resolver: zodResolver(createSchoolSchema),
-    mode: "onChange",
+    mode: 'onChange',
   });
   const { setSchoolData, currentStep, setCurrentStep } =
     UseCompleteProfileStore();
-  const nameValue = watch("name");
+  const nameValue = watch('name');
 
   const generateSchoolCode = () => {
     // Générer un code basé sur le nom + timestamp
     const initials =
       nameValue
-        ?.split(" ")
+        ?.split(' ')
         .map((word: string) => word.charAt(0))
-        .join("")
+        .join('')
         .toUpperCase()
-        .substring(0, 3) || "SCH";
+        .substring(0, 3) || 'SCH';
 
     const random = Math.random().toString(36).substring(2, 5).toUpperCase();
     return `${initials}${random}`;
@@ -60,11 +58,11 @@ export function CreateSchoolForm() {
     const finalData = {
       address: data.address,
       name: data.name,
-      inposedRole: "ADMIN",
+      inposedRole: 'ADMIN',
       code: data.code || generateSchoolCode(),
     };
     setSchoolData({
-      type: "create",
+      type: 'create',
       newSchool: finalData,
     });
     setCurrentStep(Math.min(currentStep + 1, 3));
@@ -79,11 +77,11 @@ export function CreateSchoolForm() {
           <Input
             id="name"
             type="text"
-            {...register("name")}
+            {...register('name')}
             placeholder="Ex: Groupe Scolaire Les Champions"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 "
             aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? "name-err" : undefined}
+            aria-describedby={errors.name ? 'name-err' : undefined}
           />
 
           <FieldError id="name-err">{errors.name?.message}</FieldError>
@@ -95,11 +93,11 @@ export function CreateSchoolForm() {
           <Textarea
             id="address"
             rows={3}
-            {...register("address")}
+            {...register('address')}
             placeholder="Ex: Quartier Hippodrome, Rue 234, Bamako, Mali"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full px-3 py-2 resize-none"
             aria-invalid={!!errors.address}
-            aria-describedby={errors.address ? "address-err" : undefined}
+            aria-describedby={errors.address ? 'address-err' : undefined}
           />
 
           <FieldError id="address-err">{errors.address?.message}</FieldError>
@@ -116,12 +114,12 @@ export function CreateSchoolForm() {
           <Input
             id="code"
             type="text"
-            {...register("code")}
+            {...register('code')}
             placeholder="Ex: CHAMP24"
             maxLength={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+            className="w-full px-3 py-2 uppercase"
             aria-invalid={!!errors.code}
-            aria-describedby={errors.code ? "code-err" : undefined}
+            aria-describedby={errors.code ? 'code-err' : undefined}
           />
 
           <FieldError id="code-err">{errors.code?.message}</FieldError>

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@stackschool/db/*": ["packages/db/*"],
+      "@stackschool/shared/*": ["packages/shared/*"],
+      "@stackschool/ui/*": ["packages/ui/*"],
+      "@stackschool/api/*": ["apps/api/*"],
+      "@stackschool/web/*": ["apps/web/*"],
+      "@stackschool/mobile/*": ["apps/mobile/*"]
+    },
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "target": "ESNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["packages/**/*", "apps/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

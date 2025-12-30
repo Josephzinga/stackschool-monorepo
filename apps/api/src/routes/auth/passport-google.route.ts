@@ -1,14 +1,11 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { getPlateForm } from '../../utils/deep.link';
 import { handleSocialWebCallback } from '../../controllers/social-web.controller';
 
 const router = Router();
 
 router.get('/google', (req, res, next) => {
-  const state = getPlateForm(req);
-
-  passport.authenticate('google', { scope: ['email', 'profile'], state })(
+  passport.authenticate('google', { scope: ['email', 'profile'] })(
     req,
     res,
     next,

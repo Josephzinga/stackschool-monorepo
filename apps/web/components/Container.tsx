@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 export const Container = ({
   children,
@@ -10,8 +10,8 @@ export const Container = ({
   return (
     <div
       className={cn(
-        "flex w-full min-h-screen items-center justify-center bg-linear-to-br from-slate-50 to-slate-100 dark:from-gray-700 dark:via-gray-800 dark:to-gray-900",
-        className
+        'flex w-full min-h-screen items-center justify-center bg-slate-100 dark:bg-gray-900 ',
+        className,
       )}
     >
       {children}

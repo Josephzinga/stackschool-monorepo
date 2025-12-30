@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import SchoolStep from "../../../components/complete-profile/schoolStep";
-import { Container } from "@/components/Container";
-import { Card } from "@/components/ui/card";
+import SchoolStep from '../../../components/complete-profile/schoolStep';
+import { Container } from '@/components/Container';
+import { Card } from '@/components/ui/card';
 
-import { UseCompleteProfileStore } from "@stackschool/ui";
-import Stepper from "@/components/Stepper";
-import { School } from "@stackschool/shared";
-import { useSearchParams } from "next/navigation";
-import { ProfileStep } from "@/components/complete-profile/profile-step";
-import ProtectedRoute from "@/components/protected-route";
+import { UseCompleteProfileStore } from '@stackschool/ui';
+import { School } from '@stackschool/shared';
+import { useSearchParams } from 'next/navigation';
+import { ProfileStep } from '@/components/complete-profile/profile-step';
+import ProtectedRoute from '@/components/protected-route';
+import Stepper from '@/components/Stepper';
 
 export type CompleteProfileData = {
   school: {
@@ -21,9 +21,9 @@ export type CompleteProfileData = {
 
 export default function CompleteProfile() {
   const search = useSearchParams();
-  const provider = search.get("provider");
+  const provider = search.get('provider');
   const { currentStep, setCurrentStep } = UseCompleteProfileStore();
-  const steps = ["école", "Profile", "Rôle"];
+  const steps = ['école', 'Profile', 'Rôle'];
   const totalSteps = steps.length;
 
   const handleNext = () => {
@@ -51,20 +51,33 @@ export default function CompleteProfile() {
 
   return (
     <ProtectedRoute>
-      <Container>
-        {/* Modifications principales ici */}
-        <div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10">
-          {/* Partie guide - fixe */}
-          <div className="w-full h-fit md:sticky md:top-0 md:h-screen flex flex-col justify-between bg-slate-700/40 p-4 md:p-6">
+      <Container className="flex justify-center items-center">
+        <div>
+          <div className="w-full flex flex-col justfy-center items-center ">
+            <Stepper
+              className="w-full h-15"
+              currentStep={
+                currentStep > totalSteps ? totalSteps + 1 : currentStep
+              }
+              steps={steps}
+            />
+          </div>
+
+          {/* Partie formulaire - scrollable */}
+          <div className="w-full flex justify-center py-8 md:py-12 overflow-y">
+            <Card className="w-full p-6 md:w-md lg:w-lg min-h-150 ">
+              {renderStepContent()}
+            </Card>
+          </div>
+        </div>
+      </Container>
+    </ProtectedRoute>
+  );
+}
+{
+  /*       <div className="w-full h-fit md:sticky md:top-0 md:h-screen flex flex-col justify-between bg-slate-700/40 p-4 md:p-6">
             <div className="flex justify-center w-full">
-              <Stepper
-                className="w-full"
-                currentStep={
-                  currentStep > totalSteps ? totalSteps + 1 : currentStep
-                }
-                steps={steps}
-              />
-            </div>
+
 
             <div className="mt-6 md:mt-8">
               {currentStep <= totalSteps ? (
@@ -94,16 +107,5 @@ export default function CompleteProfile() {
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Partie formulaire - scrollable */}
-          <div className="w-full flex justify-center py-8 md:py-12 overflow-y-auto">
-            <Card className="h-full lg:min-w-140 p-6 dark:bg-slate-700/50 ">
-              {renderStepContent()}
-            </Card>
-          </div>
-        </div>
-      </Container>
-    </ProtectedRoute>
-  );
+          </div>     */
 }

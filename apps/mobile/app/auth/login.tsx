@@ -14,7 +14,6 @@ export default function Login() {
       enableOnAndroid={true}
       extraHeight={75}
       contentContainerClassName={'w-full h-full'}>
-
         <SignInForm />
     </KeyboardAwareScrollView>
   );

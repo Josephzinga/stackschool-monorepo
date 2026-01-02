@@ -12,7 +12,7 @@ import { ZodSchema } from 'zod';
  */
 export function safeValidate<T>(
   schema: ZodSchema<T>,
-  data: unknown,
+  data: T,
 ): Array<{ field: string; message: string }> | undefined {
   const result = schema.safeParse(data);
   if (!result.success) {

@@ -1,9 +1,9 @@
 import * as bcrypt from 'bcryptjs';
 import { VerifyCallback } from 'passport-google-oauth20';
 import { prisma } from '../lib/prisma';
-import { Account } from '@stackschool/db';
 import { loginFormSchema } from '@stackschool/shared';
-import { safeValidate } from '../utils/validation.util';
+import { safeValidateSchema } from '../utils/validate-schema.util'; // On garde l'ancien validateur pour l'instant si safeValidate n'est pas prêt
+import { analyzeUserAccounts } from '../utils/account-analysis.util';
 
 /**
  * Gère l'authentification locale (stratégie Passport).
@@ -22,14 +22,16 @@ export default async function handleLocalAuth(
   password: string,
   done: VerifyCallback,
 ): Promise<void> {
-  // helper de validation zod
-  const errors = safeValidate(loginFormSchema, { identifier, password });
+  // Validation des données d'entrée
+  const errors = safeValidateSchema(loginFormSchema, { identifier, password });
   if (errors) {
     return done(errors);
   }
+
   try {
     const input = identifier || '';
-    // recherche de l'utilisateur par l'identifiant (email, password, phoneNumber) et inclure le profile et account dans le donné renvoyé
+
+    // Recherche de l'utilisateur
     const user = await prisma.user.findFirst({
       where: {
         OR: [
@@ -41,32 +43,37 @@ export default async function handleLocalAuth(
       include: { profile: true, Account: true },
     });
 
-    if (!user) return done(null, false, { message: 'Utilisateur introuvable' });
+    if (!user) {
+      return done(null, false, { message: 'Utilisateur introuvable' });
+    }
 
-    // on parcourt les comptes pour filtrer seulement les sociaux
-    const providers = user.Account
-      ? user.Account.map((acc: Account) => acc.provider).filter(
-          (p: string | null) => p !== 'local',
-        )
-      : [];
-    // vérifie s'il y a ou-mois un caractère dans le mot de passe
-    const hasPassword =
-      typeof user.password === 'string' && user.password.length > 0;
-    // s'il n'y a pas de mot de passe, il vient des providers
-    if (!hasPassword) {
+    // Analyse des comptes (Local vs Social)
+    const { hasLocalPassword, socialProviders, isSocialOnly } =
+      analyzeUserAccounts(user);
+
+    // Si l'utilisateur n'a pas de mot de passe (compte social uniquement)
+    if (isSocialOnly) {
       return done(null, false, {
-        message: `Ce compte utilise : ${providers.join(
-          ', ',
-        )} veilliez vous connecter avec.`,
+        message: `Ce compte utilise : ${socialProviders.join(', ')}. Veuillez vous connecter avec.`,
         isSocialOnly: true,
-        providers,
+        providers: socialProviders,
       });
     }
-    // Comparaison du mot passe
-    const match = await bcrypt.compare(password, user.password as string);
-    if (!match) return done(null, false, { message: 'Identifiants invalides' });
 
-    // donne l'user ou l'erreur à passport
+    // Si l'utilisateur a un mot de passe mais qu'il est vide (cas rare/invalide)
+    if (!hasLocalPassword) {
+      return done(null, false, {
+        message: 'Configuration du compte invalide (pas de mot de passe).',
+      });
+    }
+
+    // Vérification du mot de passe
+    const match = await bcrypt.compare(password, user.password as string);
+    if (!match) {
+      return done(null, false, { message: 'Identifiants invalides' });
+    }
+
+    // Authentification réussie
     return done(null, user);
   } catch (error) {
     return done(error);

@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   authService,
@@ -34,10 +33,12 @@ import { Container } from '@/components/Container';
 import { ButtonSocial } from '@/components/button-social';
 import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
+import { useEffect, useRef } from 'react';
 
 export default function RegisterPage() {
-  const [showPwd, setShowPwd] = useState(false);
   const router = useRouter();
+  const phoneInputRef = useRef<HTMLDivElement>(null);
+  const current = phoneInputRef.current;
 
   const {
     handleSubmit,
@@ -48,6 +49,14 @@ export default function RegisterPage() {
     resolver: zodResolver(registerFormSchema),
     mode: 'onBlur',
   });
+  useEffect(() => {
+    if (!current) return;
+    if (errors.phoneNumber) {
+      current.classList.add('phone-input-error');
+    } else {
+      current.classList.remove('phone-input-error');
+    }
+  }, [errors.phoneNumber]);
 
   async function handleRegister(data: RegisterFormType) {
     try {
@@ -95,9 +104,7 @@ export default function RegisterPage() {
                   autoComplete="name"
                   placeholder="John Doe"
                   aria-invalid={!!errors.username}
-                  aria-describedby={
-                    errors.username ? 'username-error' : undefined
-                  }
+                  aria-describedby="username-error"
                   {...register('username')}
                 />
 
@@ -123,20 +130,21 @@ export default function RegisterPage() {
               </Field>
               <Field className="gap-1.5 ">
                 <FieldLabel htmlFor="phoneNumber">Numéro WhatsApp</FieldLabel>
-                <Controller
-                  name="phoneNumber"
-                  control={control}
-                  render={({ field }) => (
-                    <PhoneInput
-                      {...field}
-                      defaultcontry="ML"
-                      id="phoneNumber"
-                      placeholder="+223 07 12 34 56 78"
-                      defaultCountry="CI"
-                      className="phone-input-custom"
-                    />
-                  )}
-                />
+                <div ref={phoneInputRef}>
+                  <Controller
+                    name="phoneNumber"
+                    control={control}
+                    render={({ field }) => (
+                      <PhoneInput
+                        {...field}
+                        id="phoneNumber"
+                        placeholder="+223 07 12 34 56 78"
+                        defaultCountry="ML"
+                        className="phone-input-custom "
+                      />
+                    )}
+                  />
+                </div>
 
                 <FieldError id="error-phone">
                   {errors.phoneNumber?.message}{' '}
@@ -150,9 +158,7 @@ export default function RegisterPage() {
                   icon={Lock}
                   {...register('password')}
                   id="password"
-                  type={showPwd ? 'text' : 'password'}
                   required
-                  placeholder="********"
                   autoComplete="current-password"
                   aria-invalid={!!errors.password}
                   aria-describedby={
@@ -171,10 +177,8 @@ export default function RegisterPage() {
                 <Input
                   isPassword
                   id="confirm"
-                  autoComplete="current-password webauthn"
                   type="password"
                   icon={Lock}
-                  placeholder="********"
                   {...register('confirm')}
                   aria-invalid={!!errors.confirm}
                   aria-describedby={

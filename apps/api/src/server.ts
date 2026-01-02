@@ -12,7 +12,6 @@ import routes from './routes';
 import helmet from 'helmet';
 import handleOauthStrategy from './controllers/passport-social.controller';
 import setupLocalStrategy from './lib/setup-local-strategy';
-import SearchSchool from './routes/shools/search-school.route';
 import { getUserFromRedis } from './lib/handle-redis-user';
 import path from 'path';
 import { JWT_SECRET } from './constant/config';
@@ -46,6 +45,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -118,7 +118,6 @@ passport.use(
 );
 
 app.use('/api', routes);
-app.use('/api', SearchSchool);
 
 app.get('/', (req, res) => {
   res.json('message serveur connecter');
@@ -126,9 +125,9 @@ app.get('/', (req, res) => {
 
 app.use(express.static(path.resolve(process.cwd(), 'public')));
 
-// Gestionnaire d'erreur centralisée (DOIT être après les routes)
+// Gestionnaire d'erreur centralisée
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`server is runing on port http://localhost:${PORT}`);
+  console.log(`server is running on port http://localhost:${PORT}`);
 });

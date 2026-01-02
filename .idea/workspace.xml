@@ -5,74 +5,37 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-social.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-social.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-social.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/social-web.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/social-web.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/validate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/server.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/mobile-session.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/mobile-session.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/passport-local.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/setup-local-strategy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/middlewares/errorHandler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/middlewares/errorHandler.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/middlewares/validate-login.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/middlewares/validate-profile-picture.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/middlewares/validate-profile-picture.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/outils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/outils.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/facebook-post.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/facebook-post.route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/forgot-password.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/forgot-password.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/google-post.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/google-post.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-facebook.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-facebook.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-google.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/passport-google.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/refresh.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/refresh.route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/resend-code.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/resend-code.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/UpsertOauthUser.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/auth-user.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/create-jwt-for-user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/jwt.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/node_mail.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/mail.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/session.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/session.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/twilio-whatshapp.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/whatsapp.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/verifiy-token-facebook.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/facebook-token.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/types/global.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/types/global.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/utils/api-response.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/utils/api-errors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/utils/deep.link.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/utils/deep.link.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/reset-password.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/reset-password.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/save-progress.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/save-progress.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/shools/search-school.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/shools/search-school.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/server.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/facebook-token.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/facebook-token.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/mail.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/mail.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/whatsapp.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/whatsapp.service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/utils/limiter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/utils/limiter.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/app.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/mobile/app/auth/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/auth/login.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/complete-profile/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/complete-profile/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/utils/validate-schema.util.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/utils/validate-schema.util.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/validations/validation-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/validations/validation-schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/auth/forgot-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/forgot-password/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/login/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/auth/register/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/register/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/reset-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/reset-password/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/verify-code/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/verify-code/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/Container.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/Container.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/button-social.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/button-social.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/create-school-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/create-school-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/profile-step.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/profile-step.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/RoleStep.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/RoleStep.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/schoolStep.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/schoolStep.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/login-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/login-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/card.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/library.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/runtime/library.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/types/api-response.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/api-response.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/auth-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/auth-schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.base.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/services/schools/schools.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/services/schools/schools.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/types/complete-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/complete-profile.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,6 +60,9 @@
     &quot;accountId&quot;: &quot;d014f285-ece5-4cf7-9ff0-474bccdd23bf&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" root0="SKIP_INSPECTION" />
+  </component>
   <component name="OptimizeOnSaveOptions">
     <option name="myRunOnSave" value="true" />
   </component>
@@ -289,6 +255,12 @@
       <workItem from="1767051431135" duration="11116000" />
       <workItem from="1767098512977" duration="1314000" />
       <workItem from="1767099917664" duration="5432000" />
+      <workItem from="1767126172567" duration="11887000" />
+      <workItem from="1767180796302" duration="2397000" />
+      <workItem from="1767289837498" duration="8686000" />
+      <workItem from="1767320289468" duration="2885000" />
+      <workItem from="1767359930101" duration="12001000" />
+      <workItem from="1767392614234" duration="4267000" />
     </task>
     <servers />
   </component>

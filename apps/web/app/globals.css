@@ -227,7 +227,6 @@
   border: none;
   outline: none;
   padding: 0.08rem;
-  background: transparent;
   height: 1.1rem;
   border-radius: 3rem;
   background-color: transparent;
@@ -258,13 +257,11 @@
   padding: 0.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  background: transparent;
   background-color: transparent;
 }
 
 .PhoneInput:focus-within {
   border-color: #3b82f6;
-  ring: 2px solid #3b82f6;
 }
 .dark .PhoneInput:focus-within {
   border: solid 2px #3b82f6;
@@ -275,4 +272,7 @@
   background: #374151;
   border-color: #4b5563;
   color: white;
+}
+.phone-input-error {
+ border: solid 2px #e74c3c;
 }

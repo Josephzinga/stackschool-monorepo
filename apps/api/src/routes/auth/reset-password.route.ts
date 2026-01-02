@@ -1,24 +1,21 @@
-import { type Request, Response, Router } from 'express';
-import { validationResult } from 'express-validator';
+import { NextFunction, type Request, Response, Router } from 'express';
+
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../lib/prisma';
 import { hashToken } from '../../lib/outils';
-import { resetPasswordValidation } from '../../validations/validation-schema';
+import { resetPasswordApiSchema } from '../../validations/validation-schema';
+import { safeValidateSchema } from '../../utils/validate-schema.util';
 
 const router = Router();
 
 router.post(
   '/reset-password',
-  resetPasswordValidation,
 
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          ok: false,
-          errors: errors.array(),
-        });
+      const errors = safeValidateSchema(resetPasswordApiSchema, req.body);
+      if (errors) {
+        return next(errors);
       }
 
       const { token, password } = req.body as {

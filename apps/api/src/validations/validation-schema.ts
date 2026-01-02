@@ -1,69 +1,24 @@
-import { body } from "express-validator";
-import { z } from "@stackschool/shared";
+import { z } from '@stackschool/shared';
 
-export const registerValidator = [
-  body("username")
-    .isString()
-    .isLength({ min: 3, max: 30 })
-    .withMessage(
-      "Le nom d'utilisateur doit contenir entre 3 et 30 caractères."
-    ),
-
-  body("password")
-    .isString()
-    .matches(/[A-Z]/)
-    .withMessage("Le mot de passe doit contenir au moins une majuscule.")
-    .matches(/[0-9]/)
-    .withMessage("Le mot de passe doit contenir au moins un chiffre.")
-    .matches(/[^a-zA-Z0-9]/)
-    .withMessage("Le mot de passe doit contenir au moins un caractère spécial.")
-    .isLength({ min: 8 })
-    .withMessage("Le mot de passe doit contenir au moins 8 caractères."),
-
-  body("email")
-    .optional({ nullable: true, checkFalsy: true })
-    .isEmail()
-    .withMessage("Adresse e-mail invalide."),
-
-  body("phoneNumber")
-    .optional({ nullable: true, checkFalsy: true })
-    .matches(/^\+?[0-9]{8,15}$/)
-    .withMessage("Numéro de téléphone invalide."),
-];
-export const resetPasswordValidation = [
-  body("token")
-    .notEmpty()
-    .withMessage("Le token de réinitialisation est requis")
-    .isLength({ min: 16 })
-    .withMessage("Token invalide"),
-  body("password")
-    .isString()
-    .matches(/[A-Z]/)
-    .withMessage("Le mot de passe doit contenir au moins une majuscule.")
-    .matches(/[0-9]/)
-    .withMessage("Le mot de passe doit contenir au moins un chiffre.")
-    .matches(/[^a-zA-Z0-9]/)
-    .withMessage("Le mot de passe doit contenir au moins un caractère spécial.")
-    .isLength({ min: 8 })
-    .withMessage("Le mot de passe doit contenir au moins 8 caractères."),
-];
-
-export const loginSchema = z.object({
-  identifier: z
-    .string()
-    .min(3, "L'identifiant doit contenir au moins 3 caractères"),
+export const resetPasswordApiSchema = z.object({
+  token: z.string().min(16, 'Token invalide'),
   password: z
     .string()
-    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+    .min(8, 'Le mot de passe doit contenir au moins 8 caractères.')
+    .regex(/[A-Z]/, 'Le mot de passe doit contenir au moins une majuscule.')
+    .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre.')
+    .regex(
+      /[^a-zA-Z0-9]/,
+      'Le mot de passe doit contenir au moins un caractère spécial.',
+    ),
 });
-
 export const validateUserFieldSchema = z.object({
-  email: z.string().email("Veuillez entrer un email valide.").optional(),
+  email: z.string().email('Veuillez entrer un email valide.').optional(),
   phoneNumber: z
     .string()
     .trim()
     .regex(/^\+?[0-9]{8,15}$/, {
-      message: "Numéro invalide (format international recommandé, ex: +223...)",
+      message: 'Numéro invalide (format international recommandé, ex: +223...)',
     })
     .optional(),
 });

@@ -1,36 +1,36 @@
-"use client";
+'use client';
 
-import { Container } from "@/components/Container";
-import { Button } from "@/components/ui/button";
+import { Container } from '@/components/Container';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
-import { ResetPasswordType, resetPasswordSchema } from "@stackschool/shared";
-import api from "@/services/api";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+} from '@/components/ui/card';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import {
+  authService,
+  parseAxiosError,
+  resetPasswordSchema,
+  ResetPasswordType,
+} from '@stackschool/shared';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, CheckCircle2, Lock } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { SubmitButton } from '@/components/submit-button';
 
 export default function ResetPasswordPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
   const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get("token");
+  const token = searchParams.get('token');
 
   const {
     register,
@@ -39,43 +39,38 @@ export default function ResetPasswordPage() {
     formState: { errors, isSubmitting, isValid },
   } = useForm<ResetPasswordType>({
     resolver: zodResolver(resetPasswordSchema),
-    mode: "onChange",
+    mode: 'onChange',
   });
 
-  const passwordValue = watch("password");
+  const passwordValue = watch('password');
 
   const onSubmit = async (data: ResetPasswordType) => {
     if (!token) {
-      toast.error("Token de réinitialisation manquant");
+      toast.error('Token de réinitialisation manquant');
       return;
     }
 
     try {
-      const res = await api.post("/auth/reset-password", {
-        token,
-        password: data.password,
-      });
+      const res = await authService.resetPassword(token, data.password);
 
-      if (res.data.ok) {
+      if (res.ok) {
         setIsSuccess(true);
         toast.success(
-          res.data?.message || "Mot de passe réinitialisé avec succès"
+          res.data?.message || 'Mot de passe réinitialisé avec succès',
         );
-
         // Redirection après 3 secondes
         setTimeout(() => {
-          router.push("/auth/login");
+          router.push('/auth/login');
         }, 3000);
       }
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || "Erreur lors de la réinitialisation";
-      toast.error(message);
+      const { message } = parseAxiosError(error);
+      toast.error(message || 'Erreur lors de la réinitialisation');
 
       // Si le token est invalide, rediriger vers forgot-password
       if (error.response?.status === 400) {
         setTimeout(() => {
-          router.push("/auth/forgot-password");
+          router.push('/auth/forgot-password');
         }, 2000);
       }
     }
@@ -122,7 +117,8 @@ export default function ResetPasswordPage() {
             <p>Le lien de réinitialisation est invalide ou a expiré.</p>
             <Button
               className="text-white font-semibold"
-              onClick={() => router.push("/auth/forgot-password")}>
+              onClick={() => router.push('/auth/forgot-password')}
+            >
               Demander un nouveau lien
             </Button>
           </CardContent>
@@ -133,7 +129,7 @@ export default function ResetPasswordPage() {
 
   return (
     <Container>
-      <Card className="max-w-md mx-auto w-100!  bg-white/50 dark:bg-slate-700/50">
+      <Card className="max-w-md mx-auto w-100! ">
         <CardHeader>
           <CardTitle className="text-center">Nouveau mot de passe</CardTitle>
           <CardDescription className="text-center">
@@ -146,21 +142,15 @@ export default function ResetPasswordPage() {
             {/* Champ mot de passe */}
             <Field>
               <FieldLabel>Nouveau mot de passe</FieldLabel>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  {...register("password")}
-                  placeholder="Votre nouveau mot de passe"
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
+              <Input
+                icon={Lock}
+                isPassword
+                {...register('password')}
+                placeholder="********"
+                aria-invalid={!!errors.password}
+              />
 
+              <FieldError>{errors.password?.message}</FieldError>
               {/* Indicateur de force du mot de passe */}
               {passwordValue && (
                 <div className="mt-2 space-y-2">
@@ -171,69 +161,50 @@ export default function ResetPasswordPage() {
                         className={`h-1 flex-1 rounded ${
                           level <= passwordStrength
                             ? level <= 2
-                              ? "bg-red-500"
+                              ? 'bg-red-500'
                               : level <= 3
-                              ? "bg-yellow-500"
-                              : "bg-green-500"
-                            : "bg-gray-200"
+                                ? 'bg-yellow-500'
+                                : 'bg-green-500'
+                            : 'bg-gray-200'
                         }`}
                       />
                     ))}
                   </div>
                   <div className="text-xs text-gray-600">
-                    {passwordStrength <= 2 && "Faible"}
-                    {passwordStrength === 3 && "Moyen"}
-                    {passwordStrength >= 4 && "Fort"}
+                    {passwordStrength <= 2 && 'Faible'}
+                    {passwordStrength === 3 && 'Moyen'}
+                    {passwordStrength >= 4 && 'Fort'}
                   </div>
                 </div>
               )}
-
-              <FieldError>{errors.password?.message}</FieldError>
             </Field>
 
-            {/* Confirmation mot de passe */}
             <Field>
               <FieldLabel>Confirmer le mot de passe</FieldLabel>
-              <div className="relative">
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  {...register("confirm")}
-                  placeholder="Confirmez votre mot de passe"
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  {showConfirmPassword ? (
-                    <EyeOff size={16} />
-                  ) : (
-                    <Eye size={16} />
-                  )}
-                </button>
-              </div>
+              <Input
+                isPassword
+                {...register('confirm')}
+                aria-invalid={!!errors.confirm}
+                icon={Lock}
+              />
 
               <FieldError>{errors.confirm?.message}</FieldError>
             </Field>
-
-            <Button
-              type="submit"
-              className="w-full text-white font-semibold"
-              disabled={isSubmitting || !isValid}>
-              {isSubmitting ? (
-                <span className="flex text-slate-300 gap-3">
-                  <Spinner /> Réinitialisation...
-                </span>
-              ) : (
-                "Réinitialiser le mot de passe"
-              )}
-            </Button>
+            <SubmitButton
+              className="w-full font-poppins"
+              isSubmitting={isSubmitting}
+            >
+              {isSubmitting
+                ? 'Réinitialisation en cours...'
+                : 'Réinitialiser le mot de passe'}
+            </SubmitButton>
           </form>
 
           <div className="mt-6 text-center">
             <Link
               href="/auth/login"
-              className="text-blue-600 hover:underline text-sm">
+              className="text-primary hover:underline text-sm"
+            >
               ← Retour à la connexion
             </Link>
           </div>

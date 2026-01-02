@@ -1,61 +1,63 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import StudentForm from "./StudentForm";
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import StudentForm from '../../app/auth/complete-profile/StudentForm';
+import { UseCompleteProfileStore } from '@stackschool/ui';
 
 export default function RoleStep({
   onComplete,
   onBack,
   selectedRole,
   onRoleSelect,
-  school,
   profile,
 }) {
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const { school, setSchoolData } = UseCompleteProfileStore();
 
+  console.log(school);
   // Charger les classes et matières de l'école
   useEffect(() => {
     if (school?.schoolId) {
       fetch(`/api/schools/${school.schoolId}/classes`)
         .then((r) => r.json())
         .then(setClasses);
-      fetch(`/api/schools/${school.schoolId}/subjects`)
+      fetch(`/api/schools/${school}/subjects`)
         .then((r) => r.json())
         .then(setSubjects);
     }
-  }, [school?.schoolId]);
+  }, [school]);
 
   const roles = [
     {
-      value: "STUDENT",
-      label: "Élève",
-      description: "Je suis étudiant dans cette école",
-      icon: "🎓",
+      value: 'STUDENT',
+      label: 'Élève',
+      description: 'Je suis étudiant dans cette école',
+      icon: '🎓',
     },
     {
-      value: "TEACHER",
-      label: "Professeur",
+      value: 'TEACHER',
+      label: 'Professeur',
       description: "J'enseigne dans cette école",
-      icon: "👨‍🏫",
+      icon: '👨‍🏫',
     },
     {
-      value: "PARENT",
-      label: "Parent",
+      value: 'PARENT',
+      label: 'Parent',
       description: "Je suis parent d'élève(s)",
-      icon: "👨‍👩‍👧‍👦",
+      icon: '👨‍👩‍👧‍👦',
     },
     {
-      value: "STAFF",
-      label: "Personnel",
+      value: 'STAFF',
+      label: 'Personnel',
       description: "Je travaille dans l'administration",
-      icon: "💼",
+      icon: '💼',
     },
     {
-      value: "ADMIN",
-      label: "Administrateur",
-      description: "Je gère cette école",
-      icon: "⚙️",
+      value: 'ADMIN',
+      label: 'Administrateur',
+      description: 'Je gère cette école',
+      icon: '⚙️',
     },
   ];
 
@@ -74,7 +76,8 @@ export default function RoleStep({
             <Card
               key={role.value}
               className="p-6 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all"
-              onClick={() => onRoleSelect(role.value)}>
+              onClick={() => onRoleSelect(role.value)}
+            >
               <div className="flex items-center space-x-4">
                 <span className="text-2xl">{role.icon}</span>
                 <div>
@@ -109,36 +112,36 @@ export default function RoleStep({
         </div>
       </div>
 
-      {selectedRole === "STUDENT" && (
+      {selectedRole === 'STUDENT' && (
         <StudentForm
           classes={classes}
-          onSubmit={(data) => onComplete({ role: "STUDENT", student: data })}
+          onSubmit={(data) => onComplete({ role: 'STUDENT', student: data })}
         />
       )}
 
-      {selectedRole === "TEACHER" && (
+      {selectedRole === 'TEACHER' && (
         <TeacherForm
           subjects={subjects}
           classes={classes}
-          onSubmit={(data) => onComplete({ role: "TEACHER", teacher: data })}
+          onSubmit={(data) => onComplete({ role: 'TEACHER', teacher: data })}
         />
       )}
 
-      {selectedRole === "PARENT" && (
+      {selectedRole === 'PARENT' && (
         <ParentForm
-          onSubmit={(data) => onComplete({ role: "PARENT", parent: data })}
+          onSubmit={(data) => onComplete({ role: 'PARENT', parent: data })}
         />
       )}
 
-      {selectedRole === "STAFF" && (
+      {selectedRole === 'STAFF' && (
         <StaffForm
-          onSubmit={(data) => onComplete({ role: "STAFF", staff: data })}
+          onSubmit={(data) => onComplete({ role: 'STAFF', staff: data })}
         />
       )}
 
-      {selectedRole === "ADMIN" && (
+      {selectedRole === 'ADMIN' && (
         <AdminForm
-          onSubmit={(data) => onComplete({ role: "ADMIN", admin: data })}
+          onSubmit={(data) => onComplete({ role: 'ADMIN', admin: data })}
         />
       )}
     </div>

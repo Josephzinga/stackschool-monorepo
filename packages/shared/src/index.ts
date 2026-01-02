@@ -1,5 +1,5 @@
-export { authService } from './services/auth';
-export { schoolService } from './services/schools';
+export { authService } from './services/auth/auth.service';
+export { schoolService } from './services/schools/schools.service';
 export { RedisService } from './services/redis/redisService';
 export * from './lib/api';
 export { z, ZodError } from 'zod';

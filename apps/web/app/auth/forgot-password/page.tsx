@@ -23,13 +23,12 @@ import { useRouter } from 'next/navigation';
 import { useForm, zodResolver } from '@stackschool/ui';
 import { toast } from 'sonner';
 import { AlertCircle, PhoneIcon } from 'lucide-react';
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 
 import { useState } from 'react';
 
 export default function ForgotPasswordPage() {
-  const [isOpen, setIsOpen] = useState(false);
   const [inputType, setInputType] = useState<'any' | 'phone' | 'email'>('any');
   const [phoneValue, setPhoneValue] = useState<string>('');
 
@@ -64,9 +63,6 @@ export default function ForgotPasswordPage() {
       setPhoneValue(value);
     }
   };
-  console.log(inputType);
-  console.log(isValidPhoneNumber(phoneValue));
-  console.log(isSubmitting);
 
   const getInputType = () => {
     return inputType === 'phone'
@@ -75,7 +71,6 @@ export default function ForgotPasswordPage() {
         ? 'email'
         : 'text';
   };
-  console.log('identifier dehors');
   const handleIdentifier = async (data: FormDataType) => {
     let identifier = data.identifier;
 

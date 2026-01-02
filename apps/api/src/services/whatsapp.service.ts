@@ -1,4 +1,5 @@
-import twilio from "twilio";
+import twilio from 'twilio';
+import { createServiceError } from '../utils/api-errors';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_ACCOUNT_TOKEN;
@@ -7,13 +8,13 @@ const client = twilio(accountSid, authToken);
 
 export default async function sendWhatshAppMessage(to: string, code: string) {
   try {
-    const res = await client.messages.create({
+    /*const res = await client.messages.create({
       from: `whatsapp:${process.env.TWILIO_MESSAGE_FROM}`,
       to: `whatsapp:${to}`,
       body: code,
-    });
-    console.log(res);
+    });*/
+    console.log('Message send to', to, code);
   } catch (error) {
-    console.error("Erreur d'envoie de message whatshapp:", error);
+    createServiceError("Erreur d'envoie de message whatsapp:", 500, error);
   }
 }

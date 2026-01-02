@@ -87,7 +87,7 @@ export default function SchoolStep() {
                 onClick={() => {
                   handleClick(school.id);
                   toast.success(
-                    `vous avez selectionner l'ecole ${school.name}`,
+                    `vous avez selectionner l'école ${school.name}`,
                   );
                 }}
                 className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700  transition-colors "
@@ -98,9 +98,7 @@ export default function SchoolStep() {
                       {school.name}
                     </ItemTitle>
 
-                    <p className="text-sm dark:text-gray-300 text-gray-700 ">
-                      {school.address}
-                    </p>
+                    <p className="text-sm  ">{school.address}</p>
                     <p className="text-xs text-foreground">
                       Code: {school.code}
                     </p>

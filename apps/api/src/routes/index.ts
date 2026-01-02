@@ -4,6 +4,7 @@ import completeProfileRoutes from './complete-profile';
 import profileRoute from './users/profile.route';
 import validateUserFieldRoute from './validationField.route';
 import uploadProfilePicture from './complete-profile/upload-profile.route';
+import schoolsRoutes from './shools';
 
 const router = Router();
 
@@ -13,5 +14,6 @@ router.use('/', profileRoute);
 router.use('/validate', validateUserFieldRoute);
 router.use('/upload', uploadProfilePicture);
 router.use('/', completeProfileRoutes);
+router.use('/', schoolsRoutes);
 
 export default router;

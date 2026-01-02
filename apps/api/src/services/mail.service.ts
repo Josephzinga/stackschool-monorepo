@@ -14,6 +14,7 @@ export async function sendResetPasswordEmail(
   subject: string,
   resetLink: string,
 ): Promise<void> {
+  console.log('resetLink in sendPasswordEmail', resetLink);
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT),

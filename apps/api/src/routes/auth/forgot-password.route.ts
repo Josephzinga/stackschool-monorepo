@@ -1,8 +1,8 @@
 import { NextFunction, type Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../../lib/prisma';
+import { prisma } from '@stackschool/db';
 import { sendResetPasswordEmail } from '../../services/mail.service';
-import sendWhatshAppMessage from '../../services/whatsapp.service';
+import sendWhatsAppMessage from '../../services/whatsapp.service';
 import {
   generate6Code,
   generateToken,
@@ -16,7 +16,9 @@ import {
 } from '../../constant/config';
 import { consumeIdentifier, consumeIp } from '../../utils/limiter';
 import { forgotPasswordSchema } from '@stackschool/shared';
-import { safeValidate } from '../../utils/validation.util';
+import { safeValidateSchema } from '../../utils/validate-schema.util';
+import { createServiceError } from '../../utils/api-errors';
+import { sendApiResponse } from '../../middlewares/errorHandler';
 
 const router = Router();
 
@@ -28,13 +30,14 @@ router.post(
         await consumeIp(req);
         await consumeIdentifier(req);
       } catch (RateLimiterQueueError) {
-        return res.status(429).json({
-          ok: false,
-          message: 'Trop de tentatives. Veuillez réessayer plus tard.',
-        });
+        createServiceError(
+          'Trop de tentatives. Veuillez réessayer plus tard',
+          429,
+        );
+        return;
       }
 
-      const errors = safeValidate(forgotPasswordSchema, req.body);
+      const errors = safeValidateSchema(forgotPasswordSchema, req.body);
       if (errors) {
         return next(errors);
       }
@@ -74,7 +77,7 @@ router.post(
 
       const now = new Date();
       const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000);
-      // verifie si le user a un message envoyer par email ou whatsapp
+      // vérifie si le user a un message envoyer par email ou whatsapp
       const [existingToken, existingCode] = await Promise.all([
         prisma.verificationToken.findFirst({
           where: {
@@ -102,10 +105,11 @@ router.post(
       );
 
       if (Date.now() - lastCreated < minDelay) {
-        return res.status(200).json({
-          ok: true,
-          message: 'Veuillez patienter avant de redemander un code.',
+        sendApiResponse(res, 200, {
+          ok: false,
+          message: ' Veuillez patienter avant de redemander un code.',
         });
+        return;
       }
 
       await Promise.all([
@@ -150,7 +154,7 @@ router.post(
           await sendResetPasswordEmail(user.email, 'password_reset', resetLink);
           sent = true;
         } catch (err) {
-          console.error('Erreur envoi email:', err);
+          createServiceError('Erreur envoi email:', 400, err);
         }
 
         return res.status(200).json({
@@ -177,10 +181,14 @@ router.post(
         });
 
         try {
-          await sendWhatshAppMessage(user.phoneNumber, rawCode);
+          await sendWhatsAppMessage(user.phoneNumber, rawCode);
           sent = true;
         } catch (err) {
-          console.error('Erreur WhatsApp:', err);
+          return createServiceError(
+            "Erreur d'envoie du message whatsapp",
+            500,
+            err,
+          );
         }
 
         // Crée un petit JWT temporaire pour réessayer sans redemander l'identifiant
@@ -205,7 +213,7 @@ router.post(
 
       return res.status(200).json({
         ok: true,
-        message: 'Aucun moyen de contact veilleuiz contacter le support',
+        message: 'Aucun moyen de contact veilliez contacter le support',
       });
     } catch (err) {
       console.error('forgot-password error:', err);

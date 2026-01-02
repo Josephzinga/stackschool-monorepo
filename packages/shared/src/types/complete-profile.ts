@@ -8,25 +8,25 @@ import type {
   Student,
   Teacher,
   User,
-} from "@stackschool/db";
+} from '@stackschool/db';
 
 type CreateSchoolPayload = {
-  type: "create";
+  type: 'create';
   newSchool: {
     code: string;
     address: string;
     name: string;
-    inposedRole: string;
+    imposedRole: string;
   };
 };
 
 type JoinSchoolPayload = {
-  type: "join";
+  type: 'join';
   schoolId: string;
 };
 
 type InviteSchoolPayload = {
-  type: "invite";
+  type: 'invite';
   invitationCode: string;
 };
 export type SchoolData =
@@ -55,3 +55,30 @@ export type UserInMe = User & {
   profile: Profile;
   Account: Account[];
 };
+
+export interface StudentFormData extends Student {
+  matricule: string;
+  enrollmentYear: string;
+  birthPlace: string;
+  nationality: string;
+  fatherName: string;
+  motherName: string;
+}
+
+export interface SchoolClass {
+  id: string;
+  name: string;
+  level: string;
+  _count: { students: number };
+}
+export interface StudentContext {
+  school: {
+    id: string;
+    name: string;
+    code: string;
+  };
+  classes: SchoolClass[];
+  suggestedMatricule: string;
+  existingStudent?: any;
+  academicYear: string;
+}

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { prisma } from '../../lib/prisma';
+import { prisma } from '@stackschool/db';
 import bcrypt from 'bcryptjs';
 import { generate6Code, generateToken, hashCode } from '../../lib/outils';
 import { createServiceError } from '../../utils/api-errors';

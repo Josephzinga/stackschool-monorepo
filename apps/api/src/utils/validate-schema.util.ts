@@ -10,7 +10,7 @@ import { ZodSchema } from 'zod';
  * Retourne un tableau d'objets d'erreur si la validation échoue,
  * sinon retourne `undefined` si la validation réussit.
  */
-export function safeValidate<T>(
+export function safeValidateSchema<T>(
   schema: ZodSchema<T>,
   data: T,
 ): Array<{ field: string; message: string }> | undefined {

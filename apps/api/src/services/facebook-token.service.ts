@@ -23,7 +23,6 @@ export async function verifyFacebookToken(accessToken: string): Promise<any> {
 
   try {
     const res = await api.post(url);
-    console.log('reponse de facebook', res.data);
 
     // Note: L'API Graph Facebook retourne généralement les données directement ou une erreur JSON,
     // pas forcément une propriété `ok`. Il faudrait vérifier res.status ou res.data.error.
@@ -31,7 +30,6 @@ export async function verifyFacebookToken(accessToken: string): Promise<any> {
     if (!res.data || res.data.error) {
       throw createServiceError('Invalid Facebook token');
     }
-
     return res.data;
   } catch (error) {
     throw createServiceError('Invalid Facebook token', 401, error);

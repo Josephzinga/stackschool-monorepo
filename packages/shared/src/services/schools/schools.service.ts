@@ -7,4 +7,9 @@ export const schoolService = {
     });
     return res.data;
   },
+
+  getClasses: async (schoolId: string) => {
+    const res = await api.get(`/schools/${schoolId}/classes`);
+    return res.data;
+  },
 };

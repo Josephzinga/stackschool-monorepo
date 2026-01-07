@@ -5,37 +5,67 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/StudentForm.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/web/components/school/create-invitation-form.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/outils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/outils.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/facebook-post.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/facebook-post.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/forgot-password.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/forgot-password.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/reset-password.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/reset-password.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/save-progress.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/save-progress.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/shools/search-school.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/shools/search-school.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/server.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/facebook-token.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/facebook-token.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/mail.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/mail.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766062640330-22413428.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766062890642-965091087.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766063060878-162420256.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766063213748-73093509.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766063411110-191551907.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766063561693-730411212.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766063712857-860946085.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766063742650-675905806.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmj9xbhqc000035mva4muamd5-1766063771495-485899693.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmjriopmo000b60mv5rnr5ozf-1767034852509-7069722.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmjriopmo000b60mv5rnr5ozf-1767035415807-923374335.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/public/images/cmjriopmo000b60mv5rnr5ozf-1767312134920-568078484.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/constant/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/constant/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/google-post.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/google-post.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/me.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/me.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/load-progress.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/load-progress.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/upload-profile.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/upload-profile.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/shools/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/shools/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/shools/student-context.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/student-context.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/users/profile.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/users/profile.route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/services/whatsapp.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/whatsapp.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/utils/limiter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/utils/limiter.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/utils/validate-schema.util.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/utils/validate-schema.util.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/validations/validation-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/validations/validation-schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/forgot-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/forgot-password/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/register/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/register/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/reset-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/reset-password/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/verify-code/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/verify-code/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/types/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/types/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/components/google-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/components/google-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/complete-profile/StudentForm.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/complete-profile/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/complete-profile/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/globals.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/RoleStep.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/RoleStep.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/create-school-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/create-school-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/invitation-form.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/profile-step.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/profile-step.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/role-from/student-from.tsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/schoolStep.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/schoolStep.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/protected-route.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/protected-route.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/button.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/lib/check-profile-field.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/lib/check-profile-field.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/edge.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index-browser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/services/schools/schools.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/services/schools/schools.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/types/complete-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/complete-profile.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/types/api-response.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/api-response.type.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/types/complete-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/complete-profile.type.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/auth-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/auth.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reset-modules.sh" beforeDir="false" afterPath="$PROJECT_DIR$/restart-modules.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rôle-form.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +92,7 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/packages/shared/src/validation/complete-profile.schema.ts" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="OptimizeOnSaveOptions">
     <option name="myRunOnSave" value="true" />
@@ -120,7 +151,7 @@
     &quot;npm.mobile &gt; typecheck.executor&quot;: &quot;Run&quot;,
     &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/prettier&quot;,
     &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor.code.editing&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
@@ -132,10 +163,11 @@
       <recent name="$PROJECT_DIR$/../E-commerce" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/web/components/school" />
+      <recent name="$PROJECT_DIR$/apps/web/components/complete-profile/school-from" />
+      <recent name="$PROJECT_DIR$/apps/api/src/routes/complete-profile" />
+      <recent name="$PROJECT_DIR$/apps/web/components/complete-profile/role-from" />
       <recent name="$PROJECT_DIR$/apps/api/src/validations" />
-      <recent name="$PROJECT_DIR$/apps/mobile/app/auth/(tabs)" />
-      <recent name="$PROJECT_DIR$/apps/mobile/assets" />
-      <recent name="$PROJECT_DIR$/apps/mobile" />
     </key>
   </component>
   <component name="RunManager" selected="Jest.handleLocalAuth">
@@ -261,6 +293,21 @@
       <workItem from="1767320289468" duration="2885000" />
       <workItem from="1767359930101" duration="12001000" />
       <workItem from="1767392614234" duration="4267000" />
+      <workItem from="1767440168939" duration="619000" />
+      <workItem from="1767441011170" duration="4113000" />
+      <workItem from="1767445845472" duration="8867000" />
+      <workItem from="1767463205227" duration="13266000" />
+      <workItem from="1767479451867" duration="6771000" />
+      <workItem from="1767527964151" duration="3491000" />
+      <workItem from="1767555158086" duration="10649000" />
+      <workItem from="1767578162079" duration="7059000" />
+      <workItem from="1767613807363" duration="9473000" />
+      <workItem from="1767634493146" duration="1203000" />
+      <workItem from="1767638343267" duration="5765000" />
+      <workItem from="1767652443853" duration="9962000" />
+      <workItem from="1767697961407" duration="18607000" />
+      <workItem from="1767741566700" duration="5453000" />
+      <workItem from="1767747467398" duration="2284000" />
     </task>
     <servers />
   </component>

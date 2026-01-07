@@ -1,19 +1,10 @@
-import {prisma} from '.';
+import { prisma } from '.';
 
 async function main() {
-  try {
-    const classes = await prisma.class.create({
-      data: {
-        schoolId: 'cmjrl907d0000y2mv43herxek',
-        teacherId: 'cmjrldyvx00001cmvvsss9k40',
-        section: 'Chimie',
-        name: 'CLASS C',
-        level: '5iéme année',
-      },
-    });
-  } catch (e) {
-    console.log('Erreur', e);
-  }
+  console.log('Start seeding...');
+
+  const session = await prisma.session.deleteMany();
+  console.log(session);
 }
 
 main()

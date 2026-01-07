@@ -1,8 +1,7 @@
-// routes/auth/google.post.ts (Express)
 import { OAuth2Client } from 'google-auth-library';
 import {
-  UpsertOauthUser,
   upsertOauthUser,
+  UpsertOauthUserParams,
 } from '../../services/auth-user.service';
 import { Router } from 'express';
 import { sendApiResponse } from '../../middlewares/errorHandler';
@@ -10,9 +9,7 @@ import { createServiceError } from '../../utils/api-errors';
 import { createMobileSession } from '../../lib/mobile-session';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-
 const router = Router();
-
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 router.post('/google', async (req, res) => {
@@ -34,7 +31,7 @@ router.post('/google', async (req, res) => {
     const payload = ticket.getPayload();
     if (!payload) return res.status(401).json({ error: 'Invalid token' });
 
-    const provider: UpsertOauthUser['provider'] = 'google';
+    const provider: UpsertOauthUserParams['provider'] = 'google';
     const providerAccountId = payload.sub!;
     const email = payload.email ?? null;
     const emailVerified = !!payload.email_verified;

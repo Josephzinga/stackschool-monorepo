@@ -256,6 +256,7 @@ exports.Prisma.ParentStudentScalarFieldEnum = {
 exports.Prisma.InviteScalarFieldEnum = {
   id: 'id',
   email: 'email',
+  phoneNumber: 'phoneNumber',
   schoolId: 'schoolId',
   studentId: 'studentId',
   token: 'token',

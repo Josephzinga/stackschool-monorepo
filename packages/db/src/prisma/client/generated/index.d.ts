@@ -17485,6 +17485,7 @@ export namespace Prisma {
   export type InviteMinAggregateOutputType = {
     id: string | null
     email: string | null
+    phoneNumber: string | null
     schoolId: string | null
     studentId: string | null
     token: string | null
@@ -17499,6 +17500,7 @@ export namespace Prisma {
   export type InviteMaxAggregateOutputType = {
     id: string | null
     email: string | null
+    phoneNumber: string | null
     schoolId: string | null
     studentId: string | null
     token: string | null
@@ -17513,6 +17515,7 @@ export namespace Prisma {
   export type InviteCountAggregateOutputType = {
     id: number
     email: number
+    phoneNumber: number
     schoolId: number
     studentId: number
     token: number
@@ -17529,6 +17532,7 @@ export namespace Prisma {
   export type InviteMinAggregateInputType = {
     id?: true
     email?: true
+    phoneNumber?: true
     schoolId?: true
     studentId?: true
     token?: true
@@ -17543,6 +17547,7 @@ export namespace Prisma {
   export type InviteMaxAggregateInputType = {
     id?: true
     email?: true
+    phoneNumber?: true
     schoolId?: true
     studentId?: true
     token?: true
@@ -17557,6 +17562,7 @@ export namespace Prisma {
   export type InviteCountAggregateInputType = {
     id?: true
     email?: true
+    phoneNumber?: true
     schoolId?: true
     studentId?: true
     token?: true
@@ -17643,7 +17649,8 @@ export namespace Prisma {
 
   export type InviteGroupByOutputType = {
     id: string
-    email: string
+    email: string | null
+    phoneNumber: string | null
     schoolId: string
     studentId: string | null
     token: string
@@ -17675,6 +17682,7 @@ export namespace Prisma {
   export type InviteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     email?: boolean
+    phoneNumber?: boolean
     schoolId?: boolean
     studentId?: boolean
     token?: boolean
@@ -17689,6 +17697,7 @@ export namespace Prisma {
   export type InviteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     email?: boolean
+    phoneNumber?: boolean
     schoolId?: boolean
     studentId?: boolean
     token?: boolean
@@ -17703,6 +17712,7 @@ export namespace Prisma {
   export type InviteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     email?: boolean
+    phoneNumber?: boolean
     schoolId?: boolean
     studentId?: boolean
     token?: boolean
@@ -17717,6 +17727,7 @@ export namespace Prisma {
   export type InviteSelectScalar = {
     id?: boolean
     email?: boolean
+    phoneNumber?: boolean
     schoolId?: boolean
     studentId?: boolean
     token?: boolean
@@ -17728,14 +17739,15 @@ export namespace Prisma {
     message?: boolean
   }
 
-  export type InviteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "schoolId" | "studentId" | "token" | "relation" | "createdAt" | "expiresAt" | "used" | "role" | "message", ExtArgs["result"]["invite"]>
+  export type InviteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "phoneNumber" | "schoolId" | "studentId" | "token" | "relation" | "createdAt" | "expiresAt" | "used" | "role" | "message", ExtArgs["result"]["invite"]>
 
   export type $InvitePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Invite"
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      email: string
+      email: string | null
+      phoneNumber: string | null
       schoolId: string
       studentId: string | null
       token: string
@@ -18170,6 +18182,7 @@ export namespace Prisma {
   interface InviteFieldRefs {
     readonly id: FieldRef<"Invite", 'String'>
     readonly email: FieldRef<"Invite", 'String'>
+    readonly phoneNumber: FieldRef<"Invite", 'String'>
     readonly schoolId: FieldRef<"Invite", 'String'>
     readonly studentId: FieldRef<"Invite", 'String'>
     readonly token: FieldRef<"Invite", 'String'>
@@ -28965,6 +28978,7 @@ export namespace Prisma {
   export const InviteScalarFieldEnum: {
     id: 'id',
     email: 'email',
+    phoneNumber: 'phoneNumber',
     schoolId: 'schoolId',
     studentId: 'studentId',
     token: 'token',
@@ -30232,7 +30246,8 @@ export namespace Prisma {
     OR?: InviteWhereInput[]
     NOT?: InviteWhereInput | InviteWhereInput[]
     id?: StringFilter<"Invite"> | string
-    email?: StringFilter<"Invite"> | string
+    email?: StringNullableFilter<"Invite"> | string | null
+    phoneNumber?: StringNullableFilter<"Invite"> | string | null
     schoolId?: StringFilter<"Invite"> | string
     studentId?: StringNullableFilter<"Invite"> | string | null
     token?: StringFilter<"Invite"> | string
@@ -30246,7 +30261,8 @@ export namespace Prisma {
 
   export type InviteOrderByWithRelationInput = {
     id?: SortOrder
-    email?: SortOrder
+    email?: SortOrderInput | SortOrder
+    phoneNumber?: SortOrderInput | SortOrder
     schoolId?: SortOrder
     studentId?: SortOrderInput | SortOrder
     token?: SortOrder
@@ -30264,7 +30280,8 @@ export namespace Prisma {
     AND?: InviteWhereInput | InviteWhereInput[]
     OR?: InviteWhereInput[]
     NOT?: InviteWhereInput | InviteWhereInput[]
-    email?: StringFilter<"Invite"> | string
+    email?: StringNullableFilter<"Invite"> | string | null
+    phoneNumber?: StringNullableFilter<"Invite"> | string | null
     schoolId?: StringFilter<"Invite"> | string
     studentId?: StringNullableFilter<"Invite"> | string | null
     relation?: StringNullableFilter<"Invite"> | string | null
@@ -30277,7 +30294,8 @@ export namespace Prisma {
 
   export type InviteOrderByWithAggregationInput = {
     id?: SortOrder
-    email?: SortOrder
+    email?: SortOrderInput | SortOrder
+    phoneNumber?: SortOrderInput | SortOrder
     schoolId?: SortOrder
     studentId?: SortOrderInput | SortOrder
     token?: SortOrder
@@ -30297,7 +30315,8 @@ export namespace Prisma {
     OR?: InviteScalarWhereWithAggregatesInput[]
     NOT?: InviteScalarWhereWithAggregatesInput | InviteScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Invite"> | string
-    email?: StringWithAggregatesFilter<"Invite"> | string
+    email?: StringNullableWithAggregatesFilter<"Invite"> | string | null
+    phoneNumber?: StringNullableWithAggregatesFilter<"Invite"> | string | null
     schoolId?: StringWithAggregatesFilter<"Invite"> | string
     studentId?: StringNullableWithAggregatesFilter<"Invite"> | string | null
     token?: StringWithAggregatesFilter<"Invite"> | string
@@ -32004,7 +32023,8 @@ export namespace Prisma {
 
   export type InviteCreateInput = {
     id?: string
-    email: string
+    email?: string | null
+    phoneNumber?: string | null
     schoolId: string
     studentId?: string | null
     token: string
@@ -32018,7 +32038,8 @@ export namespace Prisma {
 
   export type InviteUncheckedCreateInput = {
     id?: string
-    email: string
+    email?: string | null
+    phoneNumber?: string | null
     schoolId: string
     studentId?: string | null
     token: string
@@ -32032,7 +32053,8 @@ export namespace Prisma {
 
   export type InviteUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     schoolId?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     token?: StringFieldUpdateOperationsInput | string
@@ -32046,7 +32068,8 @@ export namespace Prisma {
 
   export type InviteUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     schoolId?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     token?: StringFieldUpdateOperationsInput | string
@@ -32060,7 +32083,8 @@ export namespace Prisma {
 
   export type InviteCreateManyInput = {
     id?: string
-    email: string
+    email?: string | null
+    phoneNumber?: string | null
     schoolId: string
     studentId?: string | null
     token: string
@@ -32074,7 +32098,8 @@ export namespace Prisma {
 
   export type InviteUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     schoolId?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     token?: StringFieldUpdateOperationsInput | string
@@ -32088,7 +32113,8 @@ export namespace Prisma {
 
   export type InviteUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     schoolId?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     token?: StringFieldUpdateOperationsInput | string
@@ -33705,6 +33731,7 @@ export namespace Prisma {
   export type InviteCountOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
+    phoneNumber?: SortOrder
     schoolId?: SortOrder
     studentId?: SortOrder
     token?: SortOrder
@@ -33719,6 +33746,7 @@ export namespace Prisma {
   export type InviteMaxOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
+    phoneNumber?: SortOrder
     schoolId?: SortOrder
     studentId?: SortOrder
     token?: SortOrder
@@ -33733,6 +33761,7 @@ export namespace Prisma {
   export type InviteMinOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
+    phoneNumber?: SortOrder
     schoolId?: SortOrder
     studentId?: SortOrder
     token?: SortOrder

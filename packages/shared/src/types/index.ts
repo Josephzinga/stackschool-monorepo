@@ -1,2 +1,2 @@
-export * from "./api-response";
-export type * from "./complete-profile";
+export * from './api-response.type';
+export type * from './complete-profile.type';

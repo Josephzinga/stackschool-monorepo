@@ -6,7 +6,7 @@ const authToken = process.env.TWILIO_ACCOUNT_TOKEN;
 
 const client = twilio(accountSid, authToken);
 
-export default async function sendWhatshAppMessage(to: string, code: string) {
+export default async function sendWhatsAppMessage(to: string, code: string) {
   try {
     /*const res = await client.messages.create({
       from: `whatsapp:${process.env.TWILIO_MESSAGE_FROM}`,

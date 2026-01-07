@@ -4,12 +4,14 @@ import SchoolStep from '../../../components/complete-profile/schoolStep';
 import { Container } from '@/components/Container';
 import { Card } from '@/components/ui/card';
 
-import { UseCompleteProfileStore } from '@stackschool/ui';
+import { useCompleteProfileStore, useUserStore } from '@stackschool/ui';
 import { School } from '@stackschool/shared';
 import { useSearchParams } from 'next/navigation';
 import { ProfileStep } from '@/components/complete-profile/profile-step';
 import ProtectedRoute from '@/components/protected-route';
 import Stepper from '@/components/Stepper';
+import RoleStep from '@/components/complete-profile/RoleStep';
+import { useEffect } from 'react';
 
 export type CompleteProfileData = {
   school: {
@@ -21,10 +23,18 @@ export type CompleteProfileData = {
 
 export default function CompleteProfile() {
   const search = useSearchParams();
+  const { isAuthenticated } = useUserStore();
   const provider = search.get('provider');
-  const { currentStep, setCurrentStep } = UseCompleteProfileStore();
+  const { currentStep, setCurrentStep, loadFromRedis } =
+    useCompleteProfileStore();
   const steps = ['école', 'Profile', 'Rôle'];
   const totalSteps = steps.length;
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadFromRedis();
+    }
+  }, [isAuthenticated]);
 
   const handleNext = () => {
     setCurrentStep(Math.min(currentStep + 1, totalSteps));
@@ -41,7 +51,7 @@ export default function CompleteProfile() {
       case 2:
         return <ProfileStep />;
       case 3:
-        return <div>Role step</div>;
+        return <RoleStep />;
       case 4:
         return <div>FianlStep</div>;
       default:

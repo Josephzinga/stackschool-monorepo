@@ -1,9 +1,8 @@
-// components/complete-profile/profile-step.tsx
 'use client';
 import { useState } from 'react';
 import {
   Controller,
-  UseCompleteProfileStore,
+  useCompleteProfileStore,
   useForm,
   useUserStore,
   zodResolver,
@@ -19,26 +18,33 @@ import {
 } from '../ui/select';
 import { toast } from 'sonner';
 import PhoneInput from 'react-phone-number-input';
-import { authService, profileSchema, ProfileType } from '@stackschool/shared';
+import {
+  api,
+  authService,
+  parseAxiosError,
+  profileSchema,
+  ProfileType,
+} from '@stackschool/shared';
 import { Field, FieldError, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { Spinner } from '../ui/spinner';
 import 'react-phone-number-input/style.css';
 import { checkField } from '@/lib/check-profile-field';
 import ProfileUpload from '../profile-upload';
-import api, { parseAxiosError } from '@stackschool/shared/src/lib/api';
+import { SubmitButton } from '@/components/submit-button';
 
 export function ProfileStep() {
-  const { user, fetchUser } = useUserStore();
+  const { user } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [picture, setPicture] = useState<string | null>(
-    user?.profile?.photo || null,
-  );
 
   const [phoneValue, setPhoneValue] = useState<string>('');
 
-  const { setCurrentStep, setProfileData } = UseCompleteProfileStore();
+  const { setCurrentStep, setProfileData, loadFromRedis, profile } =
+    useCompleteProfileStore();
+
+  const [picture, setPicture] = useState<string | null>(
+    user?.profile?.photo || profile?.photo || null,
+  );
 
   const {
     handleSubmit,
@@ -51,55 +57,51 @@ export function ProfileStep() {
   } = useForm<ProfileType>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstname: user?.profile?.firstname || '',
-      lastname: user?.profile?.lastname || '',
-      phoneNumber: user?.phoneNumber || '',
-      email: user?.email || '',
-      gender: undefined,
+      firstname: user?.profile?.firstname || profile?.firstname || '',
+      lastname: user?.profile?.lastname || profile?.lastname || '',
+      phoneNumber: user?.phoneNumber || profile?.phoneNumber || '',
+      email: user?.email || profile?.email || '',
+      gender: profile?.gender || undefined,
     },
     mode: 'onBlur',
   });
 
-  console.log('user dans complete profile', user);
-
-  // Fonction de validation améliorée
   const validateField = async (fieldName: keyof ProfileType, value: string) => {
     if (!value) return;
-    try {
-      const { valid, message, field } = await checkField(
-        fieldName as string,
-        value,
-      );
+    const { valid, message, status } = await checkField(
+      fieldName as string,
+      value,
+    );
 
-      if (!valid && message) {
-        setError(fieldName, {
-          type: 'manual',
-          message: message,
-        });
-      } else {
-        clearErrors(fieldName);
-      }
-    } catch (error) {
-      console.error(`Validation error for ${fieldName}:`, error);
+    if (status === 401) {
+      return toast.error(message);
+    }
+
+    if (!valid && message) {
+      setError(fieldName, {
+        type: 'manual',
+        message: message,
+      });
+    } else {
+      clearErrors(fieldName);
     }
   };
-
   const handleProfile = async (data: ProfileType) => {
     try {
       if (data.email) {
         const emailCheck = await checkField('email', data.email);
-        if (!emailCheck.valid) {
-          setError('email', { type: 'manual', message: emailCheck.message });
+        if (!emailCheck?.valid) {
+          setError('email', { type: 'manual', message: emailCheck?.message });
           return;
         }
       }
 
       if (data.phoneNumber) {
         const phoneCheck = await checkField('phoneNumber', data.phoneNumber);
-        if (!phoneCheck.valid) {
+        if (!phoneCheck?.valid) {
           setError('phoneNumber', {
             type: 'manual',
-            message: phoneCheck.message,
+            message: phoneCheck?.message,
           });
           return;
         }
@@ -174,12 +176,11 @@ export function ProfileStep() {
       setIsLoading(false);
     }
   };
-  console.log(picture);
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900">Votre Profil</h2>
+        <h2 className="text-2xl font-bold ">Votre Profil</h2>
         <p className="text-gray-600">Complétez vos informations personnelles</p>
       </div>
 
@@ -271,7 +272,7 @@ export function ProfileStep() {
 
         {/* Genre */}
         <Field>
-          <FieldLabel>Genre *</FieldLabel>
+          <FieldLabel>Genre</FieldLabel>
           <Controller
             control={control}
             name="gender"
@@ -296,26 +297,16 @@ export function ProfileStep() {
 
         <div className="flex gap-3 pt-4">
           <Button
+            variant="outline"
             type="button"
             onClick={() => setCurrentStep(1)}
-            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            className="w-1/4"
           >
             ← Retour
-          </Button>{' '}
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className=" disabled:opacity-50 disabled:cursor-not-allowed text-white"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center">
-                <Spinner className="mr-2" />
-                Sauvegarde...
-              </span>
-            ) : (
-              'Continuer →'
-            )}
           </Button>
+          <SubmitButton isSubmitting={isSubmitting} className="w-3/4">
+            {isSubmitting ? 'sauvegarde...' : 'Continuer →'}
+          </SubmitButton>
         </div>
       </form>
     </div>

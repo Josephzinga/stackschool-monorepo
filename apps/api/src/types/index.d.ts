@@ -1,9 +1,9 @@
-import { RequestHandler } from "express";
-import { SessionData, SessionOptions, Store } from "express-session";
-import { Pool, PoolConfig } from "pg";
+import { RequestHandler } from 'express';
+import { SessionData, SessionOptions, Store } from 'express-session';
+import { Pool, PoolConfig } from 'pg';
 
 declare function connectPgSimple(
-  session: (options?: SessionOptions) => RequestHandler
+  session: (options?: SessionOptions) => RequestHandler,
 ): typeof connectPgSimple.PGStore;
 
 declare namespace connectPgSimple {
@@ -14,12 +14,12 @@ declare namespace connectPgSimple {
 
     get(
       sid: string,
-      callback: (err: any, session?: SessionData | null) => void
+      callback: (err: any, session?: SessionData | null) => void,
     ): void;
     set(
       sid: string,
       session: SessionData,
-      callback?: (err?: any) => void
+      callback?: (err?: any) => void,
     ): void;
     destroy(sid: string, callback?: (err?: any) => void): void;
 

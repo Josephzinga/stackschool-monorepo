@@ -233,17 +233,18 @@ model ParentStudent {
 }
 
 model Invite {
-  id        String     @id @default(cuid())
-  email     String
-  schoolId  String
-  studentId String?
-  token     String     @unique
-  relation  String?
-  createdAt DateTime   @default(now())
-  expiresAt DateTime
-  used      Boolean    @default(false)
-  role      SchoolRole
-  message   String
+  id          String     @id @default(cuid())
+  email       String?
+  phoneNumber String?
+  schoolId    String
+  studentId   String?
+  token       String     @unique
+  relation    String?
+  createdAt   DateTime   @default(now())
+  expiresAt   DateTime
+  used        Boolean    @default(false)
+  role        SchoolRole
+  message     String
 
   @@index([schoolId])
   @@index([studentId])

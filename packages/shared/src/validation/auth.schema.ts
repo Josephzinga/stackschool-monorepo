@@ -1,5 +1,8 @@
 // users/schemas.ts
-import z from 'zod';
+
+import * as z from 'zod';
+
+z.config(z.locales.fr());
 
 export const loginFormSchema = z.object({
   identifier: z

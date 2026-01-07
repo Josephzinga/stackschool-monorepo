@@ -1,9 +1,9 @@
-import { Router, Response, Request } from "express";
-import { isAuthenticated } from "../../middlewares/auth";
+import { Request, Response, Router } from 'express';
+import { isAuthenticated } from '../../middlewares/auth';
 
 const router = Router();
 
-router.get("/me", isAuthenticated, async (req: Request, res: Response) => {
+router.get('/me', isAuthenticated, async (req: Request, res: Response) => {
   const user = req.user;
   if (!user) return;
   let provider = null;
@@ -24,6 +24,7 @@ router.get("/me", isAuthenticated, async (req: Request, res: Response) => {
       profileCompleted: user.profileCompleted,
       provider,
       profile: user.profile ?? null,
+      hasMembership: user.hasMembership,
     },
   });
 });

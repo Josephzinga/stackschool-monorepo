@@ -6,14 +6,13 @@ const router = Router();
 
 router.get('/load-progress', isAuthenticated, async (req, res) => {
   try {
-    const user = req.user;
-    const userId = user?.id;
+    const userId = req.user?.id;
     const redisKey = `complete_profile:${userId}`;
     const pathKey = `pendingPhoto${userId}`;
 
     const saveData = await redisClient.get(redisKey);
     const picturePath = await redisClient.get(pathKey);
-    console.log('picturePath in redis', picturePath);
+    console.log('profilePath', picturePath);
     if (!saveData) {
       return res.status(400).json({
         ok: true,
@@ -23,21 +22,23 @@ router.get('/load-progress', isAuthenticated, async (req, res) => {
     }
 
     const dataParsed = JSON.parse(saveData);
-    console.log('dataParsed:', dataParsed);
     if (dataParsed.userId !== userId) {
       await redisClient.del(redisKey);
       return res.status(400).json({
-        ok: true,
+        ok: false,
         data: null,
         message: 'Données de progression invalides',
       });
     }
+    const profileWithPhoto = { ...dataParsed.profile, photo: picturePath };
+
+    console.log('ProfilePhoto', profileWithPhoto.photo);
 
     return res.status(200).json({
       ok: true,
       data: {
         school: dataParsed.school,
-        profile: dataParsed.profle,
+        profile: profileWithPhoto,
         role: dataParsed.role,
         currentStep: dataParsed.currentStep,
         savedAt: dataParsed.savedAt,

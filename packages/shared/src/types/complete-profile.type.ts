@@ -1,23 +1,21 @@
 import type {
   Account,
   Gender,
-  GlobalRole,
-  ParentStudent,
   Profile,
+  SchoolRole,
   Staff,
-  Student,
   Teacher,
   User,
 } from '@stackschool/db';
+import {
+  CreateSchoolType,
+  ParentFormData,
+  StudentFormData,
+} from '../validation/complete-profile.schema';
 
 type CreateSchoolPayload = {
   type: 'create';
-  newSchool: {
-    code: string;
-    address: string;
-    name: string;
-    imposedRole: string;
-  };
+  newSchool: CreateSchoolType;
 };
 
 type JoinSchoolPayload = {
@@ -35,11 +33,11 @@ export type SchoolData =
   | InviteSchoolPayload;
 
 export interface RoleData {
-  role: GlobalRole;
-  student?: Student;
+  role: SchoolRole;
+  student?: StudentFormData;
   teacher?: Teacher;
   staff?: Staff;
-  parent?: ParentStudent;
+  parent?: ParentFormData;
 }
 
 export interface ProfileData {
@@ -56,29 +54,9 @@ export type UserInMe = User & {
   Account: Account[];
 };
 
-export interface StudentFormData extends Student {
-  matricule: string;
-  enrollmentYear: string;
-  birthPlace: string;
-  nationality: string;
-  fatherName: string;
-  motherName: string;
-}
-
 export interface SchoolClass {
   id: string;
   name: string;
   level: string;
   _count: { students: number };
-}
-export interface StudentContext {
-  school: {
-    id: string;
-    name: string;
-    code: string;
-  };
-  classes: SchoolClass[];
-  suggestedMatricule: string;
-  existingStudent?: any;
-  academicYear: string;
 }

@@ -4,11 +4,11 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { School } from '@stackschool/shared';
 import { useEffect, useState } from 'react';
-import { CreateSchoolForm } from '@/components/complete-profile/create-school-form';
-import InvitationForm from './invitation-form';
+import { CreateSchoolForm } from '@/components/complete-profile/school-form/create-school-form';
+import { InvitationForm } from '@/components/complete-profile/school-form/invitation-form';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Loader2, Search } from 'lucide-react';
-import { searchSchools, UseCompleteProfileStore } from '@stackschool/ui';
+import { searchSchools, useCompleteProfileStore } from '@stackschool/ui';
 import { Field, FieldLabel } from '../ui/field';
 import { toast } from 'sonner';
 import { Item, ItemGroup, ItemMedia, ItemTitle } from '../ui/item';
@@ -20,7 +20,7 @@ export default function SchoolStep() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const searchDebounce = useDebounce(400, searchQuery.trim() || null);
-  const { setSchoolData, setCurrentStep } = UseCompleteProfileStore();
+  const { setSchoolData, setCurrentStep } = useCompleteProfileStore();
   // Recherche d'écoles
   useEffect(() => {
     if (!searchDebounce) return setSchools([]);
@@ -80,7 +80,7 @@ export default function SchoolStep() {
               )}
             </span>
           </Field>
-          <ItemGroup className="space-y-2 max-h-60 overflow-y">
+          <ItemGroup className="space-y-2 max-h-60 overflow-y-auto h-full">
             {schools.map((school) => (
               <Item
                 key={school.id}

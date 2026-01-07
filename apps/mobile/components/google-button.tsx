@@ -43,7 +43,7 @@ export default function GoogleLoginButton() {
       console.log('Envoi du token à l’API...', idToken);
       const res = await api.post('/auth/google', { idToken });
 
-      console.log('Réponse API:', res.data);
+      console.log('Réponse API:', res.data.user);
       console.log('Session', res.data.session);
       const { data } = res;
       await saveSession(res.data.session);
@@ -54,7 +54,8 @@ export default function GoogleLoginButton() {
           text1: data.message || 'Authentification réuissi avec succé!',
           text1Style: { color: 'green' },
         });
-        if (!data.user.profileCompleted) {
+
+        if (data.user.completeProfiled) {
           router.push('/auth/complete-profile');
         }
       }

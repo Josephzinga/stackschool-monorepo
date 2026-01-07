@@ -2,13 +2,17 @@ import { Router } from 'express';
 import { redisClient } from '../../lib/redis';
 import { prisma } from '@stackschool/db';
 import { createServiceError } from '../../utils/api-errors';
+import { isAuthenticated } from '../../middlewares/auth';
+import {
+  generatSuggestedMatricule,
+  getCurrentAcademicYear,
+} from '../../lib/generatedMatricule';
 
 const router = Router();
 
-router.get('/context', async (req, res) => {
+router.get('/context', isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.id;
-
     const redisKey = `complete_profile:${userId}`;
 
     const progressData = await redisClient.get(redisKey);
@@ -40,10 +44,6 @@ router.get('/context', async (req, res) => {
         schoolId = school.schoolId;
         break;
 
-      case 'create':
-        schoolId = school.schoolId;
-        break;
-
       case 'invite':
         schoolId = school.schoolId;
         break;
@@ -64,7 +64,6 @@ router.get('/context', async (req, res) => {
         logo: true,
         code: true,
         classes: {
-          where: { updatedAt: undefined },
           select: {
             id: true,
             name: true,
@@ -84,7 +83,8 @@ router.get('/context', async (req, res) => {
     }
 
     classes = schoolDetails.classes;
-
+    const suggestMatricule = await generatSuggestedMatricule(schoolId);
+    const academicYear = getCurrentAcademicYear();
     return res.json({
       ok: true,
       context: {
@@ -93,13 +93,13 @@ router.get('/context', async (req, res) => {
           name: schoolDetails.name,
           code: schoolDetails.code,
         },
-        classes,
-        existingStudent, // Si l'étudiant existe déjà (cas invitation)
-        academicYear: '2026',
+        suggestMatricule,
+        classes, // Si l'étudiant existe déjà (cas invitation)
+        academicYear,
       },
     });
   } catch (e) {
-    createServiceError('Erreur du context student', 500, e);
+    createServiceError('Erreur lors du chargement du contexte', 500, e);
   }
 });
 export default router;

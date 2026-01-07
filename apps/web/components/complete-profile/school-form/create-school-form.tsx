@@ -1,42 +1,35 @@
 // components/complete-profile/school-step/create-school-form.tsx
-import { UseCompleteProfileStore, useForm, zodResolver } from '@stackschool/ui';
-import { z } from '@stackschool/shared';
+import { useCompleteProfileStore, useForm, zodResolver } from '@stackschool/ui';
+import { createSchoolSchema, CreateSchoolType } from '@stackschool/shared';
 import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-
-// Schéma de validation pour la création d'école
-const createSchoolSchema = z.object({
-  name: z
-    .string()
-    .min(3, "Le nom de l'école doit contenir au moins 3 caractères")
-    .max(100, 'Le nom est trop long'),
-  address: z
-    .string()
-    .min(5, "L'adresse doit être plus précise")
-    .max(200, "L'adresse est trop longue"),
-  code: z
-    .string()
-
-    .or(z.string().length(6, 'Le code doit contenir 6 caractères')),
-});
-
-type CreateSchoolFormData = z.infer<typeof createSchoolSchema>;
+import { SubmitButton } from '@/components/submit-button';
+import { Building2, Hash } from 'lucide-react';
 
 export function CreateSchoolForm() {
+  const { setSchoolData, school, currentStep, setCurrentStep } =
+    useCompleteProfileStore();
+  let safeSchool: any = {};
+  if (school && school?.type === 'create') {
+    safeSchool = school;
+  }
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
     watch,
-  } = useForm<CreateSchoolFormData>({
+  } = useForm<CreateSchoolType>({
     resolver: zodResolver(createSchoolSchema),
-    mode: 'onChange',
+    mode: 'onBlur',
+    defaultValues: {
+      name: safeSchool?.newSchool?.name || '',
+      address: safeSchool?.newSchool?.address || '',
+      code: safeSchool?.newSchool?.code || '',
+    },
   });
-  const { setSchoolData, currentStep, setCurrentStep } =
-    UseCompleteProfileStore();
+
   const nameValue = watch('name');
 
   const generateSchoolCode = () => {
@@ -53,12 +46,11 @@ export function CreateSchoolForm() {
     return `${initials}${random}`;
   };
 
-  const onSubmit = async (data: CreateSchoolFormData) => {
-    // Si pas de code fourni, on en génère un
+  const onSubmit = async (data: CreateSchoolType) => {
     const finalData = {
       address: data.address,
       name: data.name,
-      inposedRole: 'ADMIN',
+      imposedRole: 'ADMIN',
       code: data.code || generateSchoolCode(),
     };
     setSchoolData({
@@ -73,13 +65,13 @@ export function CreateSchoolForm() {
       <div className="space-y-3">
         {/* Nom de l'école */}
         <Field>
-          <FieldLabel htmlFor="name">Nom de l'école *</FieldLabel>
+          <FieldLabel htmlFor="name">Nom de l'école</FieldLabel>
           <Input
             id="name"
             type="text"
+            icon={Building2}
             {...register('name')}
             placeholder="Ex: Groupe Scolaire Les Champions"
-            className="w-full px-3 py-2 "
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? 'name-err' : undefined}
           />
@@ -89,18 +81,17 @@ export function CreateSchoolForm() {
 
         {/* Adresse */}
         <Field>
-          <FieldLabel htmlFor="address">Adresse complète *</FieldLabel>
+          <FieldLabel htmlFor="address">Adresse complète</FieldLabel>
           <Textarea
             id="address"
             rows={3}
             {...register('address')}
             placeholder="Ex: Quartier Hippodrome, Rue 234, Bamako, Mali"
-            className="w-full px-3 py-2 resize-none"
+            className="w-full resize-none"
             aria-invalid={!!errors.address}
             aria-describedby={errors.address ? 'address-err' : undefined}
           />
-
-          <FieldError id="address-err">{errors.address?.message}</FieldError>
+          {/* Note: Textarea n'a pas de prop icon, mais on pourrait l'ajouter ou mettre l'icône à côté */}
         </Field>
 
         {/* Code de l'école */}
@@ -114,10 +105,11 @@ export function CreateSchoolForm() {
           <Input
             id="code"
             type="text"
+            icon={Hash}
             {...register('code')}
             placeholder="Ex: CHAMP24"
             maxLength={6}
-            className="w-full px-3 py-2 uppercase"
+            className="uppercase"
             aria-invalid={!!errors.code}
             aria-describedby={errors.code ? 'code-err' : undefined}
           />
@@ -131,26 +123,13 @@ export function CreateSchoolForm() {
 
         {/* Actions */}
         <div className="flex gap-3 pt-4">
-          <Button
-            type="button"
-            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
-          >
+          <Button variant="outline" type="button">
             Annuler
           </Button>
 
-          <Button
-            type="submit"
-            disabled={!isValid || isSubmitting}
-            className="flex text-white font-semibold disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <>
-                <Spinner /> Création...
-              </>
-            ) : (
-              "Créer l'école"
-            )}
-          </Button>
+          <SubmitButton isSubmitting={isSubmitting} className="w-3/4">
+            {isSubmitting ? "Crée l'école" : 'Création'}
+          </SubmitButton>
         </div>
       </div>
     </form>

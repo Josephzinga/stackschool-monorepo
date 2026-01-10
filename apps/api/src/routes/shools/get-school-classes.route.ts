@@ -9,7 +9,7 @@ router.get('/:schoolId/classes', isAuthenticated, async (req, res) => {
   try {
     const schoolId = req.params.schoolId as string | undefined;
     if (!schoolId) {
-      createServiceError("L'id manquant", 404);
+      createServiceError("L'id manquant", 400);
       return;
     }
     const classes = await prisma.class.findMany({

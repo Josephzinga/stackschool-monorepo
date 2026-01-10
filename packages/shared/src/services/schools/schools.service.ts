@@ -1,9 +1,15 @@
 import api from '../../lib/api';
+import { SEARCH_SCHOOL_GQL } from '../../graphql/graphql-query';
 
 export const schoolService = {
-  searchSchools: async (search: string | null) => {
-    const res = await api.get('/schools/search', {
-      params: { search },
+  searchSchools: async (searchTerm: string | null) => {
+    const res = await api.post('/graphql', {
+      query: SEARCH_SCHOOL_GQL,
+      variables: {
+        input: {
+          searchTerm,
+        },
+      },
     });
     return res.data;
   },

@@ -20,7 +20,7 @@ router.get(
     failureRedirect: `${FRONTEND_ORIGIN}/auth/login`,
     session: true,
   }),
-  async (req, res) => handleSocialWebCallback(req, res, 'facebook'),
+  async (req, res, next) => handleSocialWebCallback(req, res, next, 'facebook'),
 );
 
 export default router;

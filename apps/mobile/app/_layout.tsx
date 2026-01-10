@@ -12,7 +12,7 @@ import { declareFonts } from '@/lib/Fonts';
 import { NAV_THEME } from '@/lib/theme';
 
 SplashScreen.preventAutoHideAsync();
-const IP_ADDRESS = '192.168.101.135';
+const IP_ADDRESS = '192.168.1.12';
 const API_PORT = 4000;
 const API_URL = `http://${IP_ADDRESS}:${API_PORT}`;
 

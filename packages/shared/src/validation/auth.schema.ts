@@ -19,9 +19,7 @@ export const loginFormSchema = z.object({
 
       // Validation username (alphanumérique + underscores, 3-20 caractères)
       const usernameRegex = /^[a-zA-Z 0-9_]{3,20}$/;
-      if (usernameRegex.test(value)) return true;
-
-      return false;
+      return usernameRegex.test(value);
     }, "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)"),
 
   password: z
@@ -53,9 +51,7 @@ export const registerFormSchema = z
 
           // Validation username (alphanumérique + underscores, 3-20 caractères)
           const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-          if (usernameRegex.test(value)) return true;
-
-          return false;
+          return usernameRegex.test(value);
         },
 
         "Veuillez entrer un email, numéro de téléphone valide ou nom d'utilisateur (3-20 caractères alphanumériques)",

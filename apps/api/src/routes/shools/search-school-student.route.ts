@@ -3,7 +3,7 @@ import { prisma } from '@stackschool/db';
 import { isAuthenticated } from '../../middlewares/auth';
 import { createServiceError } from '../../utils/api-errors';
 import { safeValidateSchema } from '../../utils/validate-schema.util';
-import { searchStudentSchema } from '@stackschool/shared';
+import { SearchStudentParams, searchStudentSchema } from '@stackschool/shared';
 
 const router = Router();
 
@@ -13,20 +13,34 @@ const router = Router();
  */
 router.get('/students/search', isAuthenticated, async (req, res, next) => {
   try {
-    const { q, schoolId } = req.query;
-    console.log('query', q, 'SchoolId', schoolId);
-    const errors = safeValidateSchema(searchStudentSchema, { q, schoolId });
+    const { searchTerm, schoolId } = req.query as SearchStudentParams;
+    console.log('query', searchTerm, 'SchoolId', schoolId);
+    const errors = safeValidateSchema<SearchStudentParams>(
+      searchStudentSchema,
+      {
+        searchTerm,
+        schoolId,
+      },
+    );
     if (errors) return next(errors);
-    if (!schoolId || !q) return;
+
     // 2. Construire la requête Prisma sécurisée
     const students = await prisma.student.findMany({
       where: {
         // Condition AND : doit être dans cette école ET correspondre à la recherche
         schoolId: schoolId,
         OR: [
-          { matricule: { contains: q, mode: 'insensitive' } },
-          { profile: { firstname: { contains: q, mode: 'insensitive' } } },
-          { profile: { lastname: { contains: q, mode: 'insensitive' } } },
+          { matricule: { contains: searchTerm, mode: 'insensitive' } },
+          {
+            profile: {
+              firstname: { contains: searchTerm, mode: 'insensitive' },
+            },
+          },
+          {
+            profile: {
+              lastname: { contains: searchTerm, mode: 'insensitive' },
+            },
+          },
         ],
       },
       take: 10, // Limiter les résultats pour la performance
@@ -72,12 +86,3 @@ router.get('/students/search', isAuthenticated, async (req, res, next) => {
 });
 
 export default router;
-function validateSchema(
-  searchStudentSchema: any,
-  arg1: {
-    q: string | ParsedQs | (string | ParsedQs)[] | undefined;
-    schoolId: string | ParsedQs | (string | ParsedQs)[] | undefined;
-  },
-) {
-  throw new Error('Function not implemented.');
-}

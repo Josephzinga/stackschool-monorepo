@@ -1,3 +1,5 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 interface AvatarProps {
   photo?: string | null;
   isLoading?: boolean;
@@ -9,48 +11,45 @@ const Spinner: React.FC = () => (
     className="animate-spin h-8 w-8 text-white"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox="0 0 24 24">
+    viewBox="0 0 24 24"
+  >
     <circle
       className="opacity-25"
       cx="12"
       cy="12"
       r="10"
       stroke="currentColor"
-      strokeWidth="4"></circle>
+      strokeWidth="4"
+    ></circle>
     <path
       className="opacity-75"
       fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    ></path>
   </svg>
 );
 
-const Avatar: React.FC<AvatarProps> = ({
+export const UploadProfilePicture: React.FC<AvatarProps> = ({
   photo,
   isLoading = false,
   onPhotoUpload,
 }) => {
   return (
-    <div className="relative w-32 h-32" aria-live="polite">
-      <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-2 border-gray-300">
-        {photo ? (
-          <img
-            src={photo}
-            alt="Photo de profil"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div
-            className="text-5xl text-gray-400"
-            aria-label="Avatar par défaut">
-            👤
-          </div>
-        )}
-      </div>
+    <div className="relative w-32 h-32 flex flex-col items-center space-y-4">
+      <Avatar className="w-32 h-32">
+        <AvatarImage
+          src={photo ?? undefined}
+          alt="Photo de profil"
+          className="w-32 h-32"
+        />
+        <AvatarFallback>👤</AvatarFallback>
+      </Avatar>
 
       {isLoading && (
         <div
           className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center"
-          aria-label="Chargement en cours">
+          aria-label="Chargement en cours"
+        >
           <Spinner />
         </div>
       )}
@@ -58,7 +57,8 @@ const Avatar: React.FC<AvatarProps> = ({
       {!isLoading && (
         <label
           className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors duration-300"
-          title="Changer la photo de profil">
+          title="Changer la photo de profil"
+        >
           <input
             type="file"
             name="profilePicture"
@@ -71,7 +71,8 @@ const Avatar: React.FC<AvatarProps> = ({
             className="w-5 h-5"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24">
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -90,5 +91,3 @@ const Avatar: React.FC<AvatarProps> = ({
     </div>
   );
 };
-
-export default Avatar;

@@ -33,17 +33,16 @@ model User {
 }
 
 model Profile {
-  id            String          @id @default(cuid())
-  firstname     String?
-  lastname      String?
-  gender        Gender?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  userId        String          @unique
-  photo         String?
-  ParentStudent ParentStudent[]
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Student       Student[]
+  id        String    @id @default(cuid())
+  firstname String?
+  lastname  String?
+  gender    Gender?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    String    @unique
+  photo     String?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Student   Student[]
 }
 
 model School {
@@ -82,6 +81,7 @@ model SchoolUser {
   Staff        Staff?
   subject      Subject[]
   Teacher      Teacher?
+  Parent       Parent?
 
   @@unique([schoolId, userId])
   @@index([schoolId])
@@ -219,17 +219,32 @@ model Student {
 }
 
 /// *
-/// * Parent - Student pivot
-model ParentStudent {
-  id              String   @id @default(cuid())
-  parentProfileId String
-  studentId       String
-  relationType    String?
-  createdAt       DateTime @default(now())
-  parentProfile   Profile  @relation(fields: [parentProfileId], references: [id])
-  student         Student  @relation(fields: [studentId], references: [id])
+/// * Parent (Nouveau modèle spécifique école)
+model Parent {
+  id                String            @id @default(cuid())
+  schoolUserId      String            @unique
+  profession        String?
+  address           String?
+  isDelegate        Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  contactPreference ContactPreference
+  updatedAt         DateTime          @updatedAt
+  schoolUser        SchoolUser        @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  students          ParentStudent[]
+}
 
-  @@unique([parentProfileId, studentId])
+/// *
+/// * Parent - Student pivot (Mis à jour)
+model ParentStudent {
+  id           String       @id @default(cuid())
+  parentId     String
+  studentId    String
+  relationType RelationType
+  createdAt    DateTime     @default(now())
+  parent       Parent       @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, studentId])
 }
 
 model Invite {
@@ -414,4 +429,21 @@ enum AttendanceStatus {
   ABSENT
   LATE
   EXCUSED
+}
+
+enum RelationType {
+  FATHER
+  MOTHER
+  GUARDIAN
+  UNCLE
+  OTHER
+  GRAND_MOTHER
+  GRAND_FATHER
+  AUNT
+}
+
+enum ContactPreference {
+  WHATSAPP
+  EMAIL
+  PHONE
 }

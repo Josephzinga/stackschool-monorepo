@@ -15,6 +15,10 @@ interface RoleConstant {
   description: string;
 }
 
+function TeacherForm() {
+  return null;
+}
+
 export default function RoleStep() {
   const { school, setCurrentStep } = useCompleteProfileStore();
   const [selectedRole, setSelectedRole] = useState<SchoolRole>();
@@ -130,7 +134,7 @@ export default function RoleStep() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full">
       <div className="flex items-center space-x-4 font-poppins">
         <Button variant="outline" onClick={() => setSelectedRole(undefined)}>
           ←
@@ -149,6 +153,8 @@ export default function RoleStep() {
       {selectedRole === 'PARENT' && (
         <ParentForm onBack={() => setSelectedRole(undefined)} />
       )}
+
+      {selectedRole === 'TEACHER' && <TeacherForm />}
 
       {selectedRole === 'ADMIN' && (
         <div className="text-center p-8">

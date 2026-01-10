@@ -1,19 +1,19 @@
-import {Controller, useForm, zodResolver} from '@stackschool/ui';
-import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
-import {Text} from '@/components/ui/text';
+import { Controller, useForm, zodResolver } from '@stackschool/ui';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 import * as React from 'react';
-import {Pressable, type TextInput, View} from 'react-native';
-import {useRouter} from 'expo-router';
-import {authService, loginFormSchema, LoginFormType, parseAxiosError} from '@stackschool/shared';
+import { Pressable, type TextInput, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { authService, loginFormSchema, LoginFormType, parseAxiosError } from '@stackschool/shared';
 import Toast from 'react-native-toast-message';
-import {FieldError} from './field';
-import {Lock, Mail} from 'lucide-react-native';
-import {SocialSections} from './social-section';
+import { FieldError } from './field';
+import { Lock, Mail } from 'lucide-react-native';
+import { SocialSections } from './social-section';
 import Logo from './Logo';
-import {CustomButton} from '@/components/CustomButton';
+import { CustomButton } from '@/components/CustomButton';
 
 export function SignInForm() {
   const {
@@ -35,6 +35,7 @@ export function SignInForm() {
     console.log('unsubmit');
     try {
       const res = await authService.login(data);
+      console.log('response ok', res);
       if (res.ok) {
         Toast.show({
           type: 'success',
@@ -55,10 +56,10 @@ export function SignInForm() {
   }
 
   return (
-    <Card className="bg-slate-50 dark:bg-blue-900 h-full py-4">
+    <Card className="h-full bg-slate-50 py-4 dark:bg-blue-900">
       <CardHeader>
         <Logo />
-        <CardTitle className="text-card! text-center font-inter-bold text-xl sm:text-left">
+        <CardTitle className="text-card! font-inter-bold text-center text-xl sm:text-left">
           Bienvenue
         </CardTitle>
         <CardDescription className="text-center sm:text-left">
@@ -129,14 +130,14 @@ export function SignInForm() {
             {errors.password && <FieldError>{errors.password.message}</FieldError>}
           </View>
           <CustomButton
-            className=" w-full mt-1"
+            className=" mt-1 w-full"
             onPress={handleSubmit(onSubmit)}
             isSubmitting={isSubmitting}>
             {isSubmitting ? 'Connexion en cours...' : 'Connexion'}
           </CustomButton>
         </View>
         <View className="flex gap-6 px-4">
-          <Text className=" text-md w-full text-center font-jost-medium text-muted-foreground">
+          <Text className=" text-md font-jost-medium w-full text-center text-muted-foreground">
             Ou continuer avec
           </Text>
 
@@ -144,16 +145,15 @@ export function SignInForm() {
           <View className=" flex w-full flex-row items-center justify-center  text-center text-sm">
             <Text className="font-inter-meduim text-sm">Pas de compte? </Text>
             <Pressable
-                onPress={() => {
-                  router.push('/auth/register');
-                }}>
+              onPress={() => {
+                router.push('/auth/register');
+              }}>
               <Text className="font-inter-semibold text-sm text-blue-700 underline underline-offset-4">
                 Crée un compte
               </Text>
             </Pressable>
           </View>
         </View>
-
       </CardContent>
     </Card>
   );

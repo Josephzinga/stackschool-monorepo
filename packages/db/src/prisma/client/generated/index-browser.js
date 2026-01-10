@@ -245,9 +245,20 @@ exports.Prisma.StudentScalarFieldEnum = {
   nationality: 'nationality'
 };
 
+exports.Prisma.ParentScalarFieldEnum = {
+  id: 'id',
+  schoolUserId: 'schoolUserId',
+  profession: 'profession',
+  address: 'address',
+  isDelegate: 'isDelegate',
+  createdAt: 'createdAt',
+  contactPreference: 'contactPreference',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ParentStudentScalarFieldEnum = {
   id: 'id',
-  parentProfileId: 'parentProfileId',
+  parentId: 'parentId',
   studentId: 'studentId',
   relationType: 'relationType',
   createdAt: 'createdAt'
@@ -403,6 +414,23 @@ exports.SchoolRole = exports.$Enums.SchoolRole = {
   STAFF: 'STAFF'
 };
 
+exports.ContactPreference = exports.$Enums.ContactPreference = {
+  WHATSAPP: 'WHATSAPP',
+  EMAIL: 'EMAIL',
+  PHONE: 'PHONE'
+};
+
+exports.RelationType = exports.$Enums.RelationType = {
+  FATHER: 'FATHER',
+  MOTHER: 'MOTHER',
+  GUARDIAN: 'GUARDIAN',
+  UNCLE: 'UNCLE',
+  OTHER: 'OTHER',
+  GRAND_MOTHER: 'GRAND_MOTHER',
+  GRAND_FATHER: 'GRAND_FATHER',
+  AUNT: 'AUNT'
+};
+
 exports.AttendanceStatus = exports.$Enums.AttendanceStatus = {
   PRESENT: 'PRESENT',
   ABSENT: 'ABSENT',
@@ -422,6 +450,7 @@ exports.Prisma.ModelName = {
   Class: 'Class',
   ClassTeacher: 'ClassTeacher',
   Student: 'Student',
+  Parent: 'Parent',
   ParentStudent: 'ParentStudent',
   Invite: 'Invite',
   Attendance: 'Attendance',

@@ -6,15 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useForm } from 'react-hook-form';
-import {
-  api,
-  Class,
-  studentFormSchema,
-  StudentFormType,
-} from '@stackschool/shared';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { SubmitButton } from '@/components/submit-button';
 import {
   Popover,
   PopoverContent,
@@ -25,10 +16,25 @@ import { Calendar } from '@/components/ui/calendar';
 import {
   Controller,
   useCompleteProfileStore,
+  useForm,
   zodResolver,
 } from '@stackschool/ui';
-import { Calendar as CalendarIcon, Flag, IdCard, MapPin, User } from 'lucide-react';
+import {
+  Calendar as CalendarIcon,
+  Flag,
+  IdCard,
+  MapPin,
+  User,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
+import {
+  api,
+  Class,
+  StudentFormData,
+  studentFormSchema,
+} from '@stackschool/shared';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { SubmitButton } from '@/components/submit-button';
 
 export default function StudentForm() {
   const {
@@ -36,7 +42,7 @@ export default function StudentForm() {
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<StudentFormType>({
+  } = useForm<StudentFormData>({
     resolver: zodResolver(studentFormSchema),
     mode: 'onBlur',
   });
@@ -60,8 +66,8 @@ export default function StudentForm() {
     fetchData();
   }, []);
 
-  const onSubmit = async (data: StudentFormType) => {
-    setRoleData({ role: 'USER', student: data });
+  const onSubmit = async (data: StudentFormData) => {
+    setRoleData({ role: 'STUDENT', student: data });
     try {
     } catch (e) {}
   };

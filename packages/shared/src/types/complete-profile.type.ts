@@ -2,6 +2,7 @@ import type {
   Account,
   Gender,
   Profile,
+  School,
   SchoolRole,
   Staff,
   Teacher,
@@ -11,7 +12,7 @@ import {
   CreateSchoolType,
   ParentFormData,
   StudentFormData,
-} from '../validation/complete-profile.schema';
+} from '@stackschool/shared/src';
 
 type CreateSchoolPayload = {
   type: 'create';
@@ -20,7 +21,7 @@ type CreateSchoolPayload = {
 
 type JoinSchoolPayload = {
   type: 'join';
-  schoolId: string;
+  schoolSelected: Pick<School, 'name' | 'id' | 'code' | 'address' | 'logo'>;
 };
 
 type InviteSchoolPayload = {
@@ -49,10 +50,10 @@ export interface ProfileData {
   phoneNumber?: string | undefined;
 }
 
-export type UserInMe = User & {
+export interface UserInMe extends User {
   profile: Profile;
   Account: Account[];
-};
+}
 
 export interface SchoolClass {
   id: string;

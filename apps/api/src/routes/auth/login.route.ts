@@ -49,7 +49,6 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
 
       req.login(user, async (loginErr: any) => {
         if (loginErr) {
-          console.error('req.login error:', loginErr);
           return next(
             createServiceError('La connexion a échoué', 500, loginErr),
           );
@@ -75,6 +74,7 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
 
         return res.json({
           ok: true,
+          message: 'Authentification reussi avec succès!',
           user: {
             id: user.id,
             email: user.email,
@@ -85,6 +85,7 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
           },
         });
       });
+      console.log('user', user);
     } catch (error: any) {
       console.error('Error in local login callback:', error);
       return next(error);

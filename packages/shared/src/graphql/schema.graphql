@@ -1,0 +1,62 @@
+enum Relation {
+   FATHER
+   MOTHER
+   GUARDIAN
+   UNCLE
+   OTHER
+   GRAND_MOTHER
+   GRAND_FATHER
+   AUNT
+}
+enum ContactPreference {
+   WHATSAPP
+   EMAIL
+   PHONE
+}
+type Student {
+   id: ID!,
+   firstname: String!,
+   lastname: String!,
+   photo: String,
+   matricule: String!,
+   className: String!
+}
+
+type School {
+   id: ID,
+   name: String!,
+   slug: String
+   address: String!
+   code: String
+   logo: String
+}
+
+input SchoolSearchInput {
+   searchTerm: String
+}
+
+input StudentSearchInput {
+   schoolId: ID!,
+   searchTerm: String
+}
+
+input ChildInput {
+   studentId: ID!
+   relation: Relation
+}
+
+input CompleteParentProfileInput {
+   children: [ChildInput!]!
+   contactPreference: ContactPreference!
+   profession: String
+}
+
+type Mutation {
+   completeParentProfile(input: CompleteParentProfileInput!): Boolean
+}
+
+type Query {
+   searchStudent(filter: StudentSearchInput!): [Student]
+   searchSchool(filter: SchoolSearchInput!): [School!]
+}
+

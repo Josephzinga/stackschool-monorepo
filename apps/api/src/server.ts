@@ -8,7 +8,6 @@ import { Strategy as FacebookStrategy } from 'passport-facebook';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import pg from 'pg';
-import routes from './routes';
 import helmet from 'helmet';
 import handleOauthStrategy from './controllers/passport-social.controller';
 import setupLocalStrategy from './lib/setup-local-strategy';
@@ -16,6 +15,9 @@ import { getUserFromRedis } from './lib/handle-redis-user';
 import path from 'path';
 import { JWT_SECRET } from './constant/config';
 import { errorHandler } from './middlewares/errorHandler';
+import graphqlMiddleware from './graphql';
+import { isAuthenticated } from './middlewares/auth';
+import routes from './routes';
 
 config();
 
@@ -118,7 +120,7 @@ passport.use(
 );
 
 app.use('/api', routes);
-
+app.all('/api/graphql', isAuthenticated, graphqlMiddleware);
 app.get('/', (req, res) => {
   res.json('message serveur connecter');
 });

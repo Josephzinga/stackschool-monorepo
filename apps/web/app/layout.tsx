@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { ModeToggle } from '@/components/DropMenu';
 import { Toaster } from '@/components/ui/sonner';
 import { inter, jost, poppins } from '@/lib/fonts';
+import Providers from './providers';
 
 /**
  * RootLayout est le composant racine de l'application.
@@ -16,7 +17,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="fr"
       // suppressHydrationWarning est nécessaire car next-themes modifie le DOM côté client
       // pour appliquer le thème, ce qui peut causer des avertissements d'hydratation.
       suppressHydrationWarning
@@ -24,24 +25,19 @@ export default async function RootLayout({
       className={`${jost.variable}  ${inter.variable} ${poppins.variable}`}
     >
       <body>
-        {/* 
-          ThemeProvider gère le basculement entre les thèmes clair et sombre.
-          attribute="class" indique que le thème est appliqué via une classe CSS sur l'élément html.
-        */}
         <ThemeProvider attribute="class" enableSystem={false}>
-          {children}
-          
-          {/* Composant pour afficher les notifications toast (Sonner) */}
-          <Toaster
-            position="top-center"
-            className="bg-sky-500! text-lg"
-            duration={4000}
-          />
-          
-          {/* Bouton flottant pour basculer le thème (temporaire ou positionné ici) */}
-          <div className="absolute right-4 top-4">
-            <ModeToggle />
-          </div>
+          <Providers>
+            {children}
+
+            <Toaster
+              position="top-center"
+              className="bg-sky-500! text-lg"
+              duration={4000}
+            />
+            <div className="absolute right-4 top-4">
+              <ModeToggle />
+            </div>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

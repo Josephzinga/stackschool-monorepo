@@ -12,7 +12,6 @@ router.post(
       const userId = req.user.id;
       const redisKey = `complete_profile:${userId}`;
       console.log('Body:', req.body);
-      console.log('userId:', userId);
 
       const setRedis = await redisClient.setEx(
         redisKey,

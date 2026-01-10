@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { createUserSession } from '../services/session.service';
 import { createServiceError } from '../utils/api-errors';
 
@@ -11,20 +11,21 @@ import { createServiceError } from '../utils/api-errors';
  *
  * @param {Request} req - La requête Express contenant l'utilisateur authentifié (req.user).
  * @param {Response} res - La réponse Express pour gérer les cookies et la redirection.
+ * @param {NextFunction} next - pour passer l'erreur à l'intercepteur d'erreur centrale
  * @param {string} provider - Le nom du fournisseur OAuth (pour les logs d'erreur).
  * @returns {Promise<void>}
  */
 export async function handleSocialWebCallback(
   req: Request,
   res: Response,
+  next: NextFunction,
   provider: string,
 ): Promise<void> {
   try {
     const baseUrl = process.env.FRONTEND_URL!;
-    const user = req.user;
+    const user = req?.user;
 
-    if (!user || !user.id) {
-      console.log('user not found');
+    if (!user || !user?.id) {
       return res.redirect(`${baseUrl}/auth/login=error`);
     }
 
@@ -43,6 +44,6 @@ export async function handleSocialWebCallback(
 
     return res.redirect(`${baseUrl}/dashboard`);
   } catch (error) {
-    createServiceError(`Error get ${provider} callback: `, 500, error);
+    next(createServiceError(`Error get ${provider} callback: `, 500, error));
   }
 }

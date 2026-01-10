@@ -12,10 +12,6 @@ export const createSchoolSchema = z.object({
     .max(200, "L'adresse est trop longue"),
   code: z.string().length(6, 'Le code doit contenir 6 caractères'),
 });
-// Schéma pour l'étape de sélection du rôle
-export const roleStepSchema = z.object({
-  role: z.enum(['TEACHER', 'STUDENT', 'PARENT', 'ADMIN']),
-});
 
 // Schéma pour les informations de l'étudiant
 export const studentFormSchema = z.object({
@@ -40,10 +36,31 @@ export const studentFormSchema = z.object({
 
 // Schéma pour les informations du parent
 export const parentFormSchema = z.object({
-  childrenIds: z
-    .array(z.string())
+  children: z
+    .array(
+      z.object({
+        studentId: z.string(),
+        relation: z.enum([
+          'FATHER',
+          'MOTHER',
+          'GRAND_FATHER',
+          'GRAND_MOTHER',
+          'UNCLE',
+          'AUNT',
+          'OTHER',
+          'GUARDIAN',
+        ]),
+      }),
+    )
     .min(1, 'Veuillez sélectionner au moins un enfant.'),
+
+  contactPreference: z.enum(['WHATSAPP', 'PHONE', 'EMAIL']),
+  profession: z
+    .string()
+    .min(3, 'veillez entrez une profession valide')
+    .optional(),
 });
+
 export const invitationSchema = z.object({
   invitationCode: z
     .string()
@@ -61,11 +78,11 @@ export const teacherFormSchema = z.object({
 // Schéma générique pour la sauvegarde de progression
 export const saveProgressSchema = z.object({
   step: z.number().int().min(1),
-  data: z.record(z.any()), // Données flexibles selon l'étape
+  data: z.record(z.any(), z.any()), // Données flexibles selon l'étape
 });
 
 // Types inférés
-export type RoleStepData = z.infer<typeof roleStepSchema>;
+
 export type InvitationFormData = z.infer<typeof invitationSchema>;
 export type CreateSchoolType = z.infer<typeof createSchoolSchema>;
 export type StudentFormData = z.infer<typeof studentFormSchema>;

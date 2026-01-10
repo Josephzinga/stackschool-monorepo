@@ -30,7 +30,7 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import 'react-phone-number-input/style.css';
 import { checkField } from '@/lib/check-profile-field';
-import ProfileUpload from '../profile-upload';
+import { UploadProfilePicture } from '../profile-upload';
 import { SubmitButton } from '@/components/submit-button';
 
 export function ProfileStep() {
@@ -198,8 +198,9 @@ export function ProfileStep() {
           </p>
         </div>
       )}
-      <div className="flex flex-col items-center space-y-4">
-        <ProfileUpload
+
+      <div className="w-full flex justify-center items-center">
+        <UploadProfilePicture
           onPhotoUpload={handlePhotoUpload}
           isLoading={isLoading}
           photo={picture}

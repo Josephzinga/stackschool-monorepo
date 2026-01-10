@@ -1,10 +1,19 @@
 import { prisma } from '.';
 
 async function main() {
-  console.log('Start seeding...');
-
-  const session = await prisma.session.deleteMany();
-  console.log(session);
+  const student = await prisma.student.update({
+    where: {
+      id: 'cmjypb8i30003ohnw56o6ccoo',
+    },
+    data: {
+      profile: {
+        update: {
+          photo: 'cmjxjksut000041nwgsrc610n-1767563053416-53186339.jpeg',
+        },
+      },
+    },
+  });
+  console.log(student);
 }
 
 main()

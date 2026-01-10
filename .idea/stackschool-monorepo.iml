@@ -2,7 +2,14 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.idea/codeStyles" />
       <excludeFolder url="file://$MODULE_DIR$/apps/mobile/.expo" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/mobile/ios" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/mobile/ios/StackSchool.xcodeproj/project.xcworkspace" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/db/src/prisma/migrations/20251224043650_ajouter_la_date_de_verification_d_email_et_changer_le_type_du_email_verified_en_boolean" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/db/src/prisma/migrations/20260106131031_ajouter_le_champs_phone_number_dans_la_table_invite" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/db/src/prisma/migrations/20260109132559_ajout_du_model_paren" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/db/src/prisma/migrations/20260109134024_ajout_des_enum" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -18,7 +18,7 @@ router.get(
     failureRedirect: '/auth/login',
     session: true,
   }),
-  (req, res) => handleSocialWebCallback(req, res, 'google'),
+  (req, res, next) => handleSocialWebCallback(req, res, next, 'google'),
 );
 
 export default router;

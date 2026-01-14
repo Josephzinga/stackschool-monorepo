@@ -1,0 +1,140 @@
+
+
+:root {
+    --si-primary: rgba(99, 102, 241, 1);        /* violet/primary */
+    --si-primary-soft: rgba(99, 102, 241, 0.12);/* soft glow */
+    --si-muted: rgba(107, 114, 128, 1);         /* muted */
+    --si-bg: var(--background, #fff);
+    --si-border: rgba(148, 163, 184, 0.16);
+}
+
+/* wrapper */
+.search-input {
+    transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease,
+    border-color 220ms ease;
+    transform-origin: center;
+    will-change: transform, box-shadow;
+}
+
+/* focus-within (works even without JS but we also keep data-focused for explicit control) */
+.search-input:focus-within,
+.search-input[data-focused="true"] {
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(2,6,23,0.06);
+}
+
+/* icon (left) — slide + color fade */
+.search-input__icon {
+    top: 50%;
+    transform: translateY(-50%) translateX(0);
+    color: var(--si-muted);
+    transition: transform 260ms cubic-bezier(.2,.9,.2,1), color 200ms linear, opacity 200ms;
+    opacity: 1;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* when focused, nudge icon slightly left and brighten color */
+.search-input:focus-within .search-input__icon,
+.search-input[data-focused="true"] .search-input__icon {
+    transform: translateY(-50%) translateX(-6px) scale(1.02);
+    color: var(--si-primary);
+}
+
+/* input field styling transitions */
+.search-input__field {
+    transition:
+            box-shadow 260ms cubic-bezier(.2,.9,.2,1),
+            border-color 200ms linear,
+            background-color 200ms linear,
+            transform 220ms cubic-bezier(.2,.9,.2,1);
+    border-color: var(--si-border);
+    background: var(--si-bg);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* focus ring and glow */
+.search-input:focus-within .search-input__field,
+.search-input[data-focused="true"] .search-input__field {
+    box-shadow: 0 8px 30px var(--si-primary-soft);
+    border-color: var(--si-primary);
+}
+
+/* subtle hover on input */
+.search-input__field:hover {
+    transform: translateY(-1px);
+}
+
+/* loader: keep spin + gentle fade-in/out */
+.search-input__loader {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.95);
+    transition: opacity 180ms linear, transform 180ms cubic-bezier(.2,.9,.2,1);
+    will-change: opacity, transform;
+}
+
+/* show loader when present */
+.search-input__loader svg {
+    animation: search-input-spin 800ms linear infinite;
+}
+
+/* when loader exists in DOM (mounted) fade it in — we can't select "exists", but immediate presence will animate from default */
+.search-input__loader {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+}
+
+/* clear button: appear smoothly from the right (fade + slide + scale) */
+.search-input__clear {
+    opacity: 0;
+    transform: translateX(6px) scale(0.92);
+    transition: opacity 180ms ease, transform 180ms cubic-bezier(.2,.9,.2,1), background-color 140ms;
+    pointer-events: none;
+}
+
+/* when clear is present (mounted) enable click and animate in */
+.search-input[data-has-value="true"] .search-input__clear {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+}
+
+/* hover states for clear */
+.search-input__clear:hover {
+    background-color: rgba(15, 23, 42, 0.06);
+}
+
+/* small accessibility focus-visible */
+.search-input__clear:focus-visible {
+    outline: 2px solid rgba(99,102,241,0.18);
+    outline-offset: 3px;
+    border-radius: 9999px;
+}
+
+/* tiny micro-interaction when the clear is clicked: scale feedback */
+.search-input__clear:active {
+    transform: translateX(0) scale(0.95);
+}
+
+/* keyframes for loader (in case the icon svg doesn't spin by tailwind) */
+@keyframes search-input-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .search-input,
+    .search-input__icon,
+    .search-input__field,
+    .search-input__loader,
+    .search-input__clear {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+}

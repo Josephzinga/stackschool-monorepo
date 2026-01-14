@@ -1,43 +1,47 @@
 import { Field, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Item, ItemGroup, ItemTitle } from '@/components/ui/item';
+import { Item, ItemTitle } from '@/components/ui/item';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { School, schoolService } from '@stackschool/shared';
+import { SchoolSelected, schoolService } from '@stackschool/shared';
 import { toast } from 'sonner';
 import { useCompleteProfileStore } from '@stackschool/ui';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useState } from 'react';
-import { Spinner } from '@/components/ui/spinner';
-import { Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { SearchInput } from '@/components/search-input';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export const SearchSchoolFrom = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const searchDebounce = useDebounce(400, searchQuery.trim() || null);
   const {
     setSchoolData,
     setCurrentStep,
     school: schoolData,
   } = useCompleteProfileStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchDebounce = useDebounce(400, searchQuery.trim() || null);
+  const [schoolSelected, setSchoolSelected] = useState<SchoolSelected | null>(
+    schoolData?.type === 'join' ? schoolData.schoolSelected : null,
+  );
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['school', searchDebounce],
-    queryFn: async (): Promise<School[] | null | any> => {
+    queryFn: async (): Promise<SchoolSelected[]> => {
       if (!searchDebounce || searchDebounce.length < 2) return [];
       const data = await schoolService.searchSchools(searchDebounce);
       if (data.errors) {
         const message = data.errors[0]?.message;
         throw new Error(message);
       }
-      return data.data.searchSchool;
+      return data.data.searchSchool as SchoolSelected[];
     },
   });
 
   if (error) {
     toast.error(error.message);
   }
-  const schoolSelected =
-    schoolData?.type === 'join' ? schoolData.schoolSelected : null;
-  const handleClick = (school: School) => {
+  console.log('data', data);
+  const handleClick = (school: SchoolSelected) => {
     setSchoolData({
       type: 'join',
       schoolSelected: {
@@ -48,36 +52,61 @@ export const SearchSchoolFrom = () => {
         logo: school.logo,
       },
     });
+    toast.success(`vous avez selectionner l'école ${school.name}`);
     setCurrentStep(2);
   };
 
   return (
-    <div className="space-y-4">
-      <Field className="relative">
-        <FieldLabel htmlFor="search" className="font-poppins">
+    <div className="space-y-4 px-2!">
+      <Field className="">
+        <FieldLabel
+          htmlFor="search"
+          className="font-poppins font-meduim text-center text-lg"
+        >
           Rechercher une école
         </FieldLabel>
-        <Input
+
+        <SearchInput
           id="search"
-          icon={Search}
+          isLoading={isLoading}
           placeholder="Nom de l'école ou code..."
-          className="h-10 border-border"
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
           }}
         />
-        <span className="absolute w-6! right-2 top-10 text-gray-400">
-          {isLoading && <Spinner className="text-primary" />}
-        </span>
+
+        {!!data?.length && (
+          <div className=" w-full mt-1 border rounded-lg bg-slate-50 dark:bg-slate-900 shadow-lg max-h-60 overflow-y-auto overflow-x-hidden">
+            {data.map((item) => (
+              <div
+                onClick={() => handleClick(item)}
+                className={cn(
+                  'flex px-3 py-1.5 justify-between items-center w-full font-poppins',
+                  'cursor-pointer transition-colors hover:bg-slate-200 dark:hover:bg-slate-800',
+                  'border-b last:border-0 border-slate-300 dark:border-slate-800',
+                )}
+              >
+                <div className="flex flex-col gap-2">
+                  <ItemTitle className="font-poppins font-semibold text-foreground">
+                    {item.name}
+                  </ItemTitle>
+                  <p className="text-sm  ">{item.address}</p>
+                  <p className="text-xs text-foreground">Code: {item.code}</p>
+                </div>
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={`/images/${item.logo}`} />
+                  <AvatarFallback>{item.name[0]}</AvatarFallback>
+                </Avatar>
+              </div>
+            ))}
+          </div>
+        )}
       </Field>
 
       {schoolSelected && !searchQuery && (
-        <>
-          <Item
-            onClick={() => setCurrentStep(2)}
-            className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700 p-2 transition-colors px-4"
-          >
+        <div className="flex flex-col gap-10">
+          <Item className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700 p-2 transition-colors px-4">
             <div className="flex justify-between items-center w-full font-inter">
               <div className="flex flex-col gap-2">
                 <ItemTitle className="font-poppins font-semibold text-foreground">
@@ -93,37 +122,16 @@ export const SearchSchoolFrom = () => {
                 <AvatarImage src={`/images/${schoolSelected.logo}`} />
                 <AvatarFallback>{schoolSelected.name[0]}</AvatarFallback>
               </Avatar>
+              <Button variant="ghost" onClick={() => setSchoolSelected(null)}>
+                <X />
+              </Button>
             </div>
-          </Item>
-        </>
+          </Item>{' '}
+          <Button onClick={() => setCurrentStep(2)}>
+            <Button>Continuer →</Button>
+          </Button>
+        </div>
       )}
-      <ItemGroup className="space-y-2 max-h-60 overflow-y-auto h-full">
-        {data?.map((school: School) => (
-          <Item
-            key={school.id}
-            onClick={() => {
-              handleClick(school);
-              toast.success(`vous avez selectionner l'école ${school.name}`);
-            }}
-            className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700 p-2 transition-colors px-4"
-          >
-            <div className="flex justify-between items-center w-full font-inter">
-              <div className="flex flex-col gap-2">
-                <ItemTitle className="font-poppins font-semibold text-foreground">
-                  {school.name}
-                </ItemTitle>
-
-                <p className="text-sm  ">{school.address}</p>
-                <p className="text-xs text-foreground">Code: {school.code}</p>
-              </div>
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={`/images/${school.logo}`} />
-                <AvatarFallback>{school.name[0]}</AvatarFallback>
-              </Avatar>
-            </div>
-          </Item>
-        ))}
-      </ItemGroup>
     </div>
   );
 };

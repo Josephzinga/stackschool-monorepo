@@ -1,17 +1,30 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { Plus, Search, Trash2 } from 'lucide-react';
-import { api, parseAxiosError } from '@stackschool/shared';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Check, User, UserPlus, X } from 'lucide-react';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useQuery } from '@tanstack/react-query';
+import {
+  api,
+  ParentFormData,
+  parentFormSchema,
+  parseAxiosError,
+  RelationType,
+  SEARCH_STUDENT_GQL,
+  StudentResult,
+} from '@stackschool/shared';
 import { toast } from 'sonner';
 import {
-  contactMethods,
-  relationTypes,
+  Controller,
+  relationItems,
   useCompleteProfileStore,
+  useFieldArray,
 } from '@stackschool/ui';
 import { SubmitButton } from '@/components/submit-button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 import {
   Select,
   SelectContent,
@@ -19,400 +32,341 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-
-interface Student {
-  id: string;
-  matricule: string;
-  fullName: string;
-}
-
-interface ParentContext {
-  school: {
-    id: string;
-    name: string;
-    code: string;
-  };
-  students: Student[];
-  relationTypes: Array<{ value: string; label: string }>;
-  contactMethods: Array<{ value: string; label: string; icon: string }>;
-}
-
-interface ChildData {
-  studentId: string;
-  relationType: string;
-  requiresVerification?: boolean;
-}
-
-interface ParentFormData {
-  contactPriority: string;
-  children: ChildData[];
-}
-
-interface ParentFormProps {
-  onSubmit: (data: ParentFormData) => void;
-  onBack: () => void;
-  isSubmitting: boolean;
-}
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Badge } from '@/components/ui/badge';
+import { SearchResultsList } from '@/components/search-results-list';
+import { SearchInput } from '@/components/search-input';
 
 export function ParentForm({ onBack }: { onBack: () => void }) {
-  const [context, setContext] = useState<ParentContext | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [formData, setFormData] = useState<ParentFormData>({
-    contactPriority: 'whatsapp',
-    children: [{ studentId: '', relationType: 'PERE' }],
+  const { setRoleData, school, setCurrentStep, role } =
+    useCompleteProfileStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedQuery = useDebounce(500, searchQuery);
+  const parentData = role?.role === 'PARENT' ? role.parent : null;
+  const [childrenDetails, setChildrenDetails] = useState<
+    Record<string, StudentResult>
+  >({});
+
+  const [childToConfigure, setChildToConfigure] =
+    useState<StudentResult | null>(null);
+  const [tempRelation, setTempRelation] = useState<RelationType>('FATHER');
+  console.log('parentData', parentData);
+  const {
+    handleSubmit,
+    register,
+    control,
+    formState: { isSubmitting, errors },
+  } = useForm<ParentFormData>({
+    resolver: zodResolver(parentFormSchema),
+    defaultValues: {
+      children: parentData?.children || [],
+      contactPreference: parentData?.contactPreference || 'PHONE',
+      profession: parentData?.profession || '',
+      address: parentData?.address || '',
+    },
+    mode: 'onBlur',
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const { isSubmitting } = useCompleteProfileStore();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'children',
+  });
 
-  const loadParentContext = async () => {
-    try {
-      setIsLoading(true);
-      const res = await api.get('/complete-profile/parent/context');
-      const data = res.data;
+  const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;
+  if (!schoolId) return;
 
-      if (data.ok) {
-        setContext(data.context);
-        setFilteredStudents(data.context.students);
-      }
-    } catch (error) {
-      const { message } = parseAxiosError(error);
-      toast.error(message || 'Erreur de chargement du contexte parent');
-      console.error(
-        message || 'Erreur de chargement du contexte parent',
-        error,
-      );
-    } finally {
-      setIsLoading(false);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['student', schoolId, debouncedQuery],
+    queryFn: async () => {
+      if (searchQuery.length < 2) return [];
+      const res = await api.post('/graphql', {
+        query: SEARCH_STUDENT_GQL,
+        variables: {
+          input: {
+            schoolId,
+            searchTerm: debouncedQuery,
+          },
+        },
+      });
+
+      return res.data.data.searchStudent as StudentResult[];
+    },
+  });
+
+  const filteredResults = useMemo(() => {
+    const { message } = parseAxiosError(error);
+    if (!data) {
+      return [];
     }
+    if (!isLoading && error) {
+      toast.error(message || 'Erreur reseaux');
+      return [];
+    }
+    return data.filter((s) => !fields?.some((child) => child.id === s.id));
+  }, [data, fields]);
+
+  const openConfiguration = (student: StudentResult) => {
+    setChildToConfigure(student);
   };
 
-  const onSubmit = async () => {
-    console.log('onSubmit');
-  };
-
-  // Filtrer les étudiants selon la recherche
-
-  useEffect(() => {
-    if (!context) return;
-    const filtered = context.students.filter(
-      (student) =>
-        student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.matricule.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    setFilteredStudents(filtered);
-  }, [context, searchTerm]);
-
-  const handleChildChange = (
-    index: number,
-    field: keyof ChildData,
-    value: string | boolean,
-  ) => {
-    const newChildren = [...formData.children];
-    newChildren[index] = { ...newChildren[index], [field]: value };
-    setFormData({ ...formData, children: newChildren });
-  };
-
-  const addChild = () => {
-    setFormData({
-      ...formData,
-      children: [...formData.children, { studentId: '', relationType: 'PERE' }],
+  const confirmAddChild = () => {
+    if (!childToConfigure) return;
+    append({
+      id: childToConfigure.id,
+      relation: tempRelation,
+      firstname: childToConfigure.firstname,
+      lastname: childToConfigure.lastname,
+      photo: childToConfigure.photo,
     });
+
+    setChildrenDetails((prev) => ({
+      ...prev,
+      [childToConfigure.id]: { ...childToConfigure, relation: tempRelation },
+    }));
+
+    setChildToConfigure(null);
+    setSearchQuery('');
+    toast.success(`${childToConfigure?.firstname} ajouté !`);
   };
 
-  const removeChild = (index: number) => {
-    if (formData.children.length <= 1) return;
-    const newChildren = formData.children.filter((_, i) => i !== index);
-    setFormData({ ...formData, children: newChildren });
+  const relationSelected = (childRelation: RelationType) => {
+    const relation = relationItems.filter((r) => r.value === childRelation);
+    return relation.length > 0 ? relation[0].label : '';
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validation
-    const invalidChild = formData.children.find(
-      (child) => !child.studentId || !child.relationType,
-    );
-    if (invalidChild) {
-      toast.error(
-        'Veuillez sélectionner un étudiant et un type de relation pour chaque enfant',
-      );
-      return;
-    }
-
-    // Vérifier les doublons
-    const studentIds = formData.children.map((child) => child.studentId);
-    const hasDuplicates = new Set(studentIds).size !== studentIds.length;
-    if (hasDuplicates) {
-      toast.error("Un même étudiant ne peut être associé qu'une seule fois");
-      return;
+  const onSubmit = async (data: ParentFormData) => {
+    try {
+      setRoleData({ role: 'PARENT', parent: data });
+      setCurrentStep(4);
+      toast.success('Enfants enregistrés avec succès !');
+    } catch (e) {
+      toast.error("Erreur lors de l'enregistrement");
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (!context) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-destructive">
-          Erreur lors du chargement du contexte
-        </p>
-        <Button onClick={loadParentContext} className="mt-4 ">
-          Réessayer
-        </Button>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      {/* En-tête avec contexte */}
-      <div className="bg-foreground border border-border rounded-lg p-4">
-        <h2 className="font-semibold text-primary">
-          Inscription en tant que parent
-        </h2>
-        <p className="text-sm text-accent-foreground">
-          École: <strong>{context.school.name}</strong>
-        </p>
-        <p className="text-xs text-blue-500 mt-1">
-          {context.students.length} étudiant(s) disponible(s) dans cette école
+    <div className="space-y-4 h-full">
+      <div className="space-y-2 font-poppins">
+        <h3 className="text-lg font-medium font-inter">Ajouter vos enfants</h3>
+        <p className="text-sm text-muted-foreground font-inter">
+          Recherchez vos enfants par leur nom ou matricule pour les lier à votre
+          compte.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Méthode de contact préférée */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field>
-          <FieldLabel className="block text-sm font-medium text-gray-700 mb-2">
-            Méthode de contact préférée
-          </FieldLabel>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {contactMethods.map((method) => (
-              <label>
-                <Input
-                  type="radio"
-                  name="contactPriority"
-                  value={method.value}
-                  checked={formData.contactPriority === method.value}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      contactPriority: e.target.value,
-                    })
-                  }
-                  className="sr-only"
-                />
-                <span className="text-xl mb-1">{method.icon}</span>
-                <span className="text-sm text-center">{method.label}</span>
-              </label>
-            ))}
-          </div>
+          <FieldLabel htmlFor="profession">Profession</FieldLabel>
+          <Input
+            id="profession"
+            {...register('profession')}
+            aria-invalid={!!errors.profession}
+          />
+          <FieldError errors={[{ message: errors.profession?.message }]} />
         </Field>
-
-        {/* Liste des enfants */}
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <FieldLabel>Enfants à associer</FieldLabel>
-            <Button variant="ghost" type="button" onClick={addChild}>
-              <Plus className="w-4 h-4 mr-1" />
-              Ajouter un enfant
-            </Button>
-          </div>
-
-          {formData.children.map((child, index) => (
-            <div
-              key={index}
-              className="border border-border rounded-lg p-4 space-y-4"
+        <Field>
+          <FieldLabel>Address</FieldLabel>
+          <Input
+            id="address"
+            autoComplete="address-level1"
+            {...register('address')}
+            aria-invalid={!!errors.address}
+          />
+          <FieldError>{errors.address?.message}</FieldError>
+        </Field>
+      </div>
+      {/* methode de contact */}
+      <Field className=" font-inter">
+        <FieldLabel className="font-inter" htmlFor="contactPreference">
+          Préférence de contact
+        </FieldLabel>
+        <Controller
+          name="contactPreference"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <Select
+              value={value}
+              name="contactPreference"
+              onValueChange={onChange}
             >
-              <div className="flex justify-between items-center">
-                <h4 className="font-medium ">Enfant #{index + 1}</h4>
-                {formData.children.length > 1 && (
-                  <Button
-                    variant="destructive"
-                    type="button"
-                    onClick={() => removeChild(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
+              <SelectTrigger name="contactPreference" className="w-full h-15">
+                <SelectValue placeholder="WhatsApp" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PHONE">Appel Téléphonique</SelectItem>
+                <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
+                <SelectItem value="EMAIL">Email</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+      </Field>
+      {/* Zone de recherche */}
+      <div className="relative space-y-3">
+        <SearchInput
+          isLoading={isLoading}
+          onClear={() => setSearchQuery('')}
+          placeholder="Rechercher par nom ou matricule..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
 
-              {/* Recherche étudiant */}
-              <Field>
-                <FieldLabel className="block text-sm font-medium text-gray-700 mb-1">
-                  Rechercher l'étudiant
-                </FieldLabel>
-                {
-                  <Input
-                    icon={Search}
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Matricule ou nom de l'étudiant..."
-                  />
-                }
-
-                {/* Liste des étudiants filtrés */}
-                {searchTerm && filteredStudents.length > 0 && (
-                  <div className="mt-2 max-h-40 overflow-y-auto  border border-border rounded-md">
-                    {filteredStudents.map((student) => (
-                      <div
-                        key={student.id}
-                        onClick={() =>
-                          handleChildChange(index, 'studentId', student.id)
-                        }
-                        className={`p-2 hover:bg-accent space-y-1 hover:text-accent-foreground dark:hover:bg-accent/50 cursor-pointer first:border-none border-t border-border ${
-                          child.studentId === student.id
-                            ? 'bg-accent/70 text-accent-foreground'
-                            : ''
-                        }`}
-                      >
-                        <div className="font-medium">{student.fullName}</div>
-                        <div className="text-xs text-gray-500">
-                          {student.matricule}
-                        </div>
-                      </div>
-                    ))}
+        {/* Résultats de recherche */}
+        {searchQuery.length >= 2 && (
+          <SearchResultsList
+            items={filteredResults}
+            onSelect={openConfiguration}
+            renderItem={(student) => (
+              <div className="p-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={`/images/${student.photo}`} />
+                    <AvatarFallback>
+                      {student.firstname[0]}
+                      {student.lastname[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium text-sm">
+                      {student.firstname} {student.lastname}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Matricule: {student.matricule}
+                    </p>
                   </div>
-                )}
+                </div>
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                  <UserPlus className="h-4 w-4 text-primary" />
+                </Button>
+              </div>
+            )}
+          />
+        )}
+      </div>
+      {/* Liste des enfants sélectionnés */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-medium flex items-center gap-2">
+          <User className="h-4 w-4" />
+          Enfants sélectionnés ({fields?.length})
+        </h4>
+        {fields?.length === 0 ? (
+          <div className="text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+            Aucun enfant sélectionné. Utilisez la recherche ci-dessus.
+          </div>
+        ) : (
+          <>
+            {fields?.map((field, index) => {
+              return (
+                <div
+                  key={field.id}
+                  className=" flex justify-center border-border border rounded-md py-2 bg-slate-50 dark:bg-slate-800/50"
+                >
+                  <div className="w-full flex px-3 justify-between">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={`/images/${field.photo}`} />
+                        <AvatarFallback className=" bg-primary/10 text-primary font-bold text-sm font-jost ">
+                          {field.firstname}
+                        </AvatarFallback>
+                      </Avatar>
+                      <p className="font-medium text-sm font-inter">
+                        {field.firstname} {field.lastname}
+                      </p>
+                    </div>
 
-                {/* Étudiant sélectionné */}
-                {child.studentId && (
-                  <div className="mt-2 p-2 bg-primary/90 rounded-md">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-medium">
-                          {
-                            context.students.find(
-                              (s) => s.id === child.studentId,
-                            )?.fullName
-                          }
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {
-                            context.students.find(
-                              (s) => s.id === child.studentId,
-                            )?.matricule
-                          }
-                        </div>
-                      </div>
-                      <Button
-                        variant={'secondary'}
-                        type="button"
-                        onClick={() =>
-                          handleChildChange(index, 'studentId', '')
-                        }
-                      >
-                        Changer
-                      </Button>
+                    <div className="flex items-center  gap-5 text-xs text-muted-foreground">
+                      <Badge variant="outline">
+                        {relationSelected(field.relation)}
+                      </Badge>
                     </div>
                   </div>
-                )}
-              </Field>
 
-              {/* Type de relation */}
-              <Field>
-                <FieldLabel className="block text-sm font-medium text-gray-700 mb-1">
-                  Type de relation
-                </FieldLabel>
-                <Select
-                  value={child.relationType}
-                  onValueChange={(value) =>
-                    handleChildChange(index, 'relationType', value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="" />
-                  </SelectTrigger>
-                  <SelectContent className="w-full">
-                    {relationTypes.map((relation) => (
-                      <SelectItem key={relation.value} value={relation.value}>
-                        {relation.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 mr-4 text-muted-foreground hover:text-destructive"
+                    onClick={() => remove(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              );
+            })}
+          </>
+        )}
 
-              {/* Vérification requise */}
-              <div className="flex items-center">
-                <Checkbox
-                  id={`verification-${index}`}
-                  checked={child.requiresVerification || false}
-                  onClick={(e) =>
-                    handleChildChange(
-                      index,
-                      'requiresVerification',
-                      !child.requiresVerification,
-                    )
-                  }
-                />
-                <Label
-                  htmlFor={`verification-${index}`}
-                  className="ml-2 text-sm text-gray-700"
-                >
-                  Nécessite vérification par l'étudiant
-                </Label>
-              </div>
-            </div>
-          ))}
-        </div>
+        <FieldError errors={[{ message: errors.children?.message }]} />
+      </div>
 
-        {/* Information */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-yellow-800 mb-1">
-            ⚠️ Information importante
-          </h4>
-          <p className="text-sm text-yellow-700">
-            • L'association avec un étudiant nécessite parfois la validation de
-            celui-ci
-            <br />
-            • Vous recevrez les notifications selon votre méthode de contact
-            préférée
-            <br />• Vous pouvez associer plusieurs enfants à votre compte
-          </p>
-        </div>
+      {/* Actions */}
+      <div className="flex gap-4 pt-4 items-end">
+        <Button variant="outline" onClick={onBack} type="button">
+          ← Retour
+        </Button>
+        <SubmitButton
+          isSubmitting={isSubmitting}
+          onClick={handleSubmit(onSubmit)}
+          className="flex-1"
+          disabled={fields.length === 0}
+        >
+          <Check className="mr-2 h-4 w-4" />
+          Confirmer la sélection
+        </SubmitButton>
+      </div>
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-6 ">
-          <Button
-            variant="outline"
-            type="button"
-            className="w-1/4"
-            onClick={onBack}
-          >
-            ← Retour
-          </Button>
+      {/* Modale de configuration */}
+      <Dialog
+        open={!!childToConfigure}
+        onOpenChange={(open) => !open && setChildToConfigure(null)}
+      >
+        <DialogContent className="w-90">
+          <DialogHeader className="flex items-center justify-between font-poppins">
+            <DialogTitle>Configurer le lien</DialogTitle>
+            <DialogDescription>
+              Précisez votre relation avec{' '}
+              <span className="font-semibold">
+                {childToConfigure?.firstname}.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
 
-          <SubmitButton isSubmitting={isSubmitting} className="w-3/4">
-            {isSubmitting ? 'Finalisation...' : "Finaliser l'inscription"}
-          </SubmitButton>
-        </div>
-      </form>
+          <div className="grid gap-4 py-4">
+            <Field>
+              <FieldLabel htmlFor="relation">Votre relation</FieldLabel>
+              <Select
+                name="relation"
+                value={tempRelation}
+                onValueChange={setTempRelation as (value: string) => void}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {relationItems.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setChildToConfigure(null)}>
+              Annuler
+            </Button>
+            <Button onClick={confirmAddChild}>Ajouter</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-/*  <button
-            type="submit"
-            disabled={
-              isSubmitting ||
-              formData.children.some((child) => !child.studentId)
-            }
-            className="flex-1 px-4 py-2 text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Finalisation...
-              </span>
-            ) : (
-              "Finaliser l'inscription"
-            )}
-          </button>*/

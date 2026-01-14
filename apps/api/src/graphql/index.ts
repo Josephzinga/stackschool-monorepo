@@ -6,20 +6,28 @@ import { studentResolver } from './resolvers/searchSchoolStudent.resolver';
 import { parentResolver } from './resolvers/createParentStudent.resolver';
 import { searchSchoolResolver } from './resolvers/searchSchool.resolver';
 import merge from 'lodash.merge';
+import { getClassesSubjectsResolver } from './resolvers/getClassesSubjects.resolver';
 
-const schemaPath = path.resolve(
+const dirPath = path.resolve(
   __dirname,
-  '../../../../packages/shared/src/graphql/schema.graphql',
+  '../../../../packages/shared/src/graphql',
 );
+const dirSchema = fs.readdirSync(dirPath, 'utf-8');
+const files = dirSchema.filter((f) => f.includes('.graphql'));
 
-const typeDefs = fs.readFileSync(schemaPath, 'utf-8');
-const schema = buildSchema(typeDefs);
+let typeDefsSchema = '';
+for (const file of files) {
+  typeDefsSchema += fs.readFileSync(`${dirPath}/${file}`, 'utf-8') + '\n';
+}
+
+const schema = buildSchema(typeDefsSchema);
 
 const rootResolvers = merge(
   {},
   studentResolver,
   parentResolver,
   searchSchoolResolver,
+  getClassesSubjectsResolver,
 );
 
 const graphqlMiddleware = createHandler({

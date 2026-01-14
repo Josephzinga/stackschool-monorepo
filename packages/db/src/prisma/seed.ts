@@ -1,21 +1,51 @@
 import { prisma } from '.';
 
 async function main() {
-  const student = await prisma.student.update({
+  const schoolId = 'cmjrl907d0000y2mv43herxek';
+  const classId = 'cmjxihigu0000m0nwrns9mx45';
+  const subjectId = 'cmkaas7u50000dinwyxnhdquf';
+  const classSubjects = await prisma.classSubjects.createMany({
+    data: [
+      {
+        classId,
+        subjectId: 'cmkacecj30000k2nwfxffc1e7',
+      },
+      {
+        classId,
+        subjectId: 'cmjw9l3j700006xnw3sj935xa',
+      },
+    ],
+  });
+  console.log('subjects', classSubjects);
+}
+
+/*
+
+update({
     where: {
-      id: 'cmjypb8i30003ohnw56o6ccoo',
+      classId: 'cmjwzm3tv0000wenw7j4qau6g',
     },
     data: {
-      profile: {
-        update: {
-          photo: 'cmjxjksut000041nwgsrc610n-1767563053416-53186339.jpeg',
+      subject: {
+        create: {
+          name: 'Mathématique',
+          teacherId: 'cmjyma1zs00055vnwa1tjzuq0',
+          schoolId: 'cmjrl907d0000y2mv43herxek',
         },
       },
     },
   });
-  console.log(student);
-}
-
+prisma.classSubjects.create({
+    data: {
+      subject: {
+        create: {
+          schoolId: 'cmjrl907d0000y2mv43herxek',
+          name: 'Physique',
+        },
+      },
+    },
+  });
+} */
 main()
   .catch((e) => {
     console.error(e);

@@ -11,6 +11,17 @@ export const inter = localFont({
   display: 'swap',
 });
 
+/*
+ * Police google sans
+ * Utilise un fichier de police variable.
+ * Variable CSS: --google-sans*/
+
+export const sans = localFont({
+  src: '../fonts/GoogleSans-VariableFont_GRAD,opsz,wght.ttf',
+  variable: '--font-sans',
+  display: 'swap',
+});
+
 /**
  * Police Jost.
  * Utilise un fichier de police variable.

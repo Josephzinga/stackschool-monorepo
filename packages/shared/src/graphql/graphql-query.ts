@@ -26,3 +26,28 @@ export const SEARCH_SCHOOL_GQL = `
   logo
  }
   }`;
+export const SEARCH_CLASSES_GQL = `
+  query GetClassStudents($input: StudentSearchInput!) {
+  getClassSubjects(filter: $input) {
+    id
+    name
+    level
+    section
+    subjects {
+      id
+      name
+      code
+    }
+  }
+  }
+ `;
+
+export const GET_CLASSES_GQL = `
+  query GetClasses($input: StudentSearchInput!) {
+  getClassSubjects(filter: $input) {
+  id
+  name
+  section
+  }
+  }
+  `;

@@ -1,8 +1,9 @@
-import './globals.css';
+import './styles/globals.css';
+import './styles/search-input.css';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { ModeToggle } from '@/components/DropMenu';
 import { Toaster } from '@/components/ui/sonner';
-import { inter, jost, poppins } from '@/lib/fonts';
+import { inter, jost, poppins, sans } from '@/lib/fonts';
 import Providers from './providers';
 
 /**
@@ -22,7 +23,7 @@ export default async function RootLayout({
       // pour appliquer le thème, ce qui peut causer des avertissements d'hydratation.
       suppressHydrationWarning
       // Injection des variables CSS pour les polices (Inter, Jost, Poppins)
-      className={`${jost.variable}  ${inter.variable} ${poppins.variable}`}
+      className={`${jost.variable}  ${inter.variable} ${poppins.variable} ${sans.variable}`}
     >
       <body>
         <ThemeProvider attribute="class" enableSystem={false}>

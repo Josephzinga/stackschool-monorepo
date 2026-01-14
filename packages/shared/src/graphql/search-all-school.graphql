@@ -31,6 +31,12 @@ type School {
    logo: String
 }
 
+type Subject {
+   id: ID!
+   name: String!
+   code: String
+}
+
 input SchoolSearchInput {
    searchTerm: String
 }
@@ -38,6 +44,7 @@ input SchoolSearchInput {
 input StudentSearchInput {
    schoolId: ID!,
    searchTerm: String
+   getOnly: Boolean
 }
 
 input ChildInput {
@@ -45,18 +52,16 @@ input ChildInput {
    relation: Relation
 }
 
-input CompleteParentProfileInput {
-   children: [ChildInput!]!
-   contactPreference: ContactPreference!
-   profession: String
-}
-
-type Mutation {
-   completeParentProfile(input: CompleteParentProfileInput!): Boolean
+type Classes {
+   id: ID!,
+   name: String!,
+   level: String!,
+   section: String
+   subjects: [Subject]
 }
 
 type Query {
    searchStudent(filter: StudentSearchInput!): [Student]
    searchSchool(filter: SchoolSearchInput!): [School!]
+   getClassSubjects(filter: StudentSearchInput!): [Classes]
 }
-

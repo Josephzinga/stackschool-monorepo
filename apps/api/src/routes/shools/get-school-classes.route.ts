@@ -5,12 +5,11 @@ import { isAuthenticated } from '../../middlewares/auth';
 
 const router = Router();
 
-router.get('/:schoolId/classes', isAuthenticated, async (req, res) => {
+router.get('/:schoolId/classes', isAuthenticated, async (req, res, next) => {
   try {
     const schoolId = req.params.schoolId as string | undefined;
     if (!schoolId) {
-      createServiceError("L'id manquant", 400);
-      return;
+      return next(createServiceError("L'id manquant", 400));
     }
     const classes = await prisma.class.findMany({
       where: {
@@ -25,14 +24,12 @@ router.get('/:schoolId/classes', isAuthenticated, async (req, res) => {
       },
     });
     if (!classes || classes.length <= 0) {
-      return res
-        .status(404)
-        .json({ ok: false, message: 'Aucune classe trouvé' });
+      return res.status(200).json({ ok: true, classes: [] });
     }
 
-    return res.status(200).json({ ok: true, classes: classes });
+    return res.status(200).json({ ok: true, classes });
   } catch (e) {
-    throw createServiceError('Erreur lors de la recherche des classes', 500, e);
+    next(createServiceError('Erreur lors de la recherche des classes', 500, e));
   }
 });
 

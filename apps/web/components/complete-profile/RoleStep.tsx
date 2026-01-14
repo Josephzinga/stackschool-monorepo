@@ -1,63 +1,33 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useState } from 'react';
-import StudentForm from '@/components/complete-profile/role-form/StudentForm';
-import { useCompleteProfileStore } from '@stackschool/ui';
+import { useEffect, useState } from 'react';
+import StudentForm from '@/components/complete-profile/role-form/student-form';
+import { allRoles, useCompleteProfileStore } from '@stackschool/ui';
 import { SchoolRole } from '@stackschool/shared';
-import { ParentForm } from '@/components/complete-profile/role-form/parent-form1';
+import { ParentForm } from '@/components/complete-profile/role-form/parent-form';
 import { toast } from 'sonner';
+import { TeacherForm } from './role-form/teacher-from';
 import { cn } from '@/lib/utils';
-
-interface RoleConstant {
-  value: SchoolRole;
-  label: string;
-  icon: string;
-  description: string;
-}
-
-function TeacherForm() {
-  return null;
-}
+import StaffAdminForm from '@/components/complete-profile/role-form/staff-admin-form';
+import { useRouter } from 'next/navigation';
 
 export default function RoleStep() {
-  const { school, setCurrentStep } = useCompleteProfileStore();
+  const { school, setCurrentStep, setRoleData } = useCompleteProfileStore();
   const [selectedRole, setSelectedRole] = useState<SchoolRole>();
+  const router = useRouter();
 
   // Détermine si l'utilisateur est le créateur de l'école
   const isSchoolCreator = school?.type === 'create';
 
-  const roles: RoleConstant[] = [
-    {
-      value: 'STUDENT',
-      label: 'Élève',
-      description: 'Je suis étudiant dans cette école',
-      icon: '🎓',
-    },
-    {
-      value: 'TEACHER',
-      label: 'Professeur',
-      description: "J'enseigne dans cette école",
-      icon: '👨‍🏫',
-    },
-    {
-      value: 'PARENT',
-      label: 'Parent',
-      description: "Je suis parent d'élève(s)",
-      icon: '👨‍👩‍👧‍👦',
-    },
-    {
-      value: 'STAFF',
-      label: 'Personnel',
-      description: "Je travaille dans l'administration",
-      icon: '💼',
-    },
-    {
-      value: 'ADMIN',
-      label: 'Administrateur',
-      description: 'Je gère cette école',
-      icon: '⚙️',
-    },
-  ];
+  const filteredRoles = allRoles.filter((r) =>
+    isSchoolCreator ? r.value === 'ADMIN' : r.value !== 'ADMIN',
+  );
+
+  useEffect(() => {
+    if (isSchoolCreator && !selectedRole) {
+      setSelectedRole('ADMIN');
+    }
+  }, [isSchoolCreator]);
 
   const handleRoleSelect = (role: SchoolRole) => {
     // Si créateur d'école, seul ADMIN est autorisé
@@ -70,56 +40,80 @@ export default function RoleStep() {
     setSelectedRole(role);
   };
 
+  const renderedRoleFrom = () => {
+    switch (selectedRole) {
+      case 'STUDENT':
+        return <StudentForm onBack={() => setSelectedRole(undefined)} />;
+      case 'TEACHER':
+        return <TeacherForm onBack={() => setSelectedRole(undefined)} />;
+      case 'PARENT':
+        return <ParentForm onBack={() => setSelectedRole(undefined)} />;
+      case 'STAFF':
+        return (
+          <StaffAdminForm
+            role="STAFF"
+            onSubmit={(data) => {
+              setRoleData({ role: 'STAFF', staff: data });
+              setCurrentStep(4);
+            }}
+            onBack={() => setSelectedRole(undefined)}
+          />
+        );
+      case 'ADMIN':
+        return (
+          <StaffAdminForm
+            onSubmit={(data) => {
+              setRoleData({ role: 'ADMIN', admin: data });
+              setCurrentStep(4);
+            }}
+            role="ADMIN"
+            onBack={() => setSelectedRole(undefined)}
+          />
+        );
+    }
+  };
+
   if (!selectedRole) {
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold font-inter">Votre Rôle</h2>
-          <p className="text-gray-600 font-poppins">
-            Comment allez-vous utiliser la plateforme ?
-          </p>
+          <h2 className="text-2xl font-bold font-sans">Votre Rôle</h2>
+          {isSchoolCreator
+            ? 'Configuration de votre compte administrateur'
+            : 'Comment allez-vous utiliser la plateforme ?'}
           {isSchoolCreator && (
-            <p className="text-amber-600 text-sm mt-2 font-medium">
+            <p className="text-amber-600 text-sm mt-2 font-jost font-medium">
               Note : Vous avez créé une école, le rôle Administrateur est
               requis.
             </p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {roles.map((role) => {
-            const isDisabled = isSchoolCreator && role.value !== 'ADMIN';
-
-            return (
-              <Card
-                key={role.value}
-                className={cn(
-                  'p-6 transition-all border-border',
-                  isDisabled
-                    ? 'opacity-40 cursor-not-allowed bg-muted/50'
-                    : 'cursor-pointer hover:border-primary hover:shadow-md',
-                )}
-                onClick={() => handleRoleSelect(role.value)}
-              >
-                <div className="flex items-center space-x-4">
-                  <span className="text-2xl grayscale">{role.icon}</span>
-                  <div>
-                    <h3
-                      className={cn(
-                        'font-semibold font-inter text-lg',
-                        isDisabled && 'text-muted-foreground',
-                      )}
-                    >
-                      {role.label}
-                    </h3>
-                    <p className="text-sm text-gray-600 font-jost">
-                      {role.description}
-                    </p>
-                  </div>
+        <div
+          className={cn(
+            'grid gap-4',
+            isSchoolCreator ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2',
+          )}
+        >
+          {filteredRoles.map((role) => (
+            <Card
+              key={role.value}
+              className="p-6 transition-all border-border cursor-pointer hover:border-primary hover:shadow-md"
+              onClick={() => handleRoleSelect(role.value)}
+            >
+              <div className="flex items-center space-x-4">
+                <span className="text-2xl">{role.icon}</span>
+                <div>
+                  <h3 className="font-semibold font-inter text-lg">
+                    {role.label}
+                  </h3>
+                  <p className="text-sm text-gray-600 font-jost">
+                    {role.description}
+                  </p>
                 </div>
-              </Card>
-            );
-          })}
+              </div>
+            </Card>
+          ))}
         </div>
 
         <Button
@@ -141,7 +135,8 @@ export default function RoleStep() {
         </Button>
         <div className="flex justify-cent flex-col items-center">
           <h2 className="text-2xl font-semibold">
-            Informations {roles.find((r) => r.value === selectedRole)?.label}
+            Informations{' '}
+            {filteredRoles.find((r) => r.value === selectedRole)?.label}
           </h2>
           <p className="text-gray-600">
             Complétez vos informations spécifiques
@@ -149,18 +144,7 @@ export default function RoleStep() {
         </div>
       </div>
 
-      {selectedRole === 'STUDENT' && <StudentForm />}
-      {selectedRole === 'PARENT' && (
-        <ParentForm onBack={() => setSelectedRole(undefined)} />
-      )}
-
-      {selectedRole === 'TEACHER' && <TeacherForm />}
-
-      {selectedRole === 'ADMIN' && (
-        <div className="text-center p-8">
-          <p>Formulaire Administrateur à venir...</p>
-        </div>
-      )}
+      {renderedRoleFrom()}
     </div>
   );
 }

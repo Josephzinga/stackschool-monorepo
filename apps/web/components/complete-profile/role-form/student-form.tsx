@@ -26,17 +26,22 @@ import {
   MapPin,
   User,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   api,
   Class,
+  GET_CLASSES_GQL,
   StudentFormData,
   studentFormSchema,
 } from '@stackschool/shared';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { SubmitButton } from '@/components/submit-button';
+import { useQuery } from '@tanstack/react-query';
 
-export default function StudentForm() {
+export default function StudentForm({ onBack }: { onBack: () => void }) {
+  const { setRoleData, school, role, setCurrentStep } =
+    useCompleteProfileStore();
+  const studentData = role?.role === 'STUDENT' ? role.student : null;
   const {
     register,
     handleSubmit,
@@ -45,10 +50,19 @@ export default function StudentForm() {
   } = useForm<StudentFormData>({
     resolver: zodResolver(studentFormSchema),
     mode: 'onBlur',
+    defaultValues: {
+      birthDate: studentData?.birthDate || undefined,
+      birthPlace: studentData?.birthPlace || '',
+      fatherName: studentData?.fatherName || '',
+      motherName: studentData?.motherName || '',
+      matricule: studentData?.matricule || '',
+      classId: studentData?.classId,
+      enrollmentYear: studentData?.enrollmentYear || '',
+    },
   });
-  const { setRoleData, submitCompleteProfile } = useCompleteProfileStore();
-  const [classes, setClasses] = useState<Class[]>([]);
+
   const [open, setOpen] = useState(false);
+
   const currentYear = new Date().getFullYear();
   const academicYears = [
     `${currentYear}-${currentYear + 1}`,
@@ -56,24 +70,35 @@ export default function StudentForm() {
     `${currentYear - 2}-${currentYear - 1}`,
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await api.get('/complete-profile/student/context');
-      if (res.data.ok) {
-        setClasses(res.data.context.classes);
-      }
-    };
-    fetchData();
-  }, []);
+  const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;
+
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['classes'],
+    queryFn: async () => {
+      const res = await api.post(`/graphql`, {
+        query: GET_CLASSES_GQL,
+        variables: {
+          input: {
+            schoolId,
+            getOnly: true,
+          },
+        },
+      });
+
+      return res.data.data.getClassSubjects as Class[];
+    },
+  });
 
   const onSubmit = async (data: StudentFormData) => {
     setRoleData({ role: 'STUDENT', student: data });
+    console.log('data', data);
+    setCurrentStep(4);
     try {
     } catch (e) {}
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 font-poppins">
       <div className="grid grid-cols-2 gap-4">
         <Field>
           <FieldLabel htmlFor="matricule">Matricule</FieldLabel>
@@ -118,7 +143,7 @@ export default function StudentForm() {
                   className="w-full justify-between font-normal"
                 >
                   {field.value
-                    ? field.value.toLocaleDateString()
+                    ? field?.value.toString().split('00', length - 1)
                     : 'Sélectionné votre date'}
                   <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
@@ -201,9 +226,10 @@ export default function StudentForm() {
             <SelectValue placeholder="Sélectionnez votre classe" />
           </SelectTrigger>
           <SelectContent>
-            {classes?.map((classe: Class) => (
+            {data?.map((classe: Class) => (
               <SelectItem key={classe.id} value={classe.id}>
-                {classe.name}
+                <p className="font-semibold ">{classe.name}</p>
+                <p>{classe.section}</p>
               </SelectItem>
             ))}
           </SelectContent>
@@ -211,7 +237,9 @@ export default function StudentForm() {
       </Field>
 
       <div className="w-full flex gap-4">
-        <Button variant="outline">← Retour</Button>
+        <Button onClick={onBack} variant="outline">
+          ← Retour
+        </Button>
         <SubmitButton isSubmitting={isSubmitting} className="w-3/4">
           {isSubmitting
             ? 'Finalisation en cours...'

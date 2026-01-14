@@ -1,14 +1,33 @@
 'use client';
 import { CardDescription, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Tabs,
+  TabsContent,
+  TabsContents,
+  TabsList,
+  TabsTrigger,
+} from '@/components/animate-ui/components/radix/tabs';
+import {
+  TabsHighlight,
+  TabsHighlightItem,
+} from '@/components/animate-ui/primitives/radix/tabs';
 import { useState } from 'react';
 import { CreateSchoolForm } from '@/components/complete-profile/school-form/create-school-form';
 import { InvitationForm } from '@/components/complete-profile/school-form/invitation-form';
 import { SearchSchoolFrom } from '@/components/complete-profile/school-form/search-school-from';
 
-export default function SchoolStep() {
-  const [mode, setMode] = useState<'join' | 'create' | 'invite'>('join');
+interface Value {
+  value: 'join' | 'create' | 'invite';
+  label: string;
+}
 
+export default function SchoolStep() {
+  const [mode, setMode] = useState<Value['value']>('join');
+  const constant: Value[] = [
+    { value: 'join', label: 'Rejoindre' },
+    { value: 'create', label: 'Crée' },
+    { value: 'invite', label: 'Invitation' },
+  ];
   return (
     <div className="space-y-6 p-3 w-full h-full">
       <div className="text-center max-h-screen">
@@ -19,29 +38,40 @@ export default function SchoolStep() {
       </div>
 
       <Tabs
-        className="w-full flex justify-center mx-auto"
+        className="space-y-4"
         value={mode}
-        onValueChange={(val) => setMode(val as any)}
+        onValueChange={(val) => setMode(val as Value['value'])}
       >
         <div className="w-full flex justify-center">
-          <TabsList className="grid grid-cols-3 mb-6 gap-2 h-10">
-            <TabsTrigger value="join">Rejoindre</TabsTrigger>
-            <TabsTrigger value="create">Créer</TabsTrigger>
-            <TabsTrigger value="invite">Invitation</TabsTrigger>
-          </TabsList>
+          <TabsHighlight className="w-full">
+            <TabsList className="h-10 gap-4">
+              {constant.map((item) => (
+                <TabsHighlightItem key={item.value} value={item.value}>
+                  <TabsTrigger
+                    className="font-poppins font-semibold h-8 w-23"
+                    value={item.value}
+                  >
+                    {item.label}
+                  </TabsTrigger>
+                </TabsHighlightItem>
+              ))}
+            </TabsList>
+          </TabsHighlight>
         </div>
 
-        <TabsContent value="join" className="space-y-4">
-          <SearchSchoolFrom />
-        </TabsContent>
+        <TabsContents>
+          <TabsContent value="join">
+            <SearchSchoolFrom />
+          </TabsContent>
 
-        <TabsContent value="create" className="space-y-4 h-full">
-          <CreateSchoolForm />
-        </TabsContent>
+          <TabsContent value="create">
+            <CreateSchoolForm />
+          </TabsContent>
 
-        <TabsContent value="invite" className="space-y-4">
-          <InvitationForm />
-        </TabsContent>
+          <TabsContent value="invite">
+            <InvitationForm />
+          </TabsContent>
+        </TabsContents>
       </Tabs>
     </div>
   );

@@ -10,7 +10,7 @@ export const SubmitButton = ({
   onClick,
   ...props
 }: {
-  isSubmitting: boolean;
+  isSubmitting?: boolean;
   children: React.ReactNode | string;
   className?: string;
   onClick?: () => void;

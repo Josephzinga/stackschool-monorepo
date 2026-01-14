@@ -39,7 +39,10 @@ export const parentFormSchema = z.object({
   children: z
     .array(
       z.object({
-        studentId: z.string(),
+        id: z.cuid(),
+        firstname: z.string(),
+        lastname: z.string(),
+        photo: z.string().optional(),
         relation: z.enum([
           'FATHER',
           'MOTHER',
@@ -55,6 +58,7 @@ export const parentFormSchema = z.object({
     .min(1, 'Veuillez sélectionner au moins un enfant.'),
 
   contactPreference: z.enum(['WHATSAPP', 'PHONE', 'EMAIL']),
+  address: createSchoolSchema.shape.address,
   profession: z
     .string()
     .min(3, 'veillez entrez une profession valide')
@@ -68,11 +72,28 @@ export const invitationSchema = z.object({
 });
 
 // Schéma pour les informations de l'enseignant
-export const teacherFormSchema = z.object({
-  specialization: z.string().min(1, 'La spécialisation est requise'),
-  diploma: z.string().optional(),
-  experience: z.string().optional(),
-  subjects: z.array(z.string()).optional(), // IDs des matières
+export const teacherSchema = z.object({
+  diploma: z.string().min(2, 'Le diplôme est requis'),
+  department: z.string().optional(),
+  assignments: z
+    .array(
+      z.object({
+        classId: z.string(),
+        isMainTeacher: z.boolean().default(false).optional(),
+        subjectIds: z
+          .array(z.string())
+          .min(1, 'Sélectionnez au moins une matière'),
+        className: z.string().optional(),
+        subjectNames: z.array(z.string()),
+      }),
+    )
+    .min(1, 'Veuillez sélectionner au moins une classe'),
+});
+export const StaffFormSchema = z.object({
+  position: z.string().min(2, 'Le poste est requis'),
+  departement: z.string().min(2, 'Le département est requis'),
+  hireDate: z.date().optional(),
+  //...
 });
 
 // Schéma générique pour la sauvegarde de progression
@@ -82,10 +103,10 @@ export const saveProgressSchema = z.object({
 });
 
 // Types inférés
-
+export type StaffFormValues = z.infer<typeof StaffFormSchema>;
 export type InvitationFormData = z.infer<typeof invitationSchema>;
 export type CreateSchoolType = z.infer<typeof createSchoolSchema>;
 export type StudentFormData = z.infer<typeof studentFormSchema>;
 export type ParentFormData = z.infer<typeof parentFormSchema>;
-export type TeacherFormData = z.infer<typeof teacherFormSchema>;
+export type TeacherFormData = z.infer<typeof teacherSchema>;
 export type SaveProgressData = z.infer<typeof saveProgressSchema>;

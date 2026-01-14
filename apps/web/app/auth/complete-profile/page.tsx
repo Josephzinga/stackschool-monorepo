@@ -12,6 +12,7 @@ import ProtectedRoute from '@/components/protected-route';
 import Stepper from '@/components/Stepper';
 import RoleStep from '@/components/complete-profile/RoleStep';
 import { useEffect } from 'react';
+import ReviewStep from '@/components/complete-profile/review-step';
 
 export type CompleteProfileData = {
   school: {
@@ -25,8 +26,13 @@ export default function CompleteProfile() {
   const search = useSearchParams();
   const { isAuthenticated } = useUserStore();
   const provider = search.get('provider');
-  const { currentStep, setCurrentStep, loadFromRedis } =
-    useCompleteProfileStore();
+  const {
+    currentStep,
+    setCurrentStep,
+    loadFromRedis,
+    submitCompleteProfile,
+    isSubmitting,
+  } = useCompleteProfileStore();
   const steps = ['école', 'Profile', 'Rôle'];
   const totalSteps = steps.length;
 
@@ -53,9 +59,7 @@ export default function CompleteProfile() {
       case 3:
         return <RoleStep />;
       case 4:
-        return <div>FianlStep</div>;
-      default:
-        null;
+        return <ReviewStep />;
     }
   };
 
@@ -66,6 +70,7 @@ export default function CompleteProfile() {
           <div className="w-full flex flex-col justfy-center items-center ">
             <Stepper
               className="w-full h-15"
+              setCurrentStep={setCurrentStep}
               currentStep={
                 currentStep > totalSteps ? totalSteps + 1 : currentStep
               }

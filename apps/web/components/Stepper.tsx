@@ -1,22 +1,30 @@
-import { cn } from "@/lib/utils";
-import React from "react";
+import { cn } from '@/lib/utils';
+import React from 'react';
 
 interface StepperProps {
   currentStep: number;
   steps: string[];
   className?: string;
+  setCurrentStep: (step: number) => void;
 }
 
-const Stepper: React.FC<StepperProps> = ({ currentStep, steps, className }) => {
-  const numberOfSteps = steps.length;
-
+const Stepper: React.FC<StepperProps> = ({
+  currentStep,
+  steps,
+  className,
+  setCurrentStep,
+}) => {
+  let numberOfSteps = 3;
+  if (currentStep === 4) {
+    numberOfSteps = 4;
+  }
   return (
-    <div className={cn("w-full max-w-lg mx-auto px-2 py-3", className)}>
+    <div className={cn('w-full max-w-lg mx-auto px-2 py-3', className)}>
       <div className="relative flex items-center justify-between">
         {/* Ligne de progression */}
         <div className="absolute left-0 top-[calc(50% - 13px)] -translate-y-1/2 h-3 rounded-lg w-full bg-gray-200" />
         <div
-          className="absolute left-0 top-[calc(50% - 13px)] -translate-y-1/2 h-3 bg-blue-600 transition-all duration-500 ease-in-out rounded-lg"
+          className="absolute left-0 top-[calc(50% - 13px)] -translate-y-1/2 h-3 bg-blue-700 transition-all duration-500 ease-in-out rounded-lg"
           style={{
             width: `${((currentStep - 1) / (numberOfSteps - 1)) * 100}%`,
           }}
@@ -29,19 +37,23 @@ const Stepper: React.FC<StepperProps> = ({ currentStep, steps, className }) => {
           const isCurrent = stepNumber === currentStep;
 
           return (
-            <div key={stepNumber} className="z-10 flex flex-col items-center">
+            <div
+              key={stepNumber}
+              onClick={() => setCurrentStep(stepNumber)}
+              className="z-10 flex flex-col items-center"
+            >
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300
-                  ${isCompleted ? "bg-blue-600 text-white" : ""}
+                  ${isCompleted ? 'bg-blue-600 text-white' : ''}
                   ${
                     isCurrent
-                      ? "bg-white border-2 border-blue-600 text-blue-600 scale-110"
-                      : ""
+                      ? 'bg-white border-2 border-blue-600 text-blue-600 scale-110 '
+                      : ''
                   }
                   ${
                     !isCompleted && !isCurrent
-                      ? "bg-white border-2 border-gray-300 text-gray-400"
-                      : ""
+                      ? 'bg-white border-2 border-gray-300 text-gray-400'
+                      : ''
                   }
                 `}
               >
@@ -66,7 +78,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep, steps, className }) => {
               </div>
               <p
                 className={`mt-2 text-sm text-center font-medium transition-colors duration-300 w-24
-                ${isCurrent ? "text-blue-600" : "text-gray-500"}
+                ${isCurrent ? 'text-blue-600' : 'text-gray-500'}
               `}
               >
                 {title}

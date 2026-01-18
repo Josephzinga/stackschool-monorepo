@@ -231,6 +231,7 @@ exports.Prisma.ClassTeacherScalarFieldEnum = {
 exports.Prisma.StudentScalarFieldEnum = {
   id: 'id',
   profileId: 'profileId',
+  schoolUserId: 'schoolUserId',
   matricule: 'matricule',
   enrollmentYear: 'enrollmentYear',
   birthDate: 'birthDate',
@@ -365,6 +366,7 @@ exports.Prisma.TeacherScalarFieldEnum = {
   isActive: 'isActive',
   salary: 'salary',
   departement: 'departement',
+  addrress: 'addrress',
   specialization: 'specialization',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

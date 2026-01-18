@@ -2,7 +2,6 @@ import { config } from 'dotenv';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
-import cors from 'cors';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import session from 'express-session';
@@ -13,11 +12,13 @@ import handleOauthStrategy from './controllers/passport-social.controller';
 import setupLocalStrategy from './lib/setup-local-strategy';
 import { getUserFromRedis } from './lib/handle-redis-user';
 import path from 'path';
+import cors from 'cors';
 import { JWT_SECRET } from './constant/config';
 import { errorHandler } from './middlewares/errorHandler';
 import graphqlMiddleware from './graphql';
 import { isAuthenticated } from './middlewares/auth';
 import routes from './routes';
+import { express as useragent } from 'express-useragent';
 
 config();
 
@@ -33,7 +34,7 @@ const pgPool = new pg.Pool({
 
 const app = express();
 app.use(helmet());
-const allowedOrigins = [FRONTEND_ORIGIN, `*`];
+const allowedOrigins = FRONTEND_ORIGIN;
 
 const corsOptions = {
   origin: (origin: any, callback: any) => {
@@ -45,9 +46,15 @@ const corsOptions = {
   },
   credentials: true,
 };
-
-app.use(cors(corsOptions));
-
+app.use(
+  cors({
+    origin: [FRONTEND_ORIGIN, '*'],
+    credentials: true,
+    methods: ['POST', 'GET', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  }),
+);
+app.use(useragent());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -120,7 +127,7 @@ passport.use(
 );
 
 app.use('/api', routes);
-app.all('/api/graphql', isAuthenticated, graphqlMiddleware);
+app.all('/graphql', isAuthenticated, graphqlMiddleware);
 app.get('/', (req, res) => {
   res.json('message serveur connecter');
 });

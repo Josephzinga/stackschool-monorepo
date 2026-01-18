@@ -38,7 +38,10 @@ export function InvitationForm() {
     setIsLoading(true);
     try {
       // Appel API pour vérifier le code et récupérer les infos de l'école
-      const res = await api.post('/complete-profile/verify-invitation', data);
+      const res = await api.post(
+        '/api/complete-profile/verify-invitation',
+        data,
+      );
 
       if (res.data.ok) {
         toast.success('Code valide !');

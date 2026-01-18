@@ -20,7 +20,7 @@ export const consumeResendCode = (req: Request) => {
   return resendCodeLimiter.consume(ip);
 };
 
-const verifiCodeLimiter = new RateLimiterMemory({
+const verifyCodeLimiter = new RateLimiterMemory({
   points: 4,
   duration: 600,
 });
@@ -32,10 +32,22 @@ const verifiCodeLimiter = new RateLimiterMemory({
  * @param {Request} req - La requête Express contenant l'IP.
  * @returns {Promise<RateLimiterRes>} Promesse résolue si autorisé, rejetée si limite atteinte ou IP manquante.
  */
-export const consumeCode = (req: Request) => {
+export const consumeCode = (req: Request): Promise<RateLimiterRes> => {
   const ip = req.ip;
   if (!ip) return Promise.reject(new Error('IP manquants'));
-  return verifiCodeLimiter.consume(ip);
+  return verifyCodeLimiter.consume(ip);
+};
+
+/**
+ * Réinitialise le compteur de tentatives de vérification de code pour une IP.
+ * À utiliser lors de l'envoi d'un nouveau code (resend).
+ *
+ * @param {Request} req - La requête Express contenant l'IP.
+ */
+export const resetVerifyCodeLimit = (req: Request): Promise<boolean> => {
+  const ip = req.ip;
+  if (!ip) return Promise.resolve(false);
+  return verifyCodeLimiter.delete(ip);
 };
 
 const rateLimiter = new RateLimiterMemory({

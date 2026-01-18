@@ -60,8 +60,4 @@ type Classes {
    subjects: [Subject]
 }
 
-type Query {
-   searchStudent(filter: StudentSearchInput!): [Student]
-   searchSchool(filter: SchoolSearchInput!): [School!]
-   getClassSubjects(filter: StudentSearchInput!): [Classes]
-}
+

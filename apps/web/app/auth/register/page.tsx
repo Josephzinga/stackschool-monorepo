@@ -32,14 +32,12 @@ import { toast } from 'sonner';
 import { Container } from '@/components/Container';
 import { ButtonSocial } from '@/components/button-social';
 import 'react-phone-number-input/style.css';
-import PhoneInput from 'react-phone-number-input';
-import { useEffect, useRef } from 'react';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import { useEffect, useRef, useState } from 'react';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const phoneInputRef = useRef<HTMLDivElement>(null);
-  const current = phoneInputRef.current;
-
+  const [isValid, setIsValid] = useState<Boolean | undefined>();
   const {
     handleSubmit,
     register,
@@ -49,14 +47,6 @@ export default function RegisterPage() {
     resolver: zodResolver(registerFormSchema),
     mode: 'onBlur',
   });
-  useEffect(() => {
-    if (!current) return;
-    if (errors.phoneNumber) {
-      current.classList.add('phone-input-error');
-    } else {
-      current.classList.remove('phone-input-error');
-    }
-  }, [errors.phoneNumber]);
 
   async function handleRegister(data: RegisterFormType) {
     try {
@@ -70,6 +60,7 @@ export default function RegisterPage() {
       toast.error(error.message || 'Une erreur est survenue.');
     }
   }
+  console.log('isValide', isValid);
 
   return (
     <Container>
@@ -83,7 +74,7 @@ export default function RegisterPage() {
         <CardContent>
           <form onSubmit={handleSubmit(handleRegister)} className="mt-0">
             <FieldGroup className="gap-1.5 md:gap-2 text-sm md:text-base">
-              <Field className="gap-1.5">
+              <Field>
                 <ButtonSocial provider="google" icon={<GoogleIcon />} />
                 <ButtonSocial provider="facebook" icon={<FacebookIcon />} />
               </Field>
@@ -92,7 +83,7 @@ export default function RegisterPage() {
                   Ou continuer avec
                 </span>
               </FieldSeparator>
-              <Field className="gap-1.5 text-sm mt-3">
+              <Field className=" mt-3">
                 <FieldLabel htmlFor="username">
                   Nom d&apos;utilisateur
                 </FieldLabel>
@@ -112,7 +103,7 @@ export default function RegisterPage() {
                   {errors.username?.message}{' '}
                 </FieldError>
               </Field>
-              <Field className="gap-1.5 text-sm">
+              <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   icon={Mail}
@@ -128,29 +119,32 @@ export default function RegisterPage() {
                   {errors.email?.message}{' '}
                 </FieldError>
               </Field>
-              <Field className="gap-1.5 ">
+              <Field>
                 <FieldLabel htmlFor="phoneNumber">Numéro WhatsApp</FieldLabel>
-                <div ref={phoneInputRef}>
-                  <Controller
-                    name="phoneNumber"
-                    control={control}
-                    render={({ field }) => (
-                      <PhoneInput
-                        {...field}
-                        id="phoneNumber"
-                        placeholder="+223 07 12 34 56 78"
-                        defaultCountry="ML"
-                        className="phone-input-custom "
-                      />
-                    )}
-                  />
-                </div>
+
+                <Controller
+                  name="phoneNumber"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput
+                      {...field}
+                      id="phoneNumber"
+                      placeholder="+223 07 12 34 56 78"
+                      defaultCountry="ML"
+                      className="phone-input-custom "
+                      onCountryChange={(country) =>
+                        console.log('contry', country)
+                      }
+                      international
+                    />
+                  )}
+                />
 
                 <FieldError id="error-phone">
                   {errors.phoneNumber?.message}{' '}
                 </FieldError>
               </Field>
-              <Field className="gap-1.5">
+              <Field>
                 <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
 
                 <Input
@@ -190,7 +184,7 @@ export default function RegisterPage() {
                 </FieldError>
               </Field>
 
-              <Field className="gap-1.5">
+              <Field>
                 <Button type="submit" className="font-semibold text-white mt-2">
                   {isSubmitting ? (
                     <>

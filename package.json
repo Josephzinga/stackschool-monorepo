@@ -16,13 +16,19 @@
     "dev:api": "pnpm --filter @stackschool/api run dev",
     "dev:web": "pnpm --filter @stackschool/web run dev",
     "dev:mobile": "pnpm --filter @stackschool/mobile run start",
-    "db:generate": "pnpm --filter @stackschool/db run generate"
+    "db:generate": "pnpm --filter @stackschool/db run generate",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.1.17",
     "@tanstack/eslint-plugin-query": "^5.91.2",
+    "@graphql-codegen/typescript-resolvers": "^5.1.5",
+    "@graphql-codegen/cli": "^6.1.1",
+    "@graphql-codegen/typescript": "^5.0.7",
+    "@graphql-codegen/typescript-operations": "^5.0.7",
+    "@graphql-codegen/typescript-react-query": "^6.1.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "19.1.0",

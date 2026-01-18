@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 
 import { useCompleteProfileStore, useUserStore } from '@stackschool/ui';
 import { School } from '@stackschool/shared';
-import { useSearchParams } from 'next/navigation';
 import { ProfileStep } from '@/components/complete-profile/profile-step';
 import ProtectedRoute from '@/components/protected-route';
 import Stepper from '@/components/Stepper';
@@ -23,24 +22,15 @@ export type CompleteProfileData = {
 };
 
 export default function CompleteProfile() {
-  const search = useSearchParams();
   const { isAuthenticated } = useUserStore();
-  const provider = search.get('provider');
-  const {
-    currentStep,
-    setCurrentStep,
-    loadFromRedis,
-    submitCompleteProfile,
-    isSubmitting,
-  } = useCompleteProfileStore();
+  const { currentStep, setCurrentStep, loadFromRedis, isSubmitting } =
+    useCompleteProfileStore();
   const steps = ['école', 'Profile', 'Rôle'];
   const totalSteps = steps.length;
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadFromRedis();
-    }
-  }, [isAuthenticated]);
+    loadFromRedis();
+  }, []);
 
   const handleNext = () => {
     setCurrentStep(Math.min(currentStep + 1, totalSteps));
@@ -71,9 +61,7 @@ export default function CompleteProfile() {
             <Stepper
               className="w-full h-15"
               setCurrentStep={setCurrentStep}
-              currentStep={
-                currentStep > totalSteps ? totalSteps + 1 : currentStep
-              }
+              currentStep={currentStep}
               steps={steps}
             />
           </div>

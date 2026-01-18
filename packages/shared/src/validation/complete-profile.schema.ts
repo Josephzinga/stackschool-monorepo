@@ -22,7 +22,7 @@ export const studentFormSchema = z.object({
         ? 'La date de naissance est requise'
         : 'Format de date invalide',
   }),
-  classId: z.string().optional(), // Optionnel si pas encore affecté
+  classId: z.string('Veillez sélectionner une classe'), // Optionnel si pas encore affecté
   enrollmentYear: z.string().optional(),
   fatherName: z
     .string('Le nom du pére est requis')
@@ -96,12 +96,6 @@ export const StaffFormSchema = z.object({
   //...
 });
 
-// Schéma générique pour la sauvegarde de progression
-export const saveProgressSchema = z.object({
-  step: z.number().int().min(1),
-  data: z.record(z.any(), z.any()), // Données flexibles selon l'étape
-});
-
 // Types inférés
 export type StaffFormValues = z.infer<typeof StaffFormSchema>;
 export type InvitationFormData = z.infer<typeof invitationSchema>;
@@ -109,4 +103,3 @@ export type CreateSchoolType = z.infer<typeof createSchoolSchema>;
 export type StudentFormData = z.infer<typeof studentFormSchema>;
 export type ParentFormData = z.infer<typeof parentFormSchema>;
 export type TeacherFormData = z.infer<typeof teacherSchema>;
-export type SaveProgressData = z.infer<typeof saveProgressSchema>;

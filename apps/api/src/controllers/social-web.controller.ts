@@ -38,7 +38,7 @@ export async function handleSocialWebCallback(
       maxAge: expires.getTime() - Date.now(),
     });
 
-    if (!user.profileCompleted) {
+    if (!user?.profileCompleted) {
       return res.redirect(`${baseUrl}/auth/complete-profile`);
     }
 

@@ -42,7 +42,7 @@ model Profile {
   userId    String    @unique
   photo     String?
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Student   Student[]
+  student   Student[]
 }
 
 model School {
@@ -74,14 +74,15 @@ model SchoolUser {
   role         SchoolRole
   isOwner      Boolean        @default(false)
   createdAt    DateTime       @default(now())
-  Class        Class[]
-  ClassTeacher ClassTeacher[]
+  class        Class[]
+  classTeacher ClassTeacher[]
   school       School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   Staff        Staff?
   subject      Subject[]
-  Teacher      Teacher?
+  teacher      Teacher?
   Parent       Parent?
+  student      Student?
 
   @@unique([schoolId, userId])
   @@index([schoolId])
@@ -101,9 +102,9 @@ model Subject {
   updatedAt     DateTime        @updatedAt
   schoolUserId  String?
   ClassSubjects ClassSubjects[]
-  Exam          Exam[]
+  exam          Exam[]
   school        School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  SchoolUser    SchoolUser?     @relation(fields: [schoolUserId], references: [id])
+  schoolUser    SchoolUser?     @relation(fields: [schoolUserId], references: [id])
   teacher       Teacher?        @relation(fields: [teacherId], references: [id])
 
   @@unique([code, schoolId])
@@ -135,7 +136,7 @@ model Exam {
   updatedAt DateTime @updatedAt
   class     Class    @relation(fields: [classId], references: [id])
   subject   Subject  @relation(fields: [subjectId], references: [id])
-  Result    Result[]
+  result    Result[]
 
   @@index([classId])
   @@index([subjectId])
@@ -165,7 +166,7 @@ model Class {
   school        School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   teacher       SchoolUser?     @relation(fields: [teacherId], references: [id])
   classSubjects ClassSubjects[]
-  ClassTeacher  ClassTeacher[]
+  classTeacher  ClassTeacher[]
   exam          Exam[]
   students      Student[]
 
@@ -182,7 +183,7 @@ model ClassTeacher {
   staffMemberId String
   schoolUserId  String?
   class         Class       @relation(fields: [classId], references: [id], onDelete: Cascade)
-  SchoolUser    SchoolUser? @relation(fields: [schoolUserId], references: [id])
+  schoolUser    SchoolUser? @relation(fields: [schoolUserId], references: [id])
   teacher       Teacher     @relation(fields: [teacherId], references: [id])
 
   @@unique([classId, teacherId])
@@ -195,6 +196,7 @@ model ClassTeacher {
 model Student {
   id             String          @id @default(cuid())
   profileId      String
+  schoolUserId   String          @unique
   matricule      String
   enrollmentYear String
   birthDate      DateTime
@@ -208,13 +210,15 @@ model Student {
   motherName     String?
   nationality    String?
   attendances    Attendance[]
-  ParentStudent  ParentStudent[]
+  parentStudent  ParentStudent[]
   Result         Result[]
   schoolClass    Class?          @relation(fields: [classId], references: [id])
   profile        Profile         @relation(fields: [profileId], references: [id])
   school         School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser     SchoolUser      @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
 
   @@unique([matricule, schoolId])
+  @@index([schoolUserId])
   @@index([schoolId])
 }
 
@@ -254,6 +258,7 @@ model Invite {
   schoolId    String
   studentId   String?
   token       String     @unique
+  code        String?
   relation    String?
   createdAt   DateTime   @default(now())
   expiresAt   DateTime
@@ -382,6 +387,7 @@ model Teacher {
   isActive       Boolean
   salary         Float?
   departement    String?
+  addrress       String?
   specialization String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt

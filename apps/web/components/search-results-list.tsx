@@ -11,7 +11,7 @@ interface SearchResultsListProps<T> {
   emptyMessage?: string;
 }
 
-export function SearchResultsList<T extends { id: string | number }>({
+export function SearchResultsList<T extends { id: string | null }>({
   items,
   renderItem,
   onSelect,
@@ -19,25 +19,28 @@ export function SearchResultsList<T extends { id: string | number }>({
 }: SearchResultsListProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
-    if (!items.length || !containerRef.current) return;
+  useGSAP(
+    () => {
+      if (!items.length || !containerRef.current) return;
 
-    const children = containerRef.current.children;
+      const children = containerRef.current.children;
 
-    // Animation simple et robuste : on part de 0 vers 1
-    gsap.fromTo(children, 
-      { autoAlpha: 0, y: -10 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.3,
-        stagger: 0.05,
-        ease: 'power2.out',
-        clearProps: 'all' // Nettoie les styles inline après l'animation pour éviter les conflits
-      }
-    );
-
-  }, { dependencies: [items], scope: containerRef });
+      // Animation simple et robuste : on part de 0 vers 1
+      gsap.fromTo(
+        children,
+        { autoAlpha: 0, y: -10 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.3,
+          stagger: 0.05,
+          ease: 'power2.out',
+          clearProps: 'all', // Nettoie les styles inline après l'animation pour éviter les conflits
+        },
+      );
+    },
+    { dependencies: [items], scope: containerRef },
+  );
 
   if (!items || items.length === 0) {
     return null;
@@ -48,7 +51,7 @@ export function SearchResultsList<T extends { id: string | number }>({
       ref={containerRef}
       className={cn(
         'absolute z-50 w-full mt-1 border rounded-md bg-white dark:bg-slate-900 shadow-lg max-h-60 overflow-y-auto overflow-x-hidden',
-        className
+        className,
       )}
     >
       {items.map((item) => (
@@ -56,7 +59,7 @@ export function SearchResultsList<T extends { id: string | number }>({
           key={item.id}
           className={cn(
             'cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800',
-            'border-b last:border-0 border-slate-100 dark:border-slate-800'
+            'border-b last:border-0 border-slate-100 dark:border-slate-800',
           )}
           onClick={() => onSelect(item)}
         >

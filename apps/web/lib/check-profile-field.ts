@@ -5,13 +5,15 @@ export async function checkField(
   field: string,
   value: string,
 ): Promise<{
-  valid?: boolean;
+  valid: boolean;
   message: string;
   field?: string;
   status?: number | null;
 } | null> {
   try {
-    const response = await api.get(`/validate/user-field?${field}=${value}`);
+    const response = await api.get(`/api/validate/user-field?`, {
+      params: { [field]: value },
+    });
     if (response.data) {
       return {
         status: response.status,

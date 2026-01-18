@@ -16,7 +16,9 @@ router.put('/profile', isAuthenticated, async (req, res, next) => {
     const redisKey = `complete_profile:${userId}`;
 
     const existingData = await redisClient.get(redisKey);
-    const profileData = existingData ? JSON.parse(existingData) : req.body;
+    const profileData = existingData
+      ? JSON.parse(existingData).profile
+      : req.body;
     await redisClient.setEx(
       redisKey,
       24 * 60 * 600,

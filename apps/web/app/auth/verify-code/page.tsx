@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Container } from '@/components/Container';
@@ -35,8 +34,8 @@ import { useEffect, useState } from 'react';
 
 export default function VerifyCode() {
   const search = useSearchParams();
+  const token = search.get('token');
   const router = useRouter();
-  const tempToken = search.get('token');
   const [countdown, setCountdown] = useState(0);
 
   const {
@@ -58,10 +57,10 @@ export default function VerifyCode() {
 
   const handleCode = async ({ code }: VerifyCodeFormType) => {
     try {
-      const res = await authService.verifyCode(code, tempToken);
+      const res = await authService.verifyCode(code, null);
       toast.success(res.message);
-      if (res.resetToken) {
-        router.push(`/auth/reset-password?token=${res.resetToken}`);
+      if (res.ok) {
+        router.push(`/auth/reset-password`);
       }
     } catch (error: any) {
       const { message } = parseAxiosError(error);
@@ -73,7 +72,7 @@ export default function VerifyCode() {
 
   const handleResendCode = async () => {
     try {
-      const res = await authService.resendCode(tempToken);
+      const res = await authService.resendCode();
       if (res.ok) {
         toast.success(res.message || 'Nouveau code envoyé');
         setCountdown(60); // 60 secondes d'attente
@@ -119,6 +118,7 @@ export default function VerifyCode() {
                             key={index}
                             index={index}
                             className="w-10 h-10 text-lg border"
+                            aria-invalid={!!errors.code}
                           />
                         ))}
                       </InputOTPGroup>
@@ -126,8 +126,11 @@ export default function VerifyCode() {
                   )}
                 />
               </div>
-
-              <FieldError>{errors.code?.message}</FieldError>
+              <div className="w-full flex justify-center mt-1">
+                <FieldError className="mx-auto">
+                  {errors.code?.message}
+                </FieldError>
+              </div>
             </Field>
 
             <Button

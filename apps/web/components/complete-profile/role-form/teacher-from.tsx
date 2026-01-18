@@ -14,6 +14,7 @@ import {
   useCompleteProfileStore,
   useFieldArray,
   useForm,
+  useGetClassSubjectsQuery,
   zodResolver,
 } from '@stackschool/ui';
 import { Button } from '@/components/ui/button';
@@ -65,25 +66,18 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
     },
   });
 
-  const { data: classesData, isLoading } = useQuery({
-    queryKey: ['classes', debouncedSearch, schoolId],
-    queryFn: async () => {
-      if (!debouncedSearch || debouncedSearch.length < 2 || !schoolId)
-        return [];
-
-      const res = await api.post('/graphql', {
-        query: SEARCH_CLASSES_GQL,
-        variables: {
-          input: {
-            searchTerm: debouncedSearch,
-            schoolId,
-          },
-        },
-      });
-      return (res.data.data?.getClassSubjects as ClassWithSubjects[]) || [];
+  const { data, isLoading } = useGetClassSubjectsQuery(
+    {
+      input: {
+        searchTerm: debouncedSearch,
+        schoolId: schoolId as string,
+      },
     },
-    enabled: !!schoolId && searchQuery?.length >= 2,
-  });
+    {
+      enabled: !!schoolId && debouncedSearch?.length! >= 2,
+    },
+  );
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'assignments',
@@ -126,11 +120,11 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
   };
 
   const filteredResults = useMemo(() => {
-    if (!classesData) return [];
-    return classesData.filter(
-      (cls) => !fields?.some((assignment) => assignment.classId === cls.id),
+    if (!data?.getClassSubjects) return [];
+    return data.getClassSubjects.filter(
+      (cls) => !fields?.some((assignment) => assignment.classId === cls?.id),
     );
-  }, [classesData, fields]);
+  }, [data?.getClassSubjects, fields]);
 
   const onSubmit = async (data: TeacherFormData) => {
     try {

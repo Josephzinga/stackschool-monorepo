@@ -1,0 +1,8 @@
+input CreateInvitationInput {
+    schoolId: String!
+    role: SchoolRole
+    email: String
+    phoneNumber: String
+    message: String!
+
+}

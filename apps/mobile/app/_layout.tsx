@@ -27,7 +27,7 @@ export default function RootLayout() {
   }, [loaded, error]);
 
   useEffect(() => {
-    authService.setBaseUrl(API_URL);
+    authService.setBaseUrl(`http://localhost:${API_PORT}`);
     console.log(authService.getApiBaseUrl());
   }, [IP_ADDRESS, API_PORT]);
 

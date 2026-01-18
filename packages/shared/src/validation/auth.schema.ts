@@ -162,7 +162,7 @@ export const resetPasswordSchema = z
   .superRefine((data, ctx) => {
     if (data.password !== data.confirm) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['confirm'],
         message: 'Les mots de passe ne correspondent pas.',
       });
@@ -187,7 +187,10 @@ export const profileSchema = z
     email: z
       .string()
       .trim()
-      .email('Veuillez entrer un email valide.')
+      .email({
+        pattern: z.regexes.email,
+        message: 'Veuillez entrer un email valide.',
+      })
       .optional()
       .or(z.literal('')),
 
@@ -207,12 +210,12 @@ export const profileSchema = z
 
     if (!hasEmail && !hasPhone) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['email'],
         message: 'Veuillez fournir un email ou un numéro de téléphone.',
       });
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['phoneNumber'],
         message: 'Veuillez fournir un email ou un numéro de téléphone.',
       });

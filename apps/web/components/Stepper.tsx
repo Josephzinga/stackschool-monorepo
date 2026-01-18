@@ -35,12 +35,12 @@ const Stepper: React.FC<StepperProps> = ({
           const stepNumber = index + 1;
           const isCompleted = stepNumber < currentStep;
           const isCurrent = stepNumber === currentStep;
-
+          console.log('currentStep', currentStep);
           return (
             <div
               key={stepNumber}
               onClick={() => setCurrentStep(stepNumber)}
-              className="z-10 flex flex-col items-center"
+              className="z-10 flex flex-col items-center cursor-alias"
             >
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300

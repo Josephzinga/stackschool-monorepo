@@ -51,3 +51,14 @@ export const GET_CLASSES_GQL = `
   }
   }
   `;
+
+export const CONFIRM_COMPLETE_PROFILE = `
+  query CompleteProfile {
+  me {
+  id
+  email
+  }
+  
+  }
+
+   `;

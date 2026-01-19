@@ -1,135 +1,150 @@
 import { NextFunction, type Request, Response, Router } from 'express';
-
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { prisma } from '../../lib/prisma';
 import { hashToken } from '../../lib/outils';
-import { resetPasswordApiSchema } from '../../validations/validation-schema';
 import { safeValidateSchema } from '../../utils/validate-schema.util';
+import { resetPasswordSchema } from '@stackschool/shared';
+import { createServiceError } from '../../utils/api-errors';
+import { JWT_SECRET } from '../../constant/config';
 
 const router = Router();
 
 router.post(
   '/reset-password',
-
   async (req: Request, res: Response, next: NextFunction) => {
+    const { token, password, confirm } = req.body as {
+      token?: string;
+      password: string;
+      confirm: string;
+    };
     try {
-      const errors = safeValidateSchema(resetPasswordApiSchema, req.body);
+      const errors = safeValidateSchema(resetPasswordSchema, {
+        confirm,
+        password,
+      });
       if (errors) {
         return next(errors);
       }
 
-      const { token, password } = req.body as {
-        token: string;
-        password: string;
-      };
+      let userIdToReset: string | null = null;
+      let verificationTokenId: string | null = null;
 
-      const now = new Date();
+      // --- CAS 1 : Méthode Email (Token dans le body) ---
+      if (token) {
+        const now = new Date();
+        const tokenHash = hashToken(token);
 
-      // hasher le token pour comparaison
-      const tokenHash = hashToken(token);
-
-      // chercher le token valide
-      const verificationToken = await prisma.verificationToken.findFirst({
-        where: {
-          tokenHash,
-          type: 'password_reset',
-          used: false,
-          expiresAt: {
-            gt: now, // Vérifie que le token n'est pas expiré
+        const verificationToken = await prisma.verificationToken.findFirst({
+          where: {
+            tokenHash,
+            type: 'password_reset',
+            used: false,
+            expiresAt: { gt: now },
           },
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-            },
-          },
-        },
-      });
+          include: { user: { select: { id: true } } },
+        });
 
-      // vérifier si le token existe et est valide
-      if (!verificationToken) {
+        if (!verificationToken || !verificationToken.user) {
+          return res.status(400).json({
+            ok: false,
+            message: 'Lien invalide, expiré ou déjà utilisé.',
+          });
+        }
+
+        userIdToReset = verificationToken.user.id;
+        verificationTokenId = verificationToken.id;
+      }
+      // --- CAS 2 : Méthode WhatsApp (JWT dans le cookie) ---
+      else {
+        const resetAccessToken = req.cookies.reset_access_token;
+
+        if (!resetAccessToken) {
+          return res.status(400).json({
+            ok: false,
+            message:
+              'Session expirée ou invalide. Veuillez recommencer la procédure.',
+          });
+        }
+
+        try {
+          const decoded = jwt.verify(resetAccessToken, JWT_SECRET) as any;
+
+          if (decoded.type !== 'reset_access') {
+            return res
+              .status(400)
+              .json({ ok: false, message: 'Token invalide.' });
+          }
+
+          userIdToReset = decoded.userId;
+        } catch (err) {
+          return res.status(400).json({
+            ok: false,
+            message: 'Session invalide.',
+          });
+        }
+      }
+
+      if (!userIdToReset) {
         return res.status(400).json({
           ok: false,
-          message: 'Token invalide, expiré ou déjà utilisé',
+          message: "Impossible d'identifier le compte à réinitialiser.",
         });
       }
 
-      // vérifier que l'utilisateur existe
-      if (!verificationToken.user) {
-        return res.status(400).json({
-          ok: false,
-          message: 'Utilisateur non trouvé',
-        });
-      }
-
-      // hasher le mot de passe
+      // --- Action Commune : Reset du mot de passe ---
       const hashedPassword = await bcrypt.hash(password, 12);
 
-      // 7️utiliser une transaction pour garentir l'integriter
       await prisma.$transaction(async (tx) => {
-        // a. Mettre à jour le mot de passe utilisateur
+        // 1. Mettre à jour le mot de passe
         await tx.user.update({
-          where: {
-            id: verificationToken.user.id,
-          },
+          where: { id: userIdToReset! },
           data: {
             password: hashedPassword,
             updatedAt: new Date(),
           },
         });
 
-        // b. Marquer le token comme utilisé
-        await tx.verificationToken.update({
-          where: {
-            id: verificationToken.id,
-          },
-          data: {
-            used: true,
-            updateAt: new Date(),
-          },
-        });
+        // 2. Si méthode Email : Marquer le token comme utilisé
+        if (verificationTokenId) {
+          await tx.verificationToken.update({
+            where: { id: verificationTokenId },
+            data: { used: true, updateAt: new Date() },
+          });
+        }
 
-        // c. Invalider tous les autres tokens de réinitialisation pour cet utilisateur
+        // 3. Nettoyage global (Tokens et Codes)
         await tx.verificationToken.updateMany({
           where: {
-            userId: verificationToken.user.id,
+            userId: userIdToReset!,
             type: 'password_reset',
             used: false,
           },
-          data: {
-            used: true,
-          },
+          data: { used: true },
         });
 
-        // d. Invalider les codes de réinitialisation (au cas où)
         await tx.verificationCode.updateMany({
           where: {
-            userId: verificationToken.user.id,
+            userId: userIdToReset!,
             type: 'password_reset',
             used: false,
           },
-          data: {
-            used: true,
-          },
+          data: { used: true },
         });
       });
 
-      // 8️⃣ RÉPONSE DE SUCCÈS
+      // Nettoyage des cookies
+      res.clearCookie('reset_access_token');
+      res.clearCookie('tempToken');
+
       return res.status(200).json({
         ok: true,
-        message:
-          'Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.',
+        message: 'Mot de passe réinitialisé avec succès.',
       });
     } catch (err) {
-      console.error('reset-password error:', err);
-
-      // 9️⃣ GESTION D'ERREUR SÉCURISÉE
-      return res.status(500).json({
-        ok: false,
-        message: 'Erreur lors de la réinitialisation du mot de passe',
-      });
+      return next(
+        createServiceError('Erreur lors de la réinitialisation', 500, err),
+      );
     }
   },
 );

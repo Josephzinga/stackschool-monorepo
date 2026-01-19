@@ -1,16 +1,16 @@
 import axios from 'axios';
 import { ApiErrorPayload } from '../types/api-response.type';
 
-const URL = process.env.NEXT_PUBLIC_API_URL! || 'http://localhost:4000';
+const URL = process.env.NEXT_PUBLIC_API_URL! || 'http://api/4000';
 
 export const api = axios.create({
-  baseURL: `${URL.replace(/\/$/, '')}/api`,
+  baseURL: `${URL.replace(/\/$/, '')}`,
   withCredentials: true,
 });
 
 export function setApiBaseUrl(baseUrl: string) {
   const cleaned = baseUrl.replace(/\/$/, '');
-  api.defaults.baseURL = `${cleaned}/api`;
+  api.defaults.baseURL = `${cleaned}`;
 }
 export function getApiBaseUrl() {
   return api.defaults.baseURL;
@@ -62,11 +62,11 @@ api.interceptors.response.use(
 
     // Si erreur 401 et qu'on n'a pas déjà essayé de refresh
     // On exclut aussi la route de refresh elle-même pour éviter une boucle infinie
-    console.log('Config dans api ', err.config);
+
     if (
       err.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url?.includes('/auth/refresh')
+      !originalRequest.url?.includes('/api/auth/refresh')
     ) {
       if (isRefreshing) {
         // Si un refresh est déjà en cours, on met la requête en file d'attente
@@ -87,7 +87,7 @@ api.interceptors.response.use(
       try {
         // Appel à la route de refresh
         // Note: Assurez-vous que cette route existe et fonctionne avec les cookies httpOnly
-        await api.post('/auth/refresh');
+        await api.post('/api/auth/refresh');
 
         processQueue(null);
         isRefreshing = false;

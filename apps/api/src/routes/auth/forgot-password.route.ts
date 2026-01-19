@@ -30,11 +30,12 @@ router.post(
         await consumeIp(req);
         await consumeIdentifier(req);
       } catch (RateLimiterQueueError) {
-        createServiceError(
-          'Trop de tentatives. Veuillez réessayer plus tard',
-          429,
+        return next(
+          createServiceError(
+            'Trop de tentatives. Veuillez réessayer plus tard',
+            429,
+          ),
         );
-        return;
       }
 
       const errors = safeValidateSchema(forgotPasswordSchema, req.body);
@@ -47,9 +48,9 @@ router.post(
         prisma.user.findFirst({
           where: {
             OR: [
-              { username: identifier },
-              { phoneNumber: identifier },
-              { email: identifier },
+              { username: { equals: identifier, mode: 'insensitive' } },
+              { phoneNumber: { equals: identifier, mode: 'insensitive' } },
+              { email: { equals: identifier, mode: 'insensitive' } },
             ],
           },
           select: {
@@ -68,8 +69,8 @@ router.post(
         await new Promise((resolve) =>
           setTimeout(resolve, 500 + Math.random() * 500),
         );
-        return res.status(200).json({
-          ok: true,
+        return sendApiResponse(res, 200, {
+          ok: false,
           message:
             'Si un compte correspond à cet identifiant, un message a été envoyé.',
         });
@@ -133,7 +134,10 @@ router.post(
 
       let sent = false;
       // 5️⃣ Si l'utilisateur a un email : envoi d'un lien sécurisé
-      if (user.email) {
+      if (
+        user.email.toLowerCase() === identifier.toLowerCase() ||
+        user.username.toLowerCase() === identifier.toLowerCase()
+      ) {
         const rawToken = generateToken(32);
         const tokenHash = hashToken(rawToken);
 
@@ -148,7 +152,7 @@ router.post(
           },
         });
 
-        const resetLink = `${process.env.FRONTEND_URL}/auth/reset-password?token=${rawToken}`;
+        const resetLink = `${process.env.FRONTEND_URL}/auth/reset-password?method=email&token=${rawToken}`;
 
         try {
           await sendResetPasswordEmail(user.email, 'password_reset', resetLink);
@@ -161,6 +165,7 @@ router.post(
           ok: true,
           message:
             'Un lien de réinitialisation du mot de passe a été envoyé à votre email.',
+          method: 'email',
         });
       }
       // si le lien n'est pas envoyer par email et que le user a un numéro de téléphone
@@ -193,16 +198,26 @@ router.post(
 
         // Crée un petit JWT temporaire pour réessayer sans redemander l'identifiant
         const tempToken = jwt.sign(
-          { userId: user.id, type: 'resend_code', jti: generateToken(16) },
+          {
+            userId: user.id,
+            type: 'resend_code',
+            jti: generateToken(16),
+          },
           JWT_SECRET,
 
           { expiresIn: TEMP_TOKEN_EXP },
         );
 
+        res.cookie('tempToken', tempToken, {
+          httpOnly: true,
+          sameSite: 'lax',
+          maxAge: 1000 * 60 * CODE_EXPIRES_MINUTES,
+          secure: process.env.NODE_ENV === 'production',
+        });
         return res.status(200).json({
           ok: true,
           message: 'Un code de réinitialisation a été envoyé par WhatsApp.',
-          tempToken,
+          method: 'whatsapp',
         });
       }
 
@@ -216,12 +231,13 @@ router.post(
         message: 'Aucun moyen de contact veilliez contacter le support',
       });
     } catch (err) {
-      console.error('forgot-password error:', err);
-      return res.status(200).json({
-        ok: true,
-        message:
+      return next(
+        createServiceError(
           'Si un compte correspond à cet identifiant, un message vous a été envoyé.',
-      });
+          500,
+          err,
+        ),
+      );
     }
   },
 );

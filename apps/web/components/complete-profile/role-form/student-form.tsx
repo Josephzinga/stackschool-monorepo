@@ -6,17 +6,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Controller,
   useCompleteProfileStore,
   useForm,
+  useGetClassSubjectsQuery,
   zodResolver,
 } from '@stackschool/ui';
 import {
@@ -26,17 +23,17 @@ import {
   MapPin,
   User,
 } from 'lucide-react';
-import { useState } from 'react';
-import {
-  api,
-  Class,
-  GET_CLASSES_GQL,
-  StudentFormData,
-  studentFormSchema,
-} from '@stackschool/shared';
+import { useEffect, useState } from 'react';
+import { StudentFormData, studentFormSchema } from '@stackschool/shared';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { SubmitButton } from '@/components/submit-button';
-import { useQuery } from '@tanstack/react-query';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/animate-ui/components/radix/popover';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function StudentForm({ onBack }: { onBack: () => void }) {
   const { setRoleData, school, role, setCurrentStep } =
@@ -51,12 +48,14 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
     resolver: zodResolver(studentFormSchema),
     mode: 'onBlur',
     defaultValues: {
-      birthDate: studentData?.birthDate || undefined,
+      birthDate: studentData?.birthDate
+        ? new Date(studentData.birthDate)
+        : undefined,
       birthPlace: studentData?.birthPlace || '',
       fatherName: studentData?.fatherName || '',
       motherName: studentData?.motherName || '',
       matricule: studentData?.matricule || '',
-      classId: studentData?.classId,
+      classId: studentData?.classId || '',
       enrollmentYear: studentData?.enrollmentYear || '',
     },
   });
@@ -64,41 +63,43 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
   const [open, setOpen] = useState(false);
 
   const currentYear = new Date().getFullYear();
-  const academicYears = [
-    `${currentYear}-${currentYear + 1}`,
-    `${currentYear - 1}-${currentYear}`,
-    `${currentYear - 2}-${currentYear - 1}`,
-  ];
+  const academicYears = Array.from(
+    { length: currentYear - 2010 + 1 },
+    (_, i) => `${currentYear - i - 1}-${currentYear - i}`,
+  );
 
   const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;
 
-  const { data, error, isLoading } = useQuery({
-    queryKey: ['classes'],
-    queryFn: async () => {
-      const res = await api.post(`/graphql`, {
-        query: GET_CLASSES_GQL,
-        variables: {
-          input: {
-            schoolId,
-            getOnly: true,
-          },
-        },
-      });
-
-      return res.data.data.getClassSubjects as Class[];
+  const { data, error } = useGetClassSubjectsQuery(
+    {
+      input: {
+        schoolId: schoolId as string,
+        getOnly: true,
+      },
     },
-  });
+    {
+      enabled: !!schoolId,
+    },
+  );
+
+  useEffect(() => {
+    if (error) {
+      toast.error(
+        (error?.message as string) || 'Echec de chargement de classes',
+      );
+    }
+  }, []);
 
   const onSubmit = async (data: StudentFormData) => {
     setRoleData({ role: 'STUDENT', student: data });
-    console.log('data', data);
     setCurrentStep(4);
-    try {
-    } catch (e) {}
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 font-poppins">
+    <form
+      onSubmit={handleSubmit(onSubmit, (err) => console.log(err))}
+      className="space-y-4 font-poppins"
+    >
       <div className="grid grid-cols-2 gap-4">
         <Field>
           <FieldLabel htmlFor="matricule">Matricule</FieldLabel>
@@ -114,18 +115,27 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
 
         <Field>
           <FieldLabel htmlFor="enrollmentYear">Année d'inscription</FieldLabel>
-          <Select {...register('enrollmentYear')}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionnez l'année" />
-            </SelectTrigger>
-            <SelectContent>
-              {academicYears.map((year) => (
-                <SelectItem key={year} value={year}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Controller
+            control={control}
+            name="enrollmentYear"
+            render={({ field }) => (
+              <Select
+                onValueChange={(year) => field.onChange(year)}
+                value={field.value}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner la date" />
+                </SelectTrigger>
+                <SelectContent>
+                  {academicYears.map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </Field>
       </div>
 
@@ -134,7 +144,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
         <Controller
           name="birthDate"
           control={control}
-          render={({ field }) => (
+          render={({ field: { onChange, value } }) => (
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -142,8 +152,8 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
                   id="date"
                   className="w-full justify-between font-normal"
                 >
-                  {field.value
-                    ? field?.value.toString().split('00', length - 1)
+                  {value
+                    ? new Date(value).toLocaleDateString()
                     : 'Sélectionné votre date'}
                   <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
@@ -154,10 +164,10 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
               >
                 <Calendar
                   mode="single"
-                  selected={field.value}
+                  selected={value}
                   captionLayout="dropdown"
                   onSelect={(date) => {
-                    field.onChange(date);
+                    onChange(date);
                     setOpen(false);
                   }}
                 />
@@ -165,6 +175,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
             </Popover>
           )}
         />
+        <FieldError errors={[{ message: errors.birthDate?.message }]} />
       </Field>
 
       {/* Spécificités maliennes */}
@@ -220,24 +231,31 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
       </div>
 
       <Field>
-        <FieldLabel htmlFor="classId">Classe (optionnel)</FieldLabel>
-        <Select {...register('classId')}>
-          <SelectTrigger>
-            <SelectValue placeholder="Sélectionnez votre classe" />
-          </SelectTrigger>
-          <SelectContent>
-            {data?.map((classe: Class) => (
-              <SelectItem key={classe.id} value={classe.id}>
-                <p className="font-semibold ">{classe.name}</p>
-                <p>{classe.section}</p>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <FieldLabel htmlFor="classId">Classe</FieldLabel>
+        <Controller
+          control={control}
+          name="classId"
+          render={({ field: { onChange, value } }) => (
+            <Select value={value} onValueChange={onChange}>
+              <SelectTrigger aria-invalid={!!errors.classId}>
+                <SelectValue placeholder="Sélectionnez votre classe" />
+              </SelectTrigger>
+              <SelectContent>
+                {data?.getClassSubjects?.map((classe) => (
+                  <SelectItem key={classe?.id} value={classe?.id as string}>
+                    <p className="font-semibold ">{classe?.name}</p>
+                    <p>{classe?.section}</p>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        <FieldError errors={[{ message: errors.classId?.message }]} />
       </Field>
 
       <div className="w-full flex gap-4">
-        <Button onClick={onBack} variant="outline">
+        <Button type="button" onClick={onBack} variant="outline">
           ← Retour
         </Button>
         <SubmitButton isSubmitting={isSubmitting} className="w-3/4">

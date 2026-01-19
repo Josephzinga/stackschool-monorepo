@@ -1,0 +1,70 @@
+enum SchoolRole {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+  STAFF
+}
+input Role {
+  role: SchoolRole
+}
+type Profile {
+  id: ID!
+  photo: String
+  firstname: String!
+  lastname: String!
+  gender: String
+}
+
+type Teacher {
+  id: ID!
+  schoolUserId: String!
+  diploma: String
+  experience: String
+  hireDate: String
+  isActive: Boolean
+  salary: Float
+  departement: String
+  addrress: String
+  specialization: String
+  createdAt: String
+  updatedAt: String
+}
+
+type Staff {
+  id: ID!
+  schoolUserId: String!
+  position: String!
+  hireDate: String
+  salary: Float
+  departement: String
+}
+
+type Memberships {
+  id: ID!
+  student: Student
+  teacher: Teacher
+  staff: Staff
+}
+type User {
+  id: ID!
+  email: String
+  username: String
+  phoneNumber: String
+  profileCompleted: Boolean
+  hasMembership: Boolean
+  memberships: Memberships
+  schoolId: ID
+  profile: Profile
+  school: [School]
+}
+
+type UserPayload {
+  ok: Boolean
+  message: String
+  user: User!
+}
+
+input InvitationCodeInput {
+  code: String!
+}

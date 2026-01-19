@@ -4,6 +4,7 @@ import { createInvitationSchema } from '@stackschool/shared';
 import { createAndSendInvitation } from '../../services/invitation.service';
 import { safeValidateSchema } from '../../utils/validate-schema.util';
 import { prisma } from '@stackschool/db';
+import { createServiceError } from '../../utils/api-errors';
 
 const router = Router();
 
@@ -20,7 +21,7 @@ const isSchoolAdmin = async (
     where: { schoolId_userId: { schoolId, userId } },
   });
 
-  /* if (membership && (membership.role === 'ADMIN' || membership.isOwner)) {
+  if (membership && (membership.role === 'ADMIN' || membership.isOwner)) {
     return next();
   }
 
@@ -30,31 +31,26 @@ const isSchoolAdmin = async (
       403,
     ),
   );
-*/
+
   return next();
 };
 
-router.post(
-  '/invitations',
-  isAuthenticated,
-  isSchoolAdmin, // Sécurise la route
-  async (req, res, next) => {
-    try {
-      const errors = safeValidateSchema(createInvitationSchema, req.body);
-      if (errors) return next(errors);
-      const invitationData = req.body;
+router.post('/invitations', isAuthenticated, async (req, res, next) => {
+  try {
+    const errors = safeValidateSchema(createInvitationSchema, req.body);
+    if (errors) return next(errors);
+    const invitationData = req.body;
 
-      const invitation = await createAndSendInvitation(invitationData);
+    const invitation = await createAndSendInvitation(invitationData);
 
-      res.status(201).json({
-        ok: true,
-        message: 'Invitation envoyée avec succès.',
-        invitation,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+    res.status(201).json({
+      ok: true,
+      message: 'Invitation envoyée avec succès.',
+      invitation,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;

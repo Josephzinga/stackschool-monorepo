@@ -22,7 +22,7 @@ type JoinSchoolPayload = {
 
 type InviteSchoolPayload = {
   type: 'invite';
-  invitationCode: string;
+  schoolId: string;
 };
 export type SchoolData =
   | CreateSchoolPayload
@@ -70,10 +70,10 @@ export interface ProfileData {
   phoneNumber?: string | undefined;
 }
 
-export interface UserInMe extends User {
+export type UserInMe = User & {
   profile: Profile;
   Account: Account[];
-}
+};
 
 export interface SchoolClass {
   id: string;

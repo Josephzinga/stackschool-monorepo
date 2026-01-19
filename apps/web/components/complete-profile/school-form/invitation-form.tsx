@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useCompleteProfileStore, zodResolver } from '@stackschool/ui';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { api, parseAxiosError } from '@stackschool/shared';
-import { useCompleteProfileStore } from '@stackschool/ui';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 
 // Schéma simple pour vérifier le code
@@ -38,7 +37,10 @@ export function InvitationForm() {
     setIsLoading(true);
     try {
       // Appel API pour vérifier le code et récupérer les infos de l'école
-      const res = await api.post('/complete-profile/verify-invitation', data);
+      const res = await api.post(
+        '/api/complete-profile/verify-invitation',
+        data,
+      );
 
       if (res.data.ok) {
         toast.success('Code valide !');

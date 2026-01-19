@@ -1,7 +1,7 @@
 import { z } from '@stackschool/shared';
 
 export const resetPasswordApiSchema = z.object({
-  token: z.string().min(16, 'Token invalide'),
+  token: z.string().min(16, 'Token invalide').optional(),
   password: z
     .string()
     .min(8, 'Le mot de passe doit contenir au moins 8 caractères.')

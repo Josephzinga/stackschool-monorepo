@@ -5,34 +5,85 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/a" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/constant/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/constant/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/social-web.controller.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/social-web.controller.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/social-web.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/social-web.controller.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/shools/get-school-classes.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/shools/get-school-classes.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/handle-redis-user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/handle-redis-user.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/forgot-password.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/forgot-password.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/me.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/me.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/resend-code.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/resend-code.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/reset-password.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/reset-password.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/verify-code.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/verify-code.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/save-progress.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/save-progress.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/verify-invitation.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/verify-invitation.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/shools/create-invitation.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/shools/create-invitation.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/users/profile.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/users/profile.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/server.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/invitation.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/invitation.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/whatsapp.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/whatsapp.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/utils/limiter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/utils/limiter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/utils/validate-schema.util.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/utils/validate-schema.util.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/validations/validation-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/validations/validation-schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/mobile/app/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/mobile/app/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/auth/complete-profile/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/complete-profile/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/complete-profile/steper.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/styles/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/forgot-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/forgot-password/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/register/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/register/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/reset-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/reset-password/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/verify-code/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/verify-code/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/providers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/school/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/school/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/styles/globals.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/Stepper.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/Stepper.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/RoleStep.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/RoleStep.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/StudentForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/student-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/profile-step.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/profile-step.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/review-step.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/review-step.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/parent-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/parent-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/parent-form1.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/staff-admin-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/staff-admin-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/student-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/student-form.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/teacher-from.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/teacher-from.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/invitation-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/invitation-form.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/search-school-from.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/search-school-from.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/schoolStep.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/schoolStep.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/label.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/label.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/skeleton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/skeleton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/lib/fonts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/lib/fonts.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/protected-route.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/protected-route.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/create-invitation-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/create-invitation-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/search-results-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/search-results-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/calendar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/calendar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/card.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/hooks/use-controlled-state.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/hooks/use-controlled-state.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/lib/check-profile-field.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/lib/check-profile-field.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/docker/dockerfile.api" beforeDir="false" afterPath="$PROJECT_DIR$/infra/docker/dockerfile.api" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/docker/dockerfile.web" beforeDir="false" afterPath="$PROJECT_DIR$/infra/docker/dockerfile.web" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/edge.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index-browser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/client/generated/schema.prisma" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/schéma-architecture.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/graphql-query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/graphql-query.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/schema.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/search-all-school.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/search-all-school.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/search-all-school.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/services/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/services/auth/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/services/redis/redisService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/services/redis/redisService.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/types/complete-profile.type.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/complete-profile.type.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/types/graphql.type.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/graphql.type.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/auth.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/auth.schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/complete-profile.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/complete-profile.schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
     </list>
@@ -48,10 +99,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;Josephzinga&quot;
-  }
+  &quot;lastFilter&quot;: {}
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
@@ -62,6 +110,8 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/apps/web/lib/fonts.ts" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/migrations/20260114230457_relation_de_la_table_student_a_school_user/migration.sql" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/photos-prisma.type.ts" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/packages/shared/src/validation/complete-profile.schema.ts" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -81,66 +131,67 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Jest.Deep Link Utils.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.createServiceError.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.great.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.handleLocalAuth (1).executor&quot;: &quot;Run&quot;,
-    &quot;Jest.handleLocalAuth.devrait retourner false si l'utilisateur n'a pas de mot de passe (compte social).executor&quot;: &quot;Run&quot;,
-    &quot;Jest.handleLocalAuth.devrait retourner false si l'utilisateur n'est pas trouvé.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.handleLocalAuth.devrait retourner une erreur si la validation échoue.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.handleLocalAuth.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.handleSocialWebCallback.executor&quot;: &quot;Debug&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/home/joseph/.local/share/JetBrains/WebStorm2025.3/Shell Script/shellcheck&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/apps/web&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs.jest.jest_package&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/jest&quot;,
-    &quot;nodejs_interpreter_path&quot;: &quot;/usr/local/lib/nodejs/bin/node&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.dev:web.executor&quot;: &quot;Run&quot;,
-    &quot;npm.mobile &gt; typecheck.executor&quot;: &quot;Run&quot;,
-    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/prettier&quot;,
-    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Docker.docker-compose.yml.web: Compose Deployment.executor": "Run",
+    "Jest.Deep Link Utils.executor": "Run",
+    "Jest.createServiceError.executor": "Run",
+    "Jest.great.executor": "Run",
+    "Jest.handleLocalAuth (1).executor": "Run",
+    "Jest.handleLocalAuth.devrait retourner false si l'utilisateur n'a pas de mot de passe (compte social).executor": "Run",
+    "Jest.handleLocalAuth.devrait retourner false si l'utilisateur n'est pas trouvé.executor": "Run",
+    "Jest.handleLocalAuth.devrait retourner une erreur si la validation échoue.executor": "Run",
+    "Jest.handleLocalAuth.executor": "Run",
+    "Jest.handleSocialWebCallback.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/home/joseph/.local/share/JetBrains/WebStorm2025.3/Shell Script/shellcheck",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/joseph/Projects/stackschool-monorepo/apps/web",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs.jest.jest_package": "/home/joseph/Projects/stackschool-monorepo/node_modules/jest",
+    "nodejs_interpreter_path": "/usr/local/lib/nodejs/bin/node",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev:web.executor": "Run",
+    "npm.mobile > typecheck.executor": "Run",
+    "prettierjs.PrettierConfiguration.Package": "/home/joseph/Projects/stackschool-monorepo/node_modules/prettier",
+    "rearrange.code.on.save": "true",
+    "settings.editor.selected.configurable": "Runtime.Targets.Configurable",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/home/joseph/Projects/stackschool-monorepo/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/apps/web" />
       <recent name="$PROJECT_DIR$/../E-commerce" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/packages/ui/src/lib" />
+      <recent name="$PROJECT_DIR$/packages/ui/src" />
+      <recent name="$PROJECT_DIR$/packages/shared/src/graphql" />
       <recent name="$PROJECT_DIR$/apps/web/app/styles" />
       <recent name="$PROJECT_DIR$/apps/web/app" />
-      <recent name="$PROJECT_DIR$/apps/api/src/graphql/resolvers" />
-      <recent name="$PROJECT_DIR$/packages/shared/src/graphql" />
-      <recent name="$PROJECT_DIR$/apps/api/src/graphql" />
     </key>
   </component>
-  <component name="RunManager" selected="Jest.handleLocalAuth">
+  <component name="RunManager" selected="Docker.docker-compose.yml.web: Compose Deployment">
     <configuration name="great" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/jest" />
@@ -178,17 +229,23 @@
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="handleLocalAuth.devrait retourner une erreur si la validation échoue" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/jest" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.test.ts" />
-      <test-names>
-        <test-name value="handleLocalAuth" />
-        <test-name value="devrait retourner une erreur si la validation échoue" />
-      </test-names>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.web: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="web" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
       <method v="2" />
     </configuration>
     <configuration name="dev:web" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
@@ -203,11 +260,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yml.web: Compose Deployment" />
         <item itemvalue="Jest.handleLocalAuth" />
         <item itemvalue="Jest.great" />
         <item itemvalue="npm.dev:web" />
         <item itemvalue="Jest.handleLocalAuth.devrait retourner false si l'utilisateur n'est pas trouvé" />
-        <item itemvalue="Jest.handleLocalAuth.devrait retourner une erreur si la validation échoue" />
       </list>
     </recent_temporary>
   </component>
@@ -299,6 +356,27 @@
       <workItem from="1768324439674" duration="6573000" />
       <workItem from="1768340878245" duration="9044000" />
       <workItem from="1768401594526" duration="7323000" />
+      <workItem from="1768424633636" duration="1148000" />
+      <workItem from="1768428286542" duration="16495000" />
+      <workItem from="1768470463020" duration="15309000" />
+      <workItem from="1768486403892" duration="4255000" />
+      <workItem from="1768498012785" duration="6969000" />
+      <workItem from="1768518668024" duration="9000" />
+      <workItem from="1768520765857" duration="5849000" />
+      <workItem from="1768527401694" duration="3972000" />
+      <workItem from="1768558337074" duration="8829000" />
+      <workItem from="1768576127773" duration="3237000" />
+      <workItem from="1768582209158" duration="263000" />
+      <workItem from="1768593199605" duration="6206000" />
+      <workItem from="1768599958681" duration="5040000" />
+      <workItem from="1768605733076" duration="2460000" />
+      <workItem from="1768608776551" duration="3058000" />
+      <workItem from="1768684055746" duration="11727000" />
+      <workItem from="1768735215632" duration="806000" />
+      <workItem from="1768755212608" duration="4092000" />
+      <workItem from="1768764467607" duration="11832000" />
+      <workItem from="1768807846784" duration="12529000" />
+      <workItem from="1768833839449" duration="2430000" />
     </task>
     <servers />
   </component>

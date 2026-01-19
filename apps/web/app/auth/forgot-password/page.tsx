@@ -25,7 +25,6 @@ import { toast } from 'sonner';
 import { AlertCircle, PhoneIcon } from 'lucide-react';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-
 import { useState } from 'react';
 
 export default function ForgotPasswordPage() {
@@ -57,24 +56,15 @@ export default function ForgotPasswordPage() {
   const handleIdentifierChange = (value: string) => {
     const detectedType = detectInputType(value);
     setInputType(detectedType);
-    console.log('value', value);
 
     if (detectedType === 'phone') {
       setPhoneValue(value);
     }
   };
 
-  const getInputType = () => {
-    return inputType === 'phone'
-      ? 'tel'
-      : inputType === 'email'
-        ? 'email'
-        : 'text';
-  };
   const handleIdentifier = async (data: FormDataType) => {
     let identifier = data.identifier;
 
-    // Si c'est un numéro, utiliser la version formatée du PhoneInput
     if (inputType === 'phone' && phoneValue) {
       identifier = phoneValue;
     }
@@ -83,10 +73,8 @@ export default function ForgotPasswordPage() {
       const res = await authService.forgotPassword(identifier);
       if (res.ok) {
         toast.success(res.message);
-        const tempToken = res.tempToken;
-
-        if (tempToken) {
-          router.push(`/auth/verify-code?token=${tempToken}`);
+        if (res.method === 'whatsapp') {
+          setTimeout(() => router.push(`/auth/verify-code}`), 1000);
         }
       }
     } catch (error: any) {

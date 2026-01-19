@@ -1,6 +1,6 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@stackschool/ui';
 import { useState } from 'react';
 
 export default function Providers({ children }: { children: React.ReactNode }) {

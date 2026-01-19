@@ -160,7 +160,10 @@ exports.Prisma.SchoolScalarFieldEnum = {
   deletedAt: 'deletedAt',
   inviationCode: 'inviationCode',
   logo: 'logo',
-  motto: 'motto'
+  motto: 'motto',
+  orangeMerchantId: 'orangeMerchantId',
+  paymentApiKey: 'paymentApiKey',
+  walletBalance: 'walletBalance'
 };
 
 exports.Prisma.SchoolUserScalarFieldEnum = {
@@ -181,6 +184,18 @@ exports.Prisma.SubjectScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   schoolUserId: 'schoolUserId'
+};
+
+exports.Prisma.LessonScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  day: 'day',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  subjectId: 'subjectId',
+  teacherId: 'teacherId',
+  classId: 'classId',
+  examId: 'examId'
 };
 
 exports.Prisma.ClassSubjectsScalarFieldEnum = {
@@ -216,7 +231,8 @@ exports.Prisma.ClassScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   schoolId: 'schoolId',
-  teacherId: 'teacherId'
+  teacherId: 'teacherId',
+  supervisorId: 'supervisorId'
 };
 
 exports.Prisma.ClassTeacherScalarFieldEnum = {
@@ -231,6 +247,7 @@ exports.Prisma.ClassTeacherScalarFieldEnum = {
 exports.Prisma.StudentScalarFieldEnum = {
   id: 'id',
   profileId: 'profileId',
+  schoolUserId: 'schoolUserId',
   matricule: 'matricule',
   enrollmentYear: 'enrollmentYear',
   birthDate: 'birthDate',
@@ -271,6 +288,7 @@ exports.Prisma.InviteScalarFieldEnum = {
   schoolId: 'schoolId',
   studentId: 'studentId',
   token: 'token',
+  code: 'code',
   relation: 'relation',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt',
@@ -323,6 +341,24 @@ exports.Prisma.AccountScalarFieldEnum = {
   session_state: 'session_state'
 };
 
+exports.Prisma.PaymentScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  netAmount: 'netAmount',
+  serviceFee: 'serviceFee',
+  status: 'status',
+  type: 'type',
+  description: 'description',
+  providerRef: 'providerRef',
+  payerPhone: 'payerPhone',
+  payerName: 'payerName',
+  payerId: 'payerId',
+  schoolId: 'schoolId',
+  studentId: 'studentId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.VerificationTokenScalarFieldEnum = {
   createdAt: 'createdAt',
   expiresAt: 'expiresAt',
@@ -365,6 +401,7 @@ exports.Prisma.TeacherScalarFieldEnum = {
   isActive: 'isActive',
   salary: 'salary',
   departement: 'departement',
+  addrress: 'addrress',
   specialization: 'specialization',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -414,6 +451,16 @@ exports.SchoolRole = exports.$Enums.SchoolRole = {
   STAFF: 'STAFF'
 };
 
+exports.Day = exports.$Enums.Day = {
+  MONDAY: 'MONDAY',
+  TUESDAY: 'TUESDAY',
+  WEDNESDAY: 'WEDNESDAY',
+  THURSDAY: 'THURSDAY',
+  FRIDAY: 'FRIDAY',
+  SATURDAY: 'SATURDAY',
+  SUNDAY: 'SUNDAY'
+};
+
 exports.ContactPreference = exports.$Enums.ContactPreference = {
   WHATSAPP: 'WHATSAPP',
   EMAIL: 'EMAIL',
@@ -438,12 +485,30 @@ exports.AttendanceStatus = exports.$Enums.AttendanceStatus = {
   EXCUSED: 'EXCUSED'
 };
 
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
+  PENDING: 'PENDING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED'
+};
+
+exports.PaymentType = exports.$Enums.PaymentType = {
+  TUITION: 'TUITION',
+  REGISTRATION: 'REGISTRATION',
+  CANTEEN: 'CANTEEN',
+  TRANSPORT: 'TRANSPORT',
+  UNIFORM: 'UNIFORM',
+  OTHER: 'OTHER'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Profile: 'Profile',
   School: 'School',
   SchoolUser: 'SchoolUser',
   Subject: 'Subject',
+  Lesson: 'Lesson',
   ClassSubjects: 'ClassSubjects',
   Exam: 'Exam',
   Result: 'Result',
@@ -457,6 +522,7 @@ exports.Prisma.ModelName = {
   Plan: 'Plan',
   Subscription: 'Subscription',
   Account: 'Account',
+  Payment: 'Payment',
   VerificationToken: 'VerificationToken',
   VerificationCode: 'VerificationCode',
   Session: 'Session',

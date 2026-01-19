@@ -1,4 +1,8 @@
-import { allRoles, useCompleteProfileStore } from '@stackschool/ui';
+import {
+  allRoles,
+  useCompleteProfileStore,
+  useConfirmCompleteProfileMutation,
+} from '@stackschool/ui';
 import { Button } from '@/components/ui/button';
 import { SubmitButton } from '@/components/submit-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,12 +22,11 @@ import {
   User,
   Users,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { api, ParentFormData, StudentFormData } from '@stackschool/shared';
+import { ParentFormData, StudentFormData } from '@stackschool/shared';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { toast } from 'sonner';
 
 // --- Sous-composants de Review ---
 
@@ -196,30 +199,23 @@ function StudentReview({ data }: { data: StudentFormData }) {
 
 export default function ReviewStep() {
   const { profile, school, role, setCurrentStep } = useCompleteProfileStore();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    try {
-      const res = await api.post('/complete-profile/finish', {
-        profile,
-        school,
-        role,
-      });
-
-      if (res.data.ok) {
-        toast.success('Profil complété avec succès !');
-        router.push('/dashboard');
+  const { mutateAsync, isPending, error } = useConfirmCompleteProfileMutation({
+    onSuccess: (data, context) => {
+      if (!data.confirmCompleteProfile) return;
+      if (data.confirmCompleteProfile.ok) {
+        toast.success(data.confirmCompleteProfile.message);
+        setTimeout(() => router.push('/onboard'));
       }
-    } catch (error: any) {
-      console.error(error);
-      toast.error(
-        error.response?.data?.message || 'Erreur lors de la finalisation.',
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleSubmit = async () => {
+    await mutateAsync({});
   };
 
   if (!profile || !school || !role) return null;
@@ -357,12 +353,12 @@ export default function ReviewStep() {
         <Button
           variant="outline"
           onClick={() => setCurrentStep(3)}
-          disabled={isSubmitting}
+          disabled={isPending}
         >
           ← Retour
         </Button>
         <SubmitButton
-          isSubmitting={isSubmitting}
+          isSubmitting={isPending}
           onClick={handleSubmit}
           className="flex-1"
         >

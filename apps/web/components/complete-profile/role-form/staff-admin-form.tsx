@@ -1,6 +1,6 @@
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useCompleteProfileStore, zodResolver } from '@stackschool/ui';
 import { Briefcase, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StaffFormSchema, StaffFormValues } from '@stackschool/shared';
@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/popover';
 import { SubmitButton } from '@/components/submit-button';
 import { cn } from '@/lib/utils';
-import { useCompleteProfileStore } from '@stackschool/ui';
 
 interface Props {
   role: 'ADMIN' | 'STAFF';

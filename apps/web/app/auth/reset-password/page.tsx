@@ -31,27 +31,31 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
-
+  const method = searchParams.get('method');
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting, isValid },
-  } = useForm<ResetPasswordType>({
+    formState: { errors, isSubmitting },
+  } = useForm<Omit<ResetPasswordType, 'token'>>({
     resolver: zodResolver(resetPasswordSchema),
     mode: 'onChange',
   });
 
   const passwordValue = watch('password');
 
-  const onSubmit = async (data: ResetPasswordType) => {
+  const onSubmit = async (data: Omit<ResetPasswordType, 'token'>) => {
     if (!token) {
       toast.error('Token de réinitialisation manquant');
       return;
     }
 
     try {
-      const res = await authService.resetPassword(token, data.password);
+      const res = await authService.resetPassword(
+        token,
+        data.password,
+        data.confirm,
+      );
 
       if (res.ok) {
         setIsSuccess(true);
@@ -107,7 +111,7 @@ export default function ResetPasswordPage() {
     );
   }
 
-  if (!token) {
+  if (!token && !method && method === 'email') {
     return (
       <Container>
         <Card className="max-w-md w-100! mx-auto text-center bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm">
@@ -129,7 +133,7 @@ export default function ResetPasswordPage() {
 
   return (
     <Container>
-      <Card className="max-w-md mx-auto w-100! ">
+      <Card className="max-w-md mx-auto w-100! font-poppins">
         <CardHeader>
           <CardTitle className="text-center">Nouveau mot de passe</CardTitle>
           <CardDescription className="text-center">
@@ -185,7 +189,6 @@ export default function ResetPasswordPage() {
                 isPassword
                 {...register('confirm')}
                 aria-invalid={!!errors.confirm}
-                icon={Lock}
               />
 
               <FieldError>{errors.confirm?.message}</FieldError>

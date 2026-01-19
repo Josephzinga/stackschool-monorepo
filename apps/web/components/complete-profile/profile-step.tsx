@@ -20,7 +20,6 @@ import { toast } from 'sonner';
 import PhoneInput from 'react-phone-number-input';
 import {
   api,
-  authService,
   parseAxiosError,
   profileSchema,
   ProfileType,
@@ -39,8 +38,7 @@ export function ProfileStep() {
 
   const [phoneValue, setPhoneValue] = useState<string>('');
 
-  const { setCurrentStep, setProfileData, loadFromRedis, profile } =
-    useCompleteProfileStore();
+  const { setCurrentStep, setProfileData, profile } = useCompleteProfileStore();
 
   const [picture, setPicture] = useState<string | null>(
     user?.profile?.photo || profile?.photo || null,
@@ -68,19 +66,16 @@ export function ProfileStep() {
 
   const validateField = async (fieldName: keyof ProfileType, value: string) => {
     if (!value) return;
-    const { valid, message, status } = await checkField(
-      fieldName as string,
-      value,
-    );
+    const safeData = await checkField(fieldName as string, value);
 
-    if (status === 401) {
-      return toast.error(message);
+    if (safeData?.status === 401) {
+      return toast.error(safeData?.message);
     }
 
-    if (!valid && message) {
+    if (!safeData?.valid && safeData?.message) {
       setError(fieldName, {
         type: 'manual',
-        message: message,
+        message: safeData?.message,
       });
     } else {
       clearErrors(fieldName);
@@ -107,11 +102,7 @@ export function ProfileStep() {
         }
       }
 
-      const res = await authService.updateProfile(data);
-      if (res.ok) {
-        setProfileData(data);
-        setCurrentStep(3);
-      }
+      setProfileData(data);
     } catch (error) {
       const { message } = parseAxiosError(error);
       console.error('Erreur sauvegarde profil:', message);
@@ -155,7 +146,7 @@ export function ProfileStep() {
       const formData = new FormData();
       formData.append('profilePicture', file);
 
-      const res = await api.post('/upload/profile-picture', formData);
+      const res = await api.post('/api/upload/profile-picture', formData);
 
       const data = res.data;
 
@@ -171,7 +162,7 @@ export function ProfileStep() {
       setIsLoading(false);
       const { message, status, data } = parseAxiosError(error);
       console.error('Erreur upload photo:', error);
-      toast.error(data?.errors || 'Erreur lors du téléchargement de la photo');
+      toast.error(message || 'Erreur lors du téléchargement de la photo');
     } finally {
       setIsLoading(false);
     }
@@ -183,21 +174,6 @@ export function ProfileStep() {
         <h2 className="text-2xl font-bold ">Votre Profil</h2>
         <p className="text-gray-600">Complétez vos informations personnelles</p>
       </div>
-
-      {/* Indicateurs OAuth */}
-      {1 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-blue-800 mb-2">
-            Comptes connectés
-          </h3>
-          <div className="flex gap-2">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"></span>
-          </div>
-          <p className="text-xs text-blue-600 mt-2">
-            Vos informations ont été pré-remplies depuis vos comptes connectés
-          </p>
-        </div>
-      )}
 
       <div className="w-full flex justify-center items-center">
         <UploadProfilePicture
@@ -245,7 +221,6 @@ export function ProfileStep() {
               onBlur={handleEmailBlur}
               aria-invalid={!!errors.email}
               placeholder="Votre email"
-              required
             />
             <FieldError>{errors.email?.message}</FieldError>
           </Field>
@@ -279,7 +254,10 @@ export function ProfileStep() {
             name="gender"
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger
+                  aria-invalid={!!errors.gender}
+                  className="w-full"
+                >
                   <SelectValue placeholder="Sélectionnez votre genre" />
                 </SelectTrigger>
                 <SelectContent>

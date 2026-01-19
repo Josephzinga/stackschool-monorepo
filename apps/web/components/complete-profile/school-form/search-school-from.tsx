@@ -1,12 +1,15 @@
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Item, ItemTitle } from '@/components/ui/item';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { SchoolSelected, schoolService } from '@stackschool/shared';
+import { SchoolSelected } from '@stackschool/shared';
 import { toast } from 'sonner';
-import { useCompleteProfileStore } from '@stackschool/ui';
+import {
+  SearchSchoolQuery,
+  useCompleteProfileStore,
+  useSearchSchoolQuery,
+} from '@stackschool/ui';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { SearchInput } from '@/components/search-input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -24,32 +27,27 @@ export const SearchSchoolFrom = () => {
     schoolData?.type === 'join' ? schoolData.schoolSelected : null,
   );
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['school', searchDebounce],
-    queryFn: async (): Promise<SchoolSelected[]> => {
-      if (!searchDebounce || searchDebounce.length < 2) return [];
-      const data = await schoolService.searchSchools(searchDebounce);
-      if (data.errors) {
-        const message = data.errors[0]?.message;
-        throw new Error(message);
-      }
-      return data.data.searchSchool as SchoolSelected[];
+  const { data, isLoading, error } = useSearchSchoolQuery(
+    {
+      input: {
+        searchTerm: searchDebounce,
+      },
     },
-  });
+    { enabled: searchDebounce?.length! >= 2 },
+  );
 
-  if (error) {
-    toast.error(error.message);
-  }
-  console.log('data', data);
-  const handleClick = (school: SchoolSelected) => {
+  const handleClick = (
+    school: NonNullable<SearchSchoolQuery['searchSchool']>[number],
+  ) => {
+    if (!school) return;
     setSchoolData({
       type: 'join',
       schoolSelected: {
-        id: school.id,
+        id: school.id!,
         name: school.name,
-        code: school.code,
+        code: school.code!,
         address: school.address,
-        logo: school.logo,
+        logo: school?.logo!,
       },
     });
     toast.success(`vous avez selectionner l'école ${school.name}`);
@@ -76,30 +74,38 @@ export const SearchSchoolFrom = () => {
           }}
         />
 
-        {!!data?.length && (
+        {!!data?.searchSchool!.length ? (
           <div className=" w-full mt-1 border rounded-lg bg-slate-50 dark:bg-slate-900 shadow-lg max-h-60 overflow-y-auto overflow-x-hidden">
-            {data.map((item) => (
+            {data.searchSchool.map((item) => (
               <div
                 onClick={() => handleClick(item)}
                 className={cn(
-                  'flex px-3 py-1.5 justify-between items-center w-full font-poppins',
+                  'flex px-3 py-2 justify-start gap-3 items-center w-full font-poppins',
                   'cursor-pointer transition-colors hover:bg-slate-200 dark:hover:bg-slate-800',
                   'border-b last:border-0 border-slate-300 dark:border-slate-800',
                 )}
               >
-                <div className="flex flex-col gap-2">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={`/images/${item.logo}`} />
+                  <AvatarFallback>{item.name[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col gap-1">
                   <ItemTitle className="font-poppins font-semibold text-foreground">
                     {item.name}
                   </ItemTitle>
                   <p className="text-sm  ">{item.address}</p>
                   <p className="text-xs text-foreground">Code: {item.code}</p>
                 </div>
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={`/images/${item.logo}`} />
-                  <AvatarFallback>{item.name[0]}</AvatarFallback>
-                </Avatar>
               </div>
             ))}
+          </div>
+        ) : searchQuery ? (
+          <div className="text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+            Aucuns resultat
+          </div>
+        ) : (
+          <div className="text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+            Aucun école sélectionné. Utilisez la recherche ci-dessus.
           </div>
         )}
       </Field>

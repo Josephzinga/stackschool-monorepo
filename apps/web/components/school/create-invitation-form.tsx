@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Controller, useForm, zodResolver } from '@stackschool/ui';
+import { allRoles, Controller, useForm, zodResolver } from '@stackschool/ui';
 import { toast } from 'sonner';
 import {
   Field,
@@ -25,6 +25,9 @@ import {
   FieldError,
   FieldLabel,
 } from '@/components/ui/field';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { Mail, Phone } from 'lucide-react';
 
 interface CreateInvitationFormProps {
   schoolId: string;
@@ -36,6 +39,7 @@ export function CreateInvitationForm({
   onSuccess,
 }: CreateInvitationFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isEmail, setIsEmail] = useState<boolean>(true);
 
   const {
     register,
@@ -56,7 +60,7 @@ export function CreateInvitationForm({
   async function onSubmit(data: CreateInvitationData) {
     setIsLoading(true);
     try {
-      await api.post('/schools/invitations', data);
+      await api.post('/api/schools/invitations', data);
       toast.success('Invitation envoyée avec succès !');
 
       onSuccess?.();
@@ -83,11 +87,11 @@ export function CreateInvitationForm({
                   <SelectValue placeholder="Sélectionnez un rôle" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="STUDENT">Élève</SelectItem>
-                  <SelectItem value="TEACHER">Professeur</SelectItem>
-                  <SelectItem value="PARENT">Parent</SelectItem>
-                  <SelectItem value="STAFF">Personnel</SelectItem>
-                  <SelectItem value="ADMIN">Administrateur</SelectItem>
+                  {allRoles.map((r) => (
+                    <SelectItem value={r.value} key={r.value}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FieldError errors={[{ message: errors.role?.message }]} />
@@ -95,27 +99,57 @@ export function CreateInvitationForm({
           )}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field>
-            <FieldLabel htmlFor="emaim">Email</FieldLabel>
-            <Input
-              id="email"
-              placeholder="exemple@email.com"
-              {...register('email')}
-            />
-            <FieldError errors={[{ message: errors.email?.message }]} />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="phoneNumber">Téléphone (WhatsApp)</FieldLabel>
-            <Input
-              id="phoneNumber"
-              placeholder="+33612345678"
-              {...register('phoneNumber')}
-            />
-            <FieldError errors={[{ message: errors.phoneNumber?.message }]} />
-          </Field>
+        <div className="flex flex-col gap-3">
+          {isEmail ? (
+            <Field>
+              <FieldLabel htmlFor="emaim">Email</FieldLabel>
+              <Input
+                id="email"
+                placeholder="exemple@email.com"
+                {...register('email')}
+              />
+              <FieldError errors={[{ message: errors.email?.message }]} />
+            </Field>
+          ) : (
+            <Field>
+              <FieldLabel htmlFor="phoneNumber">
+                Téléphone (WhatsApp)
+              </FieldLabel>
+              <Controller
+                control={control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <PhoneInput
+                    onChange={field.onChange}
+                    value={field.value}
+                    className="phone-input-custom"
+                    international
+                    defaultCountry="ML"
+                  />
+                )}
+              />
+              <FieldError errors={[{ message: errors.phoneNumber?.message }]} />
+            </Field>
+          )}
+          <Button
+            variant="link"
+            onClick={() => setIsEmail(!isEmail)}
+            className="text-primary hover:text-primary/60 hover:underline"
+          >
+            <span className="flex gap-2 ">
+              {isEmail ? (
+                <>
+                  <Phone /> Utiliser un numéro de téléphone
+                </>
+              ) : (
+                <>
+                  <Mail /> Utiliser l'adresse email{' '}
+                </>
+              )}
+            </span>
+          </Button>
         </div>
+
         <FieldDescription className="text-xs text-muted-foreground px-1">
           Remplissez au moins l'un des deux champs de contact.
         </FieldDescription>

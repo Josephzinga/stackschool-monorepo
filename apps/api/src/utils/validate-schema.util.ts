@@ -6,19 +6,28 @@ import { ZodSchema } from 'zod';
  * @template T
  * @param {ZodSchema<T>} schema
  * @param {unknown} data
- * @returns {Array<{field: string, message: string}> | undefined}
- * Retourne un tableau d'objets d'erreur si la validation échoue,
- * sinon retourne `undefined` si la validation réussit.
+ * @returns {SafeValidateSchemaResult<T>}
  */
+
+interface SafeValidateSchemaResult<T> {
+  success: boolean;
+  data?: T;
+  errors?: Array<{ field: string; message: string }>;
+}
+
 export function safeValidateSchema<T>(
   schema: ZodSchema<T>,
-  data: T,
-): Array<{ field: string; message: string }> | undefined {
+  data: unknown,
+): SafeValidateSchemaResult<T> {
   const result = schema.safeParse(data);
+
   if (!result.success) {
-    return result.error.issues.map((issue) => ({
+    const errors = result.error.issues.map((issue) => ({
       field: issue.path.join('.'),
       message: issue.message,
     }));
+    return { errors, success: false };
   }
+
+  return { data: result.data, success: true };
 }

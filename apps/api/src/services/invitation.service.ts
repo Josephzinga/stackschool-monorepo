@@ -1,10 +1,5 @@
 import { prisma, SchoolRole } from '@stackschool/db';
-import {
-  generate6Code,
-  generateToken,
-  hashCode,
-  hashToken,
-} from '../lib/outils';
+import { generate6Code } from '../lib/outils';
 import { sendResetPasswordEmail } from './mail.service'; // On va l'adapter
 import sendWhatsAppMessage from './whatsapp.service';
 
@@ -21,8 +16,8 @@ export async function createAndSendInvitation(params: CreateInvitationParams) {
   const { schoolId, role, email, phoneNumber, message } = params;
 
   // 1. Générer un token unique
-  const token = generateToken(32);
-  const tokenHash = hashToken(token);
+  const code = generate6Code();
+  const hashCode = hashCode(code);
   const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7); // 7 jours
 
   // 2. Créer l'invitation en base
@@ -52,10 +47,9 @@ export async function createAndSendInvitation(params: CreateInvitationParams) {
   }
 
   if (phoneNumber) {
-    const whatsappMessage = `${invitation.message} Cliquez ici pour accepter : ${joinUrl}`;
+    const whatsappMessage = `${invitation.message} Cliquez ici pour accepter : $}`;
     const code = generate6Code();
-    const codeHashed = hashCode(code);
-    await sendWhatsAppMessage(phoneNumber, codeHashed);
+    await sendWhatsAppMessage(phoneNumber, code);
   }
 
   return invitation;

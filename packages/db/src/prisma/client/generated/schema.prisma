@@ -28,6 +28,7 @@ model User {
   sessions          Session[]
   VerificationCode  VerificationCode[]
   VerificationToken VerificationToken[]
+  payments          Payment[] // Relation inverse pour les paiements effectués par cet utilisateur
 
   @@index([email])
 }
@@ -42,22 +43,28 @@ model Profile {
   userId    String    @unique
   photo     String?
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Student   Student[]
+  student   Student[]
 }
 
 model School {
-  id            String         @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String
-  slug          String?        @unique
+  slug          String?   @unique
   address       String
-  code          String?        @unique
+  code          String?   @unique
   planId        String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
   inviationCode String?
   logo          String?
   motto         String?
+
+  orangeMerchantId String?
+  paymentApiKey    String?
+  walletBalance    Float     @default(0)
+  payment          Payment[]
+
   classes       Class[]
   memberships   SchoolUser[]
   students      Student[]
@@ -74,14 +81,15 @@ model SchoolUser {
   role         SchoolRole
   isOwner      Boolean        @default(false)
   createdAt    DateTime       @default(now())
-  Class        Class[]
-  ClassTeacher ClassTeacher[]
+  class        Class[]
+  classTeacher ClassTeacher[]
   school       School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   Staff        Staff?
   subject      Subject[]
-  Teacher      Teacher?
+  teacher      Teacher?
   Parent       Parent?
+  student      Student?
 
   @@unique([schoolId, userId])
   @@index([schoolId])
@@ -93,7 +101,7 @@ model SchoolUser {
 /// * Subject: utilise pivot ClassSubjects (explicit)
 model Subject {
   id            String          @id @default(cuid())
-  name          String
+  name          String          @unique
   code          String?
   schoolId      String
   teacherId     String?
@@ -101,13 +109,35 @@ model Subject {
   updatedAt     DateTime        @updatedAt
   schoolUserId  String?
   ClassSubjects ClassSubjects[]
-  Exam          Exam[]
+  exam          Exam[]
   school        School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  SchoolUser    SchoolUser?     @relation(fields: [schoolUserId], references: [id])
+  schoolUser    SchoolUser?     @relation(fields: [schoolUserId], references: [id])
   teacher       Teacher?        @relation(fields: [teacherId], references: [id])
+  lessons       Lesson[]
 
   @@unique([code, schoolId])
   @@index([schoolId])
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  name      String?
+  day       Day
+  startTime DateTime
+  endTime   DateTime
+
+  subjectId String
+  teacherId String
+  classId   String
+  examId    String?
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  exam      Exam?   @relation(fields: [examId], references: [id])
+
+  @@index([classId])
+  @@index([teacherId])
+  @@index([subjectId])
 }
 
 /// *
@@ -135,7 +165,8 @@ model Exam {
   updatedAt DateTime @updatedAt
   class     Class    @relation(fields: [classId], references: [id])
   subject   Subject  @relation(fields: [subjectId], references: [id])
-  Result    Result[]
+  result    Result[]
+  lesson    Lesson[]
 
   @@index([classId])
   @@index([subjectId])
@@ -154,18 +185,23 @@ model Result {
 }
 
 model Class {
-  id            String          @id @default(cuid())
-  name          String
-  level         String
-  section       String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  schoolId      String
-  teacherId     String?
-  school        School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  teacher       SchoolUser?     @relation(fields: [teacherId], references: [id])
+  id           String   @id @default(cuid())
+  name         String   @unique
+  level        String
+  section      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  schoolId     String
+  teacherId    String?
+  supervisorId String?
+
+  school     School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  teacher    SchoolUser? @relation(fields: [teacherId], references: [id])
+  supervisor Teacher?    @relation("ClassSupervisor", fields: [supervisorId], references: [id])
+
   classSubjects ClassSubjects[]
-  ClassTeacher  ClassTeacher[]
+  classTeacher  ClassTeacher[]
+  lessons       Lesson[]
   exam          Exam[]
   students      Student[]
 
@@ -179,7 +215,7 @@ model ClassTeacher {
   classId       String
   teacherId     String
   createdAt     DateTime    @default(now())
-  staffMemberId String
+  staffMemberId String?
   schoolUserId  String?
   class         Class       @relation(fields: [classId], references: [id], onDelete: Cascade)
   SchoolUser    SchoolUser? @relation(fields: [schoolUserId], references: [id])
@@ -195,6 +231,7 @@ model ClassTeacher {
 model Student {
   id             String          @id @default(cuid())
   profileId      String
+  schoolUserId   String          @unique
   matricule      String
   enrollmentYear String
   birthDate      DateTime
@@ -208,13 +245,16 @@ model Student {
   motherName     String?
   nationality    String?
   attendances    Attendance[]
-  ParentStudent  ParentStudent[]
+  parentStudent  ParentStudent[]
   Result         Result[]
   schoolClass    Class?          @relation(fields: [classId], references: [id])
   profile        Profile         @relation(fields: [profileId], references: [id])
   school         School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser     SchoolUser      @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  payments       Payment[] // Relation inverse pour les paiements liés à cet étudiant
 
   @@unique([matricule, schoolId])
+  @@index([schoolUserId])
   @@index([schoolId])
 }
 
@@ -253,7 +293,8 @@ model Invite {
   phoneNumber String?
   schoolId    String
   studentId   String?
-  token       String     @unique
+  token       String?    @unique
+  code        String?    @unique
   relation    String?
   createdAt   DateTime   @default(now())
   expiresAt   DateTime
@@ -329,6 +370,33 @@ model Account {
   @@index([userId])
 }
 
+model Payment {
+  id          String        @id @default(cuid())
+  amount      Float
+  netAmount   Float
+  serviceFee  Float
+  status      PaymentStatus @default(PENDING)
+  type        PaymentType
+  description String?
+  providerRef String?       @unique
+
+  // Infos payeur (si non connecté)
+  payerPhone String?
+  payerName  String?
+
+  // Infos payeur (si connecté)
+  payerId String?
+  payer   User?   @relation(fields: [payerId], references: [id])
+
+  schoolId  String
+  school    School  @relation(fields: [schoolId], references: [id])
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model VerificationToken {
   createdAt DateTime  @default(now())
   expiresAt DateTime
@@ -374,21 +442,24 @@ model Session {
 }
 
 model Teacher {
-  id             String         @id @default(cuid())
-  schoolUserId   String         @unique
-  diploma        String?
-  experience     String?
-  hireDate       DateTime?
-  isActive       Boolean
-  salary         Float?
-  departement    String?
-  specialization String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  attendance     Attendance[]
-  classTeacher   ClassTeacher[]
-  Subject        Subject[]
-  schoolUser     SchoolUser     @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  id                String         @id @default(cuid())
+  schoolUserId      String         @unique
+  diploma           String?
+  experience        String?
+  hireDate          DateTime?
+  isActive          Boolean
+  salary            Float?
+  departement       String?
+  addrress          String?
+  specialization    String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  attendance        Attendance[]
+  classTeacher      ClassTeacher[]
+  Subject           Subject[]
+  schoolUser        SchoolUser     @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  lessons           Lesson[]
+  supervisedClasses Class[]        @relation("ClassSupervisor")
 
   @@map("Teachers")
 }
@@ -446,4 +517,31 @@ enum ContactPreference {
   WHATSAPP
   EMAIL
   PHONE
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentType {
+  TUITION // Scolarité
+  REGISTRATION // Inscription
+  CANTEEN // Cantine
+  TRANSPORT // Transport
+  UNIFORM // Tenue
+  OTHER
 }

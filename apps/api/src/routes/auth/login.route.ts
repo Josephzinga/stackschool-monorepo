@@ -24,8 +24,6 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
       }
 
       if (info) {
-        console.log('info:', info);
-
         return next(info);
       }
 

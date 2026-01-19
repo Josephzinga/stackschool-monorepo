@@ -1,6 +1,12 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Controller,
+  relationItems,
+  useCompleteProfileStore,
+  useFieldArray,
+  zodResolver,
+} from '@stackschool/ui';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check, User, UserPlus, X } from 'lucide-react';
@@ -16,12 +22,6 @@ import {
   StudentResult,
 } from '@stackschool/shared';
 import { toast } from 'sonner';
-import {
-  Controller,
-  relationItems,
-  useCompleteProfileStore,
-  useFieldArray,
-} from '@stackschool/ui';
 import { SubmitButton } from '@/components/submit-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 

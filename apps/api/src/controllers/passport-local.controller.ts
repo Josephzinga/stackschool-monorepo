@@ -44,7 +44,7 @@ export default async function handleLocalAuth(
     });
 
     if (!user) {
-      return done(null, false, { message: 'Utilisateur introuvable' });
+      return done(null, false, { message: 'Identifiants invalides' });
     }
 
     // Analyse des comptes (Local vs Social)

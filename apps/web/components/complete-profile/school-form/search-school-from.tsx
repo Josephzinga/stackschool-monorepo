@@ -74,35 +74,43 @@ export const SearchSchoolFrom = () => {
           }}
         />
 
-        {!!data?.searchSchool!.length && (
+        {!!data?.searchSchool!.length ? (
           <div className=" w-full mt-1 border rounded-lg bg-slate-50 dark:bg-slate-900 shadow-lg max-h-60 overflow-y-auto overflow-x-hidden">
             {data.searchSchool.map((item) => (
               <div
                 onClick={() => handleClick(item)}
                 className={cn(
-                  'flex px-3 py-1.5 justify-between items-center w-full font-poppins',
+                  'flex px-3 py-2 justify-start gap-3 items-center w-full font-poppins',
                   'cursor-pointer transition-colors hover:bg-slate-200 dark:hover:bg-slate-800',
                   'border-b last:border-0 border-slate-300 dark:border-slate-800',
                 )}
               >
-                <div className="flex flex-col gap-2">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={`/images/${item.logo}`} />
+                  <AvatarFallback>{item.name[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col gap-1">
                   <ItemTitle className="font-poppins font-semibold text-foreground">
                     {item.name}
                   </ItemTitle>
                   <p className="text-sm  ">{item.address}</p>
                   <p className="text-xs text-foreground">Code: {item.code}</p>
                 </div>
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={`/images/${item.logo}`} />
-                  <AvatarFallback>{item.name[0]}</AvatarFallback>
-                </Avatar>
               </div>
             ))}
+          </div>
+        ) : searchQuery ? (
+          <div className="text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+            Aucuns resultat
+          </div>
+        ) : (
+          <div className="text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+            Aucun école sélectionné. Utilisez la recherche ci-dessus.
           </div>
         )}
       </Field>
 
-      {schoolSelected && !searchQuery ? (
+      {schoolSelected && !searchQuery && (
         <div className="flex flex-col gap-10">
           <Item className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700 p-2 transition-colors px-4">
             <div className="flex justify-between items-center w-full font-inter">
@@ -128,14 +136,6 @@ export const SearchSchoolFrom = () => {
           <Button onClick={() => setCurrentStep(2)}>
             <Button>Continuer →</Button>
           </Button>
-        </div>
-      ) : !data && searchQuery && !isLoading ? (
-        <div className="text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
-          Aucuns resultat
-        </div>
-      ) : (
-        <div className="text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
-          Aucun école sélectionné. Utilisez la recherche ci-dessus.
         </div>
       )}
     </div>

@@ -48,9 +48,9 @@ router.post(
         prisma.user.findFirst({
           where: {
             OR: [
-              { username: identifier },
-              { phoneNumber: identifier },
-              { email: identifier },
+              { username: { equals: identifier, mode: 'insensitive' } },
+              { phoneNumber: { equals: identifier, mode: 'insensitive' } },
+              { email: { equals: identifier, mode: 'insensitive' } },
             ],
           },
           select: {

@@ -1,6 +1,5 @@
-import { Account, Profile, User } from "@stackschool/shared";
-import { redisClient } from "./redis";
-import { prisma } from "./prisma";
+import { redisClient } from './redis';
+import { prisma } from './prisma';
 
 export const getUserFromRedis = async (userId: string) => {
   const redisKey = `user_profile:${userId}`;
@@ -13,7 +12,17 @@ export const getUserFromRedis = async (userId: string) => {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { profile: true, Account: true },
+    include: {
+      profile: {
+        select: {
+          id: true,
+          photo: true,
+          lastname: true,
+          firstname: true,
+        },
+      },
+      Account: true,
+    },
   });
 
   await redisClient.setEx(redisKey, 12 * 60 * 60, JSON.stringify(user));

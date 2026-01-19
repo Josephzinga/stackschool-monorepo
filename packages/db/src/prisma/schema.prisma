@@ -37,6 +37,7 @@ model Profile {
   id        String    @id @default(cuid())
   firstname String?
   lastname  String?
+  adress    String?
   gender    Gender?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -129,9 +130,11 @@ model Lesson {
   subjectId String
   teacherId String
   classId   String
+  examId    String?
   subject   Subject @relation(fields: [subjectId], references: [id])
   teacher   Teacher @relation(fields: [teacherId], references: [id])
   class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  exam      Exam?   @relation(fields: [examId], references: [id])
 
   @@index([classId])
   @@index([teacherId])
@@ -141,11 +144,13 @@ model Lesson {
 /// *
 /// * Pivot explicit pour Class <-> Subject
 model ClassSubjects {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   classId   String
   subjectId String
-  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacherId String?
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@unique([classId, subjectId])
   @@index([classId])
@@ -164,6 +169,7 @@ model Exam {
   class     Class    @relation(fields: [classId], references: [id])
   subject   Subject  @relation(fields: [subjectId], references: [id])
   result    Result[]
+  lesson    Lesson[]
 
   @@index([classId])
   @@index([subjectId])
@@ -206,7 +212,7 @@ model Class {
 }
 
 /// *
-/// * Pivot Prof <-> Classe (nouveau)
+/// * Pivot Prof <-> Classe
 model ClassTeacher {
   id            String      @id @default(cuid())
   classId       String
@@ -261,7 +267,6 @@ model Parent {
   id                String            @id @default(cuid())
   schoolUserId      String            @unique
   profession        String?
-  address           String?
   isDelegate        Boolean           @default(false)
   createdAt         DateTime          @default(now())
   contactPreference ContactPreference
@@ -447,7 +452,6 @@ model Teacher {
   isActive          Boolean
   salary            Float?
   departement       String?
-  addrress          String?
   specialization    String?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt

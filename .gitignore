@@ -1,11 +1,4 @@
 .env
-packages/ui/node_modules
-packages/ui/.env
-apps/api/node_modules
-apps/api/.env
-apps/web/node_modules
-apps/web/.env
-apps/mobile/node_modules
 node_modules
 .idea
 .vscode

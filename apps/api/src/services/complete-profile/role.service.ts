@@ -55,6 +55,7 @@ export async function handleRoleCreation(
             diploma: roleData.teacher.diploma,
             departement: roleData.teacher.department,
             isActive: true,
+
           },
         });
 
@@ -69,7 +70,8 @@ export async function handleRoleCreation(
               data: {
                 classId: assignment.classId,
                 teacherId: teacher.id,
-                staffMemberId: 'TEMP_ID', // TODO: Gérer staffMemberId si obligatoire ou le rendre optionnel
+                staffMemberId: 'TEMP_ID',
+
                 // Si le prof est titulaire, on peut mettre à jour la classe (si le modèle le permet)
               },
             });

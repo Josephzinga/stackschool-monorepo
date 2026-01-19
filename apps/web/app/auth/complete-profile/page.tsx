@@ -2,16 +2,17 @@
 
 import SchoolStep from '../../../components/complete-profile/schoolStep';
 import { Container } from '@/components/Container';
-import { Card } from '@/components/ui/card';
 
 import { useCompleteProfileStore, useUserStore } from '@stackschool/ui';
 import { School } from '@stackschool/shared';
-import { ProfileStep } from '@/components/complete-profile/profile-step';
 import ProtectedRoute from '@/components/protected-route';
 import Stepper from '@/components/Stepper';
 import RoleStep from '@/components/complete-profile/RoleStep';
+import * as React from 'react';
 import { useEffect } from 'react';
 import ReviewStep from '@/components/complete-profile/review-step';
+import { Card } from '@/components/ui/card';
+import { ProfileStep } from '@/components/complete-profile/profile-step';
 
 export type CompleteProfileData = {
   school: {
@@ -31,14 +32,6 @@ export default function CompleteProfile() {
   useEffect(() => {
     loadFromRedis();
   }, []);
-
-  const handleNext = () => {
-    setCurrentStep(Math.min(currentStep + 1, totalSteps));
-  };
-
-  const handleBack = () => {
-    setCurrentStep(Math.max(currentStep - 1, 1));
-  };
 
   const renderStepContent = () => {
     switch (currentStep) {

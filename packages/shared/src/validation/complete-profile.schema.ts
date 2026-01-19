@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { profileSchema } from '@stackschool/shared/src';
 
 z.config(z.locales.fr());
 export const createSchoolSchema = z.object({
@@ -13,25 +14,46 @@ export const createSchoolSchema = z.object({
   code: z.string().length(6, 'Le code doit contenir 6 caractères'),
 });
 
+export const schoolSelectedSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  code: z.string().optional().nullable(),
+  address: z.string(),
+  logo: z.string().optional().nullable(),
+});
+
+// Schéma global pour l'étape École (Union)
+export const schoolDataSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('create'),
+    newSchool: createSchoolSchema,
+  }),
+  z.object({
+    type: z.literal('join'),
+    schoolSelected: schoolSelectedSchema,
+  }),
+  z.object({
+    type: z.literal('invite'),
+    schoolId: z.string(),
+    invitationCode: z.string().optional(),
+  }),
+]);
+
+// --- Étape 3 : Rôle ---
+
 // Schéma pour les informations de l'étudiant
 export const studentFormSchema = z.object({
   matricule: z.string().min(1, 'Le matricule est requis'),
-  birthDate: z.date({
-    error: (issue) =>
-      issue.input === undefined
-        ? 'La date de naissance est requise'
-        : 'Format de date invalide',
+  birthDate: z.coerce.date({
+    // coerce pour gérer les strings ISO
+    errorMap: (issue, ctx) => ({ message: 'Date de naissance invalide' }),
   }),
-  classId: z.string('Veillez sélectionner une classe'), // Optionnel si pas encore affecté
+  classId: z.string().optional(),
   enrollmentYear: z.string().optional(),
-  fatherName: z
-    .string('Le nom du pére est requis')
-    .min(3, 'Le nom du pére doit contenir au moins 3 caracteres'),
-  motherName: z
-    .string('Le nom de la mére est requise')
-    .min(3, 'Le nom de la mére doit contenir au moins 3 caracteres'),
-  nationality: z.string('La nationalité est requise'),
-  birthPlace: z.string().min(5, 'Le lieu de naissance est invalide'),
+  fatherName: z.string().min(3, 'Le nom du père est requis').optional(),
+  motherName: z.string().min(3, 'Le nom de la mère est requis').optional(),
+  nationality: z.string().optional(),
+  birthPlace: z.string().min(2, 'Le lieu de naissance est requis'),
 });
 
 // Schéma pour les informations du parent
@@ -58,17 +80,17 @@ export const parentFormSchema = z.object({
     .min(1, 'Veuillez sélectionner au moins un enfant.'),
 
   contactPreference: z.enum(['WHATSAPP', 'PHONE', 'EMAIL']),
-  address: createSchoolSchema.shape.address,
+  address: z.string().optional(),
   profession: z
     .string()
-    .min(3, 'veillez entrez une profession valide')
+    .min(3, 'Veuillez entrer une profession valide')
     .optional(),
 });
 
 export const invitationSchema = z.object({
   invitationCode: z
     .string()
-    .min(5, "Le code d'invitation doit contenir au moins 6 lettre"),
+    .min(5, "Le code d'invitation doit contenir au moins 6 lettres"),
 });
 
 // Schéma pour les informations de l'enseignant
@@ -84,17 +106,41 @@ export const teacherSchema = z.object({
           .array(z.string())
           .min(1, 'Sélectionnez au moins une matière'),
         className: z.string().optional(),
-        subjectNames: z.array(z.string()),
+        subjectNames: z.array(z.string()).optional(),
       }),
     )
     .min(1, 'Veuillez sélectionner au moins une classe'),
 });
+
 export const StaffFormSchema = z.object({
   position: z.string().min(2, 'Le poste est requis'),
   departement: z.string().min(2, 'Le département est requis'),
-  hireDate: z.date().optional(),
-  //...
+  hireDate: z.coerce.date().optional(),
 });
+
+// Schéma global pour l'étape Rôle (Union)
+export const roleDataSchema = z.discriminatedUnion('role', [
+  z.object({
+    role: z.literal('STUDENT'),
+    student: studentFormSchema,
+  }),
+  z.object({
+    role: z.literal('PARENT'),
+    parent: parentFormSchema,
+  }),
+  z.object({
+    role: z.literal('TEACHER'),
+    teacher: teacherSchema,
+  }),
+  z.object({
+    role: z.literal('STAFF'),
+    staff: StaffFormSchema,
+  }),
+  z.object({
+    role: z.literal('ADMIN'),
+    admin: StaffFormSchema, // Ou un schéma spécifique admin
+  }),
+]);
 
 // Types inférés
 export type StaffFormValues = z.infer<typeof StaffFormSchema>;
@@ -103,3 +149,6 @@ export type CreateSchoolType = z.infer<typeof createSchoolSchema>;
 export type StudentFormData = z.infer<typeof studentFormSchema>;
 export type ParentFormData = z.infer<typeof parentFormSchema>;
 export type TeacherFormData = z.infer<typeof teacherSchema>;
+export type ProfileFormData = z.infer<typeof profileSchema>;
+export type SchoolData = z.infer<typeof schoolDataSchema>;
+export type RoleData = z.infer<typeof roleDataSchema>;

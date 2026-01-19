@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true, // Génère les fichiers .d.ts pour les types
+    "declarationMap": true // Génère les fichiers .d.ts.map
+  },
+  "include": [
+    "index.ts",
+    "src/**/*",
+    "src/types/api-response.ts",
+    "../ui/src/lib/index.ts"
+  ],
+  "exclude": ["node_modules", "dist"],
+  "references": []
+}

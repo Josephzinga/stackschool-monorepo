@@ -24,7 +24,12 @@ import {
   User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { StudentFormData, studentFormSchema } from '@stackschool/shared';
+import {
+  generateStudentMatricule,
+  parseAxiosError,
+  StudentFormData,
+  studentFormSchema,
+} from '@stackschool/shared';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { SubmitButton } from '@/components/submit-button';
 import {
@@ -33,10 +38,9 @@ import {
   PopoverTrigger,
 } from '@/components/animate-ui/components/radix/popover';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 export default function StudentForm({ onBack }: { onBack: () => void }) {
-  const { setRoleData, school, role, setCurrentStep } =
+  const { setRoleData, school, role, setCurrentStep, profile } =
     useCompleteProfileStore();
   const studentData = role?.role === 'STUDENT' ? role.student : null;
   const {
@@ -48,13 +52,13 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
     resolver: zodResolver(studentFormSchema),
     mode: 'onBlur',
     defaultValues: {
-      birthDate: studentData?.birthDate
-        ? new Date(studentData.birthDate)
-        : undefined,
+      birthDate: studentData?.birthDate,
       birthPlace: studentData?.birthPlace || '',
       fatherName: studentData?.fatherName || '',
       motherName: studentData?.motherName || '',
-      matricule: studentData?.matricule || '',
+      matricule:
+        studentData?.matricule ||
+        generateStudentMatricule(profile?.firstname!, profile?.lastname!),
       classId: studentData?.classId || '',
       enrollmentYear: studentData?.enrollmentYear || '',
     },
@@ -84,9 +88,8 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
 
   useEffect(() => {
     if (error) {
-      toast.error(
-        (error?.message as string) || 'Echec de chargement de classes',
-      );
+      const { message } = parseAxiosError(error);
+      toast.error(message || 'Echec de chargement de classes');
     }
   }, []);
 
@@ -96,10 +99,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, (err) => console.log(err))}
-      className="space-y-4 font-poppins"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 font-poppins">
       <div className="grid grid-cols-2 gap-4">
         <Field>
           <FieldLabel htmlFor="matricule">Matricule</FieldLabel>

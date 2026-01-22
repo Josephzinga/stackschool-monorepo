@@ -1,0 +1,132 @@
+query SearchStudent($input: StudentSearchInput!) {
+  searchStudent(filter: $input) {
+    id
+    firstname
+    lastname
+    matricule
+    photo
+    className
+  }
+}
+
+query SearchSchool($input: SchoolSearchInput!) {
+  searchSchool(filter: $input) {
+    id
+    name
+    address
+    code
+    logo
+  }
+}
+
+query GetClassSubjects($input: StudentSearchInput!) {
+  getClassSubjects(filter: $input) {
+    id
+    name
+    level
+    section
+    subjects {
+      id
+      name
+      code
+    }
+  }
+}
+
+mutation ConfirmCompleteProfile {
+  confirmCompleteProfile {
+    ok
+    message
+    user {
+      id
+      email
+      profileCompleted
+      hasMembership
+    }
+  }
+}
+query GetMe {
+  me {
+      id
+      username
+      phoneNumber
+      email
+      profileCompleted
+      hasMembership
+
+      profile {
+        id
+        address
+        firstname
+        lastname
+        gender
+        photo
+      }
+      memberships {
+        id
+        role
+        school {
+          id
+          name
+          logo
+          slug
+          address
+        }
+      }
+
+}
+
+}
+
+query GetDashboardContext($input: SchoolId!) {
+  me {
+      schoolContext(schoolId: $input) {
+        id
+        role
+        teacher {
+          id
+          departement
+          specialization
+          classes {
+            id
+            name
+            section
+            subjects {
+              id
+              name
+              lessons {
+                id
+                name
+                startTime
+                endTime
+                day
+              }
+            }
+          }
+          supervisedClasses {
+            id
+            section
+            section
+          }
+        }
+        staff {
+          id
+          position
+          departement
+          schoolUserId
+        }
+        parent {
+          id
+          isDelegate
+          students {
+            id
+            className
+            firstname
+            matricule
+          }
+        }
+    }
+  }
+}
+
+

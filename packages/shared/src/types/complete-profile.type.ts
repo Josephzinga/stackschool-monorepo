@@ -65,6 +65,7 @@ export interface ProfileData {
   firstname: string;
   lastname: string;
   gender: Gender;
+  address: string | undefined;
   photo?: string | undefined;
   email?: string | undefined;
   phoneNumber?: string | undefined;
@@ -74,7 +75,7 @@ export type UserInMe = User & {
   profile: Profile;
   Account: Account[];
 };
-
+type Moi = UserInMe['id'];
 export interface SchoolClass {
   id: string;
   name: string;

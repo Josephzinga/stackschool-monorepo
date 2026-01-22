@@ -1,4 +1,4 @@
-import { Prisma, SchoolRole } from '@stackschool/db';
+import { Prisma } from '@stackschool/db';
 import { RoleData } from '@stackschool/shared';
 
 type PrismaTx = Prisma.TransactionClient;
@@ -17,18 +17,12 @@ export async function handleRoleCreation(
   schoolId: string,
   roleData: RoleData,
 ) {
-  const role = roleData.role as SchoolRole;
+  const role = roleData.role;
   console.log('schoolId', schoolId);
 
   // 1. Créer le SchoolUser de base (Membre de l'école)
-  // Note: Si l'utilisateur a créé l'école, il est déjà ADMIN via handleSchoolCreation.
-  // On doit vérifier pour ne pas créer de doublon ou gérer le cas ADMIN séparément.
-
   let schoolUser;
 
-  // Si c'est une création d'école, le SchoolUser ADMIN a déjà été créé.
-  // On le récupère pour potentiellement lui attacher d'autres infos si besoin,
-  // mais généralement un ADMIN n'a pas de profil étendu complexe dans ce flux.
   const existingMember = await tx.schoolUser.findUnique({
     where: { schoolId_userId: { schoolId, userId } },
   });
@@ -55,7 +49,6 @@ export async function handleRoleCreation(
             diploma: roleData.teacher.diploma,
             departement: roleData.teacher.department,
             isActive: true,
-
           },
         });
 
@@ -65,22 +58,50 @@ export async function handleRoleCreation(
           roleData.teacher.assignments.length > 0
         ) {
           for (const assignment of roleData.teacher.assignments) {
-            // Créer le lien Prof <-> Classe
+            // Création du lien Prof <-> Classe
             await tx.classTeacher.create({
               data: {
                 classId: assignment.classId,
                 teacherId: teacher.id,
-                staffMemberId: 'TEMP_ID',
-
-                // Si le prof est titulaire, on peut mettre à jour la classe (si le modèle le permet)
+                // On utilise le nom de la classe s'il est fourni dans les données Redis
+                // Sinon on laisse null (c'est un champ optionnel/redondant)
+                name: assignment.className || undefined,
               },
             });
 
-            // Si le prof enseigne des matières spécifiques dans cette classe
-            // Note: Votre modèle actuel lie Subject à Class via ClassSubjects,
-            // mais ne lie pas directement un Prof à une Matière DANS une classe via une table simple.
-            // Si vous voulez dire "Ce prof enseigne Maths en 6ème A", il faudrait une relation.
-            // Pour l'instant, on a juste lié le prof à la classe.
+            // Si Prof Principal (Titulaire)
+            if (assignment.isMainTeacher) {
+              await tx.class.update({
+                where: {
+                  id: assignment.classId,
+                },
+                data: {
+                  supervisorId: teacher.id,
+                },
+              });
+            }
+
+            if (assignment.subjectIds && assignment.subjectIds.length > 0) {
+              for (const subjectID of assignment.subjectIds) {
+                try {
+                  await tx.classSubjects.update({
+                    where: {
+                      classId_subjectId: {
+                        classId: assignment.classId,
+                        subjectId: subjectID,
+                      },
+                    },
+                    data: {
+                      teacherId: teacher.id,
+                    },
+                  });
+                } catch (e) {
+                  console.warn(
+                    `Impossible de lier le prof ${teacher.id} à la matière ${subjectID} dans la classe ${assignment.classId} (Lien inexistant ?)`,
+                  );
+                }
+              }
+            }
           }
         }
       }
@@ -90,6 +111,7 @@ export async function handleRoleCreation(
       const { id: profileId } = await tx.profile.findUniqueOrThrow({
         where: { userId },
       });
+
       const {
         matricule,
         motherName,
@@ -100,23 +122,23 @@ export async function handleRoleCreation(
         classId,
         birthPlace,
       } = roleData.student;
+
       if (roleData.student) {
-        const student = await tx.student.create({
+        await tx.student.create({
           data: {
-            schoolId,
-            profileId,
             schoolUserId: schoolUser.id,
+            classId,
             matricule,
             motherName,
             fatherName,
             birthDate,
-            birthPlace,
             nationality,
-            enrollmentYear: enrollmentYear as string,
-            classId,
+            enrollmentYear,
+            birthPlace,
+            schoolId,
+            profileId,
           },
         });
-        console.log('student', student);
       }
       break;
 
@@ -126,12 +148,10 @@ export async function handleRoleCreation(
           data: {
             schoolUserId: schoolUser.id,
             profession: roleData.parent.profession,
-            address: roleData.parent.address,
             contactPreference: roleData.parent.contactPreference,
           },
         });
 
-        // Lier les enfants
         if (roleData.parent.children && roleData.parent.children.length > 0) {
           for (const child of roleData.parent.children) {
             await tx.parentStudent.create({
@@ -147,7 +167,7 @@ export async function handleRoleCreation(
       break;
 
     case 'ADMIN':
-      // Rien de spécifique pour l'instant, le SchoolUser suffit
+      // Rien de spécifique pour l'instant
       break;
   }
 }

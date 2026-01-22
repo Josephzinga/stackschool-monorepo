@@ -75,7 +75,8 @@ export default function SuccessStep() {
           height={height}
           width={width}
           numberOfPieces={500}
-          gravity={0.5}
+          friction={1}
+          gravity={0.4}
           colors={['red', 'green', 'blue', 'purple', 'yellow']}
         />
       )}

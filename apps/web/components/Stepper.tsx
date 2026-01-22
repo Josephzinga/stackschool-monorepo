@@ -15,9 +15,8 @@ const Stepper: React.FC<StepperProps> = ({
   setCurrentStep,
 }) => {
   let numberOfSteps = 3;
-  if (currentStep === 4) {
-    numberOfSteps = 4;
-  }
+  const current = currentStep >= 4 ? 3 : currentStep;
+
   return (
     <div className={cn('w-full max-w-lg mx-auto px-2 py-3', className)}>
       <div className="relative flex items-center justify-between">
@@ -26,7 +25,7 @@ const Stepper: React.FC<StepperProps> = ({
         <div
           className="absolute left-0 top-[calc(50% - 13px)] -translate-y-1/2 h-3 bg-blue-700 transition-all duration-500 ease-in-out rounded-lg"
           style={{
-            width: `${((currentStep - 1) / (numberOfSteps - 1)) * 100}%`,
+            width: `${((current - 1) / (numberOfSteps - 1)) * 100}%`,
           }}
         />
 

@@ -11,3 +11,4 @@ export * from './validation/complete-profile.schema';
 export * from './validation/create-invitation.schema';
 export * from './validation/search-student.schema';
 export * from './graphql/graphql-query';
+export * from './utils/matricule.util';

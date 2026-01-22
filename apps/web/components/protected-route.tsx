@@ -11,16 +11,13 @@ export default function ProtectedRoute({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { setUser } = useUserStore();
+  const { setUser, currentSchool, setCurrentSchool } = useUserStore();
 
-  // On utilise useGetMeQuery pour vérifier la session
-  // retry: false pour ne pas insister si 401
   const { data, isLoading, error } = useGetMeQuery({}, { retry: false });
 
   useEffect(() => {
     // 1. Si chargement terminé et pas d'utilisateur (ou erreur)
     if (!isLoading && (!data?.me || error)) {
-      // Si on n'est pas déjà sur une page publique (auth), on redirige
       if (!pathname.startsWith('/auth')) {
         router.replace('/auth/login');
       }
@@ -35,32 +32,60 @@ export default function ProtectedRoute({
         data.me.profileCompleted && data.me.hasMembership;
       const isOnCompleteProfile = pathname === '/auth/complete-profile';
       const isOnAuthPage = pathname.startsWith('/auth') && !isOnCompleteProfile;
+      const isOnSelectSchool = pathname === '/dashboard/select-school';
 
-      // Cas A : Profil incomplet mais l'utilisateur essaie d'accéder à l'app
+      // Cas A : Profil incomplet
       if (!isProfileComplete && !isOnCompleteProfile && !isOnAuthPage) {
         router.replace('/auth/complete-profile');
         return;
       }
 
-      // Cas B : Profil complet mais l'utilisateur est sur complete-profile ou login
-      if (isProfileComplete && (isOnCompleteProfile || isOnAuthPage)) {
-        router.replace('/dashboard');
-        return;
+      // Cas B : Profil complet
+      if (isProfileComplete) {
+        // Redirection depuis les pages d'auth
+        if (isOnCompleteProfile || isOnAuthPage) {
+          router.replace('/dashboard');
+          return;
+        }
+
+        // Gestion Multi-Écoles
+        const memberships = data.me.memberships || [];
+
+        // Si pas d'école choisie
+        if (!currentSchool && !isOnSelectSchool) {
+          if (memberships.length === 1) {
+            // Une seule école : Auto-sélection
+            setCurrentSchool(memberships[0]?.school);
+          } else if (memberships.length > 1) {
+            // Plusieurs écoles : Redirection vers la sélection
+            router.replace('/dashboard/select-school');
+            return;
+          } else {
+            // Aucune école (ne devrait pas arriver si hasMembership=true, mais sécurité)
+            router.replace('/auth/complete-profile');
+            return;
+          }
+        }
       }
     }
-  }, [isLoading, router, data, error, pathname, setUser]);
+  }, [
+    isLoading,
+    router,
+    data,
+    error,
+    pathname,
+    setUser,
+    currentSchool,
+    setCurrentSchool,
+  ]);
 
-  // Pendant le chargement ou la redirection, on affiche un loader
-  // pour éviter le "flash" de contenu protégé ou de la page de login
   if (isLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-slate-900">
-        <Spinner className="h-10 w-10 text-primary font-bold" />
+      <div className="h-screen w-full flex items-center justify-center bg-background">
+        <Spinner className="h-8 w-8 text-primary" />
       </div>
     );
   }
 
-  // Si on est connecté (ou sur une page publique autorisée), on affiche le contenu
-  // Note: Pour une sécurité maximale, on pourrait retourner null si !data?.me && !isPublicPage
   return <>{children}</>;
 }

@@ -1,5 +1,5 @@
 import { Field, FieldLabel } from '@/components/ui/field';
-import { Item, ItemTitle } from '@/components/ui/item';
+import { ItemTitle } from '@/components/ui/item';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SchoolSelected } from '@stackschool/shared';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ export const SearchSchoolFrom = () => {
   const {
     setSchoolData,
     setCurrentStep,
+    currentStep,
     school: schoolData,
   } = useCompleteProfileStore();
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,8 +51,10 @@ export const SearchSchoolFrom = () => {
         logo: school?.logo!,
       },
     });
-    toast.success(`vous avez selectionner l'école ${school.name}`);
     setCurrentStep(2);
+    toast.success(`vous avez selectionner l'école ${school.name}`);
+
+    console.log('currentStep search-school', currentStep);
   };
 
   return (
@@ -111,31 +114,32 @@ export const SearchSchoolFrom = () => {
       </Field>
 
       {schoolSelected && !searchQuery && (
-        <div className="flex flex-col gap-10">
-          <Item className=" cursor-pointer hover:border-blue-500 bg-slate-200 dark:bg-gray-700 p-2 transition-colors px-4">
-            <div className="flex justify-between items-center w-full font-inter">
-              <div className="flex flex-col gap-2">
-                <ItemTitle className="font-poppins font-semibold text-foreground">
-                  {schoolSelected.name}
-                </ItemTitle>
+        <div className="flex flex-col gap-10 w-full">
+          <div className="rounded-lg cursor-pointer border w-full! hover:border-blue-500 bg-slate-200 dark:bg-gray-700 p-2 transition-colors px-4">
+            <div className="flex justify-end items-center font-inter">
+              <div className="flex gap-4 items-center w-full">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={`/images/${schoolSelected.logo}`} />
+                  <AvatarFallback>{schoolSelected.name[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col gap-2">
+                  <ItemTitle className="font-poppins font-semibold text-foreground">
+                    {schoolSelected.name}
+                  </ItemTitle>
 
-                <p className="text-sm  ">{schoolSelected.address}</p>
-                <p className="text-xs text-foreground">
-                  Code: {schoolSelected.code}
-                </p>
+                  <p className="text-sm  ">{schoolSelected.address}</p>
+                  <p className="text-xs text-foreground">
+                    Code: {schoolSelected.code}
+                  </p>
+                </div>
               </div>
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={`/images/${schoolSelected.logo}`} />
-                <AvatarFallback>{schoolSelected.name[0]}</AvatarFallback>
-              </Avatar>
+
               <Button variant="ghost" onClick={() => setSchoolSelected(null)}>
                 <X />
               </Button>
             </div>
-          </Item>{' '}
-          <Button onClick={() => setCurrentStep(2)}>
-            <Button>Continuer →</Button>
-          </Button>
+          </div>{' '}
+          <Button onClick={() => setCurrentStep(2)}>Continuer →</Button>
         </div>
       )}
     </div>

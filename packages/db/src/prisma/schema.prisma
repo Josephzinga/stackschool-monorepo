@@ -28,7 +28,7 @@ model User {
   sessions          Session[]
   VerificationCode  VerificationCode[]
   VerificationToken VerificationToken[]
-  payments          Payment[] // Relation inverse pour les paiements effectués par cet utilisateur
+  payments          Payment[]
 
   @@index([email])
 }
@@ -37,7 +37,7 @@ model Profile {
   id        String    @id @default(cuid())
   firstname String?
   lastname  String?
-  adress    String?
+  address   String?
   gender    Gender?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -115,6 +115,7 @@ model Subject {
   schoolUser    SchoolUser?     @relation(fields: [schoolUserId], references: [id])
   teacher       Teacher?        @relation(fields: [teacherId], references: [id])
   lessons       Lesson[]
+  assignments   Assignment[]
 
   @@unique([code, schoolId])
   @@index([schoolId])
@@ -155,6 +156,7 @@ model ClassSubjects {
   @@unique([classId, subjectId])
   @@index([classId])
   @@index([subjectId])
+  @@index([teacherId])
 }
 
 model Exam {
@@ -207,6 +209,7 @@ model Class {
   lessons       Lesson[]
   exam          Exam[]
   students      Student[]
+  assignments   Assignment[]
 
   @@index([schoolId])
 }
@@ -216,6 +219,7 @@ model Class {
 model ClassTeacher {
   id            String      @id @default(cuid())
   classId       String
+  name          String?
   teacherId     String
   createdAt     DateTime    @default(now())
   staffMemberId String?
@@ -254,15 +258,37 @@ model Student {
   profile        Profile         @relation(fields: [profileId], references: [id])
   school         School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   schoolUser     SchoolUser      @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
-  payments       Payment[] // Relation inverse pour les paiements liés à cet étudiant
+  payments       Payment[]
 
   @@unique([matricule, schoolId])
   @@index([schoolUserId])
   @@index([schoolId])
 }
 
+///*
+/// * Assignment
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime
+
+  classId String
+  class   Class  @relation(fields: [classId], references: [id])
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 /// *
-/// * Parent (Nouveau modèle spécifique école)
+/// * Parent
 model Parent {
   id                String            @id @default(cuid())
   schoolUserId      String            @unique
@@ -276,7 +302,7 @@ model Parent {
 }
 
 /// *
-/// * Parent - Student pivot (Mis à jour)
+/// * Parent - Student pivot
 model ParentStudent {
   id           String       @id @default(cuid())
   parentId     String
@@ -444,8 +470,8 @@ model Session {
 }
 
 model Teacher {
-  id                String         @id @default(cuid())
-  schoolUserId      String         @unique
+  id                String          @id @default(cuid())
+  schoolUserId      String          @unique
   diploma           String?
   experience        String?
   hireDate          DateTime?
@@ -453,14 +479,16 @@ model Teacher {
   salary            Float?
   departement       String?
   specialization    String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
   attendance        Attendance[]
   classTeacher      ClassTeacher[]
   Subject           Subject[]
-  schoolUser        SchoolUser     @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  schoolUser        SchoolUser      @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
   lessons           Lesson[]
-  supervisedClasses Class[]        @relation("ClassSupervisor")
+  supervisedClasses Class[]         @relation("ClassSupervisor")
+  classSubjects     ClassSubjects[]
+  assignments       Assignment[] // Correction: assagnment -> assignments
 
   @@map("Teachers")
 }

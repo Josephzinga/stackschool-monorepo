@@ -141,6 +141,7 @@ exports.Prisma.ProfileScalarFieldEnum = {
   id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
+  address: 'address',
   gender: 'gender',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -201,7 +202,8 @@ exports.Prisma.LessonScalarFieldEnum = {
 exports.Prisma.ClassSubjectsScalarFieldEnum = {
   id: 'id',
   classId: 'classId',
-  subjectId: 'subjectId'
+  subjectId: 'subjectId',
+  teacherId: 'teacherId'
 };
 
 exports.Prisma.ExamScalarFieldEnum = {
@@ -238,6 +240,7 @@ exports.Prisma.ClassScalarFieldEnum = {
 exports.Prisma.ClassTeacherScalarFieldEnum = {
   id: 'id',
   classId: 'classId',
+  name: 'name',
   teacherId: 'teacherId',
   createdAt: 'createdAt',
   staffMemberId: 'staffMemberId',
@@ -262,11 +265,22 @@ exports.Prisma.StudentScalarFieldEnum = {
   nationality: 'nationality'
 };
 
+exports.Prisma.AssignmentScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  dueDate: 'dueDate',
+  classId: 'classId',
+  subjectId: 'subjectId',
+  teacherId: 'teacherId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ParentScalarFieldEnum = {
   id: 'id',
   schoolUserId: 'schoolUserId',
   profession: 'profession',
-  address: 'address',
   isDelegate: 'isDelegate',
   createdAt: 'createdAt',
   contactPreference: 'contactPreference',
@@ -401,7 +415,6 @@ exports.Prisma.TeacherScalarFieldEnum = {
   isActive: 'isActive',
   salary: 'salary',
   departement: 'departement',
-  addrress: 'addrress',
   specialization: 'specialization',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -515,6 +528,7 @@ exports.Prisma.ModelName = {
   Class: 'Class',
   ClassTeacher: 'ClassTeacher',
   Student: 'Student',
+  Assignment: 'Assignment',
   Parent: 'Parent',
   ParentStudent: 'ParentStudent',
   Invite: 'Invite',

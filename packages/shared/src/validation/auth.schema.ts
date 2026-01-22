@@ -181,9 +181,13 @@ export const profileSchema = z
       .max(30, 'Le nom  ne peut pas dépasser 30 caractères.'),
     gender: z.enum(
       ['MALE', 'FEMALE', 'OTHER'],
-      'Veuillez sélectionner un genre.',
+      'Veuillez sélectionner un genre valid. MALE ou FEMALE',
     ),
-    photo: z.string().url().optional().or(z.literal('')),
+    photo: z.string().optional(),
+    address: z
+      .string()
+      .min(5, "L'adresse doit être plus précise")
+      .max(200, "L'adresse est trop longue"),
     email: z
       .string()
       .trim()

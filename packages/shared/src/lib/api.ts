@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ApiErrorPayload } from '../types/api-response.type';
 
-const URL = process.env.NEXT_PUBLIC_API_URL! || 'http://api/4000';
+const URL = process.env.NEXT_PUBLIC_API_URL! || 'http://localhost:4000';
 
 export const api = axios.create({
   baseURL: `${URL.replace(/\/$/, '')}`,

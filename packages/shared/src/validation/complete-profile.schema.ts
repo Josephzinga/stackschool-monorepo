@@ -38,18 +38,30 @@ export const schoolDataSchema = z.discriminatedUnion('type', [
     invitationCode: z.string().optional(),
   }),
 ]);
-
-// --- Étape 3 : Rôle ---
+export const ACADEMIC_YEAR_REGEX = /^(20\d{2})-(20\d{2})$/;
 
 // Schéma pour les informations de l'étudiant
+
 export const studentFormSchema = z.object({
   matricule: z.string().min(1, 'Le matricule est requis'),
   birthDate: z.coerce.date({
-    // coerce pour gérer les strings ISO
-    errorMap: (issue, ctx) => ({ message: 'Date de naissance invalide' }),
+    error: ({ input }) =>
+      input === undefined
+        ? 'Date de naissance requis'
+        : 'Date de naissance invalide',
   }),
-  classId: z.string().optional(),
-  enrollmentYear: z.string().optional(),
+  classId: z.cuid('Id invalide'),
+  enrollmentYear: z
+    .string()
+    .regex(ACADEMIC_YEAR_REGEX)
+    .refine(
+      (value) => {
+        const [start, end] = value.split('-').map(Number);
+        const current = new Date().getFullYear();
+        return end === start + 1 && start >= 2000 && end <= current + 1;
+      },
+      { message: "Année d'inscription invalide" },
+    ),
   fatherName: z.string().min(3, 'Le nom du père est requis').optional(),
   motherName: z.string().min(3, 'Le nom de la mère est requis').optional(),
   nationality: z.string().optional(),
@@ -80,7 +92,6 @@ export const parentFormSchema = z.object({
     .min(1, 'Veuillez sélectionner au moins un enfant.'),
 
   contactPreference: z.enum(['WHATSAPP', 'PHONE', 'EMAIL']),
-  address: z.string().optional(),
   profession: z
     .string()
     .min(3, 'Veuillez entrer une profession valide')
@@ -115,7 +126,7 @@ export const teacherSchema = z.object({
 export const StaffFormSchema = z.object({
   position: z.string().min(2, 'Le poste est requis'),
   departement: z.string().min(2, 'Le département est requis'),
-  hireDate: z.coerce.date().optional(),
+  hireDate: z.date().optional(),
 });
 
 // Schéma global pour l'étape Rôle (Union)

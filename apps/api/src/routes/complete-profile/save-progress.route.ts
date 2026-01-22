@@ -4,7 +4,9 @@ import { redisClient } from '../../lib/redis';
 import {
   ProfileFormData,
   profileSchema,
+  RoleData,
   roleDataSchema,
+  SchoolData,
   schoolDataSchema,
 } from '@stackschool/shared';
 import { safeValidateSchema } from '../../utils/validate-schema.util';
@@ -15,31 +17,27 @@ router.post(
   '/save-progress',
   isAuthenticated,
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log('Body', req.body);
     try {
-      const userId = req.user.id;
-      const { step, school, profile, role } = req.body;
-
-      // Validation des données selon l'étape ou les données reçues
-      // Note: Le frontend envoie souvent tout l'objet (school, profile, role) à chaque sauvegarde
-      // ou juste la partie modifiée. On valide ce qui est présent.
+      const userId = req.user!.id;
+      const { step, school, profile, role } = req.body as {
+        profile: ProfileFormData;
+        role: RoleData;
+        school: SchoolData;
+        step: number;
+      };
 
       if (profile) {
-        const { success, errors } = safeValidateSchema<ProfileFormData>(
-          profileSchema,
-          profile,
-        );
+        const { success, errors } = safeValidateSchema(profileSchema, profile);
         if (!success) {
           return next(errors);
         }
       }
 
       if (school) {
-        const { success, errors } = safeValidateSchema(
-          schoolDataSchema,
-          school,
-        );
-        if (!success) {
-          return next(errors);
+        const result = schoolDataSchema.safeParse(school);
+        if (!result.success) {
+          return next(result.error);
         }
       }
 
@@ -58,7 +56,7 @@ router.post(
 
       const newData = {
         ...existingData,
-        ...req.body, // Fusionne les nouvelles données (school, profile, role, currentStep)
+        ...req.body,
         savedAt: new Date().toISOString(),
         userId,
       };

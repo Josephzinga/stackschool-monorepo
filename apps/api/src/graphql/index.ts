@@ -1,14 +1,14 @@
 import { createHandler } from 'graphql-http/lib/use/express';
-import { buildSchema } from 'graphql';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import path from 'node:path';
 import * as fs from 'node:fs';
 import { studentResolver } from './resolvers/searchSchoolStudent.resolver';
-import { parentResolver } from './resolvers/createParentStudent.resolver';
 import { searchSchoolResolver } from './resolvers/searchSchool.resolver';
 import merge from 'lodash.merge';
 import { getClassesSubjectsResolver } from './resolvers/getClassesSubjects.resolver';
 import { confirmCompleteProfileResolver } from './resolvers/confirm-complete-profile.resolver';
 import { meResolver } from './resolvers/me.resolver';
+import { schoolResolver } from './resolvers/school.resolver';
 import { ServiceError } from '@stackschool/shared';
 import { ZodError } from 'zod';
 
@@ -19,25 +19,29 @@ const dirPath = path.resolve(
 const dirSchema = fs.readdirSync(dirPath, 'utf-8');
 const files = dirSchema.filter((f) => f.includes('.graphql'));
 
-let typeDefsSchema = '';
+let typeDefs = '';
 for (const file of files) {
-  typeDefsSchema += fs.readFileSync(`${dirPath}/${file}`, 'utf-8') + '\n';
+  typeDefs += fs.readFileSync(`${dirPath}/${file}`, 'utf-8') + '\n';
 }
 
-const schema = buildSchema(typeDefsSchema);
-
-const rootResolvers = merge(
+// Fusion des resolvers
+const resolvers = merge(
   {},
   meResolver,
+  schoolResolver,
   studentResolver,
-  parentResolver,
   searchSchoolResolver,
   getClassesSubjectsResolver,
   confirmCompleteProfileResolver,
 );
 
+// Création du schéma exécutable
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+});
+
 const graphqlMiddleware = createHandler({
-  rootValue: rootResolvers,
   schema,
   context: (req) => ({
     user: req.raw.user,
@@ -46,7 +50,8 @@ const graphqlMiddleware = createHandler({
     if (err instanceof ZodError) {
       return {
         message: 'Erreur de validation',
-        code: 'VALIDATION_ERROR',
+        code: 400,
+        name: 'ZOD_ERROR',
         details: err.issues.map((issue) => ({
           field: issue.path.join('.'),
           message: issue.message,
@@ -58,12 +63,14 @@ const graphqlMiddleware = createHandler({
       return {
         message: err.message,
         code: err.statusCode || 'SERVICE_ERROR',
+        name: 'SERVICE_ERROR',
       };
     }
 
     return {
       message: err.message || 'Une erreur interne est survenue',
-      code: 'INTERNAL_SERVER_ERROR',
+      code: 500,
+      name: 'INTERNAL_SERVER_ERROR',
     };
   },
 });

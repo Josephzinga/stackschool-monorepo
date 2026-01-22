@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { ModeToggle } from '@/components/DropMenu';
 import { Toaster } from '@/components/ui/sonner';
 import { inter, jost, poppins, sans } from '@/lib/fonts';
-import Providers from './providers';
+import QueryProvider from '@/components/providers/queryClientProvider';
 
 /**
  * RootLayout est le composant racine de l'application.
@@ -19,15 +19,12 @@ export default async function RootLayout({
   return (
     <html
       lang="fr"
-      // suppressHydrationWarning est nécessaire car next-themes modifie le DOM côté client
-      // pour appliquer le thème, ce qui peut causer des avertissements d'hydratation.
       suppressHydrationWarning
-      // Injection des variables CSS pour les polices (Inter, Jost, Poppins)
       className={`${jost.variable}  ${inter.variable} ${poppins.variable} ${sans.variable}`}
     >
       <body>
         <ThemeProvider attribute="class" enableSystem={false}>
-          <Providers>
+          <QueryProvider>
             {children}
 
             <Toaster
@@ -38,7 +35,7 @@ export default async function RootLayout({
             <div className="absolute right-4 top-4">
               <ModeToggle />
             </div>
-          </Providers>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

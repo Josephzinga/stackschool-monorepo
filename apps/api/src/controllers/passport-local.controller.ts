@@ -23,13 +23,17 @@ export default async function handleLocalAuth(
   done: VerifyCallback,
 ): Promise<void> {
   // Validation des données d'entrée
-  const errors = safeValidateSchema(loginFormSchema, { identifier, password });
-  if (errors) {
+  const { data, errors, success } = safeValidateSchema(loginFormSchema, {
+    identifier,
+    password,
+  });
+  if (!success) {
     return done(errors);
   }
 
   try {
-    const input = identifier || '';
+    const input = data?.identifier;
+    const validPassword = data?.password;
 
     // Recherche de l'utilisateur
     const user = await prisma.user.findFirst({
@@ -68,7 +72,7 @@ export default async function handleLocalAuth(
     }
 
     // Vérification du mot de passe
-    const match = await bcrypt.compare(password, user.password as string);
+    const match = await bcrypt.compare(validPassword!, user.password as string);
     if (!match) {
       return done(null, false, { message: 'Identifiants invalides' });
     }

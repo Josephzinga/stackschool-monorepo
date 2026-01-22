@@ -24,9 +24,12 @@ const config: CodegenConfig = {
         'typescript-react-query', // Génère les hooks useQuery
       ],
       config: {
+        scalar: {
+          SchoolId: 'string',
+        },
         skipTypename: false,
         // Configuration spécifique React Query v5
-        reactQueryVersion: 5, // <--- C'est ici que ça se joue
+        reactQueryVersion: 5,
         addInfiniteQuery: true,
 
         fetcher: {

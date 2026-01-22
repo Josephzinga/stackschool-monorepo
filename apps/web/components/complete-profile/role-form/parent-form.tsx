@@ -3,23 +3,21 @@ import { useForm } from 'react-hook-form';
 import {
   Controller,
   relationItems,
+  Student,
   useCompleteProfileStore,
   useFieldArray,
+  useSearchStudentQuery,
   zodResolver,
 } from '@stackschool/ui';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check, User, UserPlus, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useQuery } from '@tanstack/react-query';
 import {
-  api,
   ParentFormData,
   parentFormSchema,
   parseAxiosError,
   RelationType,
-  SEARCH_STUDENT_GQL,
-  StudentResult,
 } from '@stackschool/shared';
 import { toast } from 'sonner';
 import { SubmitButton } from '@/components/submit-button';
@@ -51,14 +49,11 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedQuery = useDebounce(500, searchQuery);
   const parentData = role?.role === 'PARENT' ? role.parent : null;
-  const [childrenDetails, setChildrenDetails] = useState<
-    Record<string, StudentResult>
-  >({});
 
-  const [childToConfigure, setChildToConfigure] =
-    useState<StudentResult | null>(null);
+  const [childToConfigure, setChildToConfigure] = useState<Student | null>(
+    null,
+  );
   const [tempRelation, setTempRelation] = useState<RelationType>('FATHER');
-  console.log('parentData', parentData);
   const {
     handleSubmit,
     register,
@@ -70,7 +65,6 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
       children: parentData?.children || [],
       contactPreference: parentData?.contactPreference || 'PHONE',
       profession: parentData?.profession || '',
-      address: parentData?.address || '',
     },
     mode: 'onBlur',
   });
@@ -82,37 +76,33 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
   const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;
   if (!schoolId) return;
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['student', schoolId, debouncedQuery],
-    queryFn: async () => {
-      if (searchQuery.length < 2) return [];
-      const res = await api.post('/graphql', {
-        query: SEARCH_STUDENT_GQL,
-        variables: {
-          input: {
-            schoolId,
-            searchTerm: debouncedQuery,
-          },
-        },
-      });
-
-      return res.data.data.searchStudent as StudentResult[];
+  const { data, isLoading, error } = useSearchStudentQuery(
+    {
+      input: {
+        schoolId,
+        searchTerm: debouncedQuery?.trim(),
+      },
     },
-  });
+    {
+      enabled: !!debouncedQuery && debouncedQuery.length! >= 2,
+    },
+  );
 
   const filteredResults = useMemo(() => {
     const { message } = parseAxiosError(error);
-    if (!data) {
+    if (!data?.searchStudent) {
       return [];
     }
     if (!isLoading && error) {
       toast.error(message || 'Erreur reseaux');
       return [];
     }
-    return data.filter((s) => !fields?.some((child) => child.id === s.id));
-  }, [data, fields]);
+    return data.searchStudent.filter(
+      (s) => !fields?.some((child) => child.id === s?.id),
+    );
+  }, [data, fields, error]);
 
-  const openConfiguration = (student: StudentResult) => {
+  const openConfiguration = (student: Student) => {
     setChildToConfigure(student);
   };
 
@@ -123,13 +113,8 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
       relation: tempRelation,
       firstname: childToConfigure.firstname,
       lastname: childToConfigure.lastname,
-      photo: childToConfigure.photo,
+      photo: childToConfigure.photo || '',
     });
-
-    setChildrenDetails((prev) => ({
-      ...prev,
-      [childToConfigure.id]: { ...childToConfigure, relation: tempRelation },
-    }));
 
     setChildToConfigure(null);
     setSearchQuery('');
@@ -171,43 +156,34 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
           />
           <FieldError errors={[{ message: errors.profession?.message }]} />
         </Field>
-        <Field>
-          <FieldLabel>Address</FieldLabel>
-          <Input
-            id="address"
-            autoComplete="address-level1"
-            {...register('address')}
-            aria-invalid={!!errors.address}
+        {/* methode de contact */}
+        <Field className=" font-inter">
+          <FieldLabel className="font-inter" htmlFor="contactPreference">
+            Préférence de contact
+          </FieldLabel>
+          <Controller
+            name="contactPreference"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <Select
+                value={value}
+                name="contactPreference"
+                onValueChange={onChange}
+              >
+                <SelectTrigger name="contactPreference" className="w-full h-15">
+                  <SelectValue placeholder="WhatsApp" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PHONE">Appel Téléphonique</SelectItem>
+                  <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
+                  <SelectItem value="EMAIL">Email</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           />
-          <FieldError>{errors.address?.message}</FieldError>
         </Field>
       </div>
-      {/* methode de contact */}
-      <Field className=" font-inter">
-        <FieldLabel className="font-inter" htmlFor="contactPreference">
-          Préférence de contact
-        </FieldLabel>
-        <Controller
-          name="contactPreference"
-          control={control}
-          render={({ field: { value, onChange } }) => (
-            <Select
-              value={value}
-              name="contactPreference"
-              onValueChange={onChange}
-            >
-              <SelectTrigger name="contactPreference" className="w-full h-15">
-                <SelectValue placeholder="WhatsApp" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="PHONE">Appel Téléphonique</SelectItem>
-                <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
-                <SelectItem value="EMAIL">Email</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
-      </Field>
+
       {/* Zone de recherche */}
       <div className="relative space-y-3">
         <SearchInput
@@ -221,7 +197,7 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
         {/* Résultats de recherche */}
         {searchQuery.length >= 2 && (
           <SearchResultsList
-            items={filteredResults}
+            items={filteredResults as Student[]}
             onSelect={openConfiguration}
             renderItem={(student) => (
               <div className="p-3 flex items-center justify-between">
@@ -266,14 +242,15 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
               return (
                 <div
                   key={field.id}
-                  className=" flex justify-center border-border border rounded-md py-2 bg-slate-50 dark:bg-slate-800/50"
+                  className=" flex justify-center min-h-15 border-border border rounded-md py-2 bg-slate-50 dark:bg-slate-800/50"
                 >
                   <div className="w-full flex px-3 justify-between">
                     <div className="flex items-center gap-4">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={`/images/${field.photo}`} />
                         <AvatarFallback className=" bg-primary/10 text-primary font-bold text-sm font-jost ">
-                          {field.firstname}
+                          {field.firstname[0]}
+                          {field.lastname[0]}
                         </AvatarFallback>
                       </Avatar>
                       <p className="font-medium text-sm font-inter">

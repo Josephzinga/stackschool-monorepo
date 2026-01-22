@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { generate6Code, generateToken, hashCode } from '../../lib/outils';
 import { createServiceError } from '../../utils/api-errors';
 import { registerFormSchema } from '@stackschool/shared';
+import { safeValidateSchema } from '../../utils/validate-schema.util';
 
 const router = Router();
 
@@ -29,14 +30,15 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     console.log('Request Body', req.body);
     try {
-      const parseResult = registerFormSchema.safeParse(req.body);
-      if (!parseResult.success) {
-        // Lève une erreur Zod qui sera attrapée par le gestionnaire d'erreurs
-        next(parseResult.error);
-        return;
+      const { data, errors, success } = safeValidateSchema(
+        registerFormSchema,
+        req.body,
+      );
+      if (!success) {
+        return next(errors);
       }
 
-      const { email, password, username, phoneNumber } = parseResult.data;
+      const { email, password, username, phoneNumber } = data!;
 
       const safeEmail = email?.trim() || undefined;
       const safePhone = phoneNumber?.trim() || undefined;

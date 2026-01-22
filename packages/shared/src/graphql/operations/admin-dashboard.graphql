@@ -1,0 +1,36 @@
+query GetAdminDashboardStats($schoolId: SchoolId) {
+  schoolStats(schoolId: $schoolId) {
+    id
+    name
+    logo
+    stats {
+      # KPI Cards
+      totalStudents
+      totalTeachers
+      totalClasses
+
+      # Finance & Présence (Mockés pour l'instant)
+      monthlyRevenue
+      pendingPaymentsCount
+      todayAttendanceRate
+      absentTodayCount
+
+      # Charts Data
+      studentGender {
+        male
+        female
+
+      }
+
+      classesOccupancy {
+        className
+        studentCount
+      }
+
+      enrollmentPerMonth {
+        month
+        count
+      }
+    }
+  }
+}

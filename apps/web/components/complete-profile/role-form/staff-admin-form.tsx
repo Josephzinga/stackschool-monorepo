@@ -96,8 +96,8 @@ export default function StaffAdminForm({
                 onChange={onChange}
                 icon={Briefcase}
                 placeholder="Ex: Finance, Ressources Humaines..."
-                disabled={isAdmin}
                 className={isAdmin ? 'bg-muted' : ''}
+                disabled={isAdmin}
               />
             )}
           />

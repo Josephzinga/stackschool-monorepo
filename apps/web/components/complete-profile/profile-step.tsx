@@ -31,6 +31,7 @@ import 'react-phone-number-input/style.css';
 import { checkField } from '@/lib/check-profile-field';
 import { UploadProfilePicture } from '../profile-upload';
 import { SubmitButton } from '@/components/submit-button';
+import { HomeIcon, Mail, User2Icon, UserIcon } from 'lucide-react';
 
 export function ProfileStep() {
   const { user } = useUserStore();
@@ -40,16 +41,13 @@ export function ProfileStep() {
 
   const { setCurrentStep, setProfileData, profile } = useCompleteProfileStore();
 
-  const [picture, setPicture] = useState<string | null>(
-    user?.profile?.photo || profile?.photo || null,
-  );
-
   const {
     handleSubmit,
     register,
     setValue,
     setError,
     clearErrors,
+    watch,
     control,
     formState: { errors, isSubmitting },
   } = useForm<ProfileType>({
@@ -60,6 +58,8 @@ export function ProfileStep() {
       phoneNumber: user?.phoneNumber || profile?.phoneNumber || '',
       email: user?.email || profile?.email || '',
       gender: profile?.gender || undefined,
+      address: profile?.address || undefined,
+      photo: user?.profile?.photo || profile?.photo || undefined,
     },
     mode: 'onBlur',
   });
@@ -151,7 +151,7 @@ export function ProfileStep() {
       const data = res.data;
 
       if (data.ok) {
-        setPicture(data.path);
+        setValue('photo', data.path);
         toast.success(
           `${res.data.message}` || 'Photo de profil téléchargée avec succès !',
         );
@@ -161,7 +161,6 @@ export function ProfileStep() {
     } catch (error: any) {
       setIsLoading(false);
       const { message, status, data } = parseAxiosError(error);
-      console.error('Erreur upload photo:', error);
       toast.error(message || 'Erreur lors du téléchargement de la photo');
     } finally {
       setIsLoading(false);
@@ -179,7 +178,7 @@ export function ProfileStep() {
         <UploadProfilePicture
           onPhotoUpload={handlePhotoUpload}
           isLoading={isLoading}
-          photo={picture}
+          photo={watch('photo')}
         />
       </div>
 
@@ -189,6 +188,7 @@ export function ProfileStep() {
           <Field>
             <FieldLabel htmlFor="firstname">Prénom</FieldLabel>
             <Input
+              icon={UserIcon}
               id="firstname"
               type="text"
               {...register('firstname')}
@@ -203,6 +203,7 @@ export function ProfileStep() {
             <FieldLabel htmlFor="lastname">Nom</FieldLabel>
             <Input
               id="lastname"
+              icon={User2Icon}
               type="text"
               {...register('lastname')}
               aria-invalid={!!errors.lastname}
@@ -216,6 +217,7 @@ export function ProfileStep() {
             <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input
               id="email"
+              icon={Mail}
               type="email"
               {...register('email')}
               onBlur={handleEmailBlur}
@@ -232,6 +234,7 @@ export function ProfileStep() {
               name="phoneNumber"
               render={({ field }) => (
                 <PhoneInput
+                  id="phoneNumber"
                   international
                   defaultCountry="ML"
                   value={phoneValue}
@@ -244,36 +247,47 @@ export function ProfileStep() {
             />
             <FieldError>{errors.phoneNumber?.message}</FieldError>
           </Field>
+
+          {/* Genre */}
+          <Field>
+            <FieldLabel htmlFor="gender">Genre</FieldLabel>
+            <Controller
+              control={control}
+              name="gender"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger
+                    aria-invalid={!!errors.gender}
+                    className="w-full"
+                    id="gender"
+                  >
+                    <SelectValue placeholder="Sélectionnez votre genre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Genre</SelectLabel>
+                      <SelectItem value="MALE">Homme</SelectItem>
+                      <SelectItem value="FEMALE">Femme</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FieldError>{errors.gender?.message}</FieldError>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="address">Adresse</FieldLabel>
+            <Input
+              {...register('address')}
+              id="address"
+              placeholder="Votre adresse"
+              required
+              icon={HomeIcon}
+              aria-invalid={!!errors.address}
+            />
+            <FieldError errors={[{ message: errors.address?.message }]} />
+          </Field>
         </div>
-
-        {/* Genre */}
-        <Field>
-          <FieldLabel>Genre</FieldLabel>
-          <Controller
-            control={control}
-            name="gender"
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger
-                  aria-invalid={!!errors.gender}
-                  className="w-full"
-                >
-                  <SelectValue placeholder="Sélectionnez votre genre" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Genre</SelectLabel>
-                    <SelectItem value="MALE">Homme</SelectItem>
-                    <SelectItem value="FEMALE">Femme</SelectItem>
-                    <SelectItem value="OTHER">Autre</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FieldError>{errors.gender?.message}</FieldError>
-        </Field>
-
         <div className="flex gap-3 pt-4">
           <Button
             variant="outline"

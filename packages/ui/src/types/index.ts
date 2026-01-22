@@ -1,5 +1,5 @@
 import { ProfileData, RoleData, SchoolData } from '@stackschool/shared';
-import { GetMeQuery } from '@stackschool/ui/src';
+import { GetMeQuery, SchoolMembership } from '@stackschool/ui/src';
 
 export interface UserStore {
   user: GetMeQuery['me'] | null;
@@ -7,6 +7,8 @@ export interface UserStore {
   isAuthenticated: boolean;
   setUser: (user: GetMeQuery['me'] | null) => void;
   fetchUser: () => Promise<void>;
+  currentSchool: SchoolMembership | null; // Remplacez 'any' par le type School importé
+  setCurrentSchool: (school: SchoolMembership) => void;
 }
 
 export interface CompleteProfileStep {

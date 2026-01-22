@@ -3,7 +3,11 @@
 import { QueryClient, QueryClientProvider } from '@stackschool/ui';
 import { useState } from 'react';
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function QueryProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   // On utilise un state pour s'assurer que chaque requête a son propre QueryClient
   // et éviter de partager les données entre différents utilisateurs sur le serveur
   const [queryClient] = useState(

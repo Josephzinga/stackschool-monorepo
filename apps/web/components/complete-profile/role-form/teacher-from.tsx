@@ -1,12 +1,9 @@
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
-  api,
   ClassWithSubjects,
-  SEARCH_CLASSES_GQL,
   TeacherFormData,
   teacherSchema,
 } from '@stackschool/shared';
@@ -219,7 +216,7 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
                     )}
                   </h4>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {assignment.subjectNames.map((name) => (
+                    {assignment.subjectNames!.map((name) => (
                       <Badge
                         key={name}
                         variant="outline"

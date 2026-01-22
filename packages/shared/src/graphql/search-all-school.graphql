@@ -13,30 +13,6 @@ enum ContactPreference {
    EMAIL
    PHONE
 }
-type Student {
-   id: ID!,
-   firstname: String!,
-   lastname: String!,
-   photo: String,
-   matricule: String!,
-   className: String!
-}
-
-type School {
-   id: ID,
-   name: String!,
-   slug: String
-   address: String!
-   code: String
-   logo: String
-}
-
-type Subject {
-   id: ID!
-   name: String!
-   code: String
-}
-
 input SchoolSearchInput {
    searchTerm: String
 }
@@ -52,12 +28,5 @@ input ChildInput {
    relation: Relation
 }
 
-type Classes {
-   id: ID!,
-   name: String!,
-   level: String!,
-   section: String
-   subjects: [Subject]
-}
 
 

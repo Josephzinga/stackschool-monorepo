@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { type Icon } from "@tabler/icons-react";
+import * as React from 'react';
+import type { LucideIcon } from 'lucide-react';
 
 import {
   SidebarGroup,
@@ -9,17 +9,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import Link from "next/link";
+} from '@/components/ui/sidebar';
+import Link from 'next/link';
 
 export interface NavSecondaryItem {
-  items: { icon: Icon; label: string; href: string }[];
+  items: { icon: LucideIcon; label: string; href: string }[];
 }
 export function NavSecondary({
   items,
   ...props
 }: {
-  items: NavSecondaryItem["items"];
+  items: NavSecondaryItem['items'];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
     <SidebarGroup {...props}>

@@ -1,8 +1,112 @@
-input CreateInvitationInput {
-    schoolId: String!
-    role: SchoolRole
-    email: String
-    phoneNumber: String
-    message: String!
+type Student {
+    id: ID!,
+    firstname: String!,
+    lastname: String!,
+    photo: String,
+    matricule: String!,
+    className: String
+    schoolClass: Classe
+}
 
+type School {
+    id: ID,
+    name: String!,
+    slug: String
+    address: String
+    code: String
+    logo: String
+    stats: SchoolStats
+}
+
+type Subject {
+    id: ID!
+    name: String!
+    code: String
+    lessons: [Lesson]
+}
+
+type Parent {
+    id: ID!
+    profession: String
+    isDelegate: Boolean
+    students: [Student]
+    relationType: String
+}
+
+type Lesson {
+    id: ID!
+    name: String
+    startTime: String
+    endTime: String
+    day: String!
+}
+
+type Teacher {
+    id: ID!
+    schoolUserId: String!
+    diploma: String
+    experience: String
+    hireDate: String
+    isActive: Boolean
+    salary: Float
+    departement: String
+    specialization: String
+    lessons: [Lesson]
+    classes: [Classe]
+    supervisedClasses: [Classe]
+    createdAt: String
+    updatedAt: String
+}
+
+type Staff {
+    id: ID!
+    schoolUserId: String!
+    position: String!
+    hireDate: String
+    salary: Float
+    departement: String
+}
+
+type Classe {
+    id: ID!,
+    name: String!,
+    level: String!,
+    section: String
+    subjects: [Subject]
+    lessons: [Lesson]
+}
+
+# --- Nouveaux Types pour le Dashboard Admin ---
+
+type GenderStats {
+    male: Int!
+    female: Int!
+}
+
+type MonthlyStats {
+    month: String!
+    count: Int!
+}
+
+type ClassStats {
+    className: String!
+    studentCount: Int!
+}
+
+type SchoolStats {
+    # KPI Cards
+    totalStudents: Int!
+    totalTeachers: Int!
+    totalClasses: Int!
+
+    # Finance & Présence
+    monthlyRevenue: Float
+    pendingPaymentsCount: Int
+    todayAttendanceRate: Float
+    absentTodayCount: Int
+
+    # Charts Data
+    studentGender: GenderStats
+    enrollmentPerMonth: [MonthlyStats!]
+    classesOccupancy: [ClassStats!]
 }

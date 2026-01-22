@@ -1,0 +1,39 @@
+type Profile {
+  id: ID!
+  firstname: String!
+  lastname: String!
+  photo: String
+  gender: String!
+  address: String
+}
+
+scalar SchoolId
+
+type SchoolMembership {
+  id: ID!
+  role: String!
+  school: School!
+
+  # Données spécifiques au rôle
+  teacher: Teacher
+  student: Student
+  parent: Parent
+  staff: Staff
+}
+
+type User {
+  id: ID!
+  email: String!
+  username: String!
+  phoneNumber: String
+  profileCompleted: Boolean
+  hasMembership: Boolean
+  profile: Profile
+
+  # Liste de toutes les écoles
+  memberships: [SchoolMembership]
+
+  # Contexte spécifique à une école
+  schoolContext(schoolId: SchoolId): SchoolMembership
+}
+

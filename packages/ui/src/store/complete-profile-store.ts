@@ -1,4 +1,8 @@
-import { authService, RedisService } from '@stackschool/shared';
+import {
+  authService,
+  parseAxiosError,
+  RedisService,
+} from '@stackschool/shared';
 import { create } from 'zustand';
 import { CompleteProfileStep } from '../types';
 
@@ -27,20 +31,25 @@ export const useCompleteProfileStore = create<CompleteProfileStep>()(
     setCurrentStep: async (step) => {
       const state = get();
 
-      if (step > state.currentStep) {
-        if (step >= 2 && !state.school) {
+      if (step >= state.currentStep) {
+        if (
+          step <= 2 &&
+          !(state.school?.type === 'join' ? state.school.schoolSelected : false)
+        ) {
+          console.log('join');
           set({
             error: "Veuillez d'abord joindre ou crée une école.",
           });
+
           return;
         }
 
-        if (step >= 2 && !state.profile) {
+        if (step >= 3 && !state.profile) {
           set({ error: "Veuillez d'abord compléter votre profil." });
           return;
         }
 
-        if (step >= 3 && !state.role) {
+        if (step >= 4 && !state.role) {
           set({ error: "Veuillez d'abord définir votre rôle." });
           return;
         }
@@ -79,6 +88,8 @@ export const useCompleteProfileStore = create<CompleteProfileStep>()(
           set({ lastSavedAt: new Date().toISOString() });
         }
       } catch (error) {
+        const { message, data } = parseAxiosError(error);
+        set({ error: message });
         return {
           success: false,
           error: 'Échec sauvegarde Redis, utilisation localStorage',

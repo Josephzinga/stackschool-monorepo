@@ -1,0 +1,27 @@
+{
+  "name": "@stackschool/ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@stackschool/shared": "workspace:*",
+    "@tanstack/react-query": "^5.90.16",
+    "clsx": "^2.1.1",
+    "react-hook-form": "^7.69.0",
+    "zustand": "^4.4.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

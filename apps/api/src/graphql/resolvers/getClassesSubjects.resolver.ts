@@ -55,7 +55,6 @@ export const getClassesSubjectsResolver: Resolvers = {
           return [];
         }
 
-        // Transformation des données pour aplatir la structure
         return classes.map((cls) => ({
           id: cls.id,
           name: cls.name,

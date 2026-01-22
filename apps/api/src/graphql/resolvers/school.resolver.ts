@@ -38,9 +38,6 @@ export const schoolResolver: Resolvers = {
         prisma.class.count({ where: { schoolId } }),
       ]);
 
-      // --- Calcul pour les graphiques ---
-
-      // Répartition par genre (Optimisé avec groupBy sur Profile)
       const genderCounts = await prisma.profile.groupBy({
         by: ['gender'],
         where: {

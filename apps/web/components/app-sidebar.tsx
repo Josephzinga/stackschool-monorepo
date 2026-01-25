@@ -32,7 +32,8 @@ import {
 } from '@/components/ui/sidebar';
 import { menuItems } from '@/lib/data';
 import { useUserStore } from '@stackschool/ui';
-import Image from 'next/image';
+import { AvatarImage, Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { School } from 'lucide-react';
 
 const data = {
   user: {
@@ -162,18 +163,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:p-1.5! h-14"
             >
               <a href="#">
-                <div>
-                  <Image
-                    src={`/images/${currentSchool?.logo}`}
-                    alt={currentSchool?.slug}
-                    width={10}
-                    height={10}
-                    className="w-12 h-12 rounded-full"
-                  />
-                </div>
+                <Avatar className="w-11 h-11 rounded-xl">
+                  <AvatarImage src={`/images/${currentSchool.logo}`} />
+                  <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
+                    <School className="h-6 w-6" />
+                  </AvatarFallback>
+                </Avatar>
                 <span className="text-lg font-poppins font-semibold">
                   {currentSchool?.name}
                 </span>

@@ -1,0 +1,117 @@
+
+/* structure globale */
+.fc {
+    font-family: inherit;
+    border: none;
+    width: 90%;
+    font-size: inherit;
+    padding: 0;
+    margin: 0;
+}
+
+.fc-toolbar-title {
+    border: solid 2px var(--border);
+    border-radius: 1rem;
+    padding: 0.2rem 0.5rem;
+    font-size: 1.1rem !important;
+}
+
+.fc-scrollgrid {
+    border: none !important;
+}
+
+    /* header jours (Lun, Mar…) */
+.fc-col-header-cell {
+    padding: 0.1rem 0.1rem !important;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-inter), serif;
+    border-radius: 1rem;
+    text-transform: uppercase;
+    color: var(--foreground); /* gray-500 */
+    background: transparent;
+
+}
+
+    /* cellules jours */
+.fc-daygrid-day-frame {
+    padding: 0.4rem 0.4rem;
+    border-radius: 10px;
+}
+
+.fc-daygrid-day-frame:hover {
+    background-color: var(--input) !important;
+    cursor: pointer;
+
+}
+
+.fc-daygrid-day-number {
+    font-size: 0.90rem;
+    font-weight: 600;
+}
+
+/* aujourd’hui */
+.fc-day-today {
+    background-color: var(--primary) !important; /* blue-50 */
+    border-radius: 0.75rem;
+
+}
+
+.fc-day-today .fc-daygrid-day-number {
+    font-weight: 600;
+    justify-content: center !important;
+    align-items: center;
+    color: var(--background);
+
+}
+.fc-daygrid-day-number {
+    width: 100%;
+    text-align: center;
+}
+.fc-daygrid-day-events {
+    display: none;
+}
+
+
+
+.fc-daygrid-day-top::before {
+    display: none !important;
+    width: 100%;
+}
+
+/* bordures légères */
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border: none; /* gray-200 */
+}
+
+/* désactiver hover événement */
+.fc-daygrid-day:hover {
+    background-color: #f9fafb;
+}
+
+.fc-button-primary .fc {
+  border: none !important;
+}
+.fc-button {
+    background-color: transparent !important;
+    border: none !important;
+}
+.fc-button:focus {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.fc-button:active {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+
+.fc-toolbar-chunk {
+    border: none !important;
+}
+
+.fc-icon {
+    color: var(--foreground);
+}

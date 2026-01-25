@@ -12,7 +12,7 @@ type School {
     id: ID,
     name: String!,
     slug: String
-    address: String
+    address: String!
     code: String
     logo: String
     stats: SchoolStats
@@ -93,6 +93,28 @@ type ClassStats {
     studentCount: Int!
 }
 
+type DailyAttendance {
+    date: String!
+    rate: Float!
+    present: Int!
+    absent: Int!
+    late: Int!
+}
+
+type MonthlyRevenue {
+    currentMonth: Float!
+    previousMonth: Float
+}
+
+type AttendanceStats {
+    rate: Float!
+    presentCount: Int!
+    absentCount: Int!
+    lateCount: Int!
+    totalExpected: Int!
+    history: [DailyAttendance!]
+}
+
 type SchoolStats {
     # KPI Cards
     totalStudents: Int!
@@ -100,10 +122,11 @@ type SchoolStats {
     totalClasses: Int!
 
     # Finance & Présence
-    monthlyRevenue: Float
+    monthlyRevenue: MonthlyRevenue
     pendingPaymentsCount: Int
-    todayAttendanceRate: Float
-    absentTodayCount: Int
+
+    # Remplacé par un objet complexe
+    attendance: AttendanceStats
 
     # Charts Data
     studentGender: GenderStats

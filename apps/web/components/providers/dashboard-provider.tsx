@@ -1,7 +1,11 @@
 'use client';
 
 import { createContext, ReactNode, useContext } from 'react';
-import { useGetDashboardContextQuery, useUserStore } from '@stackschool/ui';
+import {
+  GetDashboardContextQuery,
+  useGetDashboardContextQuery,
+  useUserStore,
+} from '@stackschool/ui';
 import { Spinner } from '@/components/ui/spinner';
 import { parseAxiosError } from '@stackschool/shared';
 
@@ -20,7 +24,7 @@ interface DashboardContextType {
   isLoading: boolean;
 }
 
-const DashboardContext = createContext<DashboardContextType | undefined>(
+const DashboardContext = createContext<GetDashboardContextQuery | undefined>(
   undefined,
 );
 
@@ -37,9 +41,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       staleTime: 1000 * 60 * 5, // Cache 5 min
     },
   );
-  console.log('currentSchool', currentSchool);
   const contextData = data?.me?.schoolContext;
-  console.log('contextData', data);
+
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
@@ -55,13 +58,10 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     return <div>Erreur de chargement du contexte école.</div>;
   }
 
-  const value: DashboardContextType = {
-    role: contextData.role,
-    school: currentSchool,
-    teacherProfile: contextData.teacher,
-    studentProfile: contextData.student,
-    parentProfile: contextData.parent,
-    isLoading,
+  const value: GetDashboardContextQuery = {
+    me: {
+      schoolContext: contextData,
+    },
   };
 
   return (

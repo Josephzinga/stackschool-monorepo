@@ -17,6 +17,16 @@ export type Scalars = {
   SchoolId: { input: any; output: any; }
 };
 
+export type AttendanceStats = {
+  __typename?: 'AttendanceStats';
+  absentCount: Scalars['Int']['output'];
+  history?: Maybe<Array<DailyAttendance>>;
+  lateCount: Scalars['Int']['output'];
+  presentCount: Scalars['Int']['output'];
+  rate: Scalars['Float']['output'];
+  totalExpected: Scalars['Int']['output'];
+};
+
 export type ChildInput = {
   relation?: InputMaybe<Relation>;
   studentId: Scalars['ID']['input'];
@@ -52,6 +62,15 @@ export type CreateInvitationInput = {
   schoolId: Scalars['ID']['input'];
 };
 
+export type DailyAttendance = {
+  __typename?: 'DailyAttendance';
+  absent: Scalars['Int']['output'];
+  date: Scalars['String']['output'];
+  late: Scalars['Int']['output'];
+  present: Scalars['Int']['output'];
+  rate: Scalars['Float']['output'];
+};
+
 export type GenderStats = {
   __typename?: 'GenderStats';
   female: Scalars['Int']['output'];
@@ -69,6 +88,12 @@ export type Lesson = {
   id: Scalars['ID']['output'];
   name?: Maybe<Scalars['String']['output']>;
   startTime?: Maybe<Scalars['String']['output']>;
+};
+
+export type MonthlyRevenue = {
+  __typename?: 'MonthlyRevenue';
+  currentMonth: Scalars['Float']['output'];
+  previousMonth?: Maybe<Scalars['Float']['output']>;
 };
 
 export type MonthlyStats = {
@@ -153,7 +178,7 @@ export type Role = {
 
 export type School = {
   __typename?: 'School';
-  address?: Maybe<Scalars['String']['output']>;
+  address: Scalars['String']['output'];
   code?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
   logo?: Maybe<Scalars['String']['output']>;
@@ -191,13 +216,12 @@ export type SchoolSearchInput = {
 
 export type SchoolStats = {
   __typename?: 'SchoolStats';
-  absentTodayCount?: Maybe<Scalars['Int']['output']>;
+  attendance?: Maybe<AttendanceStats>;
   classesOccupancy?: Maybe<Array<ClassStats>>;
   enrollmentPerMonth?: Maybe<Array<MonthlyStats>>;
-  monthlyRevenue?: Maybe<Scalars['Float']['output']>;
+  monthlyRevenue?: Maybe<MonthlyRevenue>;
   pendingPaymentsCount?: Maybe<Scalars['Int']['output']>;
   studentGender?: Maybe<GenderStats>;
-  todayAttendanceRate?: Maybe<Scalars['Float']['output']>;
   totalClasses: Scalars['Int']['output'];
   totalStudents: Scalars['Int']['output'];
   totalTeachers: Scalars['Int']['output'];
@@ -286,7 +310,7 @@ export type GetAdminDashboardStatsQueryVariables = Exact<{
 }>;
 
 
-export type GetAdminDashboardStatsQuery = { __typename?: 'Query', schoolStats?: { __typename?: 'School', id?: string | null, name: string, logo?: string | null, stats?: { __typename?: 'SchoolStats', totalStudents: number, totalTeachers: number, totalClasses: number, monthlyRevenue?: number | null, pendingPaymentsCount?: number | null, todayAttendanceRate?: number | null, absentTodayCount?: number | null, studentGender?: { __typename?: 'GenderStats', male: number, female: number } | null, classesOccupancy?: Array<{ __typename?: 'ClassStats', className: string, studentCount: number }> | null, enrollmentPerMonth?: Array<{ __typename?: 'MonthlyStats', month: string, count: number }> | null } | null } | null };
+export type GetAdminDashboardStatsQuery = { __typename?: 'Query', schoolStats?: { __typename?: 'School', id?: string | null, name: string, logo?: string | null, stats?: { __typename?: 'SchoolStats', totalStudents: number, totalTeachers: number, totalClasses: number, pendingPaymentsCount?: number | null, monthlyRevenue?: { __typename?: 'MonthlyRevenue', previousMonth?: number | null, currentMonth: number } | null, attendance?: { __typename?: 'AttendanceStats', rate: number, presentCount: number, absentCount: number, totalExpected: number, lateCount: number, history?: Array<{ __typename?: 'DailyAttendance', date: string, rate: number, present: number, absent: number, late: number }> | null } | null, studentGender?: { __typename?: 'GenderStats', male: number, female: number } | null, classesOccupancy?: Array<{ __typename?: 'ClassStats', className: string, studentCount: number }> | null, enrollmentPerMonth?: Array<{ __typename?: 'MonthlyStats', month: string, count: number }> | null } | null } | null };
 
 export type SearchStudentQueryVariables = Exact<{
   input: StudentSearchInput;
@@ -300,7 +324,7 @@ export type SearchSchoolQueryVariables = Exact<{
 }>;
 
 
-export type SearchSchoolQuery = { __typename?: 'Query', searchSchool?: Array<{ __typename?: 'School', id?: string | null, name: string, address?: string | null, code?: string | null, logo?: string | null }> | null };
+export type SearchSchoolQuery = { __typename?: 'Query', searchSchool?: Array<{ __typename?: 'School', id?: string | null, name: string, address: string, code?: string | null, logo?: string | null }> | null };
 
 export type GetClassSubjectsQueryVariables = Exact<{
   input: StudentSearchInput;
@@ -317,7 +341,7 @@ export type ConfirmCompleteProfileMutation = { __typename?: 'Mutation', confirmC
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, username: string, phoneNumber?: string | null, email: string, profileCompleted?: boolean | null, hasMembership?: boolean | null, profile?: { __typename?: 'Profile', id: string, address?: string | null, firstname: string, lastname: string, gender: string, photo?: string | null } | null, memberships?: Array<{ __typename?: 'SchoolMembership', id: string, role: string, school: { __typename?: 'School', id?: string | null, name: string, logo?: string | null, slug?: string | null, address?: string | null } } | null> | null } | null };
+export type GetMeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, username: string, phoneNumber?: string | null, email: string, profileCompleted?: boolean | null, hasMembership?: boolean | null, profile?: { __typename?: 'Profile', id: string, address?: string | null, firstname: string, lastname: string, gender: string, photo?: string | null } | null, memberships?: Array<{ __typename?: 'SchoolMembership', id: string, role: string, school: { __typename?: 'School', id?: string | null, name: string, logo?: string | null, slug?: string | null, address: string } } | null> | null } | null };
 
 export type GetDashboardContextQueryVariables = Exact<{
   input: Scalars['SchoolId']['input'];
@@ -338,10 +362,25 @@ export const GetAdminDashboardStatsDocument = `
       totalStudents
       totalTeachers
       totalClasses
-      monthlyRevenue
+      monthlyRevenue {
+        previousMonth
+        currentMonth
+      }
       pendingPaymentsCount
-      todayAttendanceRate
-      absentTodayCount
+      attendance {
+        rate
+        presentCount
+        absentCount
+        totalExpected
+        lateCount
+        history {
+          date
+          rate
+          present
+          absent
+          late
+        }
+      }
       studentGender {
         male
         female

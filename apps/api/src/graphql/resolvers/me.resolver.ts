@@ -23,6 +23,7 @@ export const meResolver: Resolvers = {
                     name: true,
                     logo: true,
                     slug: true,
+                    address: true,
                   },
                 },
                 student: { select: { id: true } },
@@ -53,18 +54,26 @@ export const meResolver: Resolvers = {
     schoolContext: async (parent: any, args, context: Context) => {
       const { schoolId } = args;
       const userId = parent.id;
-      
+
       const membership = await prisma.schoolUser.findUnique({
         where: {
-          schoolId_userId: { schoolId, userId }
+          schoolId_userId: { schoolId, userId },
         },
         include: {
           school: true,
           teacher: { include: { supervisedClasses: true } },
           student: { include: { schoolClass: true } },
-          Parent: { include: { students: { include: { student: { include: { profile: true, schoolClass: true } } } } } },
-          Staff: true
-        }
+          Parent: {
+            include: {
+              students: {
+                include: {
+                  student: { include: { profile: true, schoolClass: true } },
+                },
+              },
+            },
+          },
+          Staff: true,
+        },
       });
 
       if (!membership) {
@@ -78,8 +87,8 @@ export const meResolver: Resolvers = {
         teacher: membership.teacher as any,
         student: membership.student as any,
         parent: membership.Parent as any,
-        staff: membership.Staff as any
+        staff: membership.Staff as any,
       };
-    }
-  }
+    },
+  },
 };

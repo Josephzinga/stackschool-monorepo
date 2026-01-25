@@ -1,6 +1,5 @@
 import { prisma } from '.';
 import {
-  AttendanceStatus,
   Day,
   Gender,
   PaymentStatus,
@@ -9,7 +8,6 @@ import {
 import {
   addDays,
   addHours,
-  isBefore,
   setHours,
   setMinutes,
   startOfWeek,
@@ -52,17 +50,16 @@ async function main() {
 
   // 2. Nettoyage des données de CETTE école
   console.log('🧹 Nettoyage des données existantes...');
-  await prisma.attendance.deleteMany({ where: { schoolId } }); // Suppression des présences
-  await prisma.payment.deleteMany({ where: { schoolId } });
-  await prisma.lesson.deleteMany({ where: { schoolId } });
+  await prisma.payment.deleteMany({ where: { schoolId } }); // Suppression des paiements
+  await prisma.lesson.deleteMany();
   await prisma.student.deleteMany({ where: { schoolId } });
-  await prisma.class.deleteMany();
+  await prisma.class.deleteMany({ where: { schoolId } });
   await prisma.subject.deleteMany({ where: { schoolId } });
 
   // 3. Création des matières
   const subjectsList = [
     { name: 'Mathématiques', code: 'MATH' },
-    { name: 'Physique', code: 'PC' },
+    { name: 'Physique-Chimie', code: 'PC' },
     { name: 'SVT', code: 'SVT' },
     { name: 'Français', code: 'FR' },
     { name: 'Anglais', code: 'ANG' },
@@ -119,11 +116,9 @@ async function main() {
 
   // 5. Création des Classes
   const classesList = [
-    { name: '10ème B', level: '10eme' },
-    { name: '9ème Sciences', level: '11eme' },
-    { name: 'Terminale Sciences', level: 'Tle' },
-    { name: '11ème A', level: '11eme', section: 'Sciences' },
-    { name: 'Terminale Lettres', level: 'Tle', section: 'Lettres' },
+    { name: '8ème A', level: '10eme', section: 'Lettre' },
+    { name: '11ème B', level: '11eme', section: 'Lettre' },
+    { name: 'Terminale ', level: 'Tle', section: 'Science' },
   ];
 
   const classes = [];
@@ -194,74 +189,60 @@ async function main() {
   }
   console.log(`👨‍🎓 ${createdStudents.length} élèves créés.`);
 
-  // 7. Génération de l'Emploi du Temps (Passé et Futur)
+  // 7. Génération de l'Emploi du Temps
   console.log("📅 Génération de l'emploi du temps...");
+  const refDate = startOfWeek(addDays(new Date(), 7), { weekStartsOn: 1 });
 
-  // On génère pour la semaine dernière (pour avoir des présences) et la semaine prochaine
-  const weeksToGenerate = [-1, 0, 1];
-  const lessonsCreated = [];
+  for (const cls of classes) {
+    for (let dayIndex = 0; dayIndex < DAYS.length; dayIndex++) {
+      const dayEnum = DAYS[dayIndex];
+      let currentHour = START_HOUR;
 
-  for (const weekOffset of weeksToGenerate) {
-    const refDate = startOfWeek(addDays(new Date(), weekOffset * 7), {
-      weekStartsOn: 1,
-    });
-
-    for (const cls of classes) {
-      for (let dayIndex = 0; dayIndex < DAYS.length; dayIndex++) {
-        const dayEnum = DAYS[dayIndex];
-        let currentHour = START_HOUR;
-
-        while (currentHour < END_HOUR) {
-          if (currentHour === 12) {
-            currentHour += 2;
-            continue;
-          }
-
-          let duration = Math.random() > 0.5 ? 2 : 1;
-          if (currentHour + duration > END_HOUR) duration = 1;
-          if (currentHour < 12 && currentHour + duration > 12)
-            duration = 12 - currentHour;
-
-          const randomTeacher =
-            teachers[Math.floor(Math.random() * teachers.length)];
-          const subject = subjects.find(
-            (s) => s.id === randomTeacher.subjectId,
-          );
-
-          if (!subject) continue;
-
-          const dateBase = addDays(refDate, dayIndex);
-          const startTime = setMinutes(setHours(dateBase, currentHour), 0);
-          const endTime = addHours(startTime, duration);
-
-          const lesson = await prisma.lesson.create({
-            data: {
-              name: subject.name,
-              day: dayEnum,
-              startTime,
-              endTime,
-              schoolId,
-              classId: cls.id,
-              subjectId: subject.id,
-              teacherId: randomTeacher.id,
-            },
-          });
-
-          // On garde les leçons passées pour générer les présences
-          if (isBefore(endTime, new Date())) {
-            lessonsCreated.push(lesson);
-          }
-
-          currentHour += duration;
+      while (currentHour < END_HOUR) {
+        if (currentHour === 12) {
+          currentHour += 2;
+          continue;
         }
+
+        let duration = Math.random() > 0.5 ? 2 : 1;
+        if (currentHour + duration > END_HOUR) duration = 1;
+        if (currentHour < 12 && currentHour + duration > 12)
+          duration = 12 - currentHour;
+
+        const randomTeacher =
+          teachers[Math.floor(Math.random() * teachers.length)];
+        const subject = subjects.find((s) => s.id === randomTeacher.subjectId);
+
+        if (!subject) continue;
+
+        const dateBase = addDays(refDate, dayIndex);
+        const startTime = setMinutes(setHours(dateBase, currentHour), 0);
+        const endTime = addHours(startTime, duration);
+
+        await prisma.lesson.create({
+          data: {
+            name: subject.name,
+            day: dayEnum,
+            startTime,
+            endTime,
+            classId: cls.id,
+            subjectId: subject.id,
+            teacherId: randomTeacher.id,
+          },
+        });
+
+        currentHour += duration;
       }
     }
   }
   console.log('✅ Emploi du temps généré !');
 
-  // 8. Génération des Paiements
+  // 8. Génération des Paiements (Furtifs)
   console.log('💸 Génération des paiements...');
+
   for (const { student, user } of createdStudents) {
+    // 1. Frais de scolarité (Payé)
+
     await prisma.payment.create({
       data: {
         amount: 50000,
@@ -271,15 +252,16 @@ async function main() {
         type: PaymentType.TUITION,
         description: 'Scolarité Trimestre 1',
         providerRef: `OM-${Math.floor(Math.random() * 1000000)}`,
-        payerId: user.id,
+        payerId: user.id, // L'élève paie lui-même (ou son compte parent simulé)
         payerName: `${user.username}`,
         payerPhone: '+22300000000',
         schoolId,
         studentId: student.id,
-        createdAt: subDays(new Date(), Math.floor(Math.random() * 30)),
+        createdAt: subDays(new Date(), Math.floor(Math.random() * 30)), // Payé il y a quelques jours
       },
     });
 
+    // 2. Frais de cantine (En attente pour certains)
     if (Math.random() > 0.5) {
       await prisma.payment.create({
         data: {
@@ -299,39 +281,6 @@ async function main() {
     }
   }
   console.log('✅ Paiements générés !');
-
-  // 9. Génération des Présences (Attendance)
-  console.log('📝 Génération des présences...');
-
-  for (const lesson of lessonsCreated) {
-    // Récupérer les élèves de la classe concernée par la leçon
-    const studentsInClass = createdStudents.filter(
-      (s) => s.student.classId === lesson.classId,
-    );
-
-    for (const { student } of studentsInClass) {
-      // Probabilités : 90% Présent, 5% Absent, 5% Retard
-      const rand = Math.random();
-      let status: AttendanceStatus = AttendanceStatus.PRESENT;
-
-      if (rand > 0.95) status = AttendanceStatus.ABSENT;
-      else if (rand > 0.9) status = AttendanceStatus.LATE;
-
-      // On ne crée pas d'entrée pour "PRESENT" si on veut économiser de la place,
-      // mais pour un seed complet, on crée tout.
-
-      await prisma.attendance.create({
-        data: {
-          date: lesson.startTime, // La présence est liée à l'heure du cours
-          status,
-          studentId: student.id,
-          schoolId,
-          teacherId: lesson.teacherId, // Le prof qui a fait l'appel
-        },
-      });
-    }
-  }
-  console.log('✅ Présences générées !');
 
   console.log('🚀 Seeding terminé avec succès.');
 }

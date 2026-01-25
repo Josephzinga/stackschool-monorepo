@@ -1,19 +1,24 @@
-"use client";
+'use client';
 
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react";
+import { IconCirclePlusFilled, IconMail } from '@tabler/icons-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { NavSecondaryItem } from "./nav-secondary";
-import Link from "next/link";
+} from '@/components/ui/sidebar';
+import { NavSecondaryItem } from './nav-secondary';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 
-export function NavMain({ items }: { items: NavSecondaryItem["items"] }) {
+export function NavMain({ items }: { items: NavSecondaryItem['items'] }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  console.log('searchparams', pathname);
+  console.log('item', items);
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -21,14 +26,16 @@ export function NavMain({ items }: { items: NavSecondaryItem["items"] }) {
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
               tooltip="Quick Create"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear">
+              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+            >
               <IconCirclePlusFilled />
               <span>Quick Create</span>
             </SidebarMenuButton>
             <Button
               size="icon"
               className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline">
+              variant="outline"
+            >
               <IconMail />
               <span className="sr-only">Inbox</span>
             </Button>
@@ -38,7 +45,10 @@ export function NavMain({ items }: { items: NavSecondaryItem["items"] }) {
           {items.map((item) => (
             <SidebarMenuItem key={item.label}>
               <Link href={item.href} className="w-full">
-                <SidebarMenuButton tooltip={item.label}>
+                <SidebarMenuButton
+                  isActive={item.href.includes(pathname)}
+                  tooltip={item.label}
+                >
                   {item.icon && <item.icon />}
                   <span>{item.label}</span>
                 </SidebarMenuButton>

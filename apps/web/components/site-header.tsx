@@ -1,6 +1,9 @@
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ModeToggle } from './DropMenu';
+import { SearchInput } from '@/components/search-input';
+import { Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function SiteHeader() {
   return (
@@ -11,17 +14,22 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <h1 className="text-base font-medium">Tableau de bord</h1>
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-            <a
-              href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
-              rel="noopener noreferrer"
-              target="_blank"
-              className="dark:text-foreground"
-            >
-              GitHub
-            </a>
+        <div className="flex ml-10 items-center flex-1 w-[75%]">
+          <div className="hidden md:block">
+            <SearchInput
+              className="h-12 font-poppins"
+              placeholder="Rechercher..."
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-end w-[25%] gap-4">
+          <ModeToggle className="w-10 h-10" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-10 h-10 border-primary border"
+          >
+            <Bell />
           </Button>
         </div>
       </div>

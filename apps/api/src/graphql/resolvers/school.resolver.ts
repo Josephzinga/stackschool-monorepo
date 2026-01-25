@@ -1,6 +1,15 @@
 import { prisma } from '@stackschool/db';
 import { createServiceError } from '../../utils/api-errors';
 import { Resolvers } from '../types.generated';
+import {
+  addMonths,
+  endOfDay,
+  format,
+  startOfDay,
+  startOfMonth,
+  subDays,
+  subMonths,
+} from 'date-fns';
 
 export const schoolResolver: Resolvers = {
   Query: {
@@ -31,6 +40,43 @@ export const schoolResolver: Resolvers = {
   School: {
     stats: async (parent) => {
       const schoolId = parent.id!;
+      const today = new Date();
+      const startOfToday = startOfDay(today);
+      const endOfToday = endOfDay(today);
+
+      const startCurrentMonth = startOfMonth(today);
+      const startNextMonth = addMonths(startCurrentMonth, 1);
+      const previousMonth = subMonths(startCurrentMonth, 1);
+
+      const currentRevenue = await prisma.payment.aggregate({
+        where: {
+          schoolId,
+          createdAt: {
+            gte: startCurrentMonth,
+            lt: startNextMonth,
+          },
+        },
+        _sum: {
+          netAmount: true,
+        },
+      });
+      const previousRevenue = await prisma.payment.aggregate({
+        where: {
+          schoolId,
+          createdAt: {
+            gte: previousMonth,
+            lt: startCurrentMonth,
+          },
+        },
+        _sum: {
+          netAmount: true,
+        },
+      });
+
+      const monthlyRevenue = {
+        currentMonth: currentRevenue?._sum.netAmount || 0,
+        previousMonth: previousRevenue?._sum.netAmount || 0,
+      };
 
       const [totalStudents, totalTeachers, totalClasses] = await Promise.all([
         prisma.student.count({ where: { schoolId } }),
@@ -38,33 +84,88 @@ export const schoolResolver: Resolvers = {
         prisma.class.count({ where: { schoolId } }),
       ]);
 
-      const genderCounts = await prisma.profile.groupBy({
-        by: ['gender'],
+      // --- Calcul Présence (Aujourd'hui) ---
+      const todayAttendances = await prisma.attendance.groupBy({
+        by: ['status'],
         where: {
-          student: {
-            some: {
-              schoolId: schoolId,
-            },
+          schoolId,
+          date: {
+            gte: startOfToday,
+            lte: endOfToday,
           },
         },
-        _count: {
-          id: true,
-        },
+        _count: { id: true },
       });
 
-      const maleCount =
-        genderCounts.find((g) => g.gender === 'MALE')?._count.id || 0;
-      const femaleCount =
-        genderCounts.find((g) => g.gender === 'FEMALE')?._count.id || 0;
-      const otherCount =
-        genderCounts.find((g) => g.gender === 'OTHER')?._count.id || 0;
+      const presentCount =
+        todayAttendances.find((a) => a.status === 'PRESENT')?._count.id || 0;
+      const absentCount =
+        todayAttendances.find((a) => a.status === 'ABSENT')?._count.id || 0;
+      const lateCount =
+        todayAttendances.find((a) => a.status === 'LATE')?._count.id || 0;
+      const totalRecorded = presentCount + absentCount + lateCount;
+
+      const attendanceRate =
+        totalRecorded > 0
+          ? ((presentCount + lateCount) / totalRecorded) * 100
+          : 0;
+
+      // --- Calcul Historique Présence (7 derniers jours) ---
+      const last7Days = subDays(today, 7);
+      const historyAttendances = await prisma.attendance.findMany({
+        where: {
+          schoolId,
+          date: { gte: last7Days },
+        },
+        select: { date: true, status: true },
+      });
+
+      const historyMap = new Map();
+      historyAttendances.forEach((att) => {
+        const dateKey = format(att.date, 'yyyy-MM-dd');
+        if (!historyMap.has(dateKey)) {
+          historyMap.set(dateKey, { present: 0, absent: 0, late: 0, total: 0 });
+        }
+        const entry = historyMap.get(dateKey);
+        entry.total++;
+        if (att.status === 'PRESENT') entry.present++;
+        if (att.status === 'ABSENT') entry.absent++;
+        if (att.status === 'LATE') entry.late++;
+      });
+
+      const history = Array.from(historyMap.entries())
+        .map(([date, stats]) => ({
+          date,
+          present: stats.present,
+          absent: stats.absent,
+          late: stats.late,
+          rate:
+            stats.total > 0
+              ? ((stats.present + stats.late) / stats.total) * 100
+              : 0,
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      // --- Calcul Genre ---
+      const students = await prisma.student.findMany({
+        where: { schoolId },
+        select: { profile: { select: { gender: true } } },
+      });
+
+      const maleCount = students.filter(
+        (s) => s.profile.gender === 'MALE',
+      ).length;
+      const femaleCount = students.filter(
+        (s) => s.profile.gender === 'FEMALE',
+      ).length;
+      // Note: 'other' n'est pas dans le schéma actuel, on l'ignore ou on l'ajoute si besoin
 
       const studentGender = {
         male: maleCount,
         female: femaleCount,
-        other: otherCount,
       };
 
+      // --- Occupation Classes ---
       const classesOccupancy = await prisma.class.findMany({
         where: { schoolId },
         select: {
@@ -84,10 +185,16 @@ export const schoolResolver: Resolvers = {
           className: c.name,
           studentCount: c._count.students,
         })),
-        monthlyRevenue: 0,
+        attendance: {
+          rate: parseFloat(attendanceRate.toFixed(1)),
+          presentCount,
+          absentCount,
+          lateCount,
+          totalExpected: totalStudents,
+          history,
+        },
+        monthlyRevenue,
         pendingPaymentsCount: 0,
-        todayAttendanceRate: 0,
-        absentTodayCount: 0,
         enrollmentPerMonth: [],
       };
     },

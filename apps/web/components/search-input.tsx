@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Search, X } from 'lucide-react';
@@ -43,10 +45,12 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={cn(
-            'h-14 w-full rounded-full border-2 bg-background pl-14 pr-14 text-lg shadow-sm transition-all duration-300',
+            'h-14 w-full rounded-full dark:shadow-gray-700/50 shadow-slate-300' +
+              ' shadow-[2px_1px_4px_2px_rgba(0,0,0,0.1)]! bg-linear-to-br from-blue-100/80 to-blue-20' +
+              ' dark:bg-linear-to-tl dark:from-gray-900 dark:to-gray-800 pl-14 pr-14 text-lg transition-all' +
+              ' duration-300',
             'placeholder:text-muted-foreground/60',
-            'focus:border-primary focus:ring-primary/10 focus:shadow-sky-400! focus:outline-none' +
-              ' focus:shadow-xl!',
+            'focus:border-primary focus:outline-none',
             'hover:border-primary/30',
             isLoading ? 'border-primary/50' : 'border-muted',
             className,

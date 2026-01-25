@@ -4,22 +4,34 @@ query GetAdminDashboardStats($schoolId: SchoolId) {
     name
     logo
     stats {
-      # KPI Cards
       totalStudents
       totalTeachers
       totalClasses
 
-      # Finance & Présence (Mockés pour l'instant)
-      monthlyRevenue
+      monthlyRevenue {
+        previousMonth
+        currentMonth
+      }
       pendingPaymentsCount
-      todayAttendanceRate
-      absentTodayCount
 
-      # Charts Data
+      attendance {
+        rate
+        presentCount
+        absentCount
+        totalExpected
+        lateCount
+        history {
+          date
+          rate
+          present
+          absent
+          late
+        }
+      }
+
       studentGender {
         male
         female
-
       }
 
       classesOccupancy {

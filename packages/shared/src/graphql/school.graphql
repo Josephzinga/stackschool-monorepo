@@ -16,6 +16,7 @@ type School {
     code: String
     logo: String
     stats: SchoolStats
+    # Les listes teachers et students ont été déplacées vers des queries dédiées (list.graphql)
 }
 
 type Subject {
@@ -56,6 +57,9 @@ type Teacher {
     supervisedClasses: [Classe]
     createdAt: String
     updatedAt: String
+
+    ## Infos profil (jointure User)
+    user: User
 }
 
 type Staff {
@@ -74,6 +78,12 @@ type Classe {
     section: String
     subjects: [Subject]
     lessons: [Lesson]
+    students: [Student] # Liste simple des élèves (pas paginée ici, pour le détail classe)
+    _count: ClassCount
+}
+
+type ClassCount {
+    students: Int!
 }
 
 # --- Nouveaux Types pour le Dashboard Admin ---

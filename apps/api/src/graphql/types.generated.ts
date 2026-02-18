@@ -15,6 +15,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  DateTime: { input: any; output: any; }
   SchoolId: { input: any; output: any; }
 };
 
@@ -33,6 +34,17 @@ export type ChildInput = {
   studentId: Scalars['ID']['input'];
 };
 
+export type ClassCount = {
+  __typename?: 'ClassCount';
+  students: Scalars['Int']['output'];
+};
+
+export type ClassList = {
+  __typename?: 'ClassList';
+  data: Array<Classe>;
+  meta: PaginationMeta;
+};
+
 export type ClassStats = {
   __typename?: 'ClassStats';
   className: Scalars['String']['output'];
@@ -41,11 +53,13 @@ export type ClassStats = {
 
 export type Classe = {
   __typename?: 'Classe';
+  _count?: Maybe<ClassCount>;
   id: Scalars['ID']['output'];
   lessons?: Maybe<Array<Maybe<Lesson>>>;
   level: Scalars['String']['output'];
   name: Scalars['String']['output'];
   section?: Maybe<Scalars['String']['output']>;
+  students?: Maybe<Array<Maybe<Student>>>;
   subjects?: Maybe<Array<Maybe<Subject>>>;
 };
 
@@ -70,6 +84,12 @@ export type DailyAttendance = {
   late: Scalars['Int']['output'];
   present: Scalars['Int']['output'];
   rate: Scalars['Float']['output'];
+};
+
+export type DeleteResponse = {
+  __typename?: 'DeleteResponse';
+  message: Scalars['String']['output'];
+  ok: Scalars['Boolean']['output'];
 };
 
 export type GenderStats = {
@@ -106,6 +126,20 @@ export type MonthlyStats = {
 export type Mutation = {
   __typename?: 'Mutation';
   confirmCompleteProfile?: Maybe<UserPayload>;
+  deleteSchoolTeacher: DeleteResponse;
+};
+
+
+export type MutationDeleteSchoolTeacherArgs = {
+  teacherId: Scalars['String']['input'];
+};
+
+export type PaginationMeta = {
+  __typename?: 'PaginationMeta';
+  limit: Scalars['Int']['output'];
+  page: Scalars['Int']['output'];
+  total: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
 };
 
 export type Parent = {
@@ -130,8 +164,11 @@ export type Profile = {
 export type Query = {
   __typename?: 'Query';
   getClassSubjects?: Maybe<Array<Maybe<Classe>>>;
+  getSchoolClasses: ClassList;
+  getSchoolStudents: StudentList;
+  getSchoolTeachers: TeacherList;
   me?: Maybe<User>;
-  schoolStats?: Maybe<School>;
+  school: School;
   searchSchool?: Maybe<Array<School>>;
   searchStudent?: Maybe<Array<Maybe<Student>>>;
   verifyInvitationCode?: Maybe<User>;
@@ -143,8 +180,32 @@ export type QueryGetClassSubjectsArgs = {
 };
 
 
-export type QuerySchoolStatsArgs = {
+export type QueryGetSchoolClassesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
   schoolId?: InputMaybe<Scalars['SchoolId']['input']>;
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetSchoolStudentsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  schoolId?: InputMaybe<Scalars['SchoolId']['input']>;
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetSchoolTeachersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  schoolId: Scalars['SchoolId']['input'];
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QuerySchoolArgs = {
+  schoolId: Scalars['SchoolId']['input'];
 };
 
 
@@ -186,10 +247,6 @@ export type School = {
   name: Scalars['String']['output'];
   slug?: Maybe<Scalars['String']['output']>;
   stats?: Maybe<SchoolStats>;
-};
-
-export type SchoolIdInput = {
-  id: Scalars['ID']['input'];
 };
 
 export type SchoolMembership = {
@@ -249,6 +306,12 @@ export type Student = {
   schoolClass?: Maybe<Classe>;
 };
 
+export type StudentList = {
+  __typename?: 'StudentList';
+  data: Array<Student>;
+  meta: PaginationMeta;
+};
+
 export type StudentSearchInput = {
   getOnly?: InputMaybe<Scalars['Boolean']['input']>;
   schoolId: Scalars['ID']['input'];
@@ -279,6 +342,13 @@ export type Teacher = {
   specialization?: Maybe<Scalars['String']['output']>;
   supervisedClasses?: Maybe<Array<Maybe<Classe>>>;
   updatedAt?: Maybe<Scalars['String']['output']>;
+  user?: Maybe<User>;
+};
+
+export type TeacherList = {
+  __typename?: 'TeacherList';
+  data: Array<Teacher>;
+  meta: PaginationMeta;
 };
 
 export type User = {
@@ -383,11 +453,15 @@ export type ResolversTypes = ResolversObject<{
   AttendanceStats: ResolverTypeWrapper<AttendanceStats>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   ChildInput: ChildInput;
+  ClassCount: ResolverTypeWrapper<ClassCount>;
+  ClassList: ResolverTypeWrapper<ClassList>;
   ClassStats: ResolverTypeWrapper<ClassStats>;
   Classe: ResolverTypeWrapper<Classe>;
   ContactPreference: ContactPreference;
   CreateInvitationInput: CreateInvitationInput;
   DailyAttendance: ResolverTypeWrapper<DailyAttendance>;
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
+  DeleteResponse: ResolverTypeWrapper<DeleteResponse>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GenderStats: ResolverTypeWrapper<GenderStats>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
@@ -397,6 +471,7 @@ export type ResolversTypes = ResolversObject<{
   MonthlyRevenue: ResolverTypeWrapper<MonthlyRevenue>;
   MonthlyStats: ResolverTypeWrapper<MonthlyStats>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  PaginationMeta: ResolverTypeWrapper<PaginationMeta>;
   Parent: ResolverTypeWrapper<Parent>;
   Profile: ResolverTypeWrapper<Profile>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -404,7 +479,6 @@ export type ResolversTypes = ResolversObject<{
   Role: Role;
   School: ResolverTypeWrapper<School>;
   SchoolId: ResolverTypeWrapper<Scalars['SchoolId']['output']>;
-  SchoolIdInput: SchoolIdInput;
   SchoolMembership: ResolverTypeWrapper<SchoolMembership>;
   SchoolRole: SchoolRole;
   SchoolSearchInput: SchoolSearchInput;
@@ -412,9 +486,11 @@ export type ResolversTypes = ResolversObject<{
   Staff: ResolverTypeWrapper<Staff>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Student: ResolverTypeWrapper<Student>;
+  StudentList: ResolverTypeWrapper<StudentList>;
   StudentSearchInput: StudentSearchInput;
   Subject: ResolverTypeWrapper<Subject>;
   Teacher: ResolverTypeWrapper<Teacher>;
+  TeacherList: ResolverTypeWrapper<TeacherList>;
   User: ResolverTypeWrapper<User>;
   UserPayload: ResolverTypeWrapper<UserPayload>;
 }>;
@@ -424,10 +500,14 @@ export type ResolversParentTypes = ResolversObject<{
   AttendanceStats: AttendanceStats;
   Boolean: Scalars['Boolean']['output'];
   ChildInput: ChildInput;
+  ClassCount: ClassCount;
+  ClassList: ClassList;
   ClassStats: ClassStats;
   Classe: Classe;
   CreateInvitationInput: CreateInvitationInput;
   DailyAttendance: DailyAttendance;
+  DateTime: Scalars['DateTime']['output'];
+  DeleteResponse: DeleteResponse;
   Float: Scalars['Float']['output'];
   GenderStats: GenderStats;
   ID: Scalars['ID']['output'];
@@ -437,22 +517,24 @@ export type ResolversParentTypes = ResolversObject<{
   MonthlyRevenue: MonthlyRevenue;
   MonthlyStats: MonthlyStats;
   Mutation: Record<PropertyKey, never>;
+  PaginationMeta: PaginationMeta;
   Parent: Parent;
   Profile: Profile;
   Query: Record<PropertyKey, never>;
   Role: Role;
   School: School;
   SchoolId: Scalars['SchoolId']['output'];
-  SchoolIdInput: SchoolIdInput;
   SchoolMembership: SchoolMembership;
   SchoolSearchInput: SchoolSearchInput;
   SchoolStats: SchoolStats;
   Staff: Staff;
   String: Scalars['String']['output'];
   Student: Student;
+  StudentList: StudentList;
   StudentSearchInput: StudentSearchInput;
   Subject: Subject;
   Teacher: Teacher;
+  TeacherList: TeacherList;
   User: User;
   UserPayload: UserPayload;
 }>;
@@ -466,17 +548,28 @@ export type AttendanceStatsResolvers<ContextType = Context, ParentType extends R
   totalExpected?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 }>;
 
+export type ClassCountResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ClassCount'] = ResolversParentTypes['ClassCount']> = ResolversObject<{
+  students?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+}>;
+
+export type ClassListResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ClassList'] = ResolversParentTypes['ClassList']> = ResolversObject<{
+  data?: Resolver<Array<ResolversTypes['Classe']>, ParentType, ContextType>;
+  meta?: Resolver<ResolversTypes['PaginationMeta'], ParentType, ContextType>;
+}>;
+
 export type ClassStatsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ClassStats'] = ResolversParentTypes['ClassStats']> = ResolversObject<{
   className?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   studentCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 }>;
 
 export type ClasseResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Classe'] = ResolversParentTypes['Classe']> = ResolversObject<{
+  _count?: Resolver<Maybe<ResolversTypes['ClassCount']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lessons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Lesson']>>>, ParentType, ContextType>;
   level?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   section?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  students?: Resolver<Maybe<Array<Maybe<ResolversTypes['Student']>>>, ParentType, ContextType>;
   subjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Subject']>>>, ParentType, ContextType>;
 }>;
 
@@ -486,6 +579,15 @@ export type DailyAttendanceResolvers<ContextType = Context, ParentType extends R
   late?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   present?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   rate?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+}>;
+
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+  name: 'DateTime';
+}
+
+export type DeleteResponseResolvers<ContextType = Context, ParentType extends ResolversParentTypes['DeleteResponse'] = ResolversParentTypes['DeleteResponse']> = ResolversObject<{
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 }>;
 
 export type GenderStatsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GenderStats'] = ResolversParentTypes['GenderStats']> = ResolversObject<{
@@ -513,6 +615,14 @@ export type MonthlyStatsResolvers<ContextType = Context, ParentType extends Reso
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   confirmCompleteProfile?: Resolver<Maybe<ResolversTypes['UserPayload']>, ParentType, ContextType>;
+  deleteSchoolTeacher?: Resolver<ResolversTypes['DeleteResponse'], ParentType, ContextType, RequireFields<MutationDeleteSchoolTeacherArgs, 'teacherId'>>;
+}>;
+
+export type PaginationMetaResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PaginationMeta'] = ResolversParentTypes['PaginationMeta']> = ResolversObject<{
+  limit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  page?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  totalPages?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 }>;
 
 export type ParentResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Parent'] = ResolversParentTypes['Parent']> = ResolversObject<{
@@ -534,8 +644,11 @@ export type ProfileResolvers<ContextType = Context, ParentType extends Resolvers
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   getClassSubjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Classe']>>>, ParentType, ContextType, RequireFields<QueryGetClassSubjectsArgs, 'filter'>>;
+  getSchoolClasses?: Resolver<ResolversTypes['ClassList'], ParentType, ContextType, RequireFields<QueryGetSchoolClassesArgs, 'limit' | 'page'>>;
+  getSchoolStudents?: Resolver<ResolversTypes['StudentList'], ParentType, ContextType, RequireFields<QueryGetSchoolStudentsArgs, 'limit' | 'page'>>;
+  getSchoolTeachers?: Resolver<ResolversTypes['TeacherList'], ParentType, ContextType, RequireFields<QueryGetSchoolTeachersArgs, 'limit' | 'page' | 'schoolId'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  schoolStats?: Resolver<Maybe<ResolversTypes['School']>, ParentType, ContextType, Partial<QuerySchoolStatsArgs>>;
+  school?: Resolver<ResolversTypes['School'], ParentType, ContextType, RequireFields<QuerySchoolArgs, 'schoolId'>>;
   searchSchool?: Resolver<Maybe<Array<ResolversTypes['School']>>, ParentType, ContextType, RequireFields<QuerySearchSchoolArgs, 'filter'>>;
   searchStudent?: Resolver<Maybe<Array<Maybe<ResolversTypes['Student']>>>, ParentType, ContextType, RequireFields<QuerySearchStudentArgs, 'filter'>>;
   verifyInvitationCode?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryVerifyInvitationCodeArgs, 'code'>>;
@@ -596,6 +709,11 @@ export type StudentResolvers<ContextType = Context, ParentType extends Resolvers
   schoolClass?: Resolver<Maybe<ResolversTypes['Classe']>, ParentType, ContextType>;
 }>;
 
+export type StudentListResolvers<ContextType = Context, ParentType extends ResolversParentTypes['StudentList'] = ResolversParentTypes['StudentList']> = ResolversObject<{
+  data?: Resolver<Array<ResolversTypes['Student']>, ParentType, ContextType>;
+  meta?: Resolver<ResolversTypes['PaginationMeta'], ParentType, ContextType>;
+}>;
+
 export type SubjectResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Subject'] = ResolversParentTypes['Subject']> = ResolversObject<{
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -618,6 +736,12 @@ export type TeacherResolvers<ContextType = Context, ParentType extends Resolvers
   specialization?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   supervisedClasses?: Resolver<Maybe<Array<Maybe<ResolversTypes['Classe']>>>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+}>;
+
+export type TeacherListResolvers<ContextType = Context, ParentType extends ResolversParentTypes['TeacherList'] = ResolversParentTypes['TeacherList']> = ResolversObject<{
+  data?: Resolver<Array<ResolversTypes['Teacher']>, ParentType, ContextType>;
+  meta?: Resolver<ResolversTypes['PaginationMeta'], ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
@@ -640,14 +764,19 @@ export type UserPayloadResolvers<ContextType = Context, ParentType extends Resol
 
 export type Resolvers<ContextType = Context> = ResolversObject<{
   AttendanceStats?: AttendanceStatsResolvers<ContextType>;
+  ClassCount?: ClassCountResolvers<ContextType>;
+  ClassList?: ClassListResolvers<ContextType>;
   ClassStats?: ClassStatsResolvers<ContextType>;
   Classe?: ClasseResolvers<ContextType>;
   DailyAttendance?: DailyAttendanceResolvers<ContextType>;
+  DateTime?: GraphQLScalarType;
+  DeleteResponse?: DeleteResponseResolvers<ContextType>;
   GenderStats?: GenderStatsResolvers<ContextType>;
   Lesson?: LessonResolvers<ContextType>;
   MonthlyRevenue?: MonthlyRevenueResolvers<ContextType>;
   MonthlyStats?: MonthlyStatsResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  PaginationMeta?: PaginationMetaResolvers<ContextType>;
   Parent?: ParentResolvers<ContextType>;
   Profile?: ProfileResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
@@ -657,8 +786,10 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   SchoolStats?: SchoolStatsResolvers<ContextType>;
   Staff?: StaffResolvers<ContextType>;
   Student?: StudentResolvers<ContextType>;
+  StudentList?: StudentListResolvers<ContextType>;
   Subject?: SubjectResolvers<ContextType>;
   Teacher?: TeacherResolvers<ContextType>;
+  TeacherList?: TeacherListResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserPayload?: UserPayloadResolvers<ContextType>;
 }>;

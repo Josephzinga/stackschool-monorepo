@@ -32,8 +32,9 @@ import {
 } from '@/components/ui/sidebar';
 import { menuItems } from '@/lib/data';
 import { useUserStore } from '@stackschool/ui';
-import { AvatarImage, Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { School } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 const data = {
   user: {
@@ -154,8 +155,15 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { currentSchool, user } = useUserStore();
-  console.log(currentSchool);
-  console.log(user);
+  const pathname = usePathname();
+  
+  const currentRole = currentSchool
+    ? user?.memberships?.find((m) => m?.id === currentSchool?.id)?.role
+    : user?.memberships![0]?.role;
+  const navMainWithDashboard = menuItems.navMain.find((item) =>
+    item.href.includes('/dashboard'),
+  );
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -167,7 +175,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <Avatar className="w-11 h-11 rounded-xl">
-                  <AvatarImage src={`/images/${currentSchool.logo}`} />
+                  <AvatarImage src={`/images/${currentSchool?.logo}`} />
                   <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
                     <School className="h-6 w-6" />
                   </AvatarFallback>

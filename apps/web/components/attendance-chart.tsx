@@ -44,7 +44,7 @@ const chartConfig = {
 export default function AttendanceChart({
   data,
 }: {
-  data?: DailyAttendance[];
+  data?: DailyAttendance[] | null;
 }) {
   // Transformation des données pour l'affichage
   const chartData =

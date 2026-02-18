@@ -61,6 +61,8 @@ export async function upsertOauthUser({
         // supprimer le user dans redis
         clearUserFromRedis(user.id);
         // créer l'Account lié à ce user (si déjà lié, on ignore)
+
+      
         await prisma.account.create({
           data: {
             access_token: accessToken,

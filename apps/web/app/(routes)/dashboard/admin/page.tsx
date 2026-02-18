@@ -33,37 +33,32 @@ export default function AdminDashboard() {
     );
   }
 
-  const stats = data?.schoolStats?.stats;
+  const stats = data?.school?.stats;
 
   return (
-    <div className="flex h-full">
-      <div className="flex flex-1 flex-col w-full lg:w-[65%] overflow-y-auto">
+    <div className="flex h-screnn flex-col lg:flex-row">
+      <div className="flex flex-col w-full lg:w-[65%] xl:w-[70%] overflow-y-auto">
         <div className="flex flex-col gap-4 p-4 md:p-5">
-          {/* Cartes KPI */}
           <SectionCards stats={stats} />
 
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_2fr] gap-4">
-            {/* Graphique Genre (1/3) */}
             <div className="w-full h-[400px]">
-              {/* Utilisation du composant ChartRadialGender corrigé */}
               {stats?.studentGender && (
-                <ChartRadialGender stats={stats.studentGender} />
+                <ChartRadialGender
+                  stats={stats.studentGender}
+                  attendance={stats.attendance}
+                />
               )}
             </div>
 
-            {/* Graphique Assiduité (2/3) */}
             <div className="w-full h-[400px]">
-              {/* On passe l'historique au composant AttendanceChart */}
               <AttendanceChart data={stats?.attendance?.history} />
             </div>
           </div>
 
-          {/* Le graphique est ici  */}
           <ChartAreaInteractive />
         </div>
       </div>
-
-      {/* Calendrier Latéral */}
 
       <EventSection />
     </div>

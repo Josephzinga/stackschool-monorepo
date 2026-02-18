@@ -32,6 +32,7 @@ export default function ProtectedRoute({
       const isOnCompleteProfile = pathname === '/auth/complete-profile';
       const isOnAuthPage = pathname.startsWith('/auth') && !isOnCompleteProfile;
       const isOnSelectSchool = pathname === '/dashboard/select-school';
+      const role = data.me.memberships;
 
       // Cas A : Profil incomplet
       if (!isProfileComplete && !isOnCompleteProfile && !isOnAuthPage) {
@@ -53,12 +54,11 @@ export default function ProtectedRoute({
         // Si pas d'école choisie
         if (!currentSchool && !isOnSelectSchool) {
           if (memberships.length === 1) {
-            // Une seule école : Auto-sélection
             setCurrentSchool(memberships[0]?.school);
           } else if (memberships.length > 1) {
             // Plusieurs écoles : Redirection vers la sélection
             console.log('plusieur école', memberships);
-            router.replace('/dashboard/select-school');
+            router.replace('/school/select-school');
             return;
           } else {
             // Aucune école (ne devrait pas arriver si hasMembership=true, mais sécurité)

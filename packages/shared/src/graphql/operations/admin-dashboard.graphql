@@ -1,5 +1,5 @@
-query GetAdminDashboardStats($schoolId: SchoolId) {
-  schoolStats(schoolId: $schoolId) {
+query GetAdminDashboardStats($schoolId: SchoolId!) {
+  school(schoolId: $schoolId) {
     id
     name
     logo

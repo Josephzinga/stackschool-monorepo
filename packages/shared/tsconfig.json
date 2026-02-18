@@ -9,6 +9,5 @@
     "composite": true // Nécessaire pour les projets référencés
   },
   "include": ["index.ts", "src/**/*"],
-  "exclude": ["node_modules", "dist"],
   "references": []
 }

@@ -25,13 +25,19 @@ interface GenderStats {
   other?: number;
 }
 
+interface AttendanceStats {
+  rate: number;
+  presentCount: number;
+  totalExpected: number;
+}
+
 const chartConfig = {
   total: {
     label: 'Total',
   },
   male: {
     label: 'Garçons',
-    color: 'var(--chart-1)', // Assurez-vous que ces variables CSS existent (ex: hsl(220 70% 50%))
+    color: 'var(--chart-1)',
   },
   female: {
     label: 'Filles',
@@ -39,8 +45,18 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartRadialGender({ stats }: { stats: GenderStats }) {
+export function ChartRadialGender({
+  stats,
+  attendance,
+}: {
+  stats: GenderStats;
+  attendance?: AttendanceStats | null;
+}) {
   const total = stats.male + stats.female + (stats.other || 0);
+  const hasAttendance = !!attendance && attendance.totalExpected > 0;
+  const attendanceRate = hasAttendance ? attendance.rate : 0;
+  const attendancePresent = hasAttendance ? attendance.presentCount : 0;
+  const attendanceExpected = hasAttendance ? attendance.totalExpected : 0;
 
   const chartData = [
     {
@@ -73,11 +89,11 @@ export function ChartRadialGender({ stats }: { stats: GenderStats }) {
         <CardTitle>Répartition Élèves</CardTitle>
         <CardDescription>Année Scolaire 2023-2024</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0   min-h-50">
+      <CardContent className="flex-1 pb-0 min-h-50">
         <ChartContainer
           config={chartConfig}
           style={{ color: 'blue' }}
-          className="mx-auto aspect-square max-h-65 w-full"
+          className="mx-auto aspect-square max-h-65 w-full relative"
         >
           <RadialBarChart
             startAngle={90}
@@ -114,6 +130,18 @@ export function ChartRadialGender({ stats }: { stats: GenderStats }) {
 
             <RadialBar dataKey="count" background cornerRadius={10} />
           </RadialBarChart>
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="text-center leading-tight">
+              <p className="text-2xl font-bold">
+                {attendanceRate.toFixed(1)}
+                <span className="text-sm">%</span>
+              </p>
+              <p className="text-xs text-muted-foreground">Présence du jour</p>
+              <p className="text-sm font-medium">
+                {attendancePresent}/{attendanceExpected}
+              </p>
+            </div>
+          </div>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm pt-4">
@@ -121,8 +149,15 @@ export function ChartRadialGender({ stats }: { stats: GenderStats }) {
           {total} élèves inscrits{' '}
           <TrendingUp className="h-4 w-4 text-green-500" />
         </div>
-        <div className="text-muted-foreground text-center text-xs">
-          {stats.male} Garçons • {stats.female} Filles
+        <div className="text-muted-foreground flex gap-3 font-jost font-Bold text-sm">
+          <div className="flex gap-1 items-center">
+            <span className="h-3 w-3 rounded-full bg-chart-1" />
+            <p className="">{stats.male} Garçons</p>
+          </div>
+          <div className="flex gap-1 items-center">
+            <span className="h-3 w-3 rounded-full bg-chart-4" />
+            <p>{stats.female} Filles</p>
+          </div>
         </div>
       </CardFooter>
     </Card>

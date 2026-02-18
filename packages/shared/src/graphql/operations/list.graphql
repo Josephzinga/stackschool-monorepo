@@ -1,0 +1,47 @@
+query GetSchoolTeachers(
+  $schoolId: SchoolId!
+  $page: Int
+  $limit: Int
+  $searchTerm: String
+) {
+  getSchoolTeachers(
+    schoolId: $schoolId
+    page: $page
+    limit: $limit
+    searchTerm: $searchTerm
+  ) {
+    meta {
+      limit
+      total
+      totalPages
+    }
+    data {
+      id
+      schoolUserId
+      specialization
+      departement
+      experience
+      hireDate
+      isActive
+      user {
+        email
+        phoneNumber
+        profile {
+          firstname
+          lastname
+          photo
+        }
+      }
+      lessons {
+        id
+        endTime
+        startTime
+        day
+      }
+      classes {
+        id
+        name
+      }
+    }
+  }
+}

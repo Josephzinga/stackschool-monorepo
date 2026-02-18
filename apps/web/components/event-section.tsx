@@ -8,8 +8,8 @@ import { LectureCard } from '@/components/lecture-card';
 
 export default function EventSection() {
   return (
-    <Card className="hidden h-screen lg:flex px-2 max-w-110 lg:w-[35%] mt-4 border">
-      <div className="flex justify-center items-center h-100 text-center text-lg">
+    <Card className="h-screen! lg:flex md:max-w-120 px-2 w-full xl:w-[30%]  mt-4 border">
+      <div className="flex justify-center w-full items-center h-100 text-center text-lg">
         <CalendarDisplay />
       </div>
       <div className="w-full flex flex-col gap-4">

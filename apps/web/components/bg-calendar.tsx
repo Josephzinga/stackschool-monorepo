@@ -8,7 +8,11 @@ export default function CalendarDisplay() {
       plugins={[dayGridPlugin, interactionPlugin]}
       initialView="dayGridMonth"
       locale="fr"
-      height="auto"
+      firstDay={1}
+      height="400px"
+      dayHeaderClassNames="bg-gray-200"
+      viewClassNames="font-poppins"
+      allDayClassNames={'bg-green-500'}
       headerToolbar={{
         left: 'prev',
         center: 'title',

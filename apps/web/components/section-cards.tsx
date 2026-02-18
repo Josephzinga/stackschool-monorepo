@@ -23,7 +23,7 @@ function formatCurrency(value: number) {
   return new Intl.NumberFormat('fr-FR').format(Math.round(value));
 }
 
-export function SectionCards({ stats }: { stats: SchoolStats }) {
+export function SectionCards({ stats }: { stats?: SchoolStats | null }) {
   const currentRevenue = Number(stats?.monthlyRevenue?.currentMonth ?? 0);
   const previousRevenue = Number(stats?.monthlyRevenue?.previousMonth ?? 0);
 

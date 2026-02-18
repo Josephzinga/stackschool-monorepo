@@ -6,11 +6,9 @@ import {
   useGetDashboardContextQuery,
   useUserStore,
 } from '@stackschool/ui';
-import { Spinner } from '@/components/ui/spinner';
 import { parseAxiosError } from '@stackschool/shared';
+import { LoaderCircleIcon } from 'lucide-react';
 
-// Type du contexte (dérivé de la requête GraphQL)
-// On pourrait utiliser ReturnType<typeof useGetDashboardContextQuery>['data'] mais c'est plus propre de définir une interface
 interface DashboardContextType {
   role: string;
   school: {
@@ -31,22 +29,22 @@ const DashboardContext = createContext<GetDashboardContextQuery | undefined>(
 export function DashboardProvider({ children }: { children: ReactNode }) {
   const { currentSchool } = useUserStore();
 
-  // Si pas d'école sélectionnée, on ne charge rien (ProtectedRoute ou SelectSchool s'en occupent)
   const schoolId = currentSchool?.id;
 
   const { data, isLoading, error } = useGetDashboardContextQuery(
     { input: schoolId },
     {
       enabled: !!schoolId,
-      staleTime: 1000 * 60 * 5, // Cache 5 min
+      staleTime: 1000 * 60 * 5,
     },
   );
+
   const contextData = data?.me?.schoolContext;
 
   if (isLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center">
-        <Spinner className="h-8 w-8 text-primary" />
+      <div className="h-screen w-full flex items-center bg-gray-50 dark:bg-gray-900 animate-pulse justify-center">
+        <LoaderCircleIcon className="h-15 w-15 animate-spin text-primary" />
       </div>
     );
   }
@@ -54,7 +52,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   console.log('Error', message);
 
   if (error || !contextData) {
-    // Gérer l'erreur (ex: redirection ou message)
     return <div>Erreur de chargement du contexte école.</div>;
   }
 

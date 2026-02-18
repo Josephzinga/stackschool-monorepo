@@ -9,6 +9,7 @@ import { getClassesSubjectsResolver } from './resolvers/getClassesSubjects.resol
 import { confirmCompleteProfileResolver } from './resolvers/confirm-complete-profile.resolver';
 import { meResolver } from './resolvers/me.resolver';
 import { schoolResolver } from './resolvers/school.resolver';
+import { listResolver } from './resolvers/list.resolver';
 import { ServiceError } from '@stackschool/shared';
 import { ZodError } from 'zod';
 
@@ -29,6 +30,7 @@ const resolvers = merge(
   {},
   meResolver,
   schoolResolver,
+  listResolver, // Ajout du nouveau resolver
   studentResolver,
   searchSchoolResolver,
   getClassesSubjectsResolver,
@@ -50,8 +52,7 @@ const graphqlMiddleware = createHandler({
     if (err instanceof ZodError) {
       return {
         message: 'Erreur de validation',
-        code: 400,
-        name: 'ZOD_ERROR',
+        code: 'VALIDATION_ERROR',
         details: err.issues.map((issue) => ({
           field: issue.path.join('.'),
           message: issue.message,
@@ -69,8 +70,7 @@ const graphqlMiddleware = createHandler({
 
     return {
       message: err.message || 'Une erreur interne est survenue',
-      code: 500,
-      name: 'INTERNAL_SERVER_ERROR',
+      code: 'INTERNAL_SERVER_ERROR',
     };
   },
 });

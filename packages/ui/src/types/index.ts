@@ -1,5 +1,5 @@
 import { ProfileData, RoleData, SchoolData } from '@stackschool/shared';
-import { School, User } from '../generated/graphql';
+import { School, User } from '@stackschool/ui/src';
 
 export interface UserStore {
   user: User | null;
@@ -7,7 +7,7 @@ export interface UserStore {
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   currentSchool: School | null;
-  setCurrentSchool: (school: School) => void;
+  setCurrentSchool: (school?: Omit<School, 'students' | 'teachers'>) => void;
 }
 
 export interface CompleteProfileStep {

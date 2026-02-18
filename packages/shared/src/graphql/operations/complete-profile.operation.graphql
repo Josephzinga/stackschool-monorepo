@@ -47,86 +47,89 @@ mutation ConfirmCompleteProfile {
 }
 query GetMe {
   me {
+    id
+    username
+    phoneNumber
+    email
+    profileCompleted
+    hasMembership
+
+    profile {
       id
-      username
-      phoneNumber
-      email
-      profileCompleted
-      hasMembership
-
-      profile {
+      address
+      firstname
+      lastname
+      gender
+      photo
+    }
+    memberships {
+      id
+      role
+      school {
         id
+        name
+        logo
+        slug
         address
-        firstname
-        lastname
-        gender
-        photo
       }
-      memberships {
-        id
-        role
-        school {
-          id
-          name
-          logo
-          slug
-          address
-        }
-      }
-
-}
-
-}
-
-query GetDashboardContext($input: SchoolId!) {
-  me {
-      schoolContext(schoolId: $input) {
-        id
-        role
-        teacher {
-          id
-          departement
-          specialization
-          classes {
-            id
-            name
-            section
-            subjects {
-              id
-              name
-              lessons {
-                id
-                name
-                startTime
-                endTime
-                day
-              }
-            }
-          }
-          supervisedClasses {
-            id
-            section
-            section
-          }
-        }
-        staff {
-          id
-          position
-          departement
-          schoolUserId
-        }
-        parent {
-          id
-          isDelegate
-          students {
-            id
-            className
-            firstname
-            matricule
-          }
-        }
     }
   }
 }
 
-
+query GetDashboardContext($input: SchoolId!) {
+  me {
+    schoolContext(schoolId: $input) {
+      id
+      role
+      teacher {
+        id
+        departement
+        specialization
+        classes {
+          id
+          name
+          section
+          subjects {
+            id
+            name
+            lessons {
+              id
+              name
+              startTime
+              endTime
+              day
+            }
+          }
+        }
+        supervisedClasses {
+          id
+          section
+          section
+        }
+      }
+      staff {
+        id
+        position
+        departement
+        schoolUserId
+      }
+      parent {
+        id
+        isDelegate
+        students {
+          id
+          className
+          firstname
+          matricule
+        }
+      }
+      student {
+        id
+        className
+        lastname
+        firstname
+        matricule
+      }
+    }
+  }
+}

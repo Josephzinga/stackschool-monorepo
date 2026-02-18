@@ -13,7 +13,7 @@ import {
 
 export const schoolResolver: Resolvers = {
   Query: {
-    schoolStats: async (_: any, { schoolId }, context: any) => {
+    school: async (_: any, { schoolId }, context) => {
       const userId = context.user.id;
 
       if (!userId) {
@@ -158,14 +158,12 @@ export const schoolResolver: Resolvers = {
       const femaleCount = students.filter(
         (s) => s.profile.gender === 'FEMALE',
       ).length;
-      // Note: 'other' n'est pas dans le schéma actuel, on l'ignore ou on l'ajoute si besoin
 
       const studentGender = {
         male: maleCount,
         female: femaleCount,
       };
 
-      // --- Occupation Classes ---
       const classesOccupancy = await prisma.class.findMany({
         where: { schoolId },
         select: {

@@ -18,7 +18,7 @@ export function LectureCard({
   status,
 }: LectureCardProps) {
   return (
-    <div className="bg-white space-y-4 rounded-lg px-4 py-4 border-l-4 even:border-chart-2 odd:border-chart-5 ">
+    <div className="bg-background space-y-4 rounded-lg px-4 py-4 border-l-4 even:border-chart-1 odd:border-chart-4 ">
       <div className="flex justify-between">
         <div className="flex gap-2">
           <p>{classe}</p>

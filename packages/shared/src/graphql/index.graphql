@@ -1,16 +1,37 @@
 type Mutation {
   confirmCompleteProfile: UserPayload
+  deleteSchoolTeacher(teacherId: String!): DeleteResponse!
 }
 
-input SchoolIdInput {
-  id: ID!
-}
+scalar DateTime
 
 type Query {
   searchStudent(filter: StudentSearchInput!): [Student]
   searchSchool(filter: SchoolSearchInput!): [School!]
   getClassSubjects(filter: StudentSearchInput!): [Classe]
   me: User
-  schoolStats(schoolId: SchoolId): School
+  school(schoolId: SchoolId!): School!
   verifyInvitationCode(code: InvitationCodeInput!): User
+
+  getSchoolTeachers(
+    schoolId: SchoolId!
+    page: Int = 0
+    limit: Int = 10
+    searchTerm: String
+  ): TeacherList!
+
+  getSchoolStudents(
+    schoolId: SchoolId
+    page: Int = 0
+    limit: Int = 10
+    searchTerm: String
+  ): StudentList!
+
+
+  getSchoolClasses(
+    schoolId: SchoolId
+    page: Int = 0
+    limit: Int = 10
+    searchTerm: String
+  ): ClassList!
 }

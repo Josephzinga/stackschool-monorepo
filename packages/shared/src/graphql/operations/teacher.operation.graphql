@@ -1,0 +1,13 @@
+mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!) {
+  deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId) {
+    ok
+    message
+  }
+}
+
+mutation CreateTeacher($data: CreateTeacherInput!, $schoolId: ID!) {
+  createListTeachers(data: $data, schoolId: $schoolId) {
+    ok
+    message
+  }
+}

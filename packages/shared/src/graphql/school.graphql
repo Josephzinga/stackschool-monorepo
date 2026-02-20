@@ -16,7 +16,8 @@ type School {
     code: String
     logo: String
     stats: SchoolStats
-    # Les listes teachers et students ont été déplacées vers des queries dédiées (list.graphql)
+
+    teachers: [Teacher]
 }
 
 type Subject {
@@ -58,7 +59,10 @@ type Teacher {
     createdAt: String
     updatedAt: String
 
-    ## Infos profil (jointure User)
+    # Champ calculé
+    weeklyHours: Float
+
+    # Infos profil (jointure User)
     user: User
 }
 

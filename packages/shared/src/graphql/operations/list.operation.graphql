@@ -3,12 +3,21 @@ query GetSchoolTeachers(
   $page: Int
   $limit: Int
   $searchTerm: String
+  $classId: ID
+  $specialization: String
+  $isActive: Boolean
+  $isSupervisor: Boolean
 ) {
   getSchoolTeachers(
     schoolId: $schoolId
     page: $page
     limit: $limit
     searchTerm: $searchTerm
+
+    classId: $classId
+    specialization: $specialization
+    isActive: $isActive
+    isSupervisor: $isSupervisor
   ) {
     meta {
       limit
@@ -18,10 +27,14 @@ query GetSchoolTeachers(
     data {
       id
       schoolUserId
+      supervisedClasses {
+        id
+        name
+        level
+      }
       specialization
       departement
       experience
-      hireDate
       isActive
       user {
         email
@@ -32,12 +45,6 @@ query GetSchoolTeachers(
           photo
         }
       }
-      lessons {
-        id
-        endTime
-        startTime
-        day
-      }
       classes {
         id
         name
@@ -45,3 +52,6 @@ query GetSchoolTeachers(
     }
   }
 }
+
+
+

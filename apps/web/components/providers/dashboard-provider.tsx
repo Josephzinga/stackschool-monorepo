@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useEffect } from 'react';
 import {
   GetDashboardContextQuery,
   useGetDashboardContextQuery,
@@ -8,19 +8,7 @@ import {
 } from '@stackschool/ui';
 import { parseAxiosError } from '@stackschool/shared';
 import { LoaderCircleIcon } from 'lucide-react';
-
-interface DashboardContextType {
-  role: string;
-  school: {
-    id: string;
-    name: string;
-    logo?: string | null;
-  };
-  teacherProfile?: any;
-  studentProfile?: any;
-  parentProfile?: any;
-  isLoading: boolean;
-}
+import { usePathname, useRouter } from 'next/navigation';
 
 const DashboardContext = createContext<GetDashboardContextQuery | undefined>(
   undefined,
@@ -28,6 +16,8 @@ const DashboardContext = createContext<GetDashboardContextQuery | undefined>(
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
   const { currentSchool } = useUserStore();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const schoolId = currentSchool?.id;
 
@@ -40,6 +30,39 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   );
 
   const contextData = data?.me?.schoolContext;
+  const role = contextData?.role;
+
+  // Logique de redirection basée sur le rôle
+  useEffect(() => {
+    if (isLoading || !role) return;
+
+    // Mapping Rôle -> Route de base
+    const roleRoutes: Record<string, string> = {
+      ADMIN: '/dashboard/admin',
+      TEACHER: '/dashboard/teacher',
+      STUDENT: '/dashboard/student',
+      PARENT: '/dashboard/parent',
+    };
+
+    const allowedRoute = roleRoutes[role];
+    
+    // Si on est à la racine /dashboard, on redirige vers le dashboard spécifique
+    if (pathname === '/dashboard') {
+      router.replace(allowedRoute || '/dashboard');
+      return;
+    }
+
+    // Protection des routes spécifiques
+    // Si je suis TEACHER et que j'essaie d'aller sur /dashboard/admin...
+    if (pathname.startsWith('/dashboard/admin') && role !== 'ADMIN') {
+      router.replace(allowedRoute || '/dashboard');
+    }
+    if (pathname.startsWith('/dashboard/teacher') && role !== 'TEACHER') {
+      router.replace(allowedRoute || '/dashboard');
+    }
+    // ... ajouter d'autres règles si besoin
+
+  }, [role, pathname, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -48,10 +71,10 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  const { message } = parseAxiosError(error);
-  console.log('Error', message);
-
+  
   if (error || !contextData) {
+    const { message } = parseAxiosError(error);
+    console.log('Error', message);
     return <div>Erreur de chargement du contexte école.</div>;
   }
 

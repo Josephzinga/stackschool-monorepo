@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 
 export function SiteHeader() {
   return (
-    <header className="flex h-16 sticky top-1 left-0 right-0 z-40 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+    <header className="flex h-16 sticky top-0 backdrop-blur-xl border-b right-0 w-full z-50 bg-sidebar/50 shadow-sm shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+      <div className="flex w-full items-center h-full gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
         <Separator
           orientation="vertical"

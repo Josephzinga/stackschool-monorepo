@@ -10,6 +10,16 @@ type TeacherList {
   meta: PaginationMeta!
 }
 
+input CreateTeacherInput {
+  firstname: String!
+  lastname: String!
+  email: String
+  phoneNumber: String
+  diploma: String
+  specialization: String!
+  classIds: [String!]
+}
+
 type StudentList {
   data: [Student!]!
   meta: PaginationMeta!
@@ -20,8 +30,4 @@ type ClassList {
   meta: PaginationMeta!
 }
 
-type DeleteResponse {
-  ok: Boolean!
-  message: String!
-}
 

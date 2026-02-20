@@ -1,12 +1,10 @@
 'use client';
 import {
   type ColumnDef,
-  type ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  type SortingState,
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
@@ -46,10 +44,8 @@ export function DataTable<TData, TValue>({
   isLoading,
   meta,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const { pagination, setPagination } = useTable();
+  const { pagination, setPagination, setSorting, sorting } = useTable();
   const table = useReactTable({
     columns,
     data,
@@ -58,13 +54,11 @@ export function DataTable<TData, TValue>({
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     rowCount: meta?.total,
     manualPagination: true,
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
       pagination,
     },
@@ -72,7 +66,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full h-full font-poppins z-10 flex flex-col gap-4">
-      <div className="rounded-md border relative min-h-[300px]">
+      <div className="rounded-md border relative min-h-75">
         {isLoading && (
           <div className="absolute inset-0 bg-white/50 z-50 flex items-center justify-center backdrop-blur-sm">
             <Spinner className="h-8 w-8 text-primary" />
@@ -90,7 +84,7 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="font-semibold text-md"
+                      className="font-semibold font-inter text-md"
                     >
                       {header.isPlaceholder
                         ? null
@@ -110,10 +104,13 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="h-14 even:bg-slate-50 dark:even:bg-slate-950"
+                  className="h-14 even:bg-slate-50 dark:even:bg-slate-950 "
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className="font-medium text-gray-700 dark:text-gray-200"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),

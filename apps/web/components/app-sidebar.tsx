@@ -1,23 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-} from '@tabler/icons-react';
-
 import { NavDocuments } from '@/components/nav-documents';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -34,135 +17,39 @@ import { menuItems } from '@/lib/data';
 import { useUserStore } from '@stackschool/ui';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { School } from 'lucide-react';
-import { usePathname } from 'next/navigation';
-
-const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  navMain: [
-    {
-      title: 'Dashboard',
-      url: '#',
-      icon: IconDashboard,
-    },
-    {
-      title: 'Lifecycle',
-      url: '#',
-      icon: IconListDetails,
-    },
-    {
-      title: 'Analytics',
-      url: '#',
-      icon: IconChartBar,
-    },
-    {
-      title: 'Projects',
-      url: '#',
-      icon: IconFolder,
-    },
-    {
-      title: 'Team',
-      url: '#',
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: 'Capture',
-      icon: IconCamera,
-      isActive: true,
-      url: '#',
-      items: [
-        {
-          title: 'Active Proposals',
-          url: '#',
-        },
-        {
-          title: 'Archived',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Proposal',
-      icon: IconFileDescription,
-      url: '#',
-      items: [
-        {
-          title: 'Active Proposals',
-          url: '#',
-        },
-        {
-          title: 'Archived',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Prompts',
-      icon: IconFileAi,
-      url: '#',
-      items: [
-        {
-          title: 'Active Proposals',
-          url: '#',
-        },
-        {
-          title: 'Archived',
-          url: '#',
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: 'Settings',
-      url: '#',
-      icon: IconSettings,
-    },
-    {
-      title: 'Get Help',
-      url: '#',
-      icon: IconHelp,
-    },
-    {
-      title: 'Search',
-      url: '#',
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: 'Data Library',
-      url: '#',
-      icon: IconDatabase,
-    },
-    {
-      name: 'Reports',
-      url: '#',
-      icon: IconReport,
-    },
-    {
-      name: 'Word Assistant',
-      url: '#',
-      icon: IconFileWord,
-    },
-  ],
-};
+import { useDashboard } from './providers/dashboard-provider';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { currentSchool, user } = useUserStore();
-  const pathname = usePathname();
-  
-  const currentRole = currentSchool
-    ? user?.memberships?.find((m) => m?.id === currentSchool?.id)?.role
-    : user?.memberships![0]?.role;
-  const navMainWithDashboard = menuItems.navMain.find((item) =>
-    item.href.includes('/dashboard'),
+
+  // On essaie de récupérer le rôle depuis le contexte Dashboard (plus fiable)
+  // Sinon on fallback sur le store User
+  let role = 'GUEST';
+  try {
+    const dashboard = useDashboard();
+    role = dashboard.me?.schoolContext?.role!;
+  } catch (e) {
+    // Si on est hors du DashboardProvider (ex: page d'accueil), on utilise le store
+    role = currentSchool
+      ? user?.memberships?.find((m) => m?.school?.id === currentSchool?.id)
+          ?.role || 'GUEST'
+      : 'GUEST';
+  }
+
+  // Filtrage des menus
+  const filteredNavMain = menuItems.navMain.filter(
+    (item) => !item.visible || item.visible.includes(role),
   );
+
+  const filteredDocuments = menuItems.documents.filter(
+    (item) => !item.visible || item.visible.includes(role),
+  );
+
+  const userData = {
+    name: user?.username || 'Utilisateur',
+    email: user?.email || '',
+    avatar: user?.profile?.photo || '',
+  };
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -180,22 +67,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <School className="h-6 w-6" />
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-lg font-poppins font-semibold">
-                  {currentSchool?.name}
-                </span>
+                <div className="flex flex-col items-start overflow-hidden">
+                  <span className="text-sm font-poppins font-semibold truncate w-full">
+                    {currentSchool?.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground capitalize">
+                    {role.toLowerCase()}
+                  </span>
+                </div>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={menuItems.navMain} />
-        <NavDocuments items={menuItems.documents} />
-
-        {/*      <NavSecondary items={menuItems.navSecondary} /> */}
+        <NavMain items={filteredNavMain} />
+        <NavDocuments items={filteredDocuments} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   );

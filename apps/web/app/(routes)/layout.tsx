@@ -3,6 +3,7 @@ import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import ProtectedRoute from '@/components/providers/protected-route';
 import { DashboardProvider } from '@/components/providers/dashboard-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function DashboardLayout({
   children,
@@ -23,6 +24,14 @@ export default function DashboardLayout({
           <AppSidebar variant="inset" />
           <SidebarInset>
             <SiteHeader />
+
+            <Toaster
+              position="bottom-right"
+              className="bg-sky-500! text-lg"
+              duration={5000}
+              id="dashboard"
+            />
+
             {children}
           </SidebarInset>
         </SidebarProvider>

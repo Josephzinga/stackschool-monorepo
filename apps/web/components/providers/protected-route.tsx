@@ -32,7 +32,9 @@ export default function ProtectedRoute({
       const isOnCompleteProfile = pathname === '/auth/complete-profile';
       const isOnAuthPage = pathname.startsWith('/auth') && !isOnCompleteProfile;
       const isOnSelectSchool = pathname === '/dashboard/select-school';
-      const role = data.me.memberships;
+      const member = data.me.memberships?.filter(
+        (s) => s?.id === currentSchool?.id,
+      )!;
 
       // Cas A : Profil incomplet
       if (!isProfileComplete && !isOnCompleteProfile && !isOnAuthPage) {
@@ -44,7 +46,7 @@ export default function ProtectedRoute({
       if (isProfileComplete) {
         // Redirection depuis les pages d'auth
         if (isOnCompleteProfile || isOnAuthPage) {
-          router.replace(`/dashboard/${user?.schoolContext?.role}`);
+          router.replace(`/dashboard}`);
           return;
         }
 

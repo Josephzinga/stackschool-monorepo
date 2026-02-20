@@ -11,6 +11,7 @@ import { meResolver } from './resolvers/me.resolver';
 import { schoolResolver } from './resolvers/school.resolver';
 import { listResolver } from './resolvers/list.resolver';
 import { ServiceError } from '@stackschool/shared';
+import { createTeacherResolver } from './resolvers/create-list-teacher.resolver';
 import { ZodError } from 'zod';
 
 const dirPath = path.resolve(
@@ -35,6 +36,7 @@ const resolvers = merge(
   searchSchoolResolver,
   getClassesSubjectsResolver,
   confirmCompleteProfileResolver,
+  createTeacherResolver,
 );
 
 // Création du schéma exécutable

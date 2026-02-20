@@ -6,7 +6,16 @@ export const listResolver: Resolvers = {
   Query: {
     getSchoolTeachers: async (
       _,
-      { schoolId, page = 0, limit = 10, searchTerm },
+      {
+        schoolId,
+        page = 0,
+        limit = 10,
+        searchTerm,
+        classId,
+        specialization,
+        isActive,
+        isSupervisor,
+      },
       context,
     ) => {
       try {
@@ -14,46 +23,77 @@ export const listResolver: Resolvers = {
 
         const skip = page * limit;
         const search = searchTerm?.trim();
-        
+
         // 1. Filtre de base : L'école
         const whereClause: any = {
           schoolUser: { schoolId },
         };
 
-        // 2. Filtre de recherche (si présent)
-        if (search) {
-          whereClause.AND = [
-            {
-              OR: [
-                // Recherche par spécialisation
-                { specialization: { contains: search, mode: 'insensitive' } },
-                // Recherche par Nom (via relation)
-                {
-                  schoolUser: {
-                    user: {
-                      profile: {
-                        lastname: { contains: search, mode: 'insensitive' }
-                      }
-                    }
-                  }
-                },
-                // Recherche par Prénom (via relation)
-                {
-                  schoolUser: {
-                    user: {
-                      profile: {
-                        firstname: { contains: search, mode: 'insensitive' }
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          ];
+        // 2. Filtres spécifiques
+        if (isActive !== undefined && isActive !== null) {
+          whereClause.isActive = isActive;
         }
 
-        console.log('Search:', search);
-        // console.log('Where:', JSON.stringify(whereClause, null, 2));
+        if (specialization) {
+          whereClause.specialization = {
+            contains: specialization,
+            mode: 'insensitive',
+          };
+        }
+
+        if (isSupervisor) {
+          // On cherche ceux qui supervisent au moins une classe
+          whereClause.supervisedClasses = { some: {} };
+        }
+
+        if (classId) {
+          // Le prof est lié à la classe soit comme superviseur, soit comme enseignant
+          whereClause.OR = [
+            { supervisedClasses: { some: { id: classId } } },
+            { classTeacher: { some: { classId: classId } } },
+          ];
+          // Attention: Si on a déjà un OR pour la recherche, il faut combiner avec AND
+        }
+
+        // 3. Filtre de recherche (si présent)
+        if (search) {
+          const searchCondition = {
+            OR: [
+              { specialization: { contains: search, mode: 'insensitive' } },
+              {
+                schoolUser: {
+                  user: {
+                    profile: {
+                      lastname: { contains: search, mode: 'insensitive' },
+                    },
+                  },
+                },
+              },
+              {
+                schoolUser: {
+                  user: {
+                    profile: {
+                      firstname: { contains: search, mode: 'insensitive' },
+                    },
+                  },
+                },
+              },
+            ],
+          };
+
+          // Si on a déjà un OR (à cause de classId), on doit utiliser AND pour combiner
+          if (whereClause.OR) {
+            whereClause.AND = [
+              { OR: whereClause.OR }, // La condition classId
+              searchCondition, // La condition search
+            ];
+            delete whereClause.OR; // On nettoie l'ancien OR
+          } else {
+            // Sinon on ajoute simplement le AND avec la recherche
+            if (!whereClause.AND) whereClause.AND = [];
+            whereClause.AND.push(searchCondition);
+          }
+        }
 
         const [total, teachers] = await Promise.all([
           prisma.teacher.count({ where: whereClause }),
@@ -61,15 +101,51 @@ export const listResolver: Resolvers = {
             where: whereClause,
             take: limit,
             skip,
-            include: {
+            select: {
+              id: true,
+              diploma: true,
+              isActive: true,
+              specialization: true,
+              schoolUserId: true,
+              classTeacher: {
+                select: {
+                  class: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
               schoolUser: {
-                include: {
-                  user: { include: { profile: true } },
+                select: {
+                  user: {
+                    select: {
+                      id: true,
+                      email: true,
+                      phoneNumber: true,
+                      profile: {
+                        select: {
+                          firstname: true,
+                          lastname: true,
+                          photo: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
               supervisedClasses: true,
             },
-            orderBy: { createdAt: 'desc' },
+            orderBy: {
+              schoolUser: {
+                user: {
+                  profile: {
+                    lastname: 'asc',
+                  },
+                },
+              },
+            },
           }),
         ]);
 
@@ -77,6 +153,10 @@ export const listResolver: Resolvers = {
           data: teachers.map((t) => ({
             ...t,
             user: t.schoolUser.user as any,
+            classes: t.classTeacher.map((c) => ({
+              id: c.class.id,
+              name: c.class.name,
+            })),
           })),
           meta: {
             total,
@@ -98,7 +178,7 @@ export const listResolver: Resolvers = {
     ) => {
       if (!context.user) throw createServiceError('Non authentifié', 401);
 
-      const skip = (page - 1) * limit; // Attention à l'indexation (0 vs 1)
+      const skip = (page - 1) * limit;
       const search = searchTerm?.trim();
 
       const whereClause: any = {
@@ -194,4 +274,6 @@ export const listResolver: Resolvers = {
       };
     },
   },
+
+  Teacher: {},
 };

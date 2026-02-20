@@ -58,6 +58,7 @@ async function main() {
   await prisma.student.deleteMany({ where: { schoolId } });
   await prisma.class.deleteMany();
   await prisma.subject.deleteMany({ where: { schoolId } });
+  await prisma.user.deleteMany();
 
   // 3. Création des matières
   const subjectsList = [
@@ -89,11 +90,12 @@ async function main() {
         email: `${username}@stackschool.com`,
         username: username,
         password: 'password123',
+        phoneNumber: `+243 85${Math.floor(100000 + Math.random() * 900000)}`,
         profileCompleted: true,
         hasMembership: true,
         profile: {
           create: {
-            firstname: 'Professeur',
+            firstname: `${sub.name}prof`,
             lastname: sub.name,
             gender: Gender.MALE,
           },
@@ -119,11 +121,12 @@ async function main() {
 
   // 5. Création des Classes
   const classesList = [
-    { name: '10ème B', level: '10eme' },
-    { name: '9ème Sciences', level: '11eme' },
-    { name: 'Terminale Sciences', level: 'Tle' },
+    { name: '10ème B', level: '10eme', section: 'Science' },
+    { name: '9ème Sciences', level: '11eme', section: 'Commercial' },
+    { name: 'Terminale Sciences', level: 'Tle', section: 'Science' },
     { name: '11ème A', level: '11eme', section: 'Sciences' },
     { name: 'Terminale Lettres', level: 'Tle', section: 'Lettres' },
+    { name: 'Terminal Commercial', level: 'Tle', section: 'Commercial' },
   ];
 
   const classes = [];

@@ -35,10 +35,20 @@ router.get('/user-field', isAuthenticated, async (req, res) => {
         });
       }
     }
-
-    if (phoneNumber && user?.phoneNumber !== phoneNumber) {
+    console.log(
+      'phoneNumber',
+      phoneNumber,
+      'User phoneNumber',
+      user.phoneNumber,
+    );
+    if (
+      phoneNumber &&
+      user?.phoneNumber.replace(/\s+/g, '') !== phoneNumber.replace(/\s+/g, '')
+    ) {
       const existingUser = await prisma.user.findUnique({
-        where: { phoneNumber },
+        where: {
+          phoneNumber: phoneNumber.replace(/\s+/g, ''),
+        },
       });
 
       if (existingUser) {

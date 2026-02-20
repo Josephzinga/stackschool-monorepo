@@ -19,42 +19,40 @@ export default function TeacherPage() {
 }
 
 function TeachersView() {
-  const { pagination, searchTerm } = useTable();
+  const { pagination, searchTerm, filters } = useTable();
   const { currentSchool } = useUserStore();
   const search = useDebounce(500, searchTerm.length > 1 ? searchTerm : '');
+
   const { data, isPending } = useGetSchoolTeachersQuery(
     {
       schoolId: currentSchool?.id!,
       limit: pagination.pageSize,
       page: pagination.pageIndex,
       searchTerm: search,
+      ...filters,
     },
     {
-      enabled: !!currentSchool.id,
+      enabled: !!currentSchool?.id,
     },
   );
 
   const teacherData: Teacher[] =
-    data?.getSchoolTeachers.data.map((d) => ({
-      id: d.id,
-      firstname: d.user?.profile?.firstname || '',
-      lastname: d.user?.profile?.lastname || '',
-      email: d.user?.email || '',
-      phoneNumber: d.user?.phoneNumber || '',
-      speciality: d.specialization || [],
-      classes:
-        d.classes?.map((c) => ({
-          id: c?.id!,
-          name: c?.name!,
-        })) || [],
-      status: d.isActive || false,
-      photo: d.user?.profile?.photo || undefined,
+    data?.getSchoolTeachers.data.map((t) => ({
+      id: t.id,
+      firstname: t.user?.profile?.firstname || '',
+      lastname: t.user?.profile?.lastname || '',
+      email: t.user?.email || '',
+      phoneNumber: t.user?.phoneNumber || '',
+      speciality: t.specialization ? [t.specialization] : [],
+      classes: t.classes || [],
+      status: t.isActive || false,
+      photo: t.user?.profile?.photo || undefined,
     })) || [];
 
   const meta = data?.getSchoolTeachers.meta;
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 gap-4">
+    <div className="flex flex-col h-full p-4 md:p-6 z-10 gap-4">
       <DataTableHeader />
 
       <DataTable

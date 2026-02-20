@@ -51,14 +51,17 @@ export const columns: ColumnDef<Teacher>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'info',
+    accessorKey: 'profile',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          onClick={() => {
+            column.toggleSorting();
+            console.log('sorting', column.getIsSorted());
+          }}
         >
-          info
+          Profile
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -117,6 +120,10 @@ export const columns: ColumnDef<Teacher>[] = [
   {
     accessorKey: 'classes',
     header: 'Classes',
+    cell: ({ row }) => {
+      const count = row.original.classes.length;
+      return <div>{count ? count : <Badge>Non assigné</Badge>}</div>;
+    },
   },
   {
     id: 'actions',

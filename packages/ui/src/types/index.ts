@@ -1,5 +1,5 @@
 import { ProfileData, RoleData, SchoolData } from '@stackschool/shared';
-import { School, User } from '@stackschool/ui/src';
+import { School, User } from '../generated/graphql';
 
 export interface UserStore {
   user: User | null;

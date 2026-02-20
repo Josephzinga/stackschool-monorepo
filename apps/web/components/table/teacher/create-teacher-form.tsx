@@ -1,0 +1,357 @@
+'use client';
+
+import {
+  Controller,
+  CreateTeacherInput,
+  useCreateTeacherMutation,
+  useForm,
+  useQuery,
+  useUserStore,
+  zodResolver,
+} from '@stackschool/ui';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { toast } from 'sonner';
+import { SubmitButton } from '@/components/submit-button';
+import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import {
+  api,
+  createTeacherSchema,
+  CreateTeacherValues,
+  parseAxiosError,
+} from '@stackschool/shared';
+import { Badge } from '@/components/ui/badge';
+import { Mail, Plus, User, User2Icon, X } from 'lucide-react';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { checkField } from '@/lib/check-profile-field';
+
+interface CreateTeacherFormProps {
+  onSuccess?: () => void;
+}
+
+export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
+  const { currentSchool, user } = useUserStore();
+  const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    setError,
+    clearErrors,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateTeacherValues>({
+    resolver: zodResolver(createTeacherSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      classIds: [],
+      email: '',
+      phoneNumber: '',
+      diploma: '',
+      specialization: '',
+    },
+  });
+
+  const selectedClassIds = watch('classIds') || [];
+
+  const { data: classes, isLoading: isLoadingClasses } = useQuery({
+    queryKey: ['classes-light', currentSchool?.id],
+    queryFn: async () => {
+      const res = await api.get(
+        `/api/schools/${currentSchool?.id}/classes?limit=100`,
+      );
+      if (res.data.ok) return res.data.classes;
+      return [];
+    },
+    enabled: !!currentSchool?.id,
+  });
+
+  const { mutateAsync, isPending } = useCreateTeacherMutation({
+    onSuccess: (data) => {
+      if (data.createListTeachers?.ok) {
+        toast.success(data.createListTeachers?.message, {
+          toasterId: 'dashboard',
+        });
+      }
+    },
+    onError: (error) => {
+      const { message } = parseAxiosError(error);
+      toast.error(message || "Erreur lors de la création de l'enseignant", {
+        toasterId: 'dashboard',
+      });
+      console.error(error);
+    },
+    onSettled: () => {
+      if (onSuccess) onSuccess();
+      console.log('onSettled');
+    },
+  });
+
+  const toggleClass = (classId: string) => {
+    const current = selectedClassIds;
+    if (current.includes(classId)) {
+      setValue(
+        'classIds',
+        current.filter((id) => id !== classId),
+      );
+    } else {
+      setValue('classIds', [...current, classId]);
+    }
+  };
+
+  const verifiedField = async (
+    fieldName: keyof CreateTeacherValues,
+    value: string,
+  ) => {
+    if (!value) return;
+    const safeData = await checkField(fieldName as string, value);
+
+    if (safeData?.status === 401) {
+      return toast.error(safeData?.message);
+    }
+
+    if (!safeData?.valid && safeData?.message) {
+      setError(fieldName, {
+        type: 'onBlur',
+        message: safeData?.message,
+      });
+    } else {
+      clearErrors(fieldName);
+    }
+  };
+
+  const onSubmit = async (data: CreateTeacherInput) => {
+    await mutateAsync({
+      data,
+      schoolId: currentSchool?.id,
+    });
+    toast.promise(isPending ? Promise.resolve(data) : Promise.reject(), {
+      loading: "Création de l'enseignant en cours...",
+      success: (data1) => (
+        <div>
+          <p>{data1.firstname}</p>
+        </div>
+      ),
+      toasterId: 'dashboard',
+    });
+  };
+
+  const getSelectedClassNames = () => {
+    if (!classes) return [];
+    return classes
+      .filter((c: any) => selectedClassIds.includes(c.id))
+      .map((c: any) => c.name);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <Field>
+          <FieldLabel>Prénom</FieldLabel>
+          <Input
+            {...register('firstname')}
+            aria-invalid={!!errors.firstname}
+            placeholder="Jean"
+            icon={User}
+          />
+          <FieldError>{errors.firstname?.message}</FieldError>
+        </Field>
+        <Field>
+          <FieldLabel>Nom</FieldLabel>
+          <Input
+            {...register('lastname')}
+            aria-invalid={!!errors.lastname}
+            placeholder="Dupont"
+            icon={User2Icon}
+          />
+          <FieldError>{errors.lastname?.message}</FieldError>
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Field>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, ref, value } }) => (
+              <Input
+                name="email"
+                onChange={onChange}
+                value={value}
+                ref={ref}
+                type="email"
+                icon={Mail}
+                placeholder="jean.dupont@ecole.com"
+                onBlur={() => {
+                  verifiedField('email', watch('email'));
+                  onBlur?.();
+                }}
+              />
+            )}
+          />
+
+          <FieldError>{errors.email?.message}</FieldError>
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="phoneNumber">Téléphone</FieldLabel>
+
+          <Controller
+            control={control}
+            name="phoneNumber"
+            render={({ field: { onChange, onBlur, ref, value } }) => (
+              <PhoneInput
+                id="phoneNumber"
+                international
+                defaultCountry="ML"
+                name="phoneNumber"
+                onChange={onChange}
+                value={value}
+                className="phone-input-custom"
+                type="phoneNumber"
+                placeholder="jean.dupont@ecole.com"
+                onBlur={() => {
+                  verifiedField('phoneNumber', watch('phoneNumber')!);
+                  onBlur?.();
+                }}
+              />
+            )}
+          />
+          <FieldError>{errors.phoneNumber?.message}</FieldError>
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Field>
+          <FieldLabel>Diplôme</FieldLabel>
+          <Input
+            {...register('diploma')}
+            aria-invalid={!!errors.diploma}
+            placeholder="Master, CAP..."
+          />
+          <FieldError>{errors.diploma?.message}</FieldError>
+        </Field>
+        <Field>
+          <FieldLabel>Spécialité</FieldLabel>
+          <Input
+            {...register('specialization')}
+            aria-invalid={!!errors.specialization}
+            placeholder="Mathématiques"
+          />
+          <FieldError>{errors.specialization?.message}</FieldError>
+        </Field>
+      </div>
+
+      {/* Sélection des Classes */}
+      <div className="space-y-2">
+        <FieldLabel>Classes assignées</FieldLabel>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {getSelectedClassNames().map((name: string) => (
+            <Badge key={name} variant="secondary" className="pl-2 pr-1 py-1">
+              {name}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-4 w-4 ml-1 p-0 hover:bg-transparent"
+                onClick={() => {
+                  const cls = classes.find((c: any) => c.name === name);
+                  if (cls) toggleClass(cls.id);
+                }}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          ))}
+
+          <Dialog open={isClassDialogOpen} onOpenChange={setIsClassDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs border-dashed"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Assigner
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-100 font-poppins font-medium ">
+              <DialogHeader>
+                <DialogTitle>Assigner des classes</DialogTitle>
+                <DialogDescription>
+                  Sélectionnez les classes où cet enseignant interviendra.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="py-4 max-h-[300px] overflow-y-auto space-y-2">
+                {isLoadingClasses ? (
+                  <p className="text-sm text-muted-foreground text-center">
+                    Chargement...
+                  </p>
+                ) : classes?.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center">
+                    Aucune classe trouvée.
+                  </p>
+                ) : (
+                  classes?.map((cls: any) => (
+                    <div
+                      key={cls.id}
+                      className="flex items-center space-x-2 p-2 hover:bg-slate-50 rounded-md"
+                    >
+                      <Checkbox
+                        id={`cls-${cls.id}`}
+                        checked={selectedClassIds.includes(cls.id)}
+                        onCheckedChange={() => toggleClass(cls.id)}
+                      />
+                      <Label
+                        htmlFor={`cls-${cls.id}`}
+                        className="flex-1 cursor-pointer text-sm font-poppins"
+                      >
+                        {cls.name}{' '}
+                        <span className="text-muted-foreground text-xs">
+                          ({cls.level})
+                        </span>
+                      </Label>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  className="font-poppins font-semibold"
+                  onClick={() => setIsClassDialogOpen(false)}
+                >
+                  Terminer
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <div className="flex justify-end pt-4">
+        <SubmitButton isSubmitting={isSubmitting}>
+          Créer l'enseignant
+        </SubmitButton>
+      </div>
+    </form>
+  );
+}

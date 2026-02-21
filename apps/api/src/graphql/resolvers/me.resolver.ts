@@ -54,7 +54,6 @@ export const meResolver: Resolvers = {
     schoolContext: async (parent: any, args, context: Context) => {
       const { schoolId } = args;
       const userId = parent.id;
-
       const membership = await prisma.schoolUser.findUnique({
         where: {
           schoolId_userId: { schoolId, userId },

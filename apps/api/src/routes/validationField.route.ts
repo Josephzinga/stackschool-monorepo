@@ -9,8 +9,7 @@ router.get('/user-field', isAuthenticated, async (req, res) => {
   try {
     const user = req.user;
     const parseResult = validateUserFieldSchema.safeParse(req.query);
-    console.log('request query', req.query);
-    console.log(parseResult, 'parse data');
+
     if (!parseResult.success) {
       return res.status(400).json({
         ok: false,
@@ -20,7 +19,6 @@ router.get('/user-field', isAuthenticated, async (req, res) => {
     }
 
     const { email, phoneNumber } = parseResult.data;
-    console.log('email in validate=>', email);
 
     // check email uniqueness
     if (email && user?.email !== email) {
@@ -35,15 +33,11 @@ router.get('/user-field', isAuthenticated, async (req, res) => {
         });
       }
     }
-    console.log(
-      'phoneNumber',
-      phoneNumber,
-      'User phoneNumber',
-      user.phoneNumber,
-    );
+
     if (
       phoneNumber &&
-      user?.phoneNumber.replace(/\s+/g, '') !== phoneNumber.replace(/\s+/g, '')
+      user?.phoneNumber?.replace(/\s+/g, '') !==
+        phoneNumber?.replace(/\s+/g, '')
     ) {
       const existingUser = await prisma.user.findUnique({
         where: {

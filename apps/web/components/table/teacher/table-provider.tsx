@@ -1,11 +1,7 @@
 'use client';
 
 import { createContext, ReactNode, useContext, useState } from 'react';
-import {
-  OnChangeFn,
-  PaginationState,
-  type SortingState,
-} from '@tanstack/react-table';
+import { OnChangeFn, PaginationState, RowSelectionState } from '@tanstack/react-table';
 import { PaginationMeta } from '@stackschool/ui';
 
 interface TeacherFiltersState {
@@ -21,11 +17,14 @@ interface TableContextType {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   filters: TeacherFiltersState;
-  setFilters: OnChangeFn<TeacherFiltersState>;
+  setFilters: React.Dispatch<React.SetStateAction<TeacherFiltersState>>;
+  
+  // Nouvel état pour la sélection
+  rowSelection: RowSelectionState;
+  setRowSelection: OnChangeFn<RowSelectionState>;
+  
   meta?: Omit<PaginationMeta, 'page'>;
   isLoading?: boolean;
-  sorting?: SortingState;
-  setSorting?: OnChangeFn<SortingState>;
 }
 
 const TableContext = createContext<TableContextType | undefined>(undefined);
@@ -37,7 +36,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<TeacherFiltersState>({});
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const value = {
     pagination,
@@ -46,8 +45,8 @@ export function TableProvider({ children }: { children: ReactNode }) {
     setSearchTerm,
     filters,
     setFilters,
-    sorting,
-    setSorting,
+    rowSelection,
+    setRowSelection,
   };
 
   return (

@@ -1,21 +1,15 @@
 'use client';
 import { ColumnDef } from '@tanstack/react-table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Classe } from '@stackschool/ui';
-import { IconDotsVertical } from '@tabler/icons-react';
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { TeacherActions } from '@/components/table/teacher/teacher-actions';
+import { useTable } from '@/components/table/teacher/table-provider';
 
 export type Teacher = {
   id: string | number;
@@ -32,21 +26,32 @@ export type Teacher = {
 export const columns: ColumnDef<Teacher>[] = [
   {
     id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-      />
-    ),
+    header: ({ table }) => {
+      return (
+        <Checkbox
+          checked={
+            table.getIsAllRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        />
+      );
+    },
+    cell: ({ row, table }) => {
+      const { setSelectedIds, selectedIds } = useTable();
+
+      return (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            row.toggleSelected(!!value);
+            setSelectedIds(
+              table.getSelectedRowModel().rows.map((row) => row.original.id),
+            );
+          }}
+        />
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
@@ -101,14 +106,14 @@ export const columns: ColumnDef<Teacher>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ cell, row }) => {
+    cell: ({ row }) => {
       return (
         <div className="w-32">
           <Badge
             variant="outline"
             className={cn(
               'font-semibold px-2 ',
-              row.original.status ? 'bg-green-200' : 'bg-red-200',
+              row.original.status ? 'bg-chart-4/60' : 'bg-chart-2',
             )}
           >
             {row.original.status ? 'Actif' : 'Inactif'}
@@ -127,29 +132,6 @@ export const columns: ColumnDef<Teacher>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
-      const teacher = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Ouvrez le menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>Editer</DropdownMenuItem>
-            <DropdownMenuItem>Copier</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">Suppimer</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <TeacherActions row={row} />,
   },
 ];

@@ -182,7 +182,6 @@ export type Query = {
   __typename?: 'Query';
   getClassSubjects?: Maybe<Array<Maybe<Classe>>>;
   getSchoolClasses: ClassList;
-  getSchoolSpecialisation: Array<Scalars['String']['output']>;
   getSchoolStudents: StudentList;
   getSchoolTeachers: TeacherList;
   me?: Maybe<User>;
@@ -203,11 +202,6 @@ export type QueryGetSchoolClassesArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   schoolId?: InputMaybe<Scalars['SchoolId']['input']>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QueryGetSchoolSpecialisationArgs = {
-  schoolId: Scalars['ID']['input'];
 };
 
 
@@ -463,14 +457,7 @@ export type GetSchoolTeachersQueryVariables = Exact<{
 }>;
 
 
-export type GetSchoolTeachersQuery = { __typename?: 'Query', getSchoolTeachers: { __typename?: 'TeacherList', meta: { __typename?: 'PaginationMeta', limit: number, total: number, totalPages: number }, data: Array<{ __typename?: 'Teacher', id: string, schoolUserId: string, specialization?: string | null, departement?: string | null, experience?: string | null, isActive?: boolean | null, supervisedClasses?: Array<{ __typename?: 'Classe', id: string, name: string, level: string } | null> | null, user?: { __typename?: 'User', email: string, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname: string, lastname: string, photo?: string | null } | null } | null, classes?: Array<{ __typename?: 'Classe', id: string, name: string } | null> | null }> } };
-
-export type GetSchoolSpecializationsQueryVariables = Exact<{
-  schoolId: Scalars['ID']['input'];
-}>;
-
-
-export type GetSchoolSpecializationsQuery = { __typename?: 'Query', getSchoolSpecialisation: Array<string> };
+export type GetSchoolTeachersQuery = { __typename?: 'Query', getSchoolTeachers: { __typename?: 'TeacherList', meta: { __typename?: 'PaginationMeta', limit: number, total: number, totalPages: number }, data: Array<{ __typename?: 'Teacher', id: string, schoolUserId: string, weeklyHours?: number | null, specialization?: string | null, departement?: string | null, experience?: string | null, isActive?: boolean | null, supervisedClasses?: Array<{ __typename?: 'Classe', id: string, name: string, level: string } | null> | null, user?: { __typename?: 'User', email: string, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname: string, lastname: string, photo?: string | null } | null } | null, classes?: Array<{ __typename?: 'Classe', id: string, name: string } | null> | null }> } };
 
 export type DeleteTeachersMutationVariables = Exact<{
   teacherIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -977,6 +964,7 @@ export const GetSchoolTeachersDocument = `
         name
         level
       }
+      weeklyHours
       specialization
       departement
       experience
@@ -1040,54 +1028,6 @@ useInfiniteGetSchoolTeachersQuery.getKey = (variables: GetSchoolTeachersQueryVar
 
 
 useGetSchoolTeachersQuery.fetcher = (variables: GetSchoolTeachersQueryVariables, options?: RequestInit['headers']) => fetcher<GetSchoolTeachersQuery, GetSchoolTeachersQueryVariables>(GetSchoolTeachersDocument, variables, options);
-
-export const GetSchoolSpecializationsDocument = `
-    query GetSchoolSpecializations($schoolId: ID!) {
-  getSchoolSpecialisation(schoolId: $schoolId)
-}
-    `;
-
-export const useGetSchoolSpecializationsQuery = <
-      TData = GetSchoolSpecializationsQuery,
-      TError = unknown
-    >(
-      variables: GetSchoolSpecializationsQueryVariables,
-      options?: Omit<UseQueryOptions<GetSchoolSpecializationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetSchoolSpecializationsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<GetSchoolSpecializationsQuery, TError, TData>(
-      {
-    queryKey: ['GetSchoolSpecializations', variables],
-    queryFn: fetcher<GetSchoolSpecializationsQuery, GetSchoolSpecializationsQueryVariables>(GetSchoolSpecializationsDocument, variables),
-    ...options
-  }
-    )};
-
-useGetSchoolSpecializationsQuery.getKey = (variables: GetSchoolSpecializationsQueryVariables) => ['GetSchoolSpecializations', variables];
-
-export const useInfiniteGetSchoolSpecializationsQuery = <
-      TData = InfiniteData<GetSchoolSpecializationsQuery>,
-      TError = unknown
-    >(
-      variables: GetSchoolSpecializationsQueryVariables,
-      options: Omit<UseInfiniteQueryOptions<GetSchoolSpecializationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetSchoolSpecializationsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useInfiniteQuery<GetSchoolSpecializationsQuery, TError, TData>(
-      (() => {
-    const { queryKey: optionsQueryKey, ...restOptions } = options;
-    return {
-      queryKey: optionsQueryKey ?? ['GetSchoolSpecializations.infinite', variables],
-      queryFn: (metaData) => fetcher<GetSchoolSpecializationsQuery, GetSchoolSpecializationsQueryVariables>(GetSchoolSpecializationsDocument, {...variables, ...(metaData.pageParam ?? {})})(),
-      ...restOptions
-    }
-  })()
-    )};
-
-useInfiniteGetSchoolSpecializationsQuery.getKey = (variables: GetSchoolSpecializationsQueryVariables) => ['GetSchoolSpecializations.infinite', variables];
-
-
-useGetSchoolSpecializationsQuery.fetcher = (variables: GetSchoolSpecializationsQueryVariables, options?: RequestInit['headers']) => fetcher<GetSchoolSpecializationsQuery, GetSchoolSpecializationsQueryVariables>(GetSchoolSpecializationsDocument, variables, options);
 
 export const DeleteTeachersDocument = `
     mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!) {

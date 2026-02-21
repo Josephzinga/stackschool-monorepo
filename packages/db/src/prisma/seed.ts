@@ -17,7 +17,7 @@ import {
 } from 'date-fns';
 
 // ID de l'école cible
-const TARGET_SCHOOL_ID = 'cmkfkbtoy00003pqhbh6nn8ch';
+const TARGET_SCHOOL_ID = 'cmlvxp21a0000inqnq9i2tzd3';
 
 const START_HOUR = 8;
 const END_HOUR = 16;
@@ -58,7 +58,6 @@ async function main() {
   await prisma.student.deleteMany({ where: { schoolId } });
   await prisma.class.deleteMany();
   await prisma.subject.deleteMany({ where: { schoolId } });
-  await prisma.user.deleteMany();
 
   // 3. Création des matières
   const subjectsList = [

@@ -12,13 +12,13 @@ import {
 } from '@/components/ui/sidebar';
 import { NavSecondaryItem } from './nav-secondary';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useDashboard } from '@/components/providers/dashboard-provider';
 
 export function NavMain({ items }: { items: NavSecondaryItem['items'] }) {
   const pathname = usePathname();
-  const router = useRouter();
-  console.log('searchparams', pathname);
-  console.log('item', items);
+  const { me } = useDashboard();
+  const role = me?.schoolContext?.role.toLowerCase();
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -44,9 +44,18 @@ export function NavMain({ items }: { items: NavSecondaryItem['items'] }) {
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.label}>
-              <Link href={item.href} className="w-full">
+              <Link
+                href={
+                  item.label === 'Dashboard' ? `/dashboard/${role}` : item.href
+                }
+                className="w-full"
+              >
                 <SidebarMenuButton
-                  isActive={item.href.includes(pathname)}
+                  isActive={
+                    pathname.includes('dashboard') && item.href === '/dashboard'
+                      ? true
+                      : item.href.includes(pathname)
+                  }
                   tooltip={item.label}
                 >
                   {item.icon && <item.icon />}

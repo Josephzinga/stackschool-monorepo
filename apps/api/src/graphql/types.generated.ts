@@ -183,7 +183,6 @@ export type Query = {
   __typename?: 'Query';
   getClassSubjects?: Maybe<Array<Maybe<Classe>>>;
   getSchoolClasses: ClassList;
-  getSchoolSpecialisation: Array<Scalars['String']['output']>;
   getSchoolStudents: StudentList;
   getSchoolTeachers: TeacherList;
   me?: Maybe<User>;
@@ -204,11 +203,6 @@ export type QueryGetSchoolClassesArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   schoolId?: InputMaybe<Scalars['SchoolId']['input']>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QueryGetSchoolSpecialisationArgs = {
-  schoolId: Scalars['ID']['input'];
 };
 
 
@@ -679,7 +673,6 @@ export type ProfileResolvers<ContextType = Context, ParentType extends Resolvers
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   getClassSubjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Classe']>>>, ParentType, ContextType, RequireFields<QueryGetClassSubjectsArgs, 'filter'>>;
   getSchoolClasses?: Resolver<ResolversTypes['ClassList'], ParentType, ContextType, RequireFields<QueryGetSchoolClassesArgs, 'limit' | 'page'>>;
-  getSchoolSpecialisation?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryGetSchoolSpecialisationArgs, 'schoolId'>>;
   getSchoolStudents?: Resolver<ResolversTypes['StudentList'], ParentType, ContextType, RequireFields<QueryGetSchoolStudentsArgs, 'limit' | 'page'>>;
   getSchoolTeachers?: Resolver<ResolversTypes['TeacherList'], ParentType, ContextType, RequireFields<QueryGetSchoolTeachersArgs, 'limit' | 'page' | 'schoolId'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;

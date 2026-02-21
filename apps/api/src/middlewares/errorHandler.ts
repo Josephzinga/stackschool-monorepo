@@ -29,7 +29,7 @@ export function errorHandler(
 
   if (err instanceof ServiceError) {
     return sendApiResponse(res, err.statusCode, {
-      message: err.message,
+      message: err.message || 'Erreurr interne du serveur',
       details: err.details,
     });
   }

@@ -32,9 +32,6 @@ export default function ProtectedRoute({
       const isOnCompleteProfile = pathname === '/auth/complete-profile';
       const isOnAuthPage = pathname.startsWith('/auth') && !isOnCompleteProfile;
       const isOnSelectSchool = pathname === '/dashboard/select-school';
-      const member = data.me.memberships?.filter(
-        (s) => s?.id === currentSchool?.id,
-      )!;
 
       // Cas A : Profil incomplet
       if (!isProfileComplete && !isOnCompleteProfile && !isOnAuthPage) {
@@ -53,13 +50,12 @@ export default function ProtectedRoute({
         // Gestion Multi-Écoles
         const memberships = data.me.memberships || [];
 
-        // Si pas d'école choisie
         if (!currentSchool && !isOnSelectSchool) {
           if (memberships.length === 1) {
             setCurrentSchool(memberships[0]?.school);
           } else if (memberships.length > 1) {
             // Plusieurs écoles : Redirection vers la sélection
-            console.log('plusieur école', memberships);
+
             router.replace('/school/select-school');
             return;
           } else {

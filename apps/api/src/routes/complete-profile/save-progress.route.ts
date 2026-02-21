@@ -17,7 +17,6 @@ router.post(
   '/save-progress',
   isAuthenticated,
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('Body', req.body);
     try {
       const userId = req.user!.id;
       const { step, school, profile, role } = req.body as {
@@ -42,7 +41,12 @@ router.post(
       }
 
       if (role) {
-        const { errors, success } = safeValidateSchema(roleDataSchema, role);
+        const { errors, success } = safeValidateSchema(
+          roleDataSchema,
+          role.role === 'STAFF'
+            ? { ...role.staff, hireDate: new Date(role.staff.hireDate!) }
+            : role,
+        );
         if (!success) {
           return next(errors);
         }

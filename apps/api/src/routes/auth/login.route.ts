@@ -24,22 +24,20 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
       }
 
       if (info) {
-        return next(info);
+        if (info?.isSocialOnly) {
+          const providers = Array.isArray(info.providers)
+            ? info.providers.join(',')
+            : info.providers || '';
+
+          return res.status(403).json({
+            ok: false,
+            isSocialOnly: true,
+            providers,
+            message: 'Compte social uniquement — complétez votre profil.',
+          });
+        }
+        return next(createServiceError(info.message, 401));
       }
-
-      if (info?.isSocialOnly) {
-        const providers = Array.isArray(info.providers)
-          ? info.providers.join(',')
-          : info.providers || '';
-
-        return res.status(403).json({
-          ok: false,
-          isSocialOnly: true,
-          providers,
-          message: 'Compte social uniquement — complétez votre profil.',
-        });
-      }
-
       if (!user) {
         const msg = info?.message || 'Identifiants invalides';
         return next(createServiceError(msg, 401));

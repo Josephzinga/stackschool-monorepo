@@ -72,7 +72,7 @@ model School {
   students      Student[]
   Subject       Subject[]
   subscriptions Subscription[]
-  attendances   Attendance[] // Nouvelle relation inverse
+  attendances   Attendance[]
 }
 
 /// *
@@ -175,7 +175,7 @@ model ClassTeacher {
   schoolUserId  String?
   class         Class       @relation(fields: [classId], references: [id], onDelete: Cascade)
   SchoolUser    SchoolUser? @relation(fields: [schoolUserId], references: [id])
-  teacher       Teacher     @relation(fields: [teacherId], references: [id])
+  teacher       Teacher     @relation(fields: [teacherId], references: [id], onDelete: Cascade) // Ajout de onDelete: Cascade
 
   @@unique([classId, teacherId])
   @@index([classId])
@@ -277,6 +277,7 @@ model Attendance {
 
   @@unique([studentId, date])
   @@index([studentId, date])
+  @@index([schoolId])
 }
 
 model Lesson {
@@ -304,20 +305,20 @@ model Lesson {
 
 model Assessment {
   id          String           @id @default(cuid())
-  title       String // titre de l'évaluation
-  type        AssessmentType // type d'évaluation (ex: devoir, examen)
-  description String? // description ou instructions
-  status      AssessmentStatus @default(DRAFT) // statut de l'évaluation (brouillon, publié, fermé)
-  weight      Float? // pondération de l'évaluation
-  maxScore    Float // score maximum possible
+  title       String
+  type        AssessmentType
+  description String?
+  status      AssessmentStatus @default(DRAFT)
+  weight      Float?
+  maxScore    Float
 
-  teacherId String // enseignant responsable
-  subjectId String // matière concernée
-  classId   String // classe concernée
+  teacherId String
+  subjectId String
+  classId   String
 
-  startDate DateTime? // date de début de l'évaluation
-  endDate   DateTime? // date de fin de l'évaluation
-  dueDate   DateTime? // date limite de soumission
+  startDate DateTime?
+  endDate   DateTime?
+  dueDate   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -325,7 +326,7 @@ model Assessment {
   class   Class              @relation(fields: [classId], references: [id], onDelete: Cascade)
   teacher Teacher            @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   subject Subject            @relation(fields: [subjectId], references: [id])
-  results AssessmentResult[] // résultats des étudiants
+  results AssessmentResult[]
 
   @@index([classId])
   @@index([teacherId])
@@ -336,20 +337,19 @@ model AssessmentResult {
   id           String    @id @default(cuid())
   assessmentId String
   studentId    String
-  score        Float? // score obtenu
-  grade        String? // ex: "A", "B", "TB", ou null si non noté
-  feedback     String? // commentaires du correcteur
-  status       String? // e.g., SUBMITTED, LATE, GRADED
-  submittedAt  DateTime? // date de soumission
-  gradedAt     DateTime? // date de notation
+  score        Float?
+  grade        String?
+  feedback     String?
+  status       String?
+  submittedAt  DateTime?
+  gradedAt     DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  // Relations
   assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   student    Student    @relation(fields: [studentId], references: [id])
 
-  @@unique([assessmentId, studentId]) // un seul résultat par étudiant/évaluation
+  @@unique([assessmentId, studentId])
   @@index([studentId])
   @@index([assessmentId])
 }
@@ -412,11 +412,9 @@ model Payment {
   description String?
   providerRef String?       @unique
 
-  // Infos payeur (si non connecté)
   payerPhone String?
   payerName  String?
 
-  // Infos payeur (si connecté)
   payerId String?
   payer   User?   @relation(fields: [payerId], references: [id])
 

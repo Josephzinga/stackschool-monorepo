@@ -1,6 +1,6 @@
 'use client';
 
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -29,15 +29,15 @@ interface DailyAttendance {
 const chartConfig = {
   present: {
     label: 'Présent',
-    color: 'var(--chart-2)', // Vert/Bleu
+    color: 'var(--chart-4)', // Vert/Bleu
   },
   absent: {
     label: 'Absent',
-    color: 'var(--chart-4)', // Rouge/Orange
+    color: '#f12a2a', // Rouge/Orange
   },
   late: {
     label: 'Retard',
-    color: 'var(--chart-1)', // Jaune
+    color: '#f2ac32', // Jaune
   },
 } satisfies ChartConfig;
 
@@ -54,8 +54,6 @@ export default function AttendanceChart({
       day: format(parseISO(item.date), 'EEEE', { locale: fr }),
       // On peut combiner absent + late si on veut simplifier, ou afficher les 3
     })) || [];
-
-  console.log('ChartData', chartData);
 
   if (!data || data.length === 0) {
     return (
@@ -75,14 +73,9 @@ export default function AttendanceChart({
           Présences vs Absences (7 derniers jours)
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 min-h-[250px]">
+      <CardContent className="flex-1 min-h-62.5">
         <ChartContainer className="w-full h-full" config={chartConfig}>
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            barSize={20}
-            // margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-          >
+          <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis
               dataKey="day"
@@ -91,7 +84,7 @@ export default function AttendanceChart({
               axisLine={false}
               tickFormatter={(value) => value.slice(0, 3)} // Lun, Mar...
             />
-            <YAxis dataKey="present" />
+
             <ChartTooltip
               cursor={{ fill: 'transparent' }}
               content={<ChartTooltipContent indicator="dot" />}
@@ -99,19 +92,20 @@ export default function AttendanceChart({
             <Bar
               dataKey="present"
               fill="var(--color-present)"
-              radius={[4, 4, 0, 0]}
-              stackId="b"
+              radius={[0, 0, 5, 5]}
+              stackId="a"
             />
             <Bar
               dataKey="late"
               fill="var(--color-late)"
               radius={[0, 0, 0, 0]}
-              stackId="b"
+              stackId="a"
             />
             <Bar
               dataKey="absent"
               fill="var(--color-absent)"
-              radius={[4, 4, 0, 0]}
+              radius={[5, 5, 0, 0]}
+              stackId="a"
             />
           </BarChart>
         </ChartContainer>

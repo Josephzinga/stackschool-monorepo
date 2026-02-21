@@ -131,8 +131,9 @@ export default function StaffAdminForm({
                     mode="single"
                     captionLayout="dropdown"
                     selected={value}
-                    onSelect={(date: any) => {
+                    onSelect={(date) => {
                       onChange(date);
+                      setOpen(false);
                     }}
                   />
                 </PopoverContent>

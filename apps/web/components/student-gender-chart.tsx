@@ -60,24 +60,23 @@ export function ChartRadialGender({
 
   const chartData = [
     {
-      name: 'total',
       count: total,
       fill: 'transparent',
       display: 'none',
     },
     {
-      name: 'female',
+      gender: 'female',
       count: stats.female,
-      fill: 'var(--chart-2)', // Rose/Violet
+      fill: '#e538c4',
     },
     {
-      name: 'male',
+      gender: 'male',
       count: stats.male,
-      fill: 'var(--chart-1)', // Bleu
+      fill: 'var(--chart-1)',
     },
   ];
   const style = {
-    top: '45%',
+    top: '100%',
     right: 0,
     transform: 'translate(0, -50%)',
     lineHeight: '24px',
@@ -89,48 +88,28 @@ export function ChartRadialGender({
         <CardTitle>Répartition Élèves</CardTitle>
         <CardDescription>Année Scolaire 2023-2024</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0 min-h-50">
+      <CardContent className="h-60 w-full pb-0">
         <ChartContainer
           config={chartConfig}
           style={{ color: 'blue' }}
-          className="mx-auto aspect-square max-h-65 w-full relative"
+          className="mx-auto aspect-squar min-h-50 w-full h-full"
         >
           <RadialBarChart
             startAngle={90}
             endAngle={-270}
-            innerRadius="40%"
+            innerRadius="20%"
             outerRadius="100%"
-            dataKey="count"
-            barSize={25}
-            style={style}
             data={chartData}
+            barSize={30}
           >
-            {/*  <RadialBarChart
-            data={chartData}
-            startAngle={90}
-            endAngle={-270} // Cercle complet
-            innerRadius={60}
-            outerRadius={110}
-            barSize={50}
-            style={style}
-          > */}
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  formatter={(value, key) => [
-                    value,
-                    chartConfig[key as keyof typeof chartConfig]?.label || key,
-                  ]}
-                  hideLabel
-                  nameKey="name"
-                />
-              }
+              content={<ChartTooltipContent nameKey="gender" />}
             />
 
             <RadialBar dataKey="count" background cornerRadius={10} />
           </RadialBarChart>
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          {/* <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="text-center leading-tight">
               <p className="text-2xl font-bold">
                 {attendanceRate.toFixed(1)}
@@ -141,7 +120,7 @@ export function ChartRadialGender({
                 {attendancePresent}/{attendanceExpected}
               </p>
             </div>
-          </div>
+          </div>*/}
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm pt-4">
@@ -151,11 +130,11 @@ export function ChartRadialGender({
         </div>
         <div className="text-muted-foreground flex gap-3 font-jost font-Bold text-sm">
           <div className="flex gap-1 items-center">
-            <span className="h-3 w-3 rounded-full bg-chart-1" />
+            <span className="h-3 w-3 rounded-full bg-chart-1"></span>
             <p className="">{stats.male} Garçons</p>
           </div>
           <div className="flex gap-1 items-center">
-            <span className="h-3 w-3 rounded-full bg-chart-4" />
+            <span className="h-3 w-3 rounded-full bg-[#e538c4]" />
             <p>{stats.female} Filles</p>
           </div>
         </div>

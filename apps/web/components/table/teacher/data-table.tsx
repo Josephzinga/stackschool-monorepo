@@ -1,10 +1,12 @@
 'use client';
 import {
   type ColumnDef,
+  type ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  type SortingState,
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
@@ -44,8 +46,13 @@ export function DataTable<TData, TValue>({
   isLoading,
   meta,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const { pagination, setPagination, setSorting, sorting } = useTable();
+
+  const { pagination, setPagination, rowSelection, setRowSelection } =
+    useTable();
+
   const table = useReactTable({
     columns,
     data,
@@ -54,13 +61,19 @@ export function DataTable<TData, TValue>({
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    getRowId: (row: any) => row.id,
+
     rowCount: meta?.total,
     manualPagination: true,
     state: {
       sorting,
+      columnFilters,
       columnVisibility,
       pagination,
+      rowSelection,
     },
   });
 

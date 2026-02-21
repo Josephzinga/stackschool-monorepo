@@ -20,7 +20,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   const schoolId = currentSchool?.id;
-
+  console.log('SchoolId', schoolId);
   const { data, isLoading, error } = useGetDashboardContextQuery(
     { input: schoolId },
     {
@@ -45,7 +45,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     };
 
     const allowedRoute = roleRoutes[role];
-    
+    console.log('AllowedRoute', allowedRoute);
+
     // Si on est à la racine /dashboard, on redirige vers le dashboard spécifique
     if (pathname === '/dashboard') {
       router.replace(allowedRoute || '/dashboard');
@@ -61,7 +62,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       router.replace(allowedRoute || '/dashboard');
     }
     // ... ajouter d'autres règles si besoin
-
   }, [role, pathname, isLoading, router]);
 
   if (isLoading) {
@@ -71,7 +71,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  
+
   if (error || !contextData) {
     const { message } = parseAxiosError(error);
     console.log('Error', message);

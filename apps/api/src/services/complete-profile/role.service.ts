@@ -19,7 +19,6 @@ export async function handleRoleCreation(
 ) {
   const role = roleData.role;
 
-  // 1. Créer le SchoolUser de base (Membre de l'école)
   let schoolUser;
 
   const existingMember = await tx.schoolUser.findUnique({

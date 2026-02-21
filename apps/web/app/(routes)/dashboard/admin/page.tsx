@@ -41,18 +41,17 @@ export default function AdminDashboard() {
         <div className="flex flex-col gap-4 p-4 md:p-5">
           <SectionCards stats={stats} />
 
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_2fr] gap-4">
-            <div className="w-full h-[400px]">
+          <div className="grid grid-cols-1 md:grid-cols-[1.7fr_1.3fr] w-full gap-4">
+            <div className="w-full h-100 min-w-80">
+              <AttendanceChart data={stats?.attendance?.history} />
+            </div>
+            <div className="w-full h-100 min-w-60">
               {stats?.studentGender && (
                 <ChartRadialGender
                   stats={stats.studentGender}
                   attendance={stats.attendance}
                 />
               )}
-            </div>
-
-            <div className="w-full h-[400px]">
-              <AttendanceChart data={stats?.attendance?.history} />
             </div>
           </div>
 

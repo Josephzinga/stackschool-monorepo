@@ -44,7 +44,7 @@ export const ACADEMIC_YEAR_REGEX = /^(20\d{2})-(20\d{2})$/;
 
 export const studentFormSchema = z.object({
   matricule: z.string().min(1, 'Le matricule est requis'),
-  birthDate: z.coerce.date({
+  birthDate: z.date({
     error: ({ input }) =>
       input === undefined
         ? 'Date de naissance requis'

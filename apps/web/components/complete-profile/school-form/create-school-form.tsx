@@ -57,7 +57,7 @@ export function CreateSchoolForm() {
       type: 'create',
       newSchool: finalData,
     });
-    setCurrentStep(Math.min(currentStep + 1, 3));
+    setCurrentStep(1);
   };
 
   return (

@@ -19,7 +19,7 @@ type Query {
   school(schoolId: SchoolId!): School!
   verifyInvitationCode(code: InvitationCodeInput!): User
 
-
+  teacher(id: ID!): Teacher
 
   getSchoolTeachers(
     schoolId: SchoolId!
@@ -34,7 +34,7 @@ type Query {
   ): TeacherList!
 
   getSchoolStudents(
-    schoolId: SchoolId
+    schoolId: ID!
     page: Int = 0
     limit: Int = 10
     classId: String
@@ -43,7 +43,7 @@ type Query {
 
 
   getSchoolClasses(
-    schoolId: SchoolId
+    schoolId: ID!
     page: Int = 0
     limit: Int = 10
     searchTerm: String

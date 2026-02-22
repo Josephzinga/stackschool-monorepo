@@ -1,8 +1,10 @@
 import { z } from 'zod';
+import { profileSchema } from './auth.schema';
 
 export const createTeacherSchema = z.object({
   firstname: z.string().min(2, 'Le prénom est requis'),
   lastname: z.string().min(2, 'Le nom est requis'),
+  gender: profileSchema.shape.gender,
   email: z
     .string()
     .email({ pattern: z.regexes.email, message: 'Email invalide' }),

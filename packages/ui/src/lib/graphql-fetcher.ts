@@ -14,6 +14,7 @@ export const fetcher = <TData, TVariables>(
     const res = await api.post<{ data: TData; errors?: any[] }>('/graphql', {
       query,
       variables,
+      options,
     });
 
     const { data, errors } = res.data;

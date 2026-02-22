@@ -1,6 +1,7 @@
 import { Row } from '@tanstack/react-table';
 import { Teacher } from './columns';
 import { useDeleteTeachersMutation, useUserStore } from '@stackschool/ui';
+import { useQueryClient } from '@tanstack/react-query';
 
 import {
   DropdownMenu,
@@ -28,8 +29,13 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
   const teacherId = row.original.id;
   const { currentSchool } = useUserStore();
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  const { mutateAsync, isPending } = useDeleteTeachersMutation();
+  const { mutateAsync, isPending } = useDeleteTeachersMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['GetSchoolTeachers'] });
+    },
+  });
 
   const handleDelete = async () => {
     if (!currentSchool?.id) return;
@@ -42,7 +48,9 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
     toast.promise(promise, {
       loading: 'Suppression en cours...',
       success: (data) => {
-        return data.deleteTeachers?.message;
+        return (
+          data.deleteTeachers?.message || 'Professeur supprimé avec succès'
+        );
       },
       error: 'Erreur lors de la suppression',
       toasterId: 'dashboard',
@@ -51,7 +59,6 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
     try {
       await promise;
       setOpen(false);
-      // Idéalement, invalider la query ici pour rafraîchir la liste
     } catch (e) {
       console.error(e);
     }
@@ -88,7 +95,7 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm font-inter ">
+            <AlertDialogDescription>
               Cette action est irréversible. Elle supprimera définitivement ce
               professeur et toutes les données associées de l'école.
             </AlertDialogDescription>
@@ -97,7 +104,7 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
             <AlertDialogCancel disabled={isPending}>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
-                e.preventDefault(); // Empêche la fermeture auto pour gérer le loading
+                e.preventDefault();
                 handleDelete();
               }}
               disabled={isPending}

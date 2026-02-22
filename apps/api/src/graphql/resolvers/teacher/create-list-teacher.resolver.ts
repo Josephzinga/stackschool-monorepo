@@ -1,8 +1,8 @@
-import { Resolvers } from '../types.generated';
-import { createServiceError } from '../../utils/api-errors';
-import { safeValidateSchema } from '../../utils/validate-schema.util';
+import { Resolvers } from '../../types.generated';
+import { createServiceError } from '../../../utils/api-errors';
+import { safeValidateSchema } from '../../../utils/validate-schema.util';
 import { createTeacherSchema } from '@stackschool/shared';
-import { isAdmin } from '../../lib/verify-admin';
+import { isAdmin } from '../../../lib/verify-admin';
 import { prisma } from '@stackschool/db';
 
 export const createTeacherResolver: Resolvers = {
@@ -62,6 +62,7 @@ export const createTeacherResolver: Resolvers = {
                   create: {
                     firstname: data?.firstname,
                     lastname: data?.lastname,
+                    gender: data?.gender,
                   },
                 },
               },

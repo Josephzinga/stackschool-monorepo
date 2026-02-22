@@ -88,6 +88,7 @@ export type CreateTeacherInput = {
   diploma?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   firstname: Scalars['String']['input'];
+  gender?: InputMaybe<Gender>;
   lastname: Scalars['String']['input'];
   phoneNumber?: InputMaybe<Scalars['String']['input']>;
   specialization: Scalars['String']['input'];
@@ -102,6 +103,11 @@ export type DailyAttendance = {
   rate: Scalars['Float']['output'];
 };
 
+export enum Gender {
+  Female = 'FEMALE',
+  Male = 'MALE'
+}
+
 export type GenderStats = {
   __typename?: 'GenderStats';
   female: Scalars['Int']['output'];
@@ -114,11 +120,13 @@ export type InvitationCodeInput = {
 
 export type Lesson = {
   __typename?: 'Lesson';
+  class?: Maybe<Classe>;
   day: Scalars['String']['output'];
   endTime?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name?: Maybe<Scalars['String']['output']>;
   startTime?: Maybe<Scalars['String']['output']>;
+  subject?: Maybe<Subject>;
 };
 
 export type MonthlyRevenue = {
@@ -173,7 +181,7 @@ export type Profile = {
   __typename?: 'Profile';
   address?: Maybe<Scalars['String']['output']>;
   firstname: Scalars['String']['output'];
-  gender: Scalars['String']['output'];
+  gender?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   lastname: Scalars['String']['output'];
   photo?: Maybe<Scalars['String']['output']>;
@@ -189,6 +197,7 @@ export type Query = {
   school: School;
   searchSchool?: Maybe<Array<School>>;
   searchStudent?: Maybe<Array<Maybe<Student>>>;
+  teacher?: Maybe<Teacher>;
   verifyInvitationCode?: Maybe<User>;
 };
 
@@ -201,7 +210,7 @@ export type QueryGetClassSubjectsArgs = {
 export type QueryGetSchoolClassesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
-  schoolId?: InputMaybe<Scalars['SchoolId']['input']>;
+  schoolId: Scalars['ID']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -210,7 +219,7 @@ export type QueryGetSchoolStudentsArgs = {
   classId?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
-  schoolId?: InputMaybe<Scalars['SchoolId']['input']>;
+  schoolId: Scalars['ID']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -239,6 +248,11 @@ export type QuerySearchSchoolArgs = {
 
 export type QuerySearchStudentArgs = {
   filter: StudentSearchInput;
+};
+
+
+export type QueryTeacherArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -312,7 +326,7 @@ export type SchoolStats = {
 export type Staff = {
   __typename?: 'Staff';
   departement?: Maybe<Scalars['String']['output']>;
-  hireDate?: Maybe<Scalars['String']['output']>;
+  hireDate?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
   position: Scalars['String']['output'];
   salary?: Maybe<Scalars['Float']['output']>;
@@ -353,11 +367,11 @@ export type Subject = {
 export type Teacher = {
   __typename?: 'Teacher';
   classes?: Maybe<Array<Maybe<Classe>>>;
-  createdAt?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
   departement?: Maybe<Scalars['String']['output']>;
   diploma?: Maybe<Scalars['String']['output']>;
   experience?: Maybe<Scalars['String']['output']>;
-  hireDate?: Maybe<Scalars['String']['output']>;
+  hireDate?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
   isActive?: Maybe<Scalars['Boolean']['output']>;
   lessons?: Maybe<Array<Maybe<Lesson>>>;
@@ -365,7 +379,7 @@ export type Teacher = {
   schoolUserId: Scalars['String']['output'];
   specialization?: Maybe<Scalars['String']['output']>;
   supervisedClasses?: Maybe<Array<Maybe<Classe>>>;
-  updatedAt?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
   user?: Maybe<User>;
   weeklyHours?: Maybe<Scalars['Float']['output']>;
 };
@@ -489,6 +503,7 @@ export type ResolversTypes = ResolversObject<{
   DailyAttendance: ResolverTypeWrapper<DailyAttendance>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  Gender: Gender;
   GenderStats: ResolverTypeWrapper<GenderStats>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
@@ -623,11 +638,13 @@ export type GenderStatsResolvers<ContextType = Context, ParentType extends Resol
 }>;
 
 export type LessonResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Lesson'] = ResolversParentTypes['Lesson']> = ResolversObject<{
+  class?: Resolver<Maybe<ResolversTypes['Classe']>, ParentType, ContextType>;
   day?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   endTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   startTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  subject?: Resolver<Maybe<ResolversTypes['Subject']>, ParentType, ContextType>;
 }>;
 
 export type MonthlyRevenueResolvers<ContextType = Context, ParentType extends ResolversParentTypes['MonthlyRevenue'] = ResolversParentTypes['MonthlyRevenue']> = ResolversObject<{
@@ -664,7 +681,7 @@ export type ParentResolvers<ContextType = Context, ParentType extends ResolversP
 export type ProfileResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Profile'] = ResolversParentTypes['Profile']> = ResolversObject<{
   address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   firstname?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  gender?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  gender?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastname?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   photo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -672,13 +689,14 @@ export type ProfileResolvers<ContextType = Context, ParentType extends Resolvers
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   getClassSubjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Classe']>>>, ParentType, ContextType, RequireFields<QueryGetClassSubjectsArgs, 'filter'>>;
-  getSchoolClasses?: Resolver<ResolversTypes['ClassList'], ParentType, ContextType, RequireFields<QueryGetSchoolClassesArgs, 'limit' | 'page'>>;
-  getSchoolStudents?: Resolver<ResolversTypes['StudentList'], ParentType, ContextType, RequireFields<QueryGetSchoolStudentsArgs, 'limit' | 'page'>>;
+  getSchoolClasses?: Resolver<ResolversTypes['ClassList'], ParentType, ContextType, RequireFields<QueryGetSchoolClassesArgs, 'limit' | 'page' | 'schoolId'>>;
+  getSchoolStudents?: Resolver<ResolversTypes['StudentList'], ParentType, ContextType, RequireFields<QueryGetSchoolStudentsArgs, 'limit' | 'page' | 'schoolId'>>;
   getSchoolTeachers?: Resolver<ResolversTypes['TeacherList'], ParentType, ContextType, RequireFields<QueryGetSchoolTeachersArgs, 'limit' | 'page' | 'schoolId'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   school?: Resolver<ResolversTypes['School'], ParentType, ContextType, RequireFields<QuerySchoolArgs, 'schoolId'>>;
   searchSchool?: Resolver<Maybe<Array<ResolversTypes['School']>>, ParentType, ContextType, RequireFields<QuerySearchSchoolArgs, 'filter'>>;
   searchStudent?: Resolver<Maybe<Array<Maybe<ResolversTypes['Student']>>>, ParentType, ContextType, RequireFields<QuerySearchStudentArgs, 'filter'>>;
+  teacher?: Resolver<Maybe<ResolversTypes['Teacher']>, ParentType, ContextType, RequireFields<QueryTeacherArgs, 'id'>>;
   verifyInvitationCode?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryVerifyInvitationCodeArgs, 'code'>>;
 }>;
 
@@ -721,7 +739,7 @@ export type SchoolStatsResolvers<ContextType = Context, ParentType extends Resol
 
 export type StaffResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Staff'] = ResolversParentTypes['Staff']> = ResolversObject<{
   departement?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  hireDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hireDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   position?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   salary?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -752,11 +770,11 @@ export type SubjectResolvers<ContextType = Context, ParentType extends Resolvers
 
 export type TeacherResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Teacher'] = ResolversParentTypes['Teacher']> = ResolversObject<{
   classes?: Resolver<Maybe<Array<Maybe<ResolversTypes['Classe']>>>, ParentType, ContextType>;
-  createdAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   departement?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   diploma?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   experience?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  hireDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hireDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   isActive?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   lessons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Lesson']>>>, ParentType, ContextType>;
@@ -764,7 +782,7 @@ export type TeacherResolvers<ContextType = Context, ParentType extends Resolvers
   schoolUserId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   specialization?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   supervisedClasses?: Resolver<Maybe<Array<Maybe<ResolversTypes['Classe']>>>, ParentType, ContextType>;
-  updatedAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   weeklyHours?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
 }>;

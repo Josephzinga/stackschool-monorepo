@@ -3,11 +3,16 @@
 import { Input } from '@/components/ui/input';
 import { useTable } from './table-provider';
 import { Button } from '@/components/ui/button';
-import { Filter, Trash2, X } from 'lucide-react';
+import { Filter, Plus, Settings2, Trash2, X } from 'lucide-react';
+import * as React from 'react';
 import { useState } from 'react';
 import { TeacherFilters } from './teacher-filters';
 import { TeacherDialog } from './teacher-dialog';
-import { useDeleteTeachersMutation, useUserStore } from '@stackschool/ui';
+import {
+  useDeleteTeachersMutation,
+  useQueryClient,
+  useUserStore,
+} from '@stackschool/ui';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -19,6 +24,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+// Liste des colonnes contrôlables
+const TEACHER_COLUMNS = [
+  { id: 'info', label: 'Enseignant' },
+  { id: 'speciality', label: 'Spécialité' },
+  { id: 'phoneNumber', label: 'Téléphone' },
+  { id: 'status', label: 'Statut' },
+  { id: 'classes', label: 'Classes' },
+];
 
 export function DataTableHeader() {
   const {
@@ -28,12 +50,22 @@ export function DataTableHeader() {
     setFilters,
     rowSelection,
     setRowSelection,
+    columnVisibility,
+    setColumnVisibility,
   } = useTable();
   const [showFilters, setShowFilters] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [open, setOpen] = useState(false);
   const { currentSchool } = useUserStore();
+  const queryClient = useQueryClient();
 
-  const { mutateAsync, isPending } = useDeleteTeachersMutation();
+  const { mutateAsync, isPending } = useDeleteTeachersMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['GetSchoolTeachers'],
+      });
+    },
+  });
 
   const hasActiveFilters = Object.values(filters).some((v) => v !== undefined);
   const selectedCount = Object.keys(rowSelection).length;
@@ -50,8 +82,17 @@ export function DataTableHeader() {
 
     toast.promise(promise, {
       loading: 'Suppression en cours...',
-      success: `${teacherIds.length} professeurs supprimés`,
-      error: 'Erreur lors de la suppression',
+      success: async (data) => {
+        if (data.deleteTeachers?.ok) {
+          return `${teacherIds.length} professeurs supprimé`;
+        } else {
+          console.error(data.deleteTeachers?.message);
+          throw new Error(data.deleteTeachers?.message!);
+        }
+      },
+      error: (error) => {
+        return error.message;
+      },
     });
 
     try {
@@ -63,10 +104,19 @@ export function DataTableHeader() {
     }
   };
 
+  const toggleColumn = (columnId: string, isVisible: boolean) => {
+    setColumnVisibility((prev) => ({
+      ...prev,
+      [columnId]: isVisible,
+    }));
+  };
+
+  console.log(columnVisibility, 'Columns visible', columnVisibility['info']);
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-4 sm:gap-4">
+      <div className="flex justify-between w-full ">
+        {/*  PARTIE FILTRAGE */}
+        <div className="flex justify-between h-10 gap-2 sm:gap-4">
           {selectedCount > 0 ? (
             <div className="flex items-center gap-2 bg-red-50 text-red-900 px-3 py-2 rounded-md border border-red-100">
               <span className="text-sm font-medium">
@@ -93,12 +143,12 @@ export function DataTableHeader() {
             </div>
           ) : (
             <>
-              <div className="relative h-10 w-72">
+              <div className="relative h-full w-60 sm:w-72">
                 <Input
                   placeholder="Rechercher un enseignant..."
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  className="h-full pr-8"
+                  className=" pr-8"
                 />
                 {searchTerm && (
                   <Button
@@ -111,26 +161,58 @@ export function DataTableHeader() {
                   </Button>
                 )}
               </div>
-
+              {/*  Button filtre */}
               <Button
                 variant={
                   showFilters || hasActiveFilters ? 'secondary' : 'outline'
                 }
                 onClick={() => setShowFilters(!showFilters)}
-                className="gap-2"
+                className="gap-2 h-full"
               >
                 <Filter className="h-4 w-4" />
-                Filtres
+                <span className="hidden sm:block">Filtres</span>
                 {hasActiveFilters && (
                   <span className="ml-1 rounded-full bg-primary w-2 h-2" />
                 )}
               </Button>
+
+              {/* Menu Affichage Colonnes */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2 h-full">
+                    <Settings2 className="h-4 w-4" />
+                    <span className="hidden sm:block">Affichage</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuLabel>Colonnes visibles</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {TEACHER_COLUMNS.map((col) => (
+                    <DropdownMenuCheckboxItem
+                      key={col.id}
+                      checked={columnVisibility[col.id] !== false}
+                      onCheckedChange={(checked) =>
+                        toggleColumn(col.id, checked)
+                      }
+                    >
+                      {col.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
         </div>
-
-        {/* Remplacement du bouton simple par le Dialog */}
-        <TeacherDialog />
+        <Button
+          onClick={() => setOpen(true)}
+          className="gap-3 w-14 sm:w-30 h-full md:w-60"
+        >
+          <Plus className="h-8 w-8" />
+          <span className="hidden sm:block font-poppins font-semibold">
+            Ajouter
+          </span>
+        </Button>
+        <TeacherDialog open={open} setOpen={setOpen} />
       </div>
 
       {showFilters && !selectedCount && <TeacherFilters />}

@@ -10,5 +10,6 @@ export {
   QueryClientProvider,
   QueryClient,
   useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 export * from './generated/graphql';

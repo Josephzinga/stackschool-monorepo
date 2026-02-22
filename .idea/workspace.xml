@@ -5,30 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/teacher.resolver.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/list.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/list.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher.resolver.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/types.generated.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/types.generated.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/middlewares/errorHandler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/middlewares/errorHandler.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/login.route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/dashboard/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/dashboard/admin/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/login/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/attendance-chart.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/attendance-chart.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/create-school-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/create-school-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/nav-main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/nav-main.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/providers/dashboard-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/providers/dashboard-provider.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/student-gender-chart.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/student-gender-chart.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/table/teacher/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/table/teacher/columns.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/table/teacher/data-table-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/table/teacher/data-table-header.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/table/teacher/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/table/teacher/data-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/table/teacher/table-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/table/teacher/table-provider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/table/teacher/teacher-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/table/teacher/teacher-dialog.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/ui/alert-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/alert-dialog.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/chart.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/chart.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/list.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/list.operation.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/lib/data.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/lib/data.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/codegen.ts" beforeDir="false" afterPath="$PROJECT_DIR$/codegen.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/index.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/index.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/list.operation.graphql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/teacher.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/teacher.operation.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/school.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/school.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/src/generated/graphql.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/generated/graphql.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/ui/src/store/complete-profile-store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/store/complete-profile-store.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,11 +140,11 @@
       <recent name="$PROJECT_DIR$/../E-commerce" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher" />
+      <recent name="$PROJECT_DIR$/apps/api/src/graphql/resolvers" />
       <recent name="$PROJECT_DIR$/apps/api/src/lib" />
       <recent name="$PROJECT_DIR$/apps/web/app/dashboard/list" />
       <recent name="$PROJECT_DIR$/apps/web/app/dashboard" />
-      <recent name="$PROJECT_DIR$/apps/web/app/list" />
-      <recent name="$PROJECT_DIR$/apps/web/app" />
     </key>
   </component>
   <component name="RunManager" selected="Docker.docker-compose.yml.web: Compose Deployment">
@@ -372,6 +367,7 @@
       <workItem from="1771625733566" duration="21800000" />
       <workItem from="1771652295063" duration="1660000" />
       <workItem from="1771654079854" duration="2683000" />
+      <workItem from="1771682973920" duration="31595000" />
     </task>
     <servers />
   </component>

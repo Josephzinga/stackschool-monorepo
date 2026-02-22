@@ -1,3 +1,107 @@
+query GetSchoolTeachers(
+  $schoolId: SchoolId!
+  $page: Int
+  $limit: Int
+  $searchTerm: String
+  $classId: ID
+  $specialization: String
+  $isActive: Boolean
+  $isSupervisor: Boolean
+) {
+  getSchoolTeachers(
+    schoolId: $schoolId
+    page: $page
+    limit: $limit
+    searchTerm: $searchTerm
+
+    classId: $classId
+    specialization: $specialization
+    isActive: $isActive
+    isSupervisor: $isSupervisor
+  ) {
+    meta {
+      limit
+      total
+      totalPages
+    }
+    data {
+      id
+      schoolUserId
+      supervisedClasses {
+        id
+        name
+        level
+      }
+      weeklyHours
+      specialization
+      departement
+      experience
+      isActive
+      user {
+        email
+        phoneNumber
+        profile {
+          firstname
+          lastname
+          photo
+        }
+      }
+      classes {
+        id
+        name
+      }
+    }
+  }
+}
+
+query GetTeacherDetails($id: ID!) {
+  teacher(id: $id) {
+    id
+    specialization
+    diploma
+    experience
+    hireDate
+    salary
+    departement
+    weeklyHours
+    isActive
+    createdAt
+    user {
+      id
+      email
+      phoneNumber
+      profile {
+        firstname
+        lastname
+        photo
+        gender
+        address
+      }
+    }
+    classes {
+      id
+      name
+      level
+      _count {
+        students
+      }
+    }
+    lessons {
+      id
+      name
+      day
+      startTime
+      endTime
+      class {
+        name
+      }
+      subject {
+        name
+      }
+    }
+  }
+}
+
 mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!) {
   deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId) {
     ok

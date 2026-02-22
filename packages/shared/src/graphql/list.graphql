@@ -10,11 +10,17 @@ type TeacherList {
   meta: PaginationMeta!
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 input CreateTeacherInput {
   firstname: String!
   lastname: String!
   email: String
   phoneNumber: String
+  gender: Gender
   diploma: String
   specialization: String!
   classIds: [String!]

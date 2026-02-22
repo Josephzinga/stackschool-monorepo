@@ -11,9 +11,10 @@ import { meResolver } from './resolvers/me.resolver';
 import { schoolResolver } from './resolvers/school.resolver';
 import { listResolver } from './resolvers/list.resolver';
 import { ServiceError } from '@stackschool/shared';
-import { createTeacherResolver } from './resolvers/create-list-teacher.resolver';
+import { createTeacherResolver } from './resolvers/teacher/create-list-teacher.resolver';
 import { ZodError } from 'zod';
-import { teacherResolver } from './resolvers/teacher.resolver';
+import { teacherResolver } from './resolvers/teacher/teacher.resolver';
+import { teacherListResolver } from './resolvers/teacher/list.resolver';
 
 const dirPath = path.resolve(
   __dirname,
@@ -39,6 +40,7 @@ const resolvers = merge(
   confirmCompleteProfileResolver,
   createTeacherResolver,
   teacherResolver,
+  teacherListResolver,
 );
 
 // Création du schéma exécutable

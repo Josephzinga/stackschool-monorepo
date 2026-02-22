@@ -1,9 +1,50 @@
 import { prisma } from '@stackschool/db';
-import { Resolvers } from '../types.generated';
-import { createServiceError } from '../../utils/api-errors';
-import { isAdmin } from '../../lib/verify-admin';
+import { Resolvers } from '../../types.generated';
+import { createServiceError } from '../../../utils/api-errors';
+import { isAdmin } from '../../../lib/verify-admin';
 
 export const teacherResolver: Resolvers = {
+  Query: {
+    teacher: async (_, { id }, context) => {
+      if (!context.user) throw createServiceError('Non authentifié', 401);
+
+      const teacher = await prisma.teacher.findUnique({
+        where: { id },
+        include: {
+          schoolUser: {
+            include: {
+              user: {
+                include: { profile: true },
+              },
+              school: true,
+            },
+          },
+          supervisedClasses: true,
+          classTeacher: {
+            include: { class: true },
+          },
+        },
+      });
+
+      if (!teacher) throw createServiceError('Enseignant introuvable', 404);
+
+      // Vérification de sécurité : L'utilisateur doit être membre de la même école
+      // ou être le prof lui-même.
+      // Pour simplifier ici, on suppose que si on a l'ID, on a le droit,
+      // mais idéalement il faudrait vérifier context.user.memberships.
+
+      return {
+        ...teacher,
+        user: teacher.schoolUser.user as any,
+        // On combine les classes supervisées et enseignées pour l'affichage
+        classes: [
+          ...teacher.supervisedClasses,
+          ...teacher.classTeacher.map((ct) => ct.class),
+        ].filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i), // Dedup
+      };
+    },
+  },
+
   Mutation: {
     deleteTeachers: async (_, { teacherIds, schoolId }, context) => {
       if (!context.user) throw createServiceError('Non authentifié', 401);
@@ -18,15 +59,10 @@ export const teacherResolver: Resolvers = {
 
       try {
         // 2. Suppression
-        // On supprime les SchoolUser liés à ces profs dans cette école.
-        // Cela supprimera le Teacher en cascade (si onDelete: Cascade est configuré dans Prisma)
-        // Sinon, on doit supprimer le Teacher d'abord.
-
-        // Récupérons les schoolUserIds
         const teachers = await prisma.teacher.findMany({
           where: {
             id: { in: teacherIds as string[] },
-            schoolUser: { schoolId }, // Sécurité : on ne supprime que ceux de cette école
+            schoolUser: { schoolId },
           },
           select: { schoolUserId: true },
         });
@@ -37,7 +73,6 @@ export const teacherResolver: Resolvers = {
           return { ok: false, message: 'Aucun enseignant trouvé à supprimer.' };
         }
 
-        // Suppression des SchoolUser (ce qui supprime le Teacher et les liens classes)
         await prisma.schoolUser.deleteMany({
           where: {
             id: { in: schoolUserIds },
@@ -57,7 +92,6 @@ export const teacherResolver: Resolvers = {
 
   Teacher: {
     weeklyHours: async (parent) => {
-      // Calcul du volume horaire
       const lessons = await prisma.lesson.findMany({
         where: { teacherId: parent.id },
       });

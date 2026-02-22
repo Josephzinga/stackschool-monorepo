@@ -8,7 +8,6 @@ import {
   getPaginationRowModel,
   type SortingState,
   useReactTable,
-  type VisibilityState,
 } from '@tanstack/react-table';
 import {
   Table,
@@ -20,7 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -32,6 +31,7 @@ import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { Spinner } from '@/components/ui/spinner';
 import { useTable } from './table-provider';
 import { PaginationMeta } from '@stackschool/ui';
+import { useWindowSize } from 'react-use';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -48,10 +48,41 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  const { pagination, setPagination, rowSelection, setRowSelection } =
-    useTable();
+  const {
+    pagination,
+    setPagination,
+    rowSelection,
+    setRowSelection,
+    columnVisibility,
+    setColumnVisibility,
+  } = useTable();
+
+  const { width } = useWindowSize();
+
+  useEffect(() => {
+    if (width < 640) {
+      setColumnVisibility({
+        select: false,
+        email: false,
+        phoneNumber: false,
+        classes: false,
+        speciality: false,
+        status: false,
+      });
+    } else if (width < 1024) {
+      setColumnVisibility({
+        select: true,
+        email: false,
+        phoneNumber: false,
+        classes: false,
+        speciality: true,
+        status: true,
+      });
+    } else {
+      setColumnVisibility({});
+    }
+  }, [width, setColumnVisibility]);
 
   const table = useReactTable({
     columns,
@@ -59,17 +90,14 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
-    onSortingChange: setSorting,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     getRowId: (row: any) => row.id,
-
     rowCount: meta?.total,
     manualPagination: true,
     state: {
-      sorting,
       columnFilters,
       columnVisibility,
       pagination,
@@ -79,7 +107,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full h-full font-poppins z-10 flex flex-col gap-4">
-      <div className="rounded-md border relative min-h-75">
+      <div className="rounded-md border relative min-h-75 overflow-x-auto">
         {isLoading && (
           <div className="absolute inset-0 bg-white/50 z-50 flex items-center justify-center backdrop-blur-sm">
             <Spinner className="h-8 w-8 text-primary" />
@@ -97,7 +125,7 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="font-semibold font-inter text-md"
+                      className="font-semibold font-inter text-md whitespace-nowrap"
                     >
                       {header.isPlaceholder
                         ? null
@@ -122,7 +150,7 @@ export function DataTable<TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="font-medium text-gray-700 dark:text-gray-200"
+                      className="font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -146,14 +174,14 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between px-2">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row items-center justify-between px-2 gap-4">
+        <div className="text-sm text-muted-foreground order-2 sm:order-1">
           {table.getFilteredSelectedRowModel().rows.length} sur{' '}
           {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
         </div>
-        <div className="flex items-center space-x-6 lg:space-x-8">
-          <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Lignes par page</p>
+        <div className="flex items-center gap-4 lg:gap-8 order-1 sm:order-2 w-full sm:w-auto justify-between sm:justify-end">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium hidden sm:block">Lignes</p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {

@@ -30,21 +30,31 @@ import {
   api,
   createTeacherSchema,
   CreateTeacherValues,
-  parseAxiosError,
 } from '@stackschool/shared';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Plus, User, User2Icon, X } from 'lucide-react';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { checkField } from '@/lib/check-profile-field';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface CreateTeacherFormProps {
   onSuccess?: () => void;
 }
 
 export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
-  const { currentSchool, user } = useUserStore();
+  const { currentSchool } = useUserStore();
   const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -81,24 +91,12 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
     enabled: !!currentSchool?.id,
   });
 
-  const { mutateAsync, isPending } = useCreateTeacherMutation({
-    onSuccess: (data) => {
-      if (data.createListTeachers?.ok) {
-        toast.success(data.createListTeachers?.message, {
-          toasterId: 'dashboard',
-        });
+  const { mutateAsync } = useCreateTeacherMutation({
+    onSuccess: async (data) => {
+      if (onSuccess) {
+        onSuccess();
       }
-    },
-    onError: (error) => {
-      const { message } = parseAxiosError(error);
-      toast.error(message || "Erreur lors de la création de l'enseignant", {
-        toasterId: 'dashboard',
-      });
-      console.error(error);
-    },
-    onSettled: () => {
-      if (onSuccess) onSuccess();
-      console.log('onSettled');
+      await queryClient.invalidateQueries({ queryKey: ['GetSchoolTeachers'] });
     },
   });
 
@@ -136,17 +134,20 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
   };
 
   const onSubmit = async (data: CreateTeacherInput) => {
-    await mutateAsync({
+    const res = mutateAsync({
       data,
-      schoolId: currentSchool?.id,
+      schoolId: currentSchool?.id!,
     });
-    toast.promise(isPending ? Promise.resolve(data) : Promise.reject(), {
+    toast.promise(res, {
       loading: "Création de l'enseignant en cours...",
-      success: (data1) => (
-        <div>
-          <p>{data1.firstname}</p>
-        </div>
-      ),
+      success: (data) => {
+        if (data.createListTeachers?.ok) {
+          return data.createListTeachers?.message;
+        }
+      },
+      error: (error) => {
+        return error.message || "Erreur lors de la création de l'enseignant";
+      },
       toasterId: 'dashboard',
     });
   };
@@ -256,6 +257,33 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
           <FieldError>{errors.specialization?.message}</FieldError>
         </Field>
       </div>
+
+      <Field>
+        <FieldLabel htmlFor="gender">Genre</FieldLabel>
+        <Controller
+          control={control}
+          name="gender"
+          render={({ field }) => (
+            <Select onValueChange={field.onChange} value={field.value}>
+              <SelectTrigger
+                aria-invalid={!!errors.gender}
+                className="w-full"
+                id="gender"
+              >
+                <SelectValue placeholder="Sélectionnez le genre" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Genre</SelectLabel>
+                  <SelectItem value="MALE">Homme</SelectItem>
+                  <SelectItem value="FEMALE">Femme</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
+        />
+        <FieldError>{errors.gender?.message}</FieldError>
+      </Field>
 
       {/* Sélection des Classes */}
       <div className="space-y-2">

@@ -41,6 +41,8 @@ type Lesson {
     startTime: String
     endTime: String
     day: String!
+    class: Classe
+    subject: Subject
 }
 
 type Teacher {
@@ -48,7 +50,7 @@ type Teacher {
     schoolUserId: String!
     diploma: String
     experience: String
-    hireDate: String
+    hireDate: DateTime
     isActive: Boolean
     salary: Float
     departement: String
@@ -56,8 +58,8 @@ type Teacher {
     lessons: [Lesson]
     classes: [Classe]
     supervisedClasses: [Classe]
-    createdAt: String
-    updatedAt: String
+    createdAt: DateTime
+    updatedAt: DateTime
 
     # Champ calculé
     weeklyHours: Float
@@ -70,7 +72,7 @@ type Staff {
     id: ID!
     schoolUserId: String!
     position: String!
-    hireDate: String
+    hireDate: DateTime
     salary: Float
     departement: String
 }

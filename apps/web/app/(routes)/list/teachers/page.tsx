@@ -44,7 +44,11 @@ function TeachersView() {
       email: t.user?.email || '',
       phoneNumber: t.user?.phoneNumber || '',
       speciality: t.specialization ? [t.specialization] : [],
-      classes: t.classes || [],
+      classes:
+        t.classes?.map((c) => ({
+          id: c?.id!,
+          name: c?.name!,
+        })) || [],
       status: t.isActive || false,
       photo: t.user?.profile?.photo || undefined,
     })) || [];

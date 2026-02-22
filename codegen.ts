@@ -26,7 +26,7 @@ const config: CodegenConfig = {
       config: {
         scalar: {
           SchoolId: 'string',
-          DateTime: 'date',
+          DateTime: 'Date',
         },
         skipTypename: false,
         // Configuration spécifique React Query v5

@@ -1,37 +1,16 @@
 'use client';
 import { ColumnDef } from '@tanstack/react-table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Classe } from '@stackschool/ui';
-import { IconDotsVertical } from '@tabler/icons-react';
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { TeacherActions } from './teacher-actions';
+import { Student } from '@stackschool/ui';
 
-export type Teacher = {
-  id: string | number;
-  firstname: string;
-  lastname: string;
-  email?: string;
-  photo?: string;
-  phoneNumber?: string;
-  speciality: string[];
-  status: boolean;
-  classes: { id: string; name: string }[];
-};
-
-export const columns: ColumnDef<Teacher>[] = [
+export const columns: ColumnDef<Student>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -71,11 +50,12 @@ export const columns: ColumnDef<Teacher>[] = [
 
       return (
         <Link href={`/list/teachers/${id}`} className="block w-full h-full">
-          <div className="flex gap-3 items-center hover:bg-slate-50 p-1 rounded-md transition-colors cursor-pointer">
+          <div className="flex gap-3 items-center hover:bg-accent p-1 rounded-md transition-colors cursor-pointer">
             <Avatar className="h-10 w-10">
               <AvatarImage src={photo} />
               <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                {row.original.firstname?.[0]}{row.original.lastname?.[0]}
+                {row.original.firstname?.[0]}
+                {row.original.lastname?.[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
@@ -102,12 +82,16 @@ export const columns: ColumnDef<Teacher>[] = [
           </Badge>
         ))}
       </div>
-    )
+    ),
   },
   {
     accessorKey: 'phoneNumber',
     header: 'Téléphone',
-    cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.phoneNumber || '-'}</span>
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {row.original.phoneNumber || '-'}
+      </span>
+    ),
   },
   {
     accessorKey: 'status',
@@ -118,8 +102,8 @@ export const columns: ColumnDef<Teacher>[] = [
           variant="outline"
           className={cn(
             'font-medium px-2 py-0.5 text-xs border-0',
-            row.original.status 
-              ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20' 
+            row.original.status
+              ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
               : 'bg-red-50 text-red-700 ring-1 ring-red-600/20',
           )}
         >
@@ -133,12 +117,17 @@ export const columns: ColumnDef<Teacher>[] = [
     header: 'Classes',
     cell: ({ row }) => {
       const classes = row.original.classes;
-      if (!classes || classes.length === 0) return <span className="text-muted-foreground text-xs">-</span>;
-      
+      if (!classes || classes.length === 0)
+        return <span className="text-muted-foreground text-xs">-</span>;
+
       return (
         <div className="flex flex-wrap gap-1 max-w-[200px]">
-          {classes.slice(0, 2).map(cls => (
-            <Badge key={cls.id} variant="secondary" className="text-[10px] px-1 h-5">
+          {classes.slice(0, 2).map((cls) => (
+            <Badge
+              key={cls.id}
+              variant="secondary"
+              className="text-[10px] px-1 h-5"
+            >
               {cls.name}
             </Badge>
           ))}
@@ -149,7 +138,7 @@ export const columns: ColumnDef<Teacher>[] = [
           )}
         </div>
       );
-    }
+    },
   },
   {
     id: 'actions',

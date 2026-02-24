@@ -1,5 +1,5 @@
 import { prisma } from '@stackschool/db';
-import { Resolvers } from '../../types.generated';
+import { Day, Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
 import { isAdmin } from '../../../lib/verify-admin';
 
@@ -19,9 +19,44 @@ export const teacherResolver: Resolvers = {
               school: true,
             },
           },
+          lessons: {
+            select: {
+              id: true,
+              day: true,
+              startTime: true,
+              endTime: true,
+              title: true,
+              class: {
+                select: {
+                  id: true,
+                  name: true,
+                  level: true,
+                },
+              },
+              subject: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
           supervisedClasses: true,
           classTeacher: {
-            include: { class: true },
+            include: {
+              class: {
+                select: {
+                  id: true,
+                  name: true,
+                  level: true,
+                  _count: {
+                    select: {
+                      students: true,
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       });
@@ -36,7 +71,10 @@ export const teacherResolver: Resolvers = {
       return {
         ...teacher,
         user: teacher.schoolUser.user as any,
-        // On combine les classes supervisées et enseignées pour l'affichage
+        lessons: teacher.lessons.map((lesson) => ({
+          ...lesson,
+          day: lesson.day as Day,
+        })),
         classes: [
           ...teacher.supervisedClasses,
           ...teacher.classTeacher.map((ct) => ct.class),

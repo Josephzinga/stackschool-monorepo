@@ -104,7 +104,7 @@
     --fc-page-bg-color: #fff;
     --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
     --fc-neutral-text-color: #808080;
-    --fc-border-color: #ddd;
+    --fc-border-color: #b1b5b9;
 
     --fc-button-text-color: #fff;
     --fc-button-bg-color: var(--primary);
@@ -125,12 +125,11 @@
     --fc-event-resizer-thickness: 8px;
     --fc-event-resizer-dot-total-width: 8px;
     --fc-event-resizer-dot-border-width: 1px;
-
     --fc-non-business-color: rgba(215, 215, 215, 0.3);
     --fc-bg-event-color: rgb(143, 223, 130);
     --fc-bg-event-opacity: 0.3;
     --fc-highlight-color: rgba(188, 232, 241, 0.3);
-    --fc-today-bg-color: rgba(255, 220, 40, 0.15);
+    --fc-today-bg-color: rgba(189, 226, 231, 0.76);
     --fc-now-indicator-color: red;
 
 
@@ -174,6 +173,10 @@
   --font-sans: Open Sans, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
+
+  --fc-border-color: rgb(43, 48, 54);
+  --fc-today-bg-color: rgba(77, 85, 95, 0.25);
+
   --radius: 0.75rem;
   --shadow-x: 0px;
   --shadow-y: 2px;
@@ -199,6 +202,7 @@
     0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
     0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0);
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
+
 }
 
 @theme inline {

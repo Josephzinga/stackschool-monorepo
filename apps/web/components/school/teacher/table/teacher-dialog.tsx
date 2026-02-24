@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CreateTeacherForm } from '@/components/table/teacher/create-teacher-form'; // Réutilisation !
+import { CreateTeacherForm } from '@/components/school/teacher/table/create-teacher-form';
 
 export function TeacherDialog({
   open,

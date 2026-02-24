@@ -28,7 +28,6 @@ async function sendWhatsAppCode(phoneNumber: string, code: string) {
 router.post(
   '/register',
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('Request Body', req.body);
     try {
       const { data, errors, success } = safeValidateSchema(
         registerFormSchema,

@@ -185,29 +185,30 @@ model ClassTeacher {
 /// *
 /// * Etudiant
 model Student {
-  id             String             @id @default(cuid())
-  profileId      String
-  schoolUserId   String             @unique
+  id             String    @id @default(cuid())
   matricule      String
   enrollmentYear String
   birthDate      DateTime
-  schoolId       String
-  classId        String?
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
   deletedAt      DateTime?
   birthPlace     String?
   fatherName     String?
   motherName     String?
   nationality    String?
-  attendances    Attendance[]
-  parentStudent  ParentStudent[]
-  schoolClass    Class?             @relation(fields: [classId], references: [id])
-  profile        Profile            @relation(fields: [profileId], references: [id])
-  school         School             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  schoolUser     SchoolUser         @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
-  payments       Payment[]
-  results        AssessmentResult[]
+
+  profileId     String             @unique
+  schoolUserId  String             @unique
+  schoolId      String
+  classId       String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  attendances   Attendance[]
+  parentStudent ParentStudent[]
+  schoolClass   Class?             @relation(fields: [classId], references: [id])
+  profile       Profile            @relation(fields: [profileId], references: [id])
+  school        School             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser    SchoolUser         @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  payments      Payment[]
+  results       AssessmentResult[]
 
   @@unique([matricule, schoolId])
   @@index([schoolUserId])
@@ -282,7 +283,8 @@ model Attendance {
 
 model Lesson {
   id        String   @id @default(cuid())
-  name      String
+  title     String?
+  subtitle  String?
   startTime DateTime
   day       Day
   endTime   DateTime
@@ -478,6 +480,8 @@ model Teacher {
   experience        String?
   hireDate          DateTime?
   isActive          Boolean
+  bio               String?
+  cvUrl             String?
   salary            Float?
   departement       String?
   specialization    String?

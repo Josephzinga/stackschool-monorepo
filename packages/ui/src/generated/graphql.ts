@@ -102,6 +102,16 @@ export type DailyAttendance = {
   rate: Scalars['Float']['output'];
 };
 
+export enum Day {
+  Friday = 'FRIDAY',
+  Monday = 'MONDAY',
+  Saturday = 'SATURDAY',
+  Sunday = 'SUNDAY',
+  Thursday = 'THURSDAY',
+  Tuesday = 'TUESDAY',
+  Wednesday = 'WEDNESDAY'
+}
+
 export enum Gender {
   Female = 'FEMALE',
   Male = 'MALE'
@@ -120,12 +130,12 @@ export type InvitationCodeInput = {
 export type Lesson = {
   __typename?: 'Lesson';
   class?: Maybe<Classe>;
-  day: Scalars['String']['output'];
-  endTime?: Maybe<Scalars['String']['output']>;
+  day?: Maybe<Day>;
+  endTime?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
-  name?: Maybe<Scalars['String']['output']>;
-  startTime?: Maybe<Scalars['String']['output']>;
+  startTime?: Maybe<Scalars['DateTime']['output']>;
   subject?: Maybe<Subject>;
+  title?: Maybe<Scalars['String']['output']>;
 };
 
 export type MonthlyRevenue = {
@@ -180,7 +190,7 @@ export type Profile = {
   __typename?: 'Profile';
   address?: Maybe<Scalars['String']['output']>;
   firstname: Scalars['String']['output'];
-  gender?: Maybe<Scalars['String']['output']>;
+  gender: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   lastname: Scalars['String']['output'];
   photo?: Maybe<Scalars['String']['output']>;
@@ -334,13 +344,11 @@ export type Staff = {
 
 export type Student = {
   __typename?: 'Student';
-  className?: Maybe<Scalars['String']['output']>;
-  firstname: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  lastname: Scalars['String']['output'];
   matricule: Scalars['String']['output'];
-  photo?: Maybe<Scalars['String']['output']>;
+  parents?: Maybe<Array<Maybe<Parent>>>;
   schoolClass?: Maybe<Classe>;
+  user?: Maybe<User>;
 };
 
 export type StudentList = {
@@ -365,6 +373,7 @@ export type Subject = {
 
 export type Teacher = {
   __typename?: 'Teacher';
+  bio?: Maybe<Scalars['String']['output']>;
   classes?: Maybe<Array<Maybe<Classe>>>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   departement?: Maybe<Scalars['String']['output']>;
@@ -426,7 +435,7 @@ export type SearchStudentQueryVariables = Exact<{
 }>;
 
 
-export type SearchStudentQuery = { __typename?: 'Query', searchStudent?: Array<{ __typename?: 'Student', id: string, firstname: string, lastname: string, matricule: string, photo?: string | null, className?: string | null } | null> | null };
+export type SearchStudentQuery = { __typename?: 'Query', searchStudent?: Array<{ __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname: string, lastname: string, photo?: string | null } | null } | null, schoolClass?: { __typename?: 'Classe', name: string } | null } | null> | null };
 
 export type SearchSchoolQueryVariables = Exact<{
   input: SchoolSearchInput;
@@ -450,14 +459,14 @@ export type ConfirmCompleteProfileMutation = { __typename?: 'Mutation', confirmC
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, username: string, phoneNumber?: string | null, email: string, profileCompleted?: boolean | null, hasMembership?: boolean | null, profile?: { __typename?: 'Profile', id: string, address?: string | null, firstname: string, lastname: string, gender?: string | null, photo?: string | null } | null, memberships?: Array<{ __typename?: 'SchoolMembership', id: string, role: string, school: { __typename?: 'School', id?: string | null, name: string, logo?: string | null, slug?: string | null, address: string } } | null> | null } | null };
+export type GetMeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, username: string, phoneNumber?: string | null, email: string, profileCompleted?: boolean | null, hasMembership?: boolean | null, profile?: { __typename?: 'Profile', id: string, address?: string | null, firstname: string, lastname: string, gender: string, photo?: string | null } | null, memberships?: Array<{ __typename?: 'SchoolMembership', id: string, role: string, school: { __typename?: 'School', id?: string | null, name: string, logo?: string | null, slug?: string | null, address: string } } | null> | null } | null };
 
 export type GetDashboardContextQueryVariables = Exact<{
   input: Scalars['SchoolId']['input'];
 }>;
 
 
-export type GetDashboardContextQuery = { __typename?: 'Query', me?: { __typename?: 'User', schoolContext?: { __typename?: 'SchoolMembership', id: string, role: string, teacher?: { __typename?: 'Teacher', id: string, departement?: string | null, specialization?: string | null, classes?: Array<{ __typename?: 'Classe', id: string, name: string, section?: string | null, subjects?: Array<{ __typename?: 'Subject', id: string, name: string, lessons?: Array<{ __typename?: 'Lesson', id: string, name?: string | null, startTime?: string | null, endTime?: string | null, day: string } | null> | null } | null> | null } | null> | null, supervisedClasses?: Array<{ __typename?: 'Classe', id: string, section?: string | null } | null> | null } | null, staff?: { __typename?: 'Staff', id: string, position: string, departement?: string | null, schoolUserId: string } | null, parent?: { __typename?: 'Parent', id: string, isDelegate?: boolean | null, students?: Array<{ __typename?: 'Student', id: string, className?: string | null, firstname: string, matricule: string } | null> | null } | null, student?: { __typename?: 'Student', id: string, className?: string | null, lastname: string, firstname: string, matricule: string } | null } | null } | null };
+export type GetDashboardContextQuery = { __typename?: 'Query', me?: { __typename?: 'User', schoolContext?: { __typename?: 'SchoolMembership', id: string, role: string, teacher?: { __typename?: 'Teacher', id: string, departement?: string | null, specialization?: string | null, classes?: Array<{ __typename?: 'Classe', id: string, name: string, section?: string | null, subjects?: Array<{ __typename?: 'Subject', id: string, name: string, lessons?: Array<{ __typename?: 'Lesson', id: string, title?: string | null, startTime?: any | null, endTime?: any | null, day?: Day | null } | null> | null } | null> | null } | null> | null, supervisedClasses?: Array<{ __typename?: 'Classe', id: string, section?: string | null } | null> | null } | null, staff?: { __typename?: 'Staff', id: string, position: string, departement?: string | null, schoolUserId: string } | null, parent?: { __typename?: 'Parent', id: string, isDelegate?: boolean | null, students?: Array<{ __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', lastname: string, firstname: string, photo?: string | null } | null } | null } | null> | null } | null, student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', id: string, firstname: string, lastname: string, photo?: string | null } | null } | null } | null } | null } | null };
 
 export type GetSchoolTeachersQueryVariables = Exact<{
   schoolId: Scalars['SchoolId']['input'];
@@ -478,7 +487,7 @@ export type GetTeacherDetailsQueryVariables = Exact<{
 }>;
 
 
-export type GetTeacherDetailsQuery = { __typename?: 'Query', teacher?: { __typename?: 'Teacher', id: string, specialization?: string | null, diploma?: string | null, experience?: string | null, hireDate?: any | null, salary?: number | null, departement?: string | null, weeklyHours?: number | null, isActive?: boolean | null, createdAt?: any | null, user?: { __typename?: 'User', id: string, email: string, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname: string, lastname: string, photo?: string | null, gender?: string | null, address?: string | null } | null } | null, classes?: Array<{ __typename?: 'Classe', id: string, name: string, level: string, _count?: { __typename?: 'ClassCount', students: number } | null } | null> | null, lessons?: Array<{ __typename?: 'Lesson', id: string, name?: string | null, day: string, startTime?: string | null, endTime?: string | null, class?: { __typename?: 'Classe', name: string } | null, subject?: { __typename?: 'Subject', name: string } | null } | null> | null } | null };
+export type GetTeacherDetailsQuery = { __typename?: 'Query', teacher?: { __typename?: 'Teacher', id: string, specialization?: string | null, diploma?: string | null, experience?: string | null, bio?: string | null, hireDate?: any | null, salary?: number | null, departement?: string | null, weeklyHours?: number | null, isActive?: boolean | null, createdAt?: any | null, user?: { __typename?: 'User', id: string, email: string, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname: string, lastname: string, photo?: string | null, gender: string, address?: string | null } | null } | null, classes?: Array<{ __typename?: 'Classe', id: string, name: string, level: string, _count?: { __typename?: 'ClassCount', students: number } | null } | null> | null, lessons?: Array<{ __typename?: 'Lesson', id: string, title?: string | null, day?: Day | null, startTime?: any | null, endTime?: any | null, class?: { __typename?: 'Classe', name: string } | null, subject?: { __typename?: 'Subject', name: string } | null } | null> | null } | null };
 
 export type DeleteTeachersMutationVariables = Exact<{
   teacherIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -590,11 +599,17 @@ export const SearchStudentDocument = `
     query SearchStudent($input: StudentSearchInput!) {
   searchStudent(filter: $input) {
     id
-    firstname
-    lastname
+    user {
+      profile {
+        firstname
+        lastname
+        photo
+      }
+    }
+    schoolClass {
+      name
+    }
     matricule
-    photo
-    className
   }
 }
     `;
@@ -877,7 +892,7 @@ export const GetDashboardContextDocument = `
             name
             lessons {
               id
-              name
+              title
               startTime
               endTime
               day
@@ -901,16 +916,28 @@ export const GetDashboardContextDocument = `
         isDelegate
         students {
           id
-          className
-          firstname
+          user {
+            id
+            profile {
+              lastname
+              firstname
+              photo
+            }
+          }
           matricule
         }
       }
       student {
         id
-        className
-        lastname
-        firstname
+        user {
+          id
+          profile {
+            id
+            firstname
+            lastname
+            photo
+          }
+        }
         matricule
       }
     }
@@ -1057,6 +1084,7 @@ export const GetTeacherDetailsDocument = `
     specialization
     diploma
     experience
+    bio
     hireDate
     salary
     departement
@@ -1085,7 +1113,7 @@ export const GetTeacherDetailsDocument = `
     }
     lessons {
       id
-      name
+      title
       day
       startTime
       endTime

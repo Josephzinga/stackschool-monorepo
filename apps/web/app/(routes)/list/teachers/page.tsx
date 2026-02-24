@@ -1,12 +1,12 @@
 'use client';
 
-import { DataTable } from '@/components/table/teacher/data-table';
-import { columns, Teacher } from '@/components/table/teacher/columns';
+import { DataTable } from '@/components/school/teacher/table/data-table';
+import { columns, Teacher } from '@/components/school/teacher/table/columns';
 import {
   TableProvider,
   useTable,
-} from '@/components/table/teacher/table-provider';
-import { DataTableHeader } from '@/components/table/teacher/data-table-header';
+} from '@/components/school/teacher/table/table-provider';
+import { DataTableHeader } from '@/components/school/teacher/table/data-table-header';
 import { useGetSchoolTeachersQuery, useUserStore } from '@stackschool/ui';
 import { useDebounce } from '@/hooks/useDebounce';
 

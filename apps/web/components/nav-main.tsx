@@ -48,13 +48,14 @@ export function NavMain({ items }: { items: NavSecondaryItem['items'] }) {
                 href={
                   item.label === 'Dashboard' ? `/dashboard/${role}` : item.href
                 }
-                className="w-full"
+                className="w-full space-y-1"
               >
                 <SidebarMenuButton
+                  className="font-jost text-sm xl:text-base font-medium"
                   isActive={
-                    pathname.includes('dashboard') && item.href === '/dashboard'
-                      ? true
-                      : item.href.includes(pathname)
+                    (pathname.includes('dashboard') &&
+                      item.href === '/dashboard') ||
+                    item.href.includes(pathname)
                   }
                   tooltip={item.label}
                 >

@@ -1,11 +1,17 @@
 query SearchStudent($input: StudentSearchInput!) {
   searchStudent(filter: $input) {
     id
-    firstname
-    lastname
+    user {
+      profile {
+        firstname
+        lastname
+        photo
+      }
+    }
+    schoolClass {
+      name
+    }
     matricule
-    photo
-    className
   }
 }
 
@@ -94,7 +100,7 @@ query GetDashboardContext($input: SchoolId!) {
             name
             lessons {
               id
-              name
+              title
               startTime
               endTime
               day
@@ -118,16 +124,28 @@ query GetDashboardContext($input: SchoolId!) {
         isDelegate
         students {
           id
-          className
-          firstname
+          user {
+            id
+            profile {
+              lastname
+              firstname
+              photo
+            }
+          }
           matricule
         }
       }
       student {
         id
-        className
-        lastname
-        firstname
+        user {
+          id
+          profile {
+            id
+            firstname
+            lastname
+            photo
+          }
+        }
         matricule
       }
     }

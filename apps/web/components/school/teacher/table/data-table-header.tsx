@@ -47,7 +47,6 @@ export function DataTableHeader() {
     searchTerm,
     setSearchTerm,
     filters,
-    setFilters,
     rowSelection,
     setRowSelection,
     columnVisibility,

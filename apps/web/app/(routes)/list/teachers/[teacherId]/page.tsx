@@ -1,14 +1,20 @@
 'use client';
 
-import { useGetTeacherDetailsQuery } from '@stackschool/ui';
+import {
+  useDeleteTeachersMutation,
+  useGetTeacherDetailsQuery,
+  useUserStore,
+} from '@stackschool/ui';
 import { useParams, useRouter } from 'next/navigation';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import {
+  ActivityIcon,
   ArrowLeft,
   Briefcase,
   Edit,
   GraduationCap,
+  LucideIcon,
   Mail,
   MapPin,
   Phone,
@@ -23,17 +29,70 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/animate-ui/components/radix/tabs';
-import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
+import TimeGrid from '@/components/school/teacher/schedule-grid';
+import ClassesSection from '@/components/school/teacher/classes-section';
+import { ChartRadialPerformance } from '@/components/school/teacher/chart-performance';
+
+const shortHands = [
+  { value: 'classes', label: 'Classes', href: '/list/classes' },
+  { value: 'lessons', label: 'Leçons', href: '/list/lessons' },
+  { value: 'subject', label: 'Matières', href: '/list/subjects' },
+  { value: 'students', label: 'Élèves', href: '/list/students' },
+];
 
 export default function TeacherDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const teacherId = params.teacherId as string;
+  const { currentSchool } = useUserStore();
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const { data, isLoading, error } = useGetTeacherDetailsQuery(
     { id: teacherId },
     { enabled: !!teacherId },
   );
+
+  const { mutateAsync, isPending: isDeleting } = useDeleteTeachersMutation();
+
+  const handleDelete = async () => {
+    if (!currentSchool?.id) return;
+
+    const promise = mutateAsync({
+      teacherIds: [teacherId],
+      schoolId: currentSchool.id,
+    });
+
+    toast.promise(promise, {
+      loading: 'Suppression en cours...',
+      success: 'Professeur supprimé',
+      error: 'Erreur lors de la suppression',
+    });
+
+    try {
+      await promise;
+      router.push('/list/teachers');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleShortcut = (href: string) => {
+    // Redirection avec filtre (ex: /list/classes?teacherId=123)
+    router.push(`${href}?teacherId=${teacherId}`);
+  };
 
   if (isLoading) {
     return (
@@ -42,7 +101,6 @@ export default function TeacherDetailsPage() {
       </div>
     );
   }
-  console.log('Data', data?.teacher, data);
 
   if (error || !data?.teacher) {
     return (
@@ -59,190 +117,263 @@ export default function TeacherDetailsPage() {
   const profile = teacher.user?.profile;
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 gap-6 max-w-7xl mx-auto w-full">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-2 border-background shadow-sm">
-              <AvatarImage src={profile?.photo || undefined} />
-              <AvatarFallback className="text-lg bg-primary/10 text-primary">
-                {profile?.firstname?.[0]}
-                {profile?.lastname?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="text-2xl font-bold">
-                {profile?.firstname} {profile?.lastname}
-              </h1>
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Badge variant="secondary" className="font-normal">
-                  {teacher.specialization || 'Généraliste'}
-                </Badge>
-                <span>•</span>
-                <span>{teacher.isActive ? 'Actif' : 'Inactif'}</span>
+    <div className="flex-1 sm:p-4 flex flex-col xl:flex-row gap-4 ">
+      {/* GAUCHE (Scrollable) */}
+
+      <Card className="w-full h-full py-2 px-3">
+        <CardHeader className=" px-2 flex flex-col gap-4">
+          <div className="flex justify-between items-center w-full">
+            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Edit className="h-4 w-4 mr-2" />
+                Modifier
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setShowDeleteAlert(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Supprimer
+              </Button>
+            </div>
+          </div>
+          <div className="flex items-center py-4 md:p-4 rounded-md bg-accent h-full w-full gap-4 md:gap-6">
+            <div className="h-full flex items-center max-w-50 max-h-50 justify-center">
+              <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background shadow-sm">
+                <AvatarImage
+                  className="object-cover"
+                  src={profile?.photo || undefined}
+                />
+                <AvatarFallback className="text-3xl bg-primary/10 font-jost text-primary">
+                  {profile?.firstname?.[0]}
+                  {profile?.lastname?.[0]}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+            <div className="w-full space-y-2 md:space-y-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold">
+                  {profile?.firstname} {profile?.lastname}
+                </h1>
+                <p className="text-muted-foreground text-sm md:text-base">
+                  {teacher.specialization || 'Enseignant'}
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2 gap-2 w-full pr-1">
+                  <Item icon={Phone}>
+                    {teacher.user?.phoneNumber || 'Non renseigné'}
+                  </Item>
+                  <Item icon={Mail}>
+                    {teacher.user?.email || 'Non renseigné'}
+                  </Item>
+                  <Item icon={MapPin}>
+                    {profile?.address || 'Adresse non renseignée'}
+                  </Item>
+                  <Item icon={ActivityIcon}>
+                    <Badge
+                      variant={teacher.isActive ? 'default' : 'secondary'}
+                      className="h-5 text-xs px-2"
+                    >
+                      {teacher.isActive ? 'Actif' : 'Inactif'}
+                    </Badge>
+                  </Item>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </CardHeader>
 
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Edit className="h-4 w-4 mr-2" />
-            Modifier
-          </Button>
-          <Button variant="destructive" size="sm">
-            <Trash2 className="h-4 w-4 mr-2" />
-            Supprimer
-          </Button>
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Content */}
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList>
-          <TabsTrigger value="overview">Aperçu</TabsTrigger>
-          <TabsTrigger value="classes">
-            Classes ({teacher.classes?.length || 0})
-          </TabsTrigger>
-          <TabsTrigger value="schedule">Emploi du temps</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="mt-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Infos Contact */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  Informations Personnelles
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span>{teacher.user?.email || 'Non renseigné'}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{teacher.user?.phoneNumber || 'Non renseigné'}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>{profile?.address || 'Adresse non renseignée'}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Infos Pro */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  Informations Professionnelles
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">
-                      Diplôme
-                    </span>
-                    <span>{teacher.diploma || '-'}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Briefcase className="h-4 w-4 text-muted-foreground" />
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">
-                      Département
-                    </span>
-                    <span>{teacher.departement || '-'}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-4 w-4 flex items-center justify-center font-bold text-muted-foreground text-xs">
-                    Hr
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">
-                      Volume Horaire
-                    </span>
-                    <span>{teacher.weeklyHours}h / semaine</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="classes" className="mt-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {teacher.classes?.map((cls) => (
-              <Card
-                key={cls?.id}
-                className="hover:border-primary/50 transition-colors cursor-pointer"
+        <div className="flex-1">
+          <Tabs defaultValue="overview" className="w-full mt-4">
+            <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto">
+              <TabsTrigger
+                value="overview"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
               >
-                <CardHeader>
-                  <CardTitle className="text-base">{cls?.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">{cls?.level}</p>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm">{cls?._count?.students} élèves</div>
-                </CardContent>
-              </Card>
-            ))}
-            {(!teacher.classes || teacher.classes.length === 0) && (
-              <p className="text-muted-foreground col-span-full text-center py-8">
-                Aucune classe assignée.
-              </p>
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="schedule" className="mt-6">
-          <Card>
-            <CardContent className="p-6">
-              {/* Placeholder pour le calendrier */}
-              <div className="text-center text-muted-foreground py-12 border-2 border-dashed rounded-lg">
-                Composant Calendrier à intégrer ici
-                <br />
-                (Utilise teacher.lessons)
+                Aperçu
+              </TabsTrigger>
+              <TabsTrigger
+                value="classes"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
+              >
+                Classes ({teacher.classes?.length || 0})
+              </TabsTrigger>
+              <TabsTrigger
+                value="schedule"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
+              >
+                Emploi du temps
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent
+              value="overview"
+              className="mt-6 h-full space-y-6 px-2"
+            >
+              <div className="grid h-full grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="h-full">
+                  <CardHeader>
+                    <CardTitle className="text-lg">
+                      Informations Professionnelles
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <GraduationCap className="h-5 w-5 text-muted-foreground" />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                          Diplôme
+                        </span>
+                        <span className="font-medium">
+                          {teacher.diploma || '-'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Briefcase className="h-5 w-5 text-muted-foreground" />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                          Département
+                        </span>
+                        <span className="font-medium">
+                          {teacher.departement || '-'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="h-5 w-5 flex items-center justify-center font-bold text-muted-foreground text-xs border rounded-full">
+                        Hr
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                          Volume Horaire
+                        </span>
+                        <span className="font-medium">
+                          {teacher.weeklyHours}h / semaine
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Biographie</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {teacher?.bio}
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
+            </TabsContent>
 
-              {/* Liste simple des cours pour debug */}
-              <div className="mt-8 space-y-2">
-                {teacher.lessons?.map((lesson) => (
-                  <div
-                    key={lesson?.id}
-                    className="flex justify-between p-2 border rounded bg-slate-50"
-                  >
-                    <span className="font-medium">{lesson?.day}</span>
-                    <span>
-                      {new Date(lesson?.startTime!).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}{' '}
-                      -{' '}
-                      {new Date(lesson?.endTime!).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                    <span>
-                      {lesson?.subject?.name} ({lesson?.class?.name})
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="classes" className="mt-6 min-h-full px-2">
+              <ClassesSection classes={teacher?.classes} />
+            </TabsContent>
+
+            <TabsContent value="schedule" className="mt-6 px-2 overflow-y-auto">
+              <TimeGrid lessons={teacher?.lessons} />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </Card>
+
+      {/* DROITE (Sticky) */}
+      <div className="w-full h-full xl:w-2/7 flex flex-col gap-4">
+        <Card className="">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold font-jost">
+              Raccourcis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              {shortHands.map((item) => (
+                <Button
+                  key={item.value}
+                  variant="outline"
+                  className="h-auto py-3 flex flex-col gap-1 hover:border-primary hover:text-primary transition-all bg-card text-foreground border-2 first:border-none last:border-none shadow-sm"
+                  onClick={() => handleShortcut(item.href)}
+                >
+                  <span className="font-medium font-poppins">{item.label}</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="flex-1">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold font-jost">
+              Performance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartRadialPerformance />
+          </CardContent>
+        </Card>
+      </div>
+      {/* Dialog de suppression */}
+
+      <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer ce professeur ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Toutes les données associées seront
+              supprimées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Suppression...' : 'Supprimer'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+function Item({
+  children,
+  icon: Icon,
+  className,
+  iconClassName,
+}: {
+  children: React.ReactNode;
+  icon: LucideIcon;
+  className?: string;
+  iconClassName?: string;
+}) {
+  if (!children) return null;
+  return (
+    <div className="flex items-center gap-1 xl:gap-3">
+      <div className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
+        <Icon className={cn('h-4 w-4 text-slate-600', iconClassName)} />
+      </div>
+      <p
+        className={cn(
+          'text-sm text-wrap font-medium text-slate-700 dark:text-slate-200',
+          className,
+        )}
+      >
+        {children}
+      </p>
     </div>
   );
 }

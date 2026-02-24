@@ -44,6 +44,7 @@ export const registerFormSchema = z
           // Validation email
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (emailRegex.test(value)) return true;
+          è;
 
           // Validation téléphone (format international accepté)
           const phoneRegex = /^\+?[0-9]{8,15}$/;

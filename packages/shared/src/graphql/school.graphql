@@ -1,11 +1,18 @@
 type Student {
-    id: ID!,
-    firstname: String!,
-    lastname: String!,
-    photo: String,
-    matricule: String!,
-    className: String
+    id: ID!
+    matricule: String!
     schoolClass: Classe
+    parents: [Parent]
+    user: User
+}
+enum Day {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
 }
 
 type School {
@@ -37,10 +44,10 @@ type Parent {
 
 type Lesson {
     id: ID!
-    name: String
-    startTime: String
-    endTime: String
-    day: String!
+    title: String
+    startTime: DateTime
+    endTime: DateTime
+    day: Day
     class: Classe
     subject: Subject
 }
@@ -52,6 +59,7 @@ type Teacher {
     experience: String
     hireDate: DateTime
     isActive: Boolean
+    bio: String
     salary: Float
     departement: String
     specialization: String

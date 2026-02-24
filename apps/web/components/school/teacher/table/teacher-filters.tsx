@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useQuery, useUserStore } from '@stackschool/ui';
-import { useTable } from '@/components/table/teacher/table-provider';
+import { useTable } from '@/components/school/teacher/table/table-provider';
 import { api } from '@stackschool/shared';
 
 interface TeacherFiltersProps {

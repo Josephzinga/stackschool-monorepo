@@ -60,6 +60,7 @@ query GetTeacherDetails($id: ID!) {
     specialization
     diploma
     experience
+    bio
     hireDate
     salary
     departement
@@ -88,7 +89,7 @@ query GetTeacherDetails($id: ID!) {
     }
     lessons {
       id
-      name
+      title
       day
       startTime
       endTime

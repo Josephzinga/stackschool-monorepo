@@ -39,7 +39,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     // Mapping Rôle -> Route de base
     const roleRoutes: Record<string, string> = {
       ADMIN: '/dashboard/admin',
-      TEACHER: '/dashboard/teacher',
+      TEACHER: '/dashboard/table',
       STUDENT: '/dashboard/student',
       PARENT: '/dashboard/parent',
     };
@@ -58,7 +58,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     if (pathname.startsWith('/dashboard/admin') && role !== 'ADMIN') {
       router.replace(allowedRoute || '/dashboard');
     }
-    if (pathname.startsWith('/dashboard/teacher') && role !== 'TEACHER') {
+    if (pathname.startsWith('/dashboard/table') && role !== 'TEACHER') {
       router.replace(allowedRoute || '/dashboard');
     }
     // ... ajouter d'autres règles si besoin

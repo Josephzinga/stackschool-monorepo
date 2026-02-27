@@ -15,6 +15,7 @@ import { createTeacherResolver } from './resolvers/teacher/create-list-teacher.r
 import { ZodError } from 'zod';
 import { teacherResolver } from './resolvers/teacher/teacher.resolver';
 import { teacherListResolver } from './resolvers/teacher/list.resolver';
+import { schoolStudentsResolver } from './resolvers/student/school-students.resolver';
 
 const dirPath = path.resolve(
   __dirname,
@@ -28,12 +29,11 @@ for (const file of files) {
   typeDefs += fs.readFileSync(`${dirPath}/${file}`, 'utf-8') + '\n';
 }
 
-// Fusion des resolvers
 const resolvers = merge(
   {},
   meResolver,
   schoolResolver,
-  listResolver, // Ajout du nouveau resolver
+  listResolver,
   studentResolver,
   searchSchoolResolver,
   getClassesSubjectsResolver,
@@ -41,6 +41,7 @@ const resolvers = merge(
   createTeacherResolver,
   teacherResolver,
   teacherListResolver,
+  schoolStudentsResolver,
 );
 
 // Création du schéma exécutable

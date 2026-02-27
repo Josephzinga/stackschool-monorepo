@@ -1,24 +1,5 @@
-query GetSchoolTeachers(
-  $schoolId: SchoolId!
-  $page: Int
-  $limit: Int
-  $searchTerm: String
-  $classId: ID
-  $specialization: String
-  $isActive: Boolean
-  $isSupervisor: Boolean
-) {
-  getSchoolTeachers(
-    schoolId: $schoolId
-    page: $page
-    limit: $limit
-    searchTerm: $searchTerm
-
-    classId: $classId
-    specialization: $specialization
-    isActive: $isActive
-    isSupervisor: $isSupervisor
-  ) {
+query GetSchoolTeachers($input: GetSchoolTeachersInput) {
+  getSchoolTeachers(input: $input) {
     meta {
       limit
       total
@@ -34,6 +15,7 @@ query GetSchoolTeachers(
       }
       weeklyHours
       specialization
+      diploma
       departement
       experience
       isActive
@@ -44,6 +26,7 @@ query GetSchoolTeachers(
           firstname
           lastname
           photo
+          gender
         }
       }
       classes {
@@ -112,6 +95,13 @@ mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!) {
 
 mutation CreateTeacher($data: CreateTeacherInput!, $schoolId: ID!) {
   createListTeachers(data: $data, schoolId: $schoolId) {
+    ok
+    message
+  }
+}
+
+mutation UpdateTeacher($teacherId: ID!, $schoolId: ID!, $data: CreateTeacherInput!) {
+  updateTeacher(schoolId: $schoolId, teacherId: $teacherId, data: $data) {
     ok
     message
   }

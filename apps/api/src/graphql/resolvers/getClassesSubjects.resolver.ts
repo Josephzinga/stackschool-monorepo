@@ -6,9 +6,9 @@ import { Resolvers } from '../types.generated';
 export const getClassesSubjectsResolver: Resolvers = {
   Query: {
     getClassSubjects: async (_: any, { filter }, context: Context) => {
-      const { schoolId, searchTerm, getOnly } = filter;
+      const { schoolId, searchTerm, getSubject } = filter;
 
-      if (!getOnly && (!searchTerm || searchTerm.length < 2)) {
+      if (searchTerm && searchTerm.length < 2) {
         throw createServiceError(
           'Le terme de la recherche doit contenir au moins 2 caractères',
           400,
@@ -35,17 +35,19 @@ export const getClassesSubjectsResolver: Resolvers = {
             name: true,
             level: true,
             section: true,
-            classSubjects: {
-              select: {
-                subject: {
+            classSubjects: getSubject
+              ? {
                   select: {
-                    id: true,
-                    name: true,
-                    code: true,
+                    subject: {
+                      select: {
+                        id: true,
+                        name: true,
+                        code: true,
+                      },
+                    },
                   },
-                },
-              },
-            },
+                }
+              : false,
           },
           take: 10,
           orderBy: { name: 'desc' },
@@ -60,7 +62,9 @@ export const getClassesSubjectsResolver: Resolvers = {
           name: cls.name,
           level: cls.level,
           section: cls.section,
-          subjects: cls.classSubjects.map((cs) => cs.subject),
+          subjects: getSubject
+            ? cls?.classSubjects?.map((cs: any) => cs?.subject)
+            : null,
         })) as any;
       } catch (e) {
         throw createServiceError(

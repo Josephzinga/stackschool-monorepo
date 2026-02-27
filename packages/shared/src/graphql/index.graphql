@@ -1,7 +1,9 @@
 type Mutation {
   confirmCompleteProfile: UserPayload
   createListTeachers(data: CreateTeacherInput, schoolId: ID!): ApiResponse
-  deleteTeachers(teacherIds: [ID!]!, schoolId: ID!): ApiResponse
+  updateTeacher(teacherId: ID!, data: CreateTeacherInput!, schoolId: ID!): ApiResponse
+  deleteTeachers(teacherIds: [ID!]!, schoolId: ID!): ApiResponse!
+  createListStudent(data: CreateStudentInput, schoolId: ID!): ApiResponse!
 }
 
 scalar DateTime
@@ -21,26 +23,9 @@ type Query {
 
   teacher(id: ID!): Teacher
 
-  getSchoolTeachers(
-    schoolId: SchoolId!
-    page: Int = 0
-    limit: Int = 10
-    searchTerm: String
+  getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList!
 
-    classId: ID
-    specialization: String
-    isActive: Boolean
-    isSupervisor: Boolean
-  ): TeacherList!
-
-  getSchoolStudents(
-    schoolId: ID!
-    page: Int = 0
-    limit: Int = 10
-    classId: String
-    searchTerm: String
-  ): StudentList!
-
+  getSchoolStudents(input: GetSchoolStudentsInput): StudentList!
 
   getSchoolClasses(
     schoolId: ID!
@@ -48,4 +33,5 @@ type Query {
     limit: Int = 10
     searchTerm: String
   ): ClassList!
+
 }

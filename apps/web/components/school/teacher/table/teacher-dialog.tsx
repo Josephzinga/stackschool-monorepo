@@ -7,14 +7,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CreateTeacherForm } from '@/components/school/teacher/table/create-teacher-form';
+import { CreateTeacherForm } from '@/components/school/teacher/create-teacher-form';
+import { CreateTeacherValues } from '@stackschool/shared';
 
 export function TeacherDialog({
   open,
   setOpen,
+  defaultValues,
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
+  defaultValues: CreateTeacherValues;
 }) {
   const handleSuccess = () => {
     setOpen(false);
@@ -32,7 +35,10 @@ export function TeacherDialog({
 
         <div className="py-4">
           {/* On passe une prop onSuccess si TeacherForm la supporte, sinon on adaptera */}
-          <CreateTeacherForm onSuccess={handleSuccess} />
+          <CreateTeacherForm
+            editDefaultValues={defaultValues}
+            onSuccess={handleSuccess}
+          />
         </div>
       </DialogContent>
     </Dialog>

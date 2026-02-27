@@ -3,7 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { useTable } from './table-provider';
 import { Button } from '@/components/ui/button';
-import { Filter, Plus, Settings2, Trash2, X } from 'lucide-react';
+import { Filter, Plus, Settings2, X } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import { TeacherFilters } from './teacher-filters';
@@ -32,6 +32,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { DeleteSelectedCount } from '@/components/school/delete-selected-count';
 
 // Liste des colonnes contrôlables
 const TEACHER_COLUMNS = [
@@ -110,36 +111,17 @@ export function DataTableHeader() {
     }));
   };
 
-  console.log(columnVisibility, 'Columns visible', columnVisibility['info']);
   return (
     <div className="flex flex-col gap-4 sm:gap-4">
       <div className="flex justify-between w-full ">
         {/*  PARTIE FILTRAGE */}
         <div className="flex justify-between h-10 gap-2 sm:gap-4">
           {selectedCount > 0 ? (
-            <div className="flex items-center gap-2 bg-red-50 text-red-900 px-3 py-2 rounded-md border border-red-100">
-              <span className="text-sm font-medium">
-                {selectedCount} sélectionné(s)
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 text-red-900 hover:bg-red-100"
-                onClick={() => setRowSelection({})}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <div className="h-4 w-px bg-red-200 mx-1" />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-red-700 hover:bg-red-100 hover:text-red-900 text-xs font-medium"
-                onClick={() => setShowDeleteAlert(true)}
-              >
-                <Trash2 className="h-3 w-3 mr-1" />
-                Supprimer
-              </Button>
-            </div>
+            <DeleteSelectedCount
+              selectedCount={selectedCount}
+              onDelete={setShowDeleteAlert}
+              onClose={setRowSelection}
+            />
           ) : (
             <>
               <div className="relative h-full w-60 sm:w-72">

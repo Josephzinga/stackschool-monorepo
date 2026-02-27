@@ -1,159 +1,194 @@
 type Student {
-    id: ID!
-    matricule: String!
-    schoolClass: Classe
-    parents: [Parent]
-    user: User
+  id: ID!
+  matricule: String!
+  schoolClass: Classe
+  parents: [Parent]
+  enrollmentYear: String
+  user: User
 }
 enum Day {
-    MONDAY
-    TUESDAY
-    WEDNESDAY
-    THURSDAY
-    FRIDAY
-    SATURDAY
-    SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
 
 type School {
-    id: ID,
-    name: String!,
-    slug: String
-    address: String!
-    code: String
-    logo: String
-    stats: SchoolStats
+  id: ID
+  name: String!
+  slug: String
+  address: String!
+  code: String
+  logo: String
+  stats: SchoolStats
 
-    teachers: [Teacher]
+  teachers: [Teacher]
 }
 
 type Subject {
-    id: ID!
-    name: String!
-    code: String
-    lessons: [Lesson]
+  id: ID!
+  name: String!
+  code: String
+  lessons: [Lesson]
 }
 
 type Parent {
-    id: ID!
-    profession: String
-    isDelegate: Boolean
-    students: [Student]
-    relationType: String
+  id: ID!
+  profession: String
+  isDelegate: Boolean
+  students: [Student]
+  relationType: String
 }
 
 type Lesson {
-    id: ID!
-    title: String
-    startTime: DateTime
-    endTime: DateTime
-    day: Day
-    class: Classe
-    subject: Subject
+  id: ID!
+  title: String
+  startTime: DateTime
+  endTime: DateTime
+  day: Day
+  class: Classe
+  subject: Subject
 }
 
 type Teacher {
-    id: ID!
-    schoolUserId: String!
-    diploma: String
-    experience: String
-    hireDate: DateTime
-    isActive: Boolean
-    bio: String
-    salary: Float
-    departement: String
-    specialization: String
-    lessons: [Lesson]
-    classes: [Classe]
-    supervisedClasses: [Classe]
-    createdAt: DateTime
-    updatedAt: DateTime
+  id: ID!
+  schoolUserId: String!
+  diploma: String
+  experience: String
+  hireDate: DateTime
+  isActive: Boolean
+  bio: String
+  salary: Float
+  departement: String
+  specialization: String
+  lessons: [Lesson]
+  classes: [Classe]
+  supervisedClasses: [Classe]
+  createdAt: DateTime
+  updatedAt: DateTime
 
-    # Champ calculé
-    weeklyHours: Float
+  weeklyHours: Float
 
-    # Infos profil (jointure User)
-    user: User
+  user: User
 }
 
 type Staff {
-    id: ID!
-    schoolUserId: String!
-    position: String!
-    hireDate: DateTime
-    salary: Float
-    departement: String
+  id: ID!
+  schoolUserId: String!
+  position: String!
+  hireDate: DateTime
+  salary: Float
+  departement: String
 }
 
 type Classe {
-    id: ID!,
-    name: String!,
-    level: String!,
-    section: String
-    subjects: [Subject]
-    lessons: [Lesson]
-    students: [Student] # Liste simple des élèves (pas paginée ici, pour le détail classe)
-    _count: ClassCount
+  id: ID!
+  name: String!
+  level: String!
+  section: String
+  subjects: [Subject]
+  lessons: [Lesson]
+  students: [Student]
+  _count: ClassCount
 }
 
 type ClassCount {
-    students: Int!
+  students: Int!
 }
 
-# --- Nouveaux Types pour le Dashboard Admin ---
-
 type GenderStats {
-    male: Int!
-    female: Int!
+  male: Int!
+  female: Int!
 }
 
 type MonthlyStats {
-    month: String!
-    count: Int!
+  month: String!
+  count: Int!
 }
 
 type ClassStats {
-    className: String!
-    studentCount: Int!
+  className: String!
+  studentCount: Int!
 }
 
 type DailyAttendance {
-    date: String!
-    rate: Float!
-    present: Int!
-    absent: Int!
-    late: Int!
+  date: String!
+  rate: Float!
+  present: Int!
+  absent: Int!
+  late: Int!
 }
 
 type MonthlyRevenue {
-    currentMonth: Float!
-    previousMonth: Float
+  currentMonth: Float!
+  previousMonth: Float
 }
 
 type AttendanceStats {
-    rate: Float!
-    presentCount: Int!
-    absentCount: Int!
-    lateCount: Int!
-    totalExpected: Int!
-    history: [DailyAttendance!]
+  rate: Float!
+  presentCount: Int!
+  absentCount: Int!
+  lateCount: Int!
+  totalExpected: Int!
+  history: [DailyAttendance!]
 }
 
 type SchoolStats {
-    # KPI Cards
-    totalStudents: Int!
-    totalTeachers: Int!
-    totalClasses: Int!
+  # KPI Cards
+  totalStudents: Int!
+  totalTeachers: Int!
+  totalClasses: Int!
 
-    # Finance & Présence
-    monthlyRevenue: MonthlyRevenue
-    pendingPaymentsCount: Int
+  # Finance & Présence
+  monthlyRevenue: MonthlyRevenue
+  pendingPaymentsCount: Int
 
-    # Remplacé par un objet complexe
-    attendance: AttendanceStats
+  # Remplacé par un objet complexe
+  attendance: AttendanceStats
 
-    # Charts Data
-    studentGender: GenderStats
-    enrollmentPerMonth: [MonthlyStats!]
-    classesOccupancy: [ClassStats!]
+  # Charts Data
+  studentGender: GenderStats
+  enrollmentPerMonth: [MonthlyStats!]
+  classesOccupancy: [ClassStats!]
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+enum StudentSortField {
+  firstname
+  lastname
+  enrolementYear
+}
+input StudentSortInput {
+  field: StudentSortField
+  order: SortOrder
+}
+
+input GetSchoolStudentsInput {
+  schoolId: ID!
+  page: Int! = 0
+  limit: Int! = 10
+
+  sort: StudentSortInput
+  classId: ID
+  searchTerm: String
+  level: String
+  section: String
+}
+
+input GetSchoolTeachersInput {
+  schoolId: ID!
+  page: Int! = 0
+  limit: Int! = 10
+  searchTerm: String
+
+  classId: ID
+  specialization: String
+  isActive: Boolean
+  isSupervisor: Boolean
 }

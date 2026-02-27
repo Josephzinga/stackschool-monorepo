@@ -1,5 +1,8 @@
 import { prisma } from './prisma';
 import { createServiceError } from '../utils/api-errors';
+import { SchoolRole } from '@stackschool/db';
+
+type Role = SchoolRole;
 
 type SchoolUserContext = {
   schoolId: string;

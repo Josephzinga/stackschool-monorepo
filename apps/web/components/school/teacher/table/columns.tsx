@@ -8,16 +8,19 @@ import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { TeacherActions } from './teacher-actions';
+import { TeacherTableActions } from './teacher-table-actions';
+import { Gender } from '@stackschool/ui';
 
 export type Teacher = {
   id: string | number;
   firstname: string;
   lastname: string;
-  email?: string;
+  email: string;
   photo?: string;
   phoneNumber?: string;
-  speciality: string[];
+  specialization: string[];
+  diploma: string;
+  gender: Gender;
   status: boolean;
   classes: { id: string; name: string }[];
 };
@@ -27,6 +30,7 @@ export const columns: ColumnDef<Teacher>[] = [
     id: 'select',
     header: ({ table }) => (
       <Checkbox
+        className="cursor-pointer"
         checked={
           table.getIsAllRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
@@ -36,6 +40,7 @@ export const columns: ColumnDef<Teacher>[] = [
     ),
     cell: ({ row }) => (
       <Checkbox
+        className="cursor-pointer"
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
       />
@@ -84,11 +89,11 @@ export const columns: ColumnDef<Teacher>[] = [
     },
   },
   {
-    accessorKey: 'speciality',
+    accessorKey: 'specialization',
     header: 'Spécialité',
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
-        {row.original.speciality.map((spec, i) => (
+        {row.original.specialization.map((spec, i) => (
           <Badge key={i} variant="outline" className="font-normal text-xs">
             {spec}
           </Badge>
@@ -115,8 +120,8 @@ export const columns: ColumnDef<Teacher>[] = [
           className={cn(
             'font-medium px-2 py-0.5 text-xs border-0',
             row.original.status
-              ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
-              : 'bg-red-50 text-red-700 ring-1 ring-red-600/20',
+              ? 'bg-chart-4/10 text-chart-4 ring-1 ring-green-600/20'
+              : 'bg-destructive/10 text-destructive ring-1 ring-red-600/20',
           )}
         >
           {row.original.status ? 'Actif' : 'Inactif'}
@@ -137,14 +142,14 @@ export const columns: ColumnDef<Teacher>[] = [
           {classes.slice(0, 2).map((cls) => (
             <Badge
               key={cls.id}
-              variant="secondary"
-              className="text-[10px] px-1 h-5"
+              variant="outline"
+              className="px-1.5 text-[12px] h-5"
             >
               {cls.name}
             </Badge>
           ))}
           {classes.length > 2 && (
-            <Badge variant="secondary" className="text-[10px] px-1 h-5">
+            <Badge variant="outline" className="text-[12px] px-1.5 h-5">
               +{classes.length - 2}
             </Badge>
           )}
@@ -154,6 +159,6 @@ export const columns: ColumnDef<Teacher>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => <TeacherActions row={row} />,
+    cell: ({ row }) => <TeacherTableActions row={row} />,
   },
 ];

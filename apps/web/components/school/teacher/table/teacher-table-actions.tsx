@@ -1,3 +1,4 @@
+'use client';
 import { Row } from '@tanstack/react-table';
 import { Teacher } from './columns';
 import { useDeleteTeachersMutation, useUserStore } from '@stackschool/ui';
@@ -24,11 +25,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { TeacherDialog } from '@/components/school/teacher/table/teacher-dialog';
 
-export function TeacherActions({ row }: { row: Row<Teacher> }) {
+export function TeacherTableActions({ row }: { row: Row<Teacher> }) {
   const teacherId = row.original.id;
   const { currentSchool } = useUserStore();
-  const [open, setOpen] = useState(false);
+  const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useDeleteTeachersMutation({
@@ -58,11 +62,13 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
 
     try {
       await promise;
-      setOpen(false);
+      setOpenDeleteAlert(false);
     } catch (e) {
       console.error(e);
     }
   };
+
+  const handleEdit = async () => {};
 
   return (
     <>
@@ -70,7 +76,7 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+            className="data-[state=open]:bg-muted text-muted-foreground flex size-8 cursor-pointer"
             size="icon"
           >
             <IconDotsVertical />
@@ -78,20 +84,23 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem onClick={() => console.log('Edit')}>
+          <DropdownMenuItem onClick={() => setOpenEditDialog(true)}>
             Editer
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => console.log('Copy')}>
             Copier
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setOpen(true)} variant="destructive">
+          <DropdownMenuItem
+            onClick={() => setOpenDeleteAlert(true)}
+            variant="destructive"
+          >
             Supprimer
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
@@ -115,6 +124,12 @@ export function TeacherActions({ row }: { row: Row<Teacher> }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <TeacherDialog
+        open={openEditDialog}
+        setOpen={setOpenEditDialog}
+        defaultValues={row.original}
+      />
     </>
   );
 }

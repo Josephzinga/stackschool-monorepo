@@ -14,13 +14,22 @@ enum Gender {
   MALE
   FEMALE
 }
-
+input CreateStudentInput {
+  firstname: String!
+  lastname: String!
+  email: String
+  gender: Gender!
+  classId: ID!
+  matricule: String!
+  fatherName: String
+  motherName: String
+}
 input CreateTeacherInput {
   firstname: String!
   lastname: String!
   email: String
   phoneNumber: String
-  gender: Gender
+  gender: Gender!
   diploma: String
   specialization: String!
   classIds: [String!]

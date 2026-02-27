@@ -141,7 +141,7 @@ model ClassSubjects {
 
 model Class {
   id           String   @id @default(cuid())
-  name         String   @unique
+  name         String
   level        String
   section      String?
   createdAt    DateTime @default(now())
@@ -160,6 +160,7 @@ model Class {
   students      Student[]
   assessment    Assessment[]
 
+  @@unique([name, schoolId])
   @@index([schoolId])
 }
 

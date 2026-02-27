@@ -4,22 +4,22 @@ import { Resolvers } from '../../types.generated';
 
 export const teacherListResolver: Resolvers = {
   Query: {
-    getSchoolTeachers: async (
-      _,
-      {
-        schoolId,
-        page = 0,
-        limit = 10,
-        searchTerm,
-        classId,
-        specialization,
-        isActive,
-        isSupervisor,
-      },
-      context,
-    ) => {
+    getSchoolTeachers: async (_, { input }, context) => {
       try {
         if (!context.user) throw createServiceError('Non authentifié', 401);
+        if (!input) {
+          throw createServiceError('Données manquantes', 400);
+        }
+        const {
+          schoolId,
+          page = 0,
+          limit = 10,
+          searchTerm,
+          classId,
+          specialization,
+          isActive,
+          isSupervisor,
+        } = input;
 
         const skip = page * limit;
         const search = searchTerm?.trim();
@@ -113,6 +113,7 @@ export const teacherListResolver: Resolvers = {
                     select: {
                       id: true,
                       name: true,
+                      level: true,
                     },
                   },
                 },
@@ -129,6 +130,7 @@ export const teacherListResolver: Resolvers = {
                           firstname: true,
                           lastname: true,
                           photo: true,
+                          gender: true,
                         },
                       },
                     },
@@ -156,6 +158,7 @@ export const teacherListResolver: Resolvers = {
             classes: t.classTeacher.map((c) => ({
               id: c.class.id,
               name: c.class.name,
+              level: c.class.level,
             })),
           })),
           meta: {

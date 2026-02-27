@@ -23,7 +23,7 @@ import {
   MapPin,
   User,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   generateStudentMatricule,
   parseAxiosError,
@@ -56,6 +56,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
       birthPlace: studentData?.birthPlace || '',
       fatherName: studentData?.fatherName || '',
       motherName: studentData?.motherName || '',
+      nationality: studentData?.nationality || 'Malienne',
       matricule:
         studentData?.matricule ||
         generateStudentMatricule(profile?.firstname!, profile?.lastname!),
@@ -74,11 +75,10 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
 
   const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;
 
-  const { data, error } = useGetClassSubjectsQuery(
+  const { data, error, isError } = useGetClassSubjectsQuery(
     {
       input: {
         schoolId: schoolId as string,
-        getOnly: true,
       },
     },
     {
@@ -86,12 +86,10 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
     },
   );
 
-  useEffect(() => {
-    if (error) {
-      const { message } = parseAxiosError(error);
-      toast.error(message || 'Echec de chargement de classes');
-    }
-  }, []);
+  if (isError) {
+    const { message } = parseAxiosError(error);
+    toast.error(message || 'Echec de chargement de classes');
+  }
 
   const onSubmit = async (data: StudentFormData) => {
     setRoleData({ role: 'STUDENT', student: data });
@@ -198,7 +196,6 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
             id="nationality"
             icon={Flag}
             {...register('nationality')}
-            defaultValue="Malienne"
             aria-invalid={!!errors.nationality}
           />
           <FieldError>{errors.nationality?.message}</FieldError>
@@ -240,7 +237,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
               <SelectTrigger aria-invalid={!!errors.classId}>
                 <SelectValue placeholder="Sélectionnez votre classe" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background">
                 {data?.getClassSubjects?.map((classe) => (
                   <SelectItem key={classe?.id} value={classe?.id as string}>
                     <p className="font-semibold ">{classe?.name}</p>

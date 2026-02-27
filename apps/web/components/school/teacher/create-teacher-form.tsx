@@ -6,6 +6,7 @@ import {
   useCreateTeacherMutation,
   useForm,
   useQuery,
+  useUpdateTeacherMutation,
   useUserStore,
   zodResolver,
 } from '@stackschool/ui';
@@ -30,6 +31,7 @@ import {
   api,
   createTeacherSchema,
   CreateTeacherValues,
+  Gender,
 } from '@stackschool/shared';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Plus, User, User2Icon, X } from 'lucide-react';
@@ -46,13 +48,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Teacher } from '@/components/school/teacher/table/columns';
 
 interface CreateTeacherFormProps {
   onSuccess?: () => void;
+  editDefaultValues?: Teacher;
 }
-
-export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
+type Data = Omit<CreateTeacherValues, 'gender'> & { gender: Gender };
+export function CreateTeacherForm({
+  onSuccess,
+  editDefaultValues,
+}: CreateTeacherFormProps) {
   const { currentSchool } = useUserStore();
+
   const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -69,11 +77,14 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
     resolver: zodResolver(createTeacherSchema),
     mode: 'onBlur',
     defaultValues: {
-      classIds: [],
-      email: '',
-      phoneNumber: '',
-      diploma: '',
-      specialization: '',
+      classIds: editDefaultValues?.classes?.map((cls) => cls.id) || [],
+      lastname: editDefaultValues?.lastname || '',
+      gender: editDefaultValues?.gender || 'MALE',
+      firstname: editDefaultValues?.firstname || '',
+      email: editDefaultValues?.email || '',
+      phoneNumber: editDefaultValues?.phoneNumber || '',
+      diploma: editDefaultValues?.diploma || '',
+      specialization: editDefaultValues?.speciality?.join(','),
     },
   });
 
@@ -91,7 +102,16 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
     enabled: !!currentSchool?.id,
   });
 
-  const { mutateAsync } = useCreateTeacherMutation({
+  const { mutateAsync: createMutateAsync } = useCreateTeacherMutation({
+    onSuccess: async (data) => {
+      if (onSuccess) {
+        onSuccess();
+      }
+      await queryClient.invalidateQueries({ queryKey: ['GetSchoolTeachers'] });
+    },
+  });
+
+  const { mutateAsync: updateMutateAsync } = useUpdateTeacherMutation({
     onSuccess: async (data) => {
       if (onSuccess) {
         onSuccess();
@@ -123,7 +143,8 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
       return toast.error(safeData?.message);
     }
 
-    if (!safeData?.valid && safeData?.message) {
+    if (!safeData?.valid) {
+      console.log('not valid', fieldName);
       setError(fieldName, {
         type: 'onBlur',
         message: safeData?.message,
@@ -134,15 +155,27 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
   };
 
   const onSubmit = async (data: CreateTeacherInput) => {
-    const res = mutateAsync({
-      data,
-      schoolId: currentSchool?.id!,
-    });
-    toast.promise(res, {
+    const isEdit = !!editDefaultValues;
+    const promise = isEdit
+      ? updateMutateAsync({
+          data,
+          schoolId: currentSchool?.id!,
+          teacherId: editDefaultValues?.id as string,
+        })
+      : createMutateAsync({
+          data,
+          schoolId: currentSchool?.id!,
+        });
+
+    toast.promise(promise, {
       loading: "Création de l'enseignant en cours...",
       success: (data) => {
-        if (data.createListTeachers?.ok) {
-          return data.createListTeachers?.message;
+        if (isEdit) {
+          return isEdit
+            ? data?.updateTeacher?.message
+            : 'Enseignant modifié avec succès';
+        } else {
+          return data?.createTeacher?.message || 'Enseignant créé avec succès';
         }
       },
       error: (error) => {
@@ -156,7 +189,7 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
     if (!classes) return [];
     return classes
       .filter((c: any) => selectedClassIds.includes(c.id))
-      .map((c: any) => c.name);
+      .map((c: any) => ({ name: c.name, id: c.id }));
   };
 
   return (
@@ -289,23 +322,29 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
       <div className="space-y-2">
         <FieldLabel>Classes assignées</FieldLabel>
         <div className="flex flex-wrap gap-2 mb-2">
-          {getSelectedClassNames().map((name: string) => (
-            <Badge key={name} variant="secondary" className="pl-2 pr-1 py-1">
-              {name}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-4 w-4 ml-1 p-0 hover:bg-transparent"
-                onClick={() => {
-                  const cls = classes.find((c: any) => c.name === name);
-                  if (cls) toggleClass(cls.id);
-                }}
+          {getSelectedClassNames()?.map(
+            ({ name, id }: { name: string; id: string }) => (
+              <Badge
+                key={id}
+                variant="secondary"
+                className="pl-2 pr-1 py-1font-meduim text-xs"
               >
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          ))}
+                {name}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-4 w-4 ml-1 p-0 hover:bg-transparent"
+                  onClick={() => {
+                    const cls = classes.find((c: any) => c.name === name);
+                    if (cls) toggleClass(cls.id);
+                  }}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            ),
+          )}
 
           <Dialog open={isClassDialogOpen} onOpenChange={setIsClassDialogOpen}>
             <DialogTrigger asChild>
@@ -319,7 +358,7 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
                 Assigner
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-100 font-poppins font-medium ">
+            <DialogContent className="sm:max-w-100 font-poppins font-medium w-full justify-center items-center">
               <DialogHeader>
                 <DialogTitle>Assigner des classes</DialogTitle>
                 <DialogDescription>
@@ -340,12 +379,13 @@ export function CreateTeacherForm({ onSuccess }: CreateTeacherFormProps) {
                   classes?.map((cls: any) => (
                     <div
                       key={cls.id}
-                      className="flex items-center space-x-2 p-2 hover:bg-slate-50 rounded-md"
+                      className="flex items-center space-x-2 p-2 hover:bg-accent rounded-md"
                     >
                       <Checkbox
                         id={`cls-${cls.id}`}
                         checked={selectedClassIds.includes(cls.id)}
                         onCheckedChange={() => toggleClass(cls.id)}
+                        className="cursor-pointer"
                       />
                       <Label
                         htmlFor={`cls-${cls.id}`}

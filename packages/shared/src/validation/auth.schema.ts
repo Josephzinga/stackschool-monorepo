@@ -44,7 +44,6 @@ export const registerFormSchema = z
           // Validation email
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (emailRegex.test(value)) return true;
-          è;
 
           // Validation téléphone (format international accepté)
           const phoneRegex = /^\+?[0-9]{8,15}$/;
@@ -71,19 +70,23 @@ export const registerFormSchema = z
     email: z
       .string()
       .trim()
-      .email('Veuillez entrer un email valide.')
+      .email({
+        pattern: z.regexes.email,
+        message: 'Veuillez entrer un email valide.',
+      })
       .optional()
-      .or(z.literal('')), // <-- permet champ vide sans erreur
+      .or(z.literal('')),
 
     phoneNumber: z
       .string()
       .trim()
-      .regex(/^\+?[0-9]{8,15}$/, {
-        message:
-          'Numéro invalide (format international recommandé, ex: +223...)',
-      })
+      .regex(
+        /^\+?[0-9]{8,15}$/,
+
+        'Numéro invalide (format international recommandé, ex: +223...)',
+      )
       .optional()
-      .or(z.literal('')), // <-- permet champ vide aussi
+      .or(z.literal('')),
 
     confirm: z.string(),
   })
@@ -92,8 +95,9 @@ export const registerFormSchema = z
     if (data.password !== data.confirm) {
       ctx.addIssue({
         path: ['confirm'],
-        code: z.ZodIssueCode.custom,
+        code: 'invalid_value',
         message: 'Les mots de passe ne correspondent pas.',
+        values: [data.password, data.confirm],
       });
     }
 
@@ -103,14 +107,16 @@ export const registerFormSchema = z
 
     if (!hasEmail && !hasPhone) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'invalid_value',
         path: ['email'],
         message: 'Veuillez fournir un email ou un numéro de téléphone.',
+        values: [data.email, data.phoneNumber],
       });
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'invalid_value',
         path: ['phoneNumber'],
         message: 'Veuillez fournir un email ou un numéro de téléphone.',
+        values: [data.email, data.phoneNumber],
       });
     }
   });

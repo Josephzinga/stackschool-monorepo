@@ -8,9 +8,25 @@ import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { Student } from '@stackschool/ui';
+import { useTable } from './table-provider';
+import { SortOrder, StudentSortField } from '@stackschool/ui';
 
-export const columns: ColumnDef<Student>[] = [
+export type StudentColumns = {
+  id: string | number;
+  firstname: string | null;
+  lastname: string | null;
+  email?: string;
+  phoneNumber?: string;
+  level: string;
+  className: string | null;
+  photo?: string | null;
+  status: boolean;
+  section: string | null;
+  enrollmentYear: string | null;
+  matricule: string | null;
+};
+
+export const columns: ColumnDef<StudentColumns>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -19,11 +35,13 @@ export const columns: ColumnDef<Student>[] = [
           table.getIsAllRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
+        className="cursor-pointer"
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
       />
     ),
     cell: ({ row }) => (
       <Checkbox
+        className="cursor-pointer"
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
       />
@@ -34,12 +52,19 @@ export const columns: ColumnDef<Student>[] = [
   {
     accessorKey: 'info',
     header: ({ column }) => {
+      const { setFilters } = useTable();
       return (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          onClick={() => {
+            const sort = {
+              field: 'firstname' as StudentSortField,
+              order: 'ASC' as SortOrder,
+            };
+            setFilters((prev) => ({ ...prev, sort }));
+          }}
         >
-          Enseignant
+          Élèves
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -49,10 +74,10 @@ export const columns: ColumnDef<Student>[] = [
       const id = row.original.id;
 
       return (
-        <Link href={`/list/teachers/${id}`} className="block w-full h-full">
+        <Link href={`/list/teachers/${id}`} className="block max-w-100 h-full">
           <div className="flex gap-3 items-center hover:bg-accent p-1 rounded-md transition-colors cursor-pointer">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={photo} />
+              <AvatarImage src={photo ?? undefined} />
               <AvatarFallback className="bg-primary/10 text-primary text-xs">
                 {row.original.firstname?.[0]}
                 {row.original.lastname?.[0]}
@@ -71,27 +96,62 @@ export const columns: ColumnDef<Student>[] = [
       );
     },
   },
+
   {
-    accessorKey: 'speciality',
-    header: 'Spécialité',
-    cell: ({ row }) => (
-      <div className="flex flex-wrap gap-1">
-        {row.original.speciality.map((spec, i) => (
-          <Badge key={i} variant="outline" className="font-normal text-xs">
-            {spec}
-          </Badge>
-        ))}
-      </div>
-    ),
+    accessorKey: 'matricule',
+    header: 'Matricule',
+    cell: ({ row }) => {
+      const matricule = row.original.matricule;
+
+      return (
+        <div className="w-35 h-full items-center justify-center">
+          <span className="font-inter text-xs">{matricule}</span>
+        </div>
+      );
+    },
   },
   {
-    accessorKey: 'phoneNumber',
-    header: 'Téléphone',
-    cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground">
-        {row.original.phoneNumber || '-'}
-      </span>
-    ),
+    accessorKey: 'className',
+    header: 'Classe',
+    cell: ({ row }) => {
+      const classeName = row.original.className;
+
+      return <p className="text-xs sm:text-sm px-2 h-5">{classeName}</p>;
+    },
+  },
+  {
+    accessorKey: 'section',
+    header: 'Section',
+    cell: ({ row }) => {
+      const section = row.original.section;
+      return (
+        <div>
+          <p>{section || '-'}</p>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'level',
+    header: 'Niveau',
+    cell: ({ row }) => {
+      const level = row.original.level;
+      return (
+        <div className="flex flex-wrap gap-1">
+          <Badge variant="outline" className="font-normal text-xs">
+            {level}
+          </Badge>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'enrollmentYear',
+    header: 'Inscription',
+    cell: ({ row }) => {
+      const enrollmentYear = row.original.enrollmentYear;
+      return <Badge className="bg-primary/40">{enrollmentYear}</Badge>;
+    },
   },
   {
     accessorKey: 'status',
@@ -103,45 +163,13 @@ export const columns: ColumnDef<Student>[] = [
           className={cn(
             'font-medium px-2 py-0.5 text-xs border-0',
             row.original.status
-              ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
-              : 'bg-red-50 text-red-700 ring-1 ring-red-600/20',
+              ? 'bg-chart-4/10 text-chart-4 ring-1 ring-green-600/20'
+              : 'bg-destructive/10 text-destructive ring-1 ring-red-600/20',
           )}
         >
           {row.original.status ? 'Actif' : 'Inactif'}
         </Badge>
       );
     },
-  },
-  {
-    accessorKey: 'classes',
-    header: 'Classes',
-    cell: ({ row }) => {
-      const classes = row.original.classes;
-      if (!classes || classes.length === 0)
-        return <span className="text-muted-foreground text-xs">-</span>;
-
-      return (
-        <div className="flex flex-wrap gap-1 max-w-[200px]">
-          {classes.slice(0, 2).map((cls) => (
-            <Badge
-              key={cls.id}
-              variant="secondary"
-              className="text-[10px] px-1 h-5"
-            >
-              {cls.name}
-            </Badge>
-          ))}
-          {classes.length > 2 && (
-            <Badge variant="secondary" className="text-[10px] px-1 h-5">
-              +{classes.length - 2}
-            </Badge>
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => <TeacherActions row={row} />,
   },
 ];

@@ -1,7 +1,7 @@
 import { prisma } from '@stackschool/db';
 import { Day, Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
-import { isAdmin } from '../../../lib/verify-admin';
+import { isAdmin } from '../../../lib/verify-role';
 
 export const teacherResolver: Resolvers = {
   Query: {
@@ -63,11 +63,6 @@ export const teacherResolver: Resolvers = {
 
       if (!teacher) throw createServiceError('Enseignant introuvable', 404);
 
-      // Vérification de sécurité : L'utilisateur doit être membre de la même école
-      // ou être le prof lui-même.
-      // Pour simplifier ici, on suppose que si on a l'ID, on a le droit,
-      // mais idéalement il faudrait vérifier context.user.memberships.
-
       return {
         ...teacher,
         user: teacher.schoolUser.user as any,
@@ -78,7 +73,7 @@ export const teacherResolver: Resolvers = {
         classes: [
           ...teacher.supervisedClasses,
           ...teacher.classTeacher.map((ct) => ct.class),
-        ].filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i), // Dedup
+        ].filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i),
       };
     },
   },
@@ -96,7 +91,6 @@ export const teacherResolver: Resolvers = {
       }
 
       try {
-        // 2. Suppression
         const teachers = await prisma.teacher.findMany({
           where: {
             id: { in: teacherIds as string[] },
@@ -126,6 +120,69 @@ export const teacherResolver: Resolvers = {
         throw createServiceError('Erreur lors de la suppression', 500, error);
       }
     },
+
+    updateTeacher: async (_, { teacherId, data, schoolId }, context) => {
+      if (!context.user) throw createServiceError('Non authentifié', 401);
+
+      const adminCheck = await isAdmin({
+        context: { schoolId, userId: context.user.id },
+      });
+
+      if (!adminCheck?.success) {
+        throw createServiceError(adminCheck?.message || 'Accès refusé', 403);
+      }
+
+      try {
+        const teacher = await prisma.teacher.findUnique({
+          where: { id: teacherId },
+          include: { schoolUser: true }
+        });
+
+        if (!teacher || teacher.schoolUser.schoolId !== schoolId) {
+          throw createServiceError('Enseignant introuvable dans cette école', 404);
+        }
+
+        await prisma.$transaction(async (tx) => {
+          // 1. Mise à jour User/Profile
+          await tx.user.update({
+            where: { id: teacher.schoolUser.userId },
+            data: {
+              email: data.email || undefined,
+              phoneNumber: data.phoneNumber || undefined,
+              profile: {
+                update: {
+                  firstname: data.firstname,
+                  lastname: data.lastname,
+                  gender: data.gender,
+                }
+              }
+            }
+          });
+
+          // 2. Mise à jour Teacher
+          await tx.teacher.update({
+            where: { id: teacherId },
+            data: {
+              diploma: data.diploma,
+              specialization: data.specialization,
+              // Mise à jour des classes (Sync)
+              classTeacher: {
+                deleteMany: {}, // On supprime tout (simple et efficace pour une liste complète)
+                create: data.classIds?.map(classId => ({
+                  classId: classId!
+                })) || []
+              }
+            }
+          });
+        });
+
+        return { ok: true, message: 'Enseignant mis à jour avec succès' };
+
+      } catch (error) {
+        console.error('Erreur update prof:', error);
+        throw createServiceError('Erreur lors de la mise à jour', 500, error);
+      }
+    }
   },
 
   Teacher: {

@@ -3,7 +3,7 @@ type Profile {
   firstname: String!
   lastname: String!
   photo: String
-  gender: String!
+  gender: String
   address: String
 }
 

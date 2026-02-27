@@ -7,7 +7,11 @@ import {
   useTable,
 } from '@/components/school/teacher/table/table-provider';
 import { DataTableHeader } from '@/components/school/teacher/table/data-table-header';
-import { useGetSchoolTeachersQuery, useUserStore } from '@stackschool/ui';
+import {
+  Gender,
+  useGetSchoolTeachersQuery,
+  useUserStore,
+} from '@stackschool/ui';
 import { useDebounce } from '@/hooks/useDebounce';
 
 export default function TeacherPage() {
@@ -25,11 +29,13 @@ function TeachersView() {
 
   const { data, isPending } = useGetSchoolTeachersQuery(
     {
-      schoolId: currentSchool?.id!,
-      limit: pagination.pageSize,
-      page: pagination.pageIndex,
-      searchTerm: search,
-      ...filters,
+      input: {
+        schoolId: currentSchool?.id!,
+        limit: pagination.pageSize,
+        page: pagination.pageIndex,
+        searchTerm: search,
+        ...filters,
+      },
     },
     {
       enabled: !!currentSchool?.id,
@@ -44,6 +50,8 @@ function TeachersView() {
       email: t.user?.email || '',
       phoneNumber: t.user?.phoneNumber || '',
       speciality: t.specialization ? [t.specialization] : [],
+      gender: t?.user?.profile?.gender as Gender,
+      diploma: t?.diploma ?? '',
       classes:
         t.classes?.map((c) => ({
           id: c?.id!,

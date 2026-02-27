@@ -104,7 +104,7 @@
     --fc-page-bg-color: #fff;
     --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
     --fc-neutral-text-color: #808080;
-    --fc-border-color: #b1b5b9;
+    --fc-border-color: #518fcd;
 
     --fc-button-text-color: #fff;
     --fc-button-bg-color: var(--primary);
@@ -145,7 +145,7 @@
   --popover-foreground: oklch(0.9328 0.0025 228.7857);
   --primary: oklch(0.6692 0.1607 245.011);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.9622 0.0035 219.5331);
+  --secondary: oklch(0.797 0.118 223.322);
   --secondary-foreground: oklch(0.1884 0.0128 248.5103);
   --muted: oklch(0.209 0 0);
   --muted-foreground: oklch(0.641 0.009 247.975);

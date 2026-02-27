@@ -7,11 +7,12 @@ export const createTeacherSchema = z.object({
   gender: profileSchema.shape.gender,
   email: z
     .string()
-    .email({ pattern: z.regexes.email, message: 'Email invalide' }),
+    .email({ pattern: z.regexes.email, message: 'Email invalide' })
+    .optional(),
   phoneNumber: z.string().optional(),
   diploma: z.string().min(2, 'Le diplôme est requis'),
   specialization: z.string().min(2, 'La spécialité est requise'),
-  classIds: z.array(z.string()).optional(), // IDs des classes assignées
+  classIds: z.array(z.string()).optional(),
 });
 
 export type CreateTeacherValues = z.infer<typeof createTeacherSchema>;

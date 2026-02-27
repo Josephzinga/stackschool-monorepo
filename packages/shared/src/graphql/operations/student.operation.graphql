@@ -1,0 +1,37 @@
+query GetSchoolStudents($input: GetSchoolStudentsInput) {
+    getSchoolStudents(input: $input ) {
+        meta {
+            total
+            totalPages
+            limit
+            page
+        }
+        data {
+            id
+            matricule
+            enrollmentYear
+            user {
+                id
+                email
+                phoneNumber
+                profile {
+                    id
+                    photo
+                    firstname
+                    lastname
+                    address
+                }
+            }
+            parents {
+                id
+            }
+            schoolClass {
+                id
+                name
+                section
+                level
+            }
+        }
+    }
+}
+

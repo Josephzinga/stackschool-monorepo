@@ -2,7 +2,7 @@ import { Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
 import { safeValidateSchema } from '../../../utils/validate-schema.util';
 import { createTeacherSchema } from '@stackschool/shared';
-import { isAdmin } from '../../../lib/verify-admin';
+import { isAdmin } from '../../../lib/verify-role'; // Mise à jour de l'import
 import { prisma } from '@stackschool/db';
 
 export const createTeacherResolver: Resolvers = {
@@ -12,7 +12,7 @@ export const createTeacherResolver: Resolvers = {
         if (!context.user) throw createServiceError('Non authentifié', 401);
 
         if (!schoolId) {
-          return createServiceError('identifiant manquant');
+          return createServiceError('identifiant manquant', 400);
         }
 
         const result = safeValidateSchema(createTeacherSchema, data);
@@ -24,7 +24,6 @@ export const createTeacherResolver: Resolvers = {
             result.errors,
           );
         }
-
         const admin = await isAdmin({
           context: { schoolId, userId: context.user.id },
         });
@@ -42,22 +41,19 @@ export const createTeacherResolver: Resolvers = {
               OR: [
                 { email: data?.email },
                 { phoneNumber: data?.phoneNumber },
-              ].filter(Boolean) as any, // Filtre les conditions undefined
+              ].filter(Boolean) as any,
             },
           });
 
           if (existingUser) {
             userId = existingUser.id;
-            // Optionnel : Mettre à jour le profil si besoin, mais attention à ne pas écraser
           } else {
-            // Création d'un nouvel utilisateur
-            // Note: Il faudrait générer un mot de passe temporaire ou gérer l'invitation
             const newUser = await tx.user.create({
               data: {
                 email: data?.email || null,
                 phoneNumber: data?.phoneNumber || null,
                 username:
-                  `${data?.firstname}.${data?.lastname}.${Date.now().toString().slice(-4)}`.toLowerCase(), // Génération username unique
+                  `${data?.firstname}.${data?.lastname}.${Date.now().toString().slice(-4)}`.toLowerCase(),
                 profile: {
                   create: {
                     firstname: data?.firstname,
@@ -82,7 +78,7 @@ export const createTeacherResolver: Resolvers = {
               },
             },
           });
-          console.log('Existing menber', existingMember);
+
           if (existingMember) {
             throw createServiceError(
               "Cet utilisateur est déjà membre de l'école",
@@ -101,7 +97,6 @@ export const createTeacherResolver: Resolvers = {
                   diploma: data?.diploma,
                   specialization: data?.specialization,
                   isActive: true,
-                  // Optimisation : Création des liens classes directement ici
                   classTeacher: {
                     create:
                       data?.classIds?.map((classId) => ({
@@ -120,7 +115,6 @@ export const createTeacherResolver: Resolvers = {
         };
       } catch (error) {
         console.error('Erreur création prof:', error);
-        // Si c'est déjà une ServiceError, on la laisse passer
         if ((error as any).statusCode) throw error;
         throw createServiceError(
           'Erreur lors de la création du professeur',

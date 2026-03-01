@@ -11,18 +11,33 @@ export const fetcher = <TData, TVariables>(
   options?: RequestInit['headers'],
 ) => {
   return async (): Promise<TData> => {
-    const res = await api.post<{ data: TData; errors?: any[] }>('/graphql', {
-      query,
-      variables,
-    });
+    try {
+      const res = await api.post<{ data: TData; errors?: any[] }>('/graphql', {
+        query,
+        variables,
+        options,
+      });
 
-    const { data, errors } = res.data;
+      const { data, errors } = res.data;
 
-    if (errors) {
-      const errorMessage = errors[0]?.message || 'Erreur GraphQL inconnue';
-      throw new Error(errorMessage);
+      if (errors && errors.length > 0) {
+        const errorMessage = errors[0]?.message || 'Erreur GraphQL inconnue';
+        // On peut aussi attacher les détails de l'erreur
+        const error = new Error(errorMessage);
+        (error as any).graphQLErrors = errors;
+        throw error;
+      }
+
+      return data;
+    } catch (error: any) {
+      // Gestion des erreurs Axios (Réseau, 4xx, 5xx)
+      if (error.response) {
+        // Le serveur a répondu avec un code d'erreur
+        const serverError = error.response.data?.errors?.[0]?.message || error.response.statusText;
+        throw new Error(serverError);
+      }
+      // Erreur JS ou Réseau pure
+      throw error;
     }
-
-    return data;
   };
 };

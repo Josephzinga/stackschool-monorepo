@@ -59,7 +59,7 @@ router.get('/context', isAuthenticated, async (req, res, next) => {
         message: 'Aucune école trouver',
       });
     }
-    console.log('student schoolDetails', schoolDetails.students);
+    console.log('students schoolDetails', schoolDetails.students);
     const students = schoolDetails.students.map((student) => ({
       id: student.id,
       matricule: student.matricule,

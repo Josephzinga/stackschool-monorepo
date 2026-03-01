@@ -20,7 +20,7 @@ input SchoolSearchInput {
 input StudentSearchInput {
    schoolId: ID!,
    searchTerm: String
-   getOnly: Boolean
+   getSubject: Boolean
 }
 
 input ChildInput {

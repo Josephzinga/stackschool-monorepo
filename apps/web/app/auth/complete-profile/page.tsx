@@ -1,19 +1,19 @@
 'use client';
 
 import SchoolStep from '../../../components/complete-profile/schoolStep';
-import {Container} from '@/components/Container';
+import { Container } from '@/components/Container';
 
-import {useCompleteProfileStore, useUserStore} from '@stackschool/ui';
-import {School} from '@stackschool/shared';
-import ProtectedRoute from '@/components/protected-route';
+import { useCompleteProfileStore, useUserStore } from '@stackschool/ui';
+import { School } from '@stackschool/shared';
+import ProtectedRoute from '@/components/providers/protected-route';
 import Stepper from '@/components/Stepper';
 import RoleStep from '@/components/complete-profile/RoleStep';
 import * as React from 'react';
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 import ReviewStep from '@/components/complete-profile/review-step';
-import {Card} from '@/components/ui/card';
-import {ProfileStep} from '@/components/complete-profile/profile-step';
-import {toast} from 'sonner';
+import { Card } from '@/components/ui/card';
+import { ProfileStep } from '@/components/complete-profile/profile-step';
+import { toast } from 'sonner';
 
 export type CompleteProfileData = {
   school: {

@@ -30,7 +30,6 @@ export default function RoleStep() {
   }, [isSchoolCreator]);
 
   const handleRoleSelect = (role: SchoolRole) => {
-    // Si créateur d'école, seul ADMIN est autorisé
     if (isSchoolCreator && role !== 'ADMIN') {
       toast.warning(
         "En tant que créateur de l'école, vous devez être Administrateur.",

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Search, X } from 'lucide-react';
@@ -20,7 +22,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
       <div
         className={cn(
           'relative flex items-center w-full transition-transform duration-300 ease-in-out',
-          isFocused ? 'scale-[1.01]' : 'scale-100',
+          isFocused ? 'scale-x-[1.025] scale-y-[1.05]' : 'scale-100',
           className,
         )}
       >
@@ -43,11 +45,10 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={cn(
-            'h-14 w-full rounded-full border-2 bg-background pl-14 pr-14 text-lg shadow-sm transition-all duration-300',
+            'h-14 w-full border placeholder:text-background rounded-full dark:shadow-gray-700/50 shadow-slate-300 shadow-sm! bg-linear-to-br from-blue-100/80 to-blue-200 dark:bg-linear-to-tl dark:from-gray-600 dark:to-gray-700 pl-14 pr-14 text-lg transition-all duration-300',
             'placeholder:text-muted-foreground/60',
-            'focus:border-primary focus:ring-primary/10 focus:shadow-sky-400! focus:outline-none' +
-              ' focus:shadow-xl!',
-            'hover:border-primary/30',
+            'focus:border-primary focus:outline-none',
+            'hover:border-primary/30 focus:shadow-primary focus:shadow-2xl',
             isLoading ? 'border-primary/50' : 'border-muted',
             className,
           )}

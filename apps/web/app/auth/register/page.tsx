@@ -32,8 +32,8 @@ import { toast } from 'sonner';
 import { Container } from '@/components/Container';
 import { ButtonSocial } from '@/components/button-social';
 import 'react-phone-number-input/style.css';
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
-import { useEffect, useRef, useState } from 'react';
+import PhoneInput from 'react-phone-number-input';
+import { useState } from 'react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -60,7 +60,6 @@ export default function RegisterPage() {
       toast.error(error.message || 'Une erreur est survenue.');
     }
   }
-  console.log('isValide', isValid);
 
   return (
     <Container>

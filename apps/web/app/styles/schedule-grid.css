@@ -1,0 +1,34 @@
+tr {
+    height: 35px;
+    border: none;
+}
+
+
+
+
+.fc-theme-standard td{
+    border: 2px solid var(--fc-border-color);
+}
+
+.fc-day-true {
+
+}
+.fc-timegrid-axis  {
+    background-color: var(--accent);
+}
+.fc-col-header-cell {
+    background-color: var(--accent);
+}
+
+.fc-timegrid-slot-minor {
+    border: none !important;
+}
+.fc-media-screen  {
+    border: none !important;
+}
+.fc-scrollgrid {
+    border-color: var(--color-gray-300) !important;
+}
+.fc-event-main {
+    height: 70px;
+}

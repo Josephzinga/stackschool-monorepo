@@ -1,7 +1,6 @@
 import './styles/globals.css';
 import './styles/search-input.css';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
-import { ModeToggle } from '@/components/DropMenu';
 import { Toaster } from '@/components/ui/sonner';
 import { inter, jost, poppins, sans } from '@/lib/fonts';
 import QueryProvider from '@/components/providers/queryClientProvider';
@@ -32,9 +31,6 @@ export default async function RootLayout({
               className="bg-sky-500! text-lg"
               duration={4000}
             />
-            <div className="absolute right-4 top-4">
-              <ModeToggle />
-            </div>
           </QueryProvider>
         </ThemeProvider>
       </body>

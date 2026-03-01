@@ -1,14 +1,13 @@
 import { ProfileData, RoleData, SchoolData } from '@stackschool/shared';
-import { GetMeQuery, SchoolMembership } from '@stackschool/ui/src';
+import { School, User } from '../generated/graphql';
 
 export interface UserStore {
-  user: GetMeQuery['me'] | null;
+  user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  setUser: (user: GetMeQuery['me'] | null) => void;
-  fetchUser: () => Promise<void>;
-  currentSchool: SchoolMembership | null; // Remplacez 'any' par le type School importé
-  setCurrentSchool: (school: SchoolMembership) => void;
+  setUser: (user: User | null) => void;
+  currentSchool: School | null;
+  setCurrentSchool: (school?: Omit<School, 'students' | 'teachers'>) => void;
 }
 
 export interface CompleteProfileStep {

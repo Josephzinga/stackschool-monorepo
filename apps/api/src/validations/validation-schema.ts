@@ -13,11 +13,18 @@ export const resetPasswordApiSchema = z.object({
     ),
 });
 export const validateUserFieldSchema = z.object({
-  email: z.string().email('Veuillez entrer un email valide.').optional(),
+  email: z
+    .string()
+    .email({
+      pattern: z.regexes.email,
+      message: "'Veuillez entrer un email valide.'",
+    })
+    .optional(),
   phoneNumber: z
     .string()
     .trim()
-    .regex(/^\+?[0-9]{8,15}$/, {
+    .transform((val) => val.replace(/\s+/g, ''))
+    .refine((val) => /^\+?[0-9]{8,15}$/.test(val), {
       message: 'Numéro invalide (format international recommandé, ex: +223...)',
     })
     .optional(),

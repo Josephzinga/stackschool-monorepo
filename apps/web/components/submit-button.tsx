@@ -21,7 +21,11 @@ export const SubmitButton = ({
     onClick={onClick}
     type="submit"
     disabled={isSubmitting || disabled}
-    className={cn('font-poppins font-semibold', className)}
+    className={cn(
+      'font-poppins font-semibold',
+      (isSubmitting || disabled) && 'opacity-50 cursor-not-allowed',
+      className,
+    )}
   >
     {isSubmitting ? (
       <>

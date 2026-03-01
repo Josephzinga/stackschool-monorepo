@@ -1,0 +1,52 @@
+type PaginationMeta {
+  total: Int!
+  page: Int!
+  limit: Int!
+  totalPages: Int!
+}
+
+type TeacherList {
+  data: [Teacher!]!
+  meta: PaginationMeta!
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+input CreateStudentInput {
+  firstname: String!
+  lastname: String!
+  email: String
+  gender: Gender!
+  classId: ID!
+  matricule: String!
+  birthDate: DateTime
+  birthPlace: DateTime
+  motherName: String
+  fatherName: String
+  enrollmentYear: String
+  nationality: String
+}
+input CreateTeacherInput {
+  firstname: String!
+  lastname: String!
+  email: String
+  phoneNumber: String
+  gender: Gender!
+  diploma: String
+  specialization: String!
+  classIds: [String!]
+}
+
+type StudentList {
+  data: [Student!]!
+  meta: PaginationMeta!
+}
+
+type ClassList {
+  data: [Classe!]!
+  meta: PaginationMeta!
+}
+
+

@@ -1,0 +1,108 @@
+query GetSchoolTeachers($input: GetSchoolTeachersInput) {
+  getSchoolTeachers(input: $input) {
+    meta {
+      limit
+      total
+      totalPages
+    }
+    data {
+      id
+      schoolUserId
+      supervisedClasses {
+        id
+        name
+        level
+      }
+      weeklyHours
+      specialization
+      diploma
+      departement
+      experience
+      isActive
+      user {
+        email
+        phoneNumber
+        profile {
+          firstname
+          lastname
+          photo
+          gender
+        }
+      }
+      classes {
+        id
+        name
+      }
+    }
+  }
+}
+
+query GetTeacherDetails($id: ID!, $schoolId: ID!) {
+  teacher(id: $id, schoolId: $schoolId) {
+    id
+    specialization
+    diploma
+    experience
+    bio
+    hireDate
+    salary
+    departement
+    weeklyHours
+    isActive
+    createdAt
+    user {
+      id
+      email
+      phoneNumber
+      profile {
+        firstname
+        lastname
+        photo
+        gender
+        address
+      }
+    }
+    classes {
+      id
+      name
+      level
+      _count {
+        students
+      }
+    }
+    lessons {
+      id
+      title
+      day
+      startTime
+      endTime
+      class {
+        name
+      }
+      subject {
+        name
+      }
+    }
+  }
+}
+
+mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!, $soft: Boolean) {
+  deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId, soft: $soft) {
+    ok
+    message
+  }
+}
+
+mutation CreateTeacher($data: CreateTeacherInput!, $schoolId: ID!) {
+  createListTeachers(data: $data, schoolId: $schoolId) {
+    ok
+    message
+  }
+}
+
+mutation UpdateTeacher($teacherId: ID!, $schoolId: ID!, $data: CreateTeacherInput!) {
+  updateTeacher(schoolId: $schoolId, teacherId: $teacherId, data: $data) {
+    ok
+    message
+  }
+}

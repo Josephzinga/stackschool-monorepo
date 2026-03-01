@@ -53,7 +53,7 @@ export async function upsertOauthUser({
 
     if (email) {
       const user = await prisma.user.findUnique({
-        where: { email },
+        where: { email, isActive: true },
         include: { profile: true, Account: true },
       });
       // si le user avec l'email trouvé on crée un compte
@@ -61,6 +61,7 @@ export async function upsertOauthUser({
         // supprimer le user dans redis
         clearUserFromRedis(user.id);
         // créer l'Account lié à ce user (si déjà lié, on ignore)
+
         await prisma.account.create({
           data: {
             access_token: accessToken,

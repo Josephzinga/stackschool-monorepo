@@ -36,7 +36,7 @@
 :root {
   --background: oklch(1 0 89.876);
   --foreground: oklch(0.229 0.03 259.033);
-  --card: oklch(0.923 0.004 236.501);
+  --card: oklch(0.973 0.002 247.839);
   --card-foreground: oklch(0.27 0.071 248.357);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.1884 0.0128 248.5103);
@@ -45,8 +45,8 @@
   --secondary: oklch(0.208 0.04 265.755);
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.9222 0.0013 286.3737);
-  --muted-foreground: oklch(0.208 0.04 265.755);
-  --accent: oklch(0.685 0.103 258.445);
+  --muted-foreground: oklch(0.18 0.032 266.625);
+  --accent: oklch(0.939 0.013 262.378);
   --accent-foreground: oklch(0.29 0.121 263.009);
   --destructive: oklch(0.6188 0.2376 25.7658);
   --destructive-foreground: oklch(1 0 0);
@@ -54,10 +54,12 @@
   --input: oklch(0.78 0.075 237.899);
   --ring: oklch(0.6818 0.1584 243.354);
   --chart-1: oklch(0.745 0.12 239.681);
-  --chart-2: oklch(0.6907 0.1554 160.3454);
+  --chart-2: oklch(0.805 0.114 169.222);
   --chart-3: oklch(0.8214 0.16 82.5337);
   --chart-4: oklch(0.7064 0.1822 151.7125);
-  --chart-5: oklch(0.561 0.152 264.642);
+  --chart-5: oklch(0.715 0.105 266.643);
+  --chart-6: oklch(0.653 0.259 321.875);
+
   --sidebar: oklch(0.9784 0.0011 197.1387);
   --sidebar-foreground: oklch(0.1884 0.0128 248.5103);
   --sidebar-primary: oklch(0.6723 0.1606 244.9955);
@@ -97,6 +99,41 @@
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+    --fc-small-font-size: .85em;
+    --fc-page-bg-color: #fff;
+    --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
+    --fc-neutral-text-color: #808080;
+    --fc-border-color: #518fcd;
+
+    --fc-button-text-color: #fff;
+    --fc-button-bg-color: var(--primary);
+    --fc-button-border-color: #2C3E50;
+    --fc-button-hover-bg-color: #1e2b37;
+    --fc-button-hover-border-color: #1a252f;
+    --fc-button-active-bg-color: #1a252f;
+    --fc-button-active-border-color: #151e27;
+
+    --fc-event-bg-color: #3788d8;
+    --fc-event-border-color: #3788d8;
+    --fc-event-text-color: #fff;
+    --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
+
+    --fc-more-link-bg-color: #d0d0d0;
+    --fc-more-link-text-color: inherit;
+
+    --fc-event-resizer-thickness: 8px;
+    --fc-event-resizer-dot-total-width: 8px;
+    --fc-event-resizer-dot-border-width: 1px;
+    --fc-non-business-color: rgba(215, 215, 215, 0.3);
+    --fc-bg-event-color: rgb(143, 223, 130);
+    --fc-bg-event-opacity: 0.3;
+    --fc-highlight-color: rgba(188, 232, 241, 0.3);
+    --fc-today-bg-color: rgba(189, 226, 231, 0.76);
+    --fc-now-indicator-color: red;
+
+
+
 }
 
 .dark {
@@ -108,10 +145,10 @@
   --popover-foreground: oklch(0.9328 0.0025 228.7857);
   --primary: oklch(0.6692 0.1607 245.011);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.9622 0.0035 219.5331);
+  --secondary: oklch(0.797 0.118 223.322);
   --secondary-foreground: oklch(0.1884 0.0128 248.5103);
   --muted: oklch(0.209 0 0);
-  --muted-foreground: oklch(0.5637 0.0078 247.9662);
+  --muted-foreground: oklch(0.641 0.009 247.975);
   --accent: oklch(0.1928 0.0331 242.5459);
   --accent-foreground: oklch(0.6692 0.1607 245.011);
   --destructive: oklch(0.6188 0.2376 25.7658);
@@ -120,10 +157,11 @@
   --input: oklch(0.302 0.0288 244.8244);
   --ring: oklch(0.6818 0.1584 243.354);
   --chart-1: oklch(0.6723 0.1606 244.9955);
-  --chart-2: oklch(0.6907 0.1554 160.3454);
+  --chart-2: oklch(0.349 0.024 268.604);
   --chart-3: oklch(0.8214 0.16 82.5337);
   --chart-4: oklch(0.7064 0.1822 151.7125);
-  --chart-5: oklch(0.507 0.25 287.088);
+  --chart-5: oklch(0.232 0.014 298.396);
+  --chart-6: oklch(0.603 0.273 321.173);
   --sidebar: oklch(0.2097 0.008 274.5332);
   --sidebar-foreground: oklch(0.8853 0 0);
   --sidebar-primary: oklch(0.6818 0.1584 243.354);
@@ -135,6 +173,10 @@
   --font-sans: Open Sans, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
+
+  --fc-border-color: rgb(43, 48, 54);
+  --fc-today-bg-color: rgba(77, 85, 95, 0.25);
+
   --radius: 0.75rem;
   --shadow-x: 0px;
   --shadow-y: 2px;
@@ -160,6 +202,7 @@
     0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
     0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0);
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
+
 }
 
 @theme inline {
@@ -187,6 +230,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--color-chart-6);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -299,155 +343,3 @@
   border-radius: 10px;
 }
 
-:root {
-  --si-primary: rgb(57, 184, 242); /* violet/primary */
-  --si-primary-soft: rgba(99, 102, 241, 0.12); /* soft glow */
-  --si-muted: rgba(107, 114, 128, 1); /* muted */
-  --si-bg: var(--background, #fff);
-  --si-border: var(--border);
-}
-
-/* wrapper */
-.search-input {
-  transition:
-    transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    box-shadow 220ms ease,
-    border-color 220ms ease;
-  transform-origin: center;
-  will-change: transform, box-shadow;
-}
-
-/* focus-within (works even without JS but we also keep data-focused for explicit control) */
-.search-input:focus-within,
-.search-input[data-focused='true'] {
-  transform: scale(1.02);
-  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
-}
-
-/* icon (left) — slide + color fade */
-.search-input__icon {
-  top: 50%;
-  transform: translateY(-50%) translateX(0);
-  color: var(--si-muted);
-  transition:
-    transform 260ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    color 200ms linear,
-    opacity 200ms;
-  opacity: 1;
-  z-index: 10;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* when focused, nudge icon slightly left and brighten color */
-.search-input:focus-within .search-input__icon,
-.search-input[data-focused='true'] .search-input__icon {
-  transform: translateY(-50%) translateX(-6px) scale(1.02);
-  color: var(--si-primary);
-}
-
-/* input field styling transitions */
-.search-input__field {
-  transition:
-    box-shadow 260ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    border-color 200ms linear,
-    background-color 200ms linear,
-    transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
-  border-color: var(--si-border);
-  background: var(--si-bg);
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
-/* focus ring and glow */
-.search-input:focus-within .search-input__field,
-.search-input[data-focused='true'] .search-input__field {
-  box-shadow: 0 8px 30px var(--si-primary-soft);
-  border-color: var(--si-primary);
-}
-
-/* subtle hover on input */
-.search-input__field:hover {
-  transform: translateY(-1px);
-}
-
-/* loader: keep spin + gentle fade-in/out */
-.search-input__loader {
-  opacity: 0;
-  transform: translateY(-50%) scale(0.95);
-  transition:
-    opacity 180ms linear,
-    transform 180ms cubic-bezier(0.2, 0.9, 0.2, 1);
-  will-change: opacity, transform;
-}
-
-/* show loader when present */
-.search-input__loader svg {
-  animation: search-input-spin 800ms linear infinite;
-}
-
-/* when loader exists in DOM (mounted) fade it in — we can't select "exists", but immediate presence will animate from default */
-.search-input__loader {
-  opacity: 1;
-  transform: translateY(-50%) scale(1);
-}
-
-/* clear button: appear smoothly from the right (fade + slide + scale) */
-.search-input__clear {
-  opacity: 0;
-  transform: translateX(6px) scale(0.92);
-  transition:
-    opacity 180ms ease,
-    transform 180ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    background-color 140ms;
-  pointer-events: none;
-}
-
-/* when clear is present (mounted) enable click and animate in */
-.search-input[data-has-value='true'] .search-input__clear {
-  opacity: 1;
-  transform: translateX(0) scale(1);
-  pointer-events: auto;
-}
-
-/* hover states for clear */
-.search-input__clear:hover {
-  background-color: rgba(15, 23, 42, 0.06);
-}
-
-/* small accessibility focus-visible */
-.search-input__clear:focus-visible {
-  outline: 2px solid rgba(99, 102, 241, 0.18);
-  outline-offset: 3px;
-  border-radius: 9999px;
-}
-
-/* tiny micro-interaction when the clear is clicked: scale feedback */
-.search-input__clear:active {
-  transform: translateX(0) scale(0.95);
-}
-
-/* keyframes for loader (in case the icon svg doesn't spin by tailwind) */
-@keyframes search-input-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* reduce motion preference */
-@media (prefers-reduced-motion: reduce) {
-  .search-input,
-  .search-input__icon,
-  .search-input__field,
-  .search-input__loader,
-  .search-input__clear {
-    transition: none !important;
-    animation: none !important;
-    transform: none !important;
-  }
-}

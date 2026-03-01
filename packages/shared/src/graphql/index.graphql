@@ -1,9 +1,19 @@
 type Mutation {
   confirmCompleteProfile: UserPayload
+  createListTeachers(data: CreateTeacherInput, schoolId: ID!): ApiResponse
+  updateTeacher(teacherId: ID!, data: CreateTeacherInput!, schoolId: ID!): ApiResponse
+  deleteTeachers(teacherIds: [ID!]!, schoolId: ID!, soft: Boolean = true): ApiResponse
+  deleteStudents(studentIds: [ID!]!, schoolId: ID!, soft: Boolean = true): ApiResponse
+  createListStudent(data: CreateStudentInput!, schoolId: ID!): ApiResponse
+  updateStudent(studentId: ID!, data: CreateStudentInput!, schoolId: ID!): ApiResponse
 }
 
-input SchoolIdInput {
-  id: ID!
+scalar DateTime
+
+type ApiResponse {
+  ok: Boolean
+  message: String
+  details: [String]
 }
 
 type Query {
@@ -11,6 +21,21 @@ type Query {
   searchSchool(filter: SchoolSearchInput!): [School!]
   getClassSubjects(filter: StudentSearchInput!): [Classe]
   me: User
-  schoolStats(schoolId: SchoolId): School
+  school(schoolId: ID!): School!
   verifyInvitationCode(code: InvitationCodeInput!): User
+
+  teacher(id: ID!, schoolId: ID!): Teacher
+  student(id: ID!, schoolId: ID!): Student
+
+  getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList!
+
+  getSchoolStudents(input: GetSchoolStudentsInput): StudentList!
+
+  getSchoolClasses(
+    schoolId: ID!
+    page: Int = 0
+    limit: Int = 10
+    searchTerm: String
+  ): ClassList!
+
 }

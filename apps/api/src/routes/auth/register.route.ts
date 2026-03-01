@@ -28,7 +28,6 @@ async function sendWhatsAppCode(phoneNumber: string, code: string) {
 router.post(
   '/register',
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('Request Body', req.body);
     try {
       const { data, errors, success } = safeValidateSchema(
         registerFormSchema,
@@ -45,6 +44,7 @@ router.post(
 
       const existing = await prisma.user.findFirst({
         where: {
+          isActive: true,
           OR: [{ username }, { email: safeEmail }, { phoneNumber: safePhone }],
         },
       });

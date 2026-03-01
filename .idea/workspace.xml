@@ -5,8 +5,51 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/getClassesSubjects.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/getClassesSubjects.resolver.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/school.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/school.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/data_source_mapping.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/create-student.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/create-student.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/school-students.resolver.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/list.resolver.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/teacher.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/teacher.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/types.generated.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/types.generated.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/verify-role.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/verify-role.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/server.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/auth-user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/auth-user.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/students/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/students/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/[teacherId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/[teacherId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/create-student-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/create-student-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/student-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/student-dialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/table-filter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/table-filter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/create-teacher-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/create-teacher-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-dialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-filters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-filters.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-table-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-table-actions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/index.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/index.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/list.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/list.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/admin-dashboard.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/admin-dashboard.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/student.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/student.operation.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/teacher.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/teacher.operation.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/school.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/school.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/students.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/students.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/ui/src/generated/graphql.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/generated/graphql.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/ui/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/ui/src/lib/graphql-fetcher.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/lib/graphql-fetcher.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,6 +58,14 @@
   </component>
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="GraphQL File" />
+        <option value="TypeScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -34,6 +85,10 @@
     <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/migrations/20260114230457_relation_de_la_table_student_a_school_user/migration.sql" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/photos-prisma.type.ts" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/packages/shared/src/validation/complete-profile.schema.ts" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MigrationScriptOptions">
+    <option name="ignoreImplicitObjects" value="true" />
+    <option name="ignoreSourceCode" value="false" />
   </component>
   <component name="OptimizeOnSaveOptions">
     <option name="myRunOnSave" value="true" />
@@ -56,6 +111,7 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Docker.docker-compose.yml.web: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.stackschool.executor&quot;: &quot;Debug&quot;,
     &quot;Jest.Deep Link Utils.executor&quot;: &quot;Run&quot;,
     &quot;Jest.createServiceError.executor&quot;: &quot;Run&quot;,
     &quot;Jest.great.executor&quot;: &quot;Run&quot;,
@@ -76,10 +132,10 @@
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;web&quot;,
     &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/apps/web&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/apps/web/components/school/student/table&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -93,23 +149,29 @@
     &quot;npm.mobile &gt; typecheck.executor&quot;: &quot;Run&quot;,
     &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/prettier&quot;,
     &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;Runtime.Targets.Configurable&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/web/components/school/student/table" />
       <recent name="$PROJECT_DIR$/apps/web" />
       <recent name="$PROJECT_DIR$/../E-commerce" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/packages/ui/src/lib" />
-      <recent name="$PROJECT_DIR$/packages/ui/src" />
+      <recent name="$PROJECT_DIR$/apps/web/components/school/student" />
+      <recent name="$PROJECT_DIR$/apps/web/components/complete-profile/role-form" />
+      <recent name="$PROJECT_DIR$/apps/web/components/school/teacher" />
       <recent name="$PROJECT_DIR$/packages/shared/src/graphql" />
-      <recent name="$PROJECT_DIR$/apps/web/app/styles" />
-      <recent name="$PROJECT_DIR$/apps/web/app" />
+      <recent name="$PROJECT_DIR$/apps/web/components/school" />
     </key>
   </component>
   <component name="RunManager" selected="Docker.docker-compose.yml.web: Compose Deployment">
@@ -150,6 +212,10 @@
       </test-names>
       <method v="2" />
     </configuration>
+    <configuration name="stackschool" type="JavascriptDebugType" engineId="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" uri="http://localhost:3000" useFirstLineBreakpoints="true">
+      <mapping url="http://localhost:3000" local-file="$PROJECT_DIR$/apps/web" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -179,15 +245,6 @@
       <envs />
       <method v="2" />
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Docker.docker-compose.yml.web: Compose Deployment" />
-        <item itemvalue="Jest.handleLocalAuth" />
-        <item itemvalue="Jest.great" />
-        <item itemvalue="npm.dev:web" />
-        <item itemvalue="Jest.handleLocalAuth.devrait retourner false si l'utilisateur n'est pas trouvé" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -311,6 +368,53 @@
       <workItem from="1769002425113" duration="12435000" />
       <workItem from="1769015341301" duration="1628000" />
       <workItem from="1769032670022" duration="9914000" />
+      <workItem from="1769095459580" duration="542000" />
+      <workItem from="1769096497045" duration="8761000" />
+      <workItem from="1769165476107" duration="1977000" />
+      <workItem from="1769167596461" duration="9773000" />
+      <workItem from="1769181625746" duration="10861000" />
+      <workItem from="1769201783615" duration="7469000" />
+      <workItem from="1769210088966" duration="3202000" />
+      <workItem from="1769214442653" duration="1590000" />
+      <workItem from="1769254063025" duration="17053000" />
+      <workItem from="1769277850609" duration="6157000" />
+      <workItem from="1769285511440" duration="11253000" />
+      <workItem from="1769297830486" duration="7426000" />
+      <workItem from="1769341242127" duration="3044000" />
+      <workItem from="1769360379898" duration="9030000" />
+      <workItem from="1769477406486" duration="5453000" />
+      <workItem from="1769500260450" duration="4338000" />
+      <workItem from="1769518974868" duration="1034000" />
+      <workItem from="1769559541859" duration="31000" />
+      <workItem from="1771495615307" duration="27790000" />
+      <workItem from="1771523938750" duration="12018000" />
+      <workItem from="1771549381438" duration="8125000" />
+      <workItem from="1771598453722" duration="2353000" />
+      <workItem from="1771611640927" duration="2429000" />
+      <workItem from="1771625733566" duration="21800000" />
+      <workItem from="1771652295063" duration="1660000" />
+      <workItem from="1771654079854" duration="2683000" />
+      <workItem from="1771682973920" duration="31595000" />
+      <workItem from="1771790098629" duration="9333000" />
+      <workItem from="1771810896725" duration="16676000" />
+      <workItem from="1771844667957" duration="7570000" />
+      <workItem from="1771854960219" duration="45463000" />
+      <workItem from="1771945227629" duration="152000" />
+      <workItem from="1771945491461" duration="13584000" />
+      <workItem from="1771976226138" duration="15252000" />
+      <workItem from="1771991576006" duration="4843000" />
+      <workItem from="1772053550760" duration="8790000" />
+      <workItem from="1772062543834" duration="9984000" />
+      <workItem from="1772122593088" duration="9263000" />
+      <workItem from="1772147108968" duration="10707000" />
+      <workItem from="1772158733984" duration="15402000" />
+      <workItem from="1772191634778" duration="5703000" />
+      <workItem from="1772208563619" duration="10942000" />
+      <workItem from="1772221292497" duration="24554000" />
+      <workItem from="1772288475801" duration="5555000" />
+      <workItem from="1772296633884" duration="5023000" />
+      <workItem from="1772315838298" duration="3835000" />
+      <workItem from="1772369643508" duration="394000" />
     </task>
     <servers />
   </component>

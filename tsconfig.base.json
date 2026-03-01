@@ -9,6 +9,7 @@
       "@stackschool/web/*": ["apps/web/*"],
       "@stackschool/mobile/*": ["apps/mobile/*"]
     },
+
     "composite": true,
     "declaration": true,
     "declarationMap": true,

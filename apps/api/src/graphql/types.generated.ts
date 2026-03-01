@@ -21,6 +21,7 @@ export type Scalars = {
 
 export type ApiResponse = {
   __typename?: 'ApiResponse';
+  details?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   message?: Maybe<Scalars['String']['output']>;
   ok?: Maybe<Scalars['Boolean']['output']>;
 };
@@ -84,14 +85,18 @@ export type CreateInvitationInput = {
 };
 
 export type CreateStudentInput = {
+  birthDate?: InputMaybe<Scalars['DateTime']['input']>;
+  birthPlace?: InputMaybe<Scalars['DateTime']['input']>;
   classId: Scalars['ID']['input'];
   email?: InputMaybe<Scalars['String']['input']>;
+  enrollmentYear?: InputMaybe<Scalars['String']['input']>;
   fatherName?: InputMaybe<Scalars['String']['input']>;
   firstname: Scalars['String']['input'];
   gender: Gender;
   lastname: Scalars['String']['input'];
   matricule: Scalars['String']['input'];
   motherName?: InputMaybe<Scalars['String']['input']>;
+  nationality?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateTeacherInput = {
@@ -122,6 +127,12 @@ export enum Day {
   Thursday = 'THURSDAY',
   Tuesday = 'TUESDAY',
   Wednesday = 'WEDNESDAY'
+}
+
+export enum DisciplinaryType {
+  Expulsion = 'EXPULSION',
+  Suspension = 'SUSPENSION',
+  Warning = 'WARNING'
 }
 
 export enum Gender {
@@ -187,15 +198,17 @@ export type MonthlyStats = {
 export type Mutation = {
   __typename?: 'Mutation';
   confirmCompleteProfile?: Maybe<UserPayload>;
-  createListStudent: ApiResponse;
+  createListStudent?: Maybe<ApiResponse>;
   createListTeachers?: Maybe<ApiResponse>;
-  deleteTeachers: ApiResponse;
+  deleteStudents?: Maybe<ApiResponse>;
+  deleteTeachers?: Maybe<ApiResponse>;
+  updateStudent?: Maybe<ApiResponse>;
   updateTeacher?: Maybe<ApiResponse>;
 };
 
 
 export type MutationCreateListStudentArgs = {
-  data?: InputMaybe<CreateStudentInput>;
+  data: CreateStudentInput;
   schoolId: Scalars['ID']['input'];
 };
 
@@ -206,9 +219,24 @@ export type MutationCreateListTeachersArgs = {
 };
 
 
+export type MutationDeleteStudentsArgs = {
+  schoolId: Scalars['ID']['input'];
+  soft?: InputMaybe<Scalars['Boolean']['input']>;
+  studentIds: Array<Scalars['ID']['input']>;
+};
+
+
 export type MutationDeleteTeachersArgs = {
   schoolId: Scalars['ID']['input'];
+  soft?: InputMaybe<Scalars['Boolean']['input']>;
   teacherIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationUpdateStudentArgs = {
+  data: CreateStudentInput;
+  schoolId: Scalars['ID']['input'];
+  studentId: Scalars['ID']['input'];
 };
 
 
@@ -255,6 +283,7 @@ export type Query = {
   school: School;
   searchSchool?: Maybe<Array<School>>;
   searchStudent?: Maybe<Array<Maybe<Student>>>;
+  student?: Maybe<Student>;
   teacher?: Maybe<Teacher>;
   verifyInvitationCode?: Maybe<User>;
 };
@@ -284,7 +313,7 @@ export type QueryGetSchoolTeachersArgs = {
 
 
 export type QuerySchoolArgs = {
-  schoolId: Scalars['SchoolId']['input'];
+  schoolId: Scalars['ID']['input'];
 };
 
 
@@ -298,8 +327,15 @@ export type QuerySearchStudentArgs = {
 };
 
 
+export type QueryStudentArgs = {
+  id: Scalars['ID']['input'];
+  schoolId: Scalars['ID']['input'];
+};
+
+
 export type QueryTeacherArgs = {
   id: Scalars['ID']['input'];
+  schoolId: Scalars['ID']['input'];
 };
 
 
@@ -387,12 +423,30 @@ export type Staff = {
 
 export type Student = {
   __typename?: 'Student';
-  enrollmentYear?: Maybe<Scalars['String']['output']>;
+  birthDate?: Maybe<Scalars['DateTime']['output']>;
+  birthPlace?: Maybe<Scalars['DateTime']['output']>;
+  disciplinaryActions?: Maybe<StudentDisciplinaryAction>;
+  enrollmentYear: Scalars['String']['output'];
+  fatherName?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   matricule: Scalars['String']['output'];
+  motherName?: Maybe<Scalars['String']['output']>;
+  nationality?: Maybe<Scalars['String']['output']>;
   parents?: Maybe<Array<Maybe<Parent>>>;
+  profile?: Maybe<Profile>;
   schoolClass?: Maybe<Classe>;
+  status?: Maybe<StudentStatus>;
   user?: Maybe<User>;
+};
+
+export type StudentDisciplinaryAction = {
+  __typename?: 'StudentDisciplinaryAction';
+  endDate?: Maybe<Scalars['DateTime']['output']>;
+  id?: Maybe<Scalars['String']['output']>;
+  reason?: Maybe<Scalars['String']['output']>;
+  startDate?: Maybe<Scalars['DateTime']['output']>;
+  studentId?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<DisciplinaryType>;
 };
 
 export type StudentList = {
@@ -417,6 +471,17 @@ export type StudentSortInput = {
   field?: InputMaybe<StudentSortField>;
   order?: InputMaybe<SortOrder>;
 };
+
+export enum StudentStatus {
+  Active = 'ACTIVE',
+  Deceased = 'DECEASED',
+  DroppedOut = 'DROPPED_OUT',
+  Expelled = 'EXPELLED',
+  Graduated = 'GRADUATED',
+  Inactive = 'INACTIVE',
+  Suspended = 'SUSPENDED',
+  Transferred = 'TRANSFERRED'
+}
 
 export type Subject = {
   __typename?: 'Subject';
@@ -567,6 +632,7 @@ export type ResolversTypes = ResolversObject<{
   DailyAttendance: ResolverTypeWrapper<DailyAttendance>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Day: Day;
+  DisciplinaryType: DisciplinaryType;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Gender: Gender;
   GenderStats: ResolverTypeWrapper<GenderStats>;
@@ -595,10 +661,12 @@ export type ResolversTypes = ResolversObject<{
   Staff: ResolverTypeWrapper<Staff>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Student: ResolverTypeWrapper<Student>;
+  StudentDisciplinaryAction: ResolverTypeWrapper<StudentDisciplinaryAction>;
   StudentList: ResolverTypeWrapper<StudentList>;
   StudentSearchInput: StudentSearchInput;
   StudentSortField: StudentSortField;
   StudentSortInput: StudentSortInput;
+  StudentStatus: StudentStatus;
   Subject: ResolverTypeWrapper<Subject>;
   Teacher: ResolverTypeWrapper<Teacher>;
   TeacherList: ResolverTypeWrapper<TeacherList>;
@@ -645,6 +713,7 @@ export type ResolversParentTypes = ResolversObject<{
   Staff: Staff;
   String: Scalars['String']['output'];
   Student: Student;
+  StudentDisciplinaryAction: StudentDisciplinaryAction;
   StudentList: StudentList;
   StudentSearchInput: StudentSearchInput;
   StudentSortInput: StudentSortInput;
@@ -656,6 +725,7 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type ApiResponseResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ApiResponse'] = ResolversParentTypes['ApiResponse']> = ResolversObject<{
+  details?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
 }>;
@@ -733,9 +803,11 @@ export type MonthlyStatsResolvers<ContextType = Context, ParentType extends Reso
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   confirmCompleteProfile?: Resolver<Maybe<ResolversTypes['UserPayload']>, ParentType, ContextType>;
-  createListStudent?: Resolver<ResolversTypes['ApiResponse'], ParentType, ContextType, RequireFields<MutationCreateListStudentArgs, 'schoolId'>>;
+  createListStudent?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationCreateListStudentArgs, 'data' | 'schoolId'>>;
   createListTeachers?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationCreateListTeachersArgs, 'schoolId'>>;
-  deleteTeachers?: Resolver<ResolversTypes['ApiResponse'], ParentType, ContextType, RequireFields<MutationDeleteTeachersArgs, 'schoolId' | 'teacherIds'>>;
+  deleteStudents?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationDeleteStudentsArgs, 'schoolId' | 'soft' | 'studentIds'>>;
+  deleteTeachers?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationDeleteTeachersArgs, 'schoolId' | 'soft' | 'teacherIds'>>;
+  updateStudent?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationUpdateStudentArgs, 'data' | 'schoolId' | 'studentId'>>;
   updateTeacher?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationUpdateTeacherArgs, 'data' | 'schoolId' | 'teacherId'>>;
 }>;
 
@@ -772,7 +844,8 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   school?: Resolver<ResolversTypes['School'], ParentType, ContextType, RequireFields<QuerySchoolArgs, 'schoolId'>>;
   searchSchool?: Resolver<Maybe<Array<ResolversTypes['School']>>, ParentType, ContextType, RequireFields<QuerySearchSchoolArgs, 'filter'>>;
   searchStudent?: Resolver<Maybe<Array<Maybe<ResolversTypes['Student']>>>, ParentType, ContextType, RequireFields<QuerySearchStudentArgs, 'filter'>>;
-  teacher?: Resolver<Maybe<ResolversTypes['Teacher']>, ParentType, ContextType, RequireFields<QueryTeacherArgs, 'id'>>;
+  student?: Resolver<Maybe<ResolversTypes['Student']>, ParentType, ContextType, RequireFields<QueryStudentArgs, 'id' | 'schoolId'>>;
+  teacher?: Resolver<Maybe<ResolversTypes['Teacher']>, ParentType, ContextType, RequireFields<QueryTeacherArgs, 'id' | 'schoolId'>>;
   verifyInvitationCode?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryVerifyInvitationCodeArgs, 'code'>>;
 }>;
 
@@ -823,12 +896,29 @@ export type StaffResolvers<ContextType = Context, ParentType extends ResolversPa
 }>;
 
 export type StudentResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Student'] = ResolversParentTypes['Student']> = ResolversObject<{
-  enrollmentYear?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  birthDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  birthPlace?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  disciplinaryActions?: Resolver<Maybe<ResolversTypes['StudentDisciplinaryAction']>, ParentType, ContextType>;
+  enrollmentYear?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  fatherName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   matricule?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  motherName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  nationality?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   parents?: Resolver<Maybe<Array<Maybe<ResolversTypes['Parent']>>>, ParentType, ContextType>;
+  profile?: Resolver<Maybe<ResolversTypes['Profile']>, ParentType, ContextType>;
   schoolClass?: Resolver<Maybe<ResolversTypes['Classe']>, ParentType, ContextType>;
+  status?: Resolver<Maybe<ResolversTypes['StudentStatus']>, ParentType, ContextType>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+}>;
+
+export type StudentDisciplinaryActionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['StudentDisciplinaryAction'] = ResolversParentTypes['StudentDisciplinaryAction']> = ResolversObject<{
+  endDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  reason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  startDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  studentId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['DisciplinaryType']>, ParentType, ContextType>;
 }>;
 
 export type StudentListResolvers<ContextType = Context, ParentType extends ResolversParentTypes['StudentList'] = ResolversParentTypes['StudentList']> = ResolversObject<{
@@ -910,6 +1000,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   SchoolStats?: SchoolStatsResolvers<ContextType>;
   Staff?: StaffResolvers<ContextType>;
   Student?: StudentResolvers<ContextType>;
+  StudentDisciplinaryAction?: StudentDisciplinaryActionResolvers<ContextType>;
   StudentList?: StudentListResolvers<ContextType>;
   Subject?: SubjectResolvers<ContextType>;
   Teacher?: TeacherResolvers<ContextType>;

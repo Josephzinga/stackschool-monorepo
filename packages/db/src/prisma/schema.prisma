@@ -16,6 +16,7 @@ model User {
   updatedAt         DateTime            @updatedAt
   deletedAt         DateTime?
   emailVerifiedAt   DateTime?
+  isActive          Boolean             @default(true)
   emailVerified     Boolean?            @default(false)
   hasMembership     Boolean?            @default(false)
   profileCompleted  Boolean?            @default(false)
@@ -186,7 +187,7 @@ model ClassTeacher {
 /// *
 /// * Etudiant
 model Student {
-  id             String    @id @default(cuid())
+  id             String        @id @default(cuid())
   matricule      String
   enrollmentYear String
   birthDate      DateTime
@@ -195,25 +196,45 @@ model Student {
   fatherName     String?
   motherName     String?
   nationality    String?
+  status         StudentStatus @default(ACTIVE)
 
-  profileId     String             @unique
-  schoolUserId  String             @unique
-  schoolId      String
-  classId       String?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  attendances   Attendance[]
-  parentStudent ParentStudent[]
-  schoolClass   Class?             @relation(fields: [classId], references: [id])
-  profile       Profile            @relation(fields: [profileId], references: [id])
-  school        School             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  schoolUser    SchoolUser         @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
-  payments      Payment[]
-  results       AssessmentResult[]
+  profileId          String                      @unique
+  schoolUserId       String                      @unique
+  schoolId           String
+  classId            String?
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @updatedAt
+  attendances        Attendance[]
+  parentStudent      ParentStudent[]
+  schoolClass        Class?                      @relation(fields: [classId], references: [id])
+  profile            Profile                     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  school             School                      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser         SchoolUser                  @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  discipinaryActions StudentDisciplinaryAction[]
+  payments           Payment[]
+  results            AssessmentResult[]
 
   @@unique([matricule, schoolId])
   @@index([schoolUserId])
   @@index([schoolId])
+}
+
+model StudentDisciplinaryAction {
+  id        String  @id @default(cuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  type      DisciplinaryType
+  reason    String
+  startDate DateTime
+  endDate   DateTime?
+  createdAt DateTime         @default(now())
+}
+
+enum DisciplinaryType {
+  SUSPENSION
+  EXPULSION
+  WARNING
 }
 
 /// *
@@ -488,6 +509,7 @@ model Teacher {
   specialization    String?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
+  deletedAt         DateTime? // Ajout du champ deletedAt
   attendance        Attendance[]
   classTeacher      ClassTeacher[]
   Subject           Subject[]
@@ -586,6 +608,17 @@ enum PaymentStatus {
   FAILED
   CANCELLED
   REFUNDED
+}
+
+enum StudentStatus {
+  ACTIVE
+  SUSPENDED
+  EXPELLED
+  TRANSFERRED
+  DROPPED_OUT
+  GRADUATED
+  INACTIVE
+  DECEASED
 }
 
 enum PaymentType {

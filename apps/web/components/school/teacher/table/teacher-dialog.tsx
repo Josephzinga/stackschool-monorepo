@@ -17,7 +17,7 @@ export function TeacherDialog({
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
-  defaultValues: CreateTeacherValues;
+  defaultValues?: CreateTeacherValues;
 }) {
   const handleSuccess = () => {
     setOpen(false);

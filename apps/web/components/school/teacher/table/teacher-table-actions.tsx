@@ -14,18 +14,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { toast } from 'sonner';
+import * as React from 'react';
 import { useState } from 'react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { TeacherDialog } from '@/components/school/teacher/table/teacher-dialog';
+import { AppAlertDialog } from '@/components/app-alert-dialog';
 
 export function TeacherTableActions({ row }: { row: Row<Teacher> }) {
   const teacherId = row.original.id;
@@ -68,8 +60,6 @@ export function TeacherTableActions({ row }: { row: Row<Teacher> }) {
     }
   };
 
-  const handleEdit = async () => {};
-
   return (
     <>
       <DropdownMenu>
@@ -100,30 +90,16 @@ export function TeacherTableActions({ row }: { row: Row<Teacher> }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. Elle supprimera définitivement ce
-              professeur et toutes les données associées de l'école.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault();
-                handleDelete();
-              }}
-              disabled={isPending}
-              variant="destructive"
-            >
-              {isPending ? 'Suppression...' : 'Supprimer'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AppAlertDialog
+        open={openDeleteAlert}
+        onOpenChange={setOpenDeleteAlert}
+        isLoading={isPending}
+        title="Êtes-vous absolument sûr ?"
+        description="Cette action est irréversible. Elle supprimera définitivement ce professeur et toutes les données associées de l'école."
+        onConfirm={handleDelete}
+        cancelLabel="Annuler"
+        confirmLabel="Supprimer"
+      />
 
       <TeacherDialog
         open={openEditDialog}

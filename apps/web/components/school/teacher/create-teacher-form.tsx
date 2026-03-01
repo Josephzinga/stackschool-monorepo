@@ -84,7 +84,7 @@ export function CreateTeacherForm({
       email: editDefaultValues?.email || '',
       phoneNumber: editDefaultValues?.phoneNumber || '',
       diploma: editDefaultValues?.diploma || '',
-      specialization: editDefaultValues?.speciality?.join(','),
+      specialization: editDefaultValues?.specialization?.join(','),
     },
   });
 
@@ -194,7 +194,7 @@ export function CreateTeacherForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
         <Field>
           <FieldLabel>Prénom</FieldLabel>
           <Input
@@ -217,7 +217,7 @@ export function CreateTeacherForm({
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
           <Controller
@@ -233,7 +233,7 @@ export function CreateTeacherForm({
                 icon={Mail}
                 placeholder="jean.dupont@ecole.com"
                 onBlur={() => {
-                  verifiedField('email', watch('email'));
+                  verifiedField('email', watch('email') || '');
                   onBlur?.();
                 }}
               />
@@ -270,7 +270,7 @@ export function CreateTeacherForm({
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
         <Field>
           <FieldLabel>Diplôme</FieldLabel>
           <Input

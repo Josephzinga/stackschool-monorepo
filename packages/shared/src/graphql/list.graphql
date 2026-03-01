@@ -21,8 +21,12 @@ input CreateStudentInput {
   gender: Gender!
   classId: ID!
   matricule: String!
-  fatherName: String
+  birthDate: DateTime
+  birthPlace: DateTime
   motherName: String
+  fatherName: String
+  enrollmentYear: String
+  nationality: String
 }
 input CreateTeacherInput {
   firstname: String!

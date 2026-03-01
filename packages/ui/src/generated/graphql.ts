@@ -20,6 +20,7 @@ export type Scalars = {
 
 export type ApiResponse = {
   __typename?: 'ApiResponse';
+  details?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   message?: Maybe<Scalars['String']['output']>;
   ok?: Maybe<Scalars['Boolean']['output']>;
 };
@@ -83,14 +84,18 @@ export type CreateInvitationInput = {
 };
 
 export type CreateStudentInput = {
+  birthDate?: InputMaybe<Scalars['DateTime']['input']>;
+  birthPlace?: InputMaybe<Scalars['DateTime']['input']>;
   classId: Scalars['ID']['input'];
   email?: InputMaybe<Scalars['String']['input']>;
+  enrollmentYear?: InputMaybe<Scalars['String']['input']>;
   fatherName?: InputMaybe<Scalars['String']['input']>;
   firstname: Scalars['String']['input'];
   gender: Gender;
   lastname: Scalars['String']['input'];
   matricule: Scalars['String']['input'];
   motherName?: InputMaybe<Scalars['String']['input']>;
+  nationality?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateTeacherInput = {
@@ -121,6 +126,12 @@ export enum Day {
   Thursday = 'THURSDAY',
   Tuesday = 'TUESDAY',
   Wednesday = 'WEDNESDAY'
+}
+
+export enum DisciplinaryType {
+  Expulsion = 'EXPULSION',
+  Suspension = 'SUSPENSION',
+  Warning = 'WARNING'
 }
 
 export enum Gender {
@@ -186,15 +197,17 @@ export type MonthlyStats = {
 export type Mutation = {
   __typename?: 'Mutation';
   confirmCompleteProfile?: Maybe<UserPayload>;
-  createListStudent: ApiResponse;
+  createListStudent?: Maybe<ApiResponse>;
   createListTeachers?: Maybe<ApiResponse>;
-  deleteTeachers: ApiResponse;
+  deleteStudents?: Maybe<ApiResponse>;
+  deleteTeachers?: Maybe<ApiResponse>;
+  updateStudent?: Maybe<ApiResponse>;
   updateTeacher?: Maybe<ApiResponse>;
 };
 
 
 export type MutationCreateListStudentArgs = {
-  data?: InputMaybe<CreateStudentInput>;
+  data: CreateStudentInput;
   schoolId: Scalars['ID']['input'];
 };
 
@@ -205,9 +218,24 @@ export type MutationCreateListTeachersArgs = {
 };
 
 
+export type MutationDeleteStudentsArgs = {
+  schoolId: Scalars['ID']['input'];
+  soft?: InputMaybe<Scalars['Boolean']['input']>;
+  studentIds: Array<Scalars['ID']['input']>;
+};
+
+
 export type MutationDeleteTeachersArgs = {
   schoolId: Scalars['ID']['input'];
+  soft?: InputMaybe<Scalars['Boolean']['input']>;
   teacherIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationUpdateStudentArgs = {
+  data: CreateStudentInput;
+  schoolId: Scalars['ID']['input'];
+  studentId: Scalars['ID']['input'];
 };
 
 
@@ -254,6 +282,7 @@ export type Query = {
   school: School;
   searchSchool?: Maybe<Array<School>>;
   searchStudent?: Maybe<Array<Maybe<Student>>>;
+  student?: Maybe<Student>;
   teacher?: Maybe<Teacher>;
   verifyInvitationCode?: Maybe<User>;
 };
@@ -283,7 +312,7 @@ export type QueryGetSchoolTeachersArgs = {
 
 
 export type QuerySchoolArgs = {
-  schoolId: Scalars['SchoolId']['input'];
+  schoolId: Scalars['ID']['input'];
 };
 
 
@@ -297,8 +326,15 @@ export type QuerySearchStudentArgs = {
 };
 
 
+export type QueryStudentArgs = {
+  id: Scalars['ID']['input'];
+  schoolId: Scalars['ID']['input'];
+};
+
+
 export type QueryTeacherArgs = {
   id: Scalars['ID']['input'];
+  schoolId: Scalars['ID']['input'];
 };
 
 
@@ -386,12 +422,30 @@ export type Staff = {
 
 export type Student = {
   __typename?: 'Student';
-  enrollmentYear?: Maybe<Scalars['String']['output']>;
+  birthDate?: Maybe<Scalars['DateTime']['output']>;
+  birthPlace?: Maybe<Scalars['DateTime']['output']>;
+  disciplinaryActions?: Maybe<StudentDisciplinaryAction>;
+  enrollmentYear: Scalars['String']['output'];
+  fatherName?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   matricule: Scalars['String']['output'];
+  motherName?: Maybe<Scalars['String']['output']>;
+  nationality?: Maybe<Scalars['String']['output']>;
   parents?: Maybe<Array<Maybe<Parent>>>;
+  profile?: Maybe<Profile>;
   schoolClass?: Maybe<Classe>;
+  status?: Maybe<StudentStatus>;
   user?: Maybe<User>;
+};
+
+export type StudentDisciplinaryAction = {
+  __typename?: 'StudentDisciplinaryAction';
+  endDate?: Maybe<Scalars['DateTime']['output']>;
+  id?: Maybe<Scalars['String']['output']>;
+  reason?: Maybe<Scalars['String']['output']>;
+  startDate?: Maybe<Scalars['DateTime']['output']>;
+  studentId?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<DisciplinaryType>;
 };
 
 export type StudentList = {
@@ -416,6 +470,17 @@ export type StudentSortInput = {
   field?: InputMaybe<StudentSortField>;
   order?: InputMaybe<SortOrder>;
 };
+
+export enum StudentStatus {
+  Active = 'ACTIVE',
+  Deceased = 'DECEASED',
+  DroppedOut = 'DROPPED_OUT',
+  Expelled = 'EXPELLED',
+  Graduated = 'GRADUATED',
+  Inactive = 'INACTIVE',
+  Suspended = 'SUSPENDED',
+  Transferred = 'TRANSFERRED'
+}
 
 export type Subject = {
   __typename?: 'Subject';
@@ -478,7 +543,7 @@ export type UserPayload = {
 };
 
 export type GetAdminDashboardStatsQueryVariables = Exact<{
-  schoolId: Scalars['SchoolId']['input'];
+  schoolId: Scalars['ID']['input'];
 }>;
 
 
@@ -527,7 +592,41 @@ export type GetSchoolStudentsQueryVariables = Exact<{
 }>;
 
 
-export type GetSchoolStudentsQuery = { __typename?: 'Query', getSchoolStudents: { __typename?: 'StudentList', meta: { __typename?: 'PaginationMeta', total: number, totalPages: number, limit: number, page: number }, data: Array<{ __typename?: 'Student', id: string, matricule: string, enrollmentYear?: string | null, user?: { __typename?: 'User', id: string, email: string, phoneNumber?: string | null, profile?: { __typename?: 'Profile', id: string, photo?: string | null, firstname: string, lastname: string, address?: string | null } | null } | null, parents?: Array<{ __typename?: 'Parent', id: string } | null> | null, schoolClass?: { __typename?: 'Classe', id: string, name: string, section?: string | null, level: string } | null }> } };
+export type GetSchoolStudentsQuery = { __typename?: 'Query', getSchoolStudents: { __typename?: 'StudentList', meta: { __typename?: 'PaginationMeta', total: number, totalPages: number, limit: number, page: number }, data: Array<{ __typename?: 'Student', id: string, matricule: string, enrollmentYear: string, user?: { __typename?: 'User', id: string, email: string, phoneNumber?: string | null, profile?: { __typename?: 'Profile', id: string, photo?: string | null, firstname: string, lastname: string, address?: string | null } | null } | null, parents?: Array<{ __typename?: 'Parent', id: string } | null> | null, schoolClass?: { __typename?: 'Classe', id: string, name: string, section?: string | null, level: string } | null }> } };
+
+export type GetStudentDetailsQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  schoolId: Scalars['ID']['input'];
+}>;
+
+
+export type GetStudentDetailsQuery = { __typename?: 'Query', student?: { __typename?: 'Student', id: string, matricule: string, enrollmentYear: string, birthDate?: any | null, birthPlace?: any | null, nationality?: string | null, fatherName?: string | null, motherName?: string | null, status?: StudentStatus | null, schoolClass?: { __typename?: 'Classe', id: string, name: string, section?: string | null, level: string } | null, user?: { __typename?: 'User', id: string, phoneNumber?: string | null, email: string, username: string } | null, profile?: { __typename?: 'Profile', id: string, firstname: string, lastname: string, gender?: string | null, photo?: string | null, address?: string | null } | null } | null };
+
+export type UpdateStudentMutationVariables = Exact<{
+  studentId: Scalars['ID']['input'];
+  data: CreateStudentInput;
+  schoolId: Scalars['ID']['input'];
+}>;
+
+
+export type UpdateStudentMutation = { __typename?: 'Mutation', updateStudent?: { __typename?: 'ApiResponse', ok?: boolean | null, message?: string | null } | null };
+
+export type CreateListStudentMutationVariables = Exact<{
+  schoolId: Scalars['ID']['input'];
+  data: CreateStudentInput;
+}>;
+
+
+export type CreateListStudentMutation = { __typename?: 'Mutation', createListStudent?: { __typename?: 'ApiResponse', ok?: boolean | null, message?: string | null } | null };
+
+export type DeleteStudentsMutationVariables = Exact<{
+  schoolId: Scalars['ID']['input'];
+  studentIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  soft?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type DeleteStudentsMutation = { __typename?: 'Mutation', deleteStudents?: { __typename?: 'ApiResponse', ok?: boolean | null, message?: string | null } | null };
 
 export type GetSchoolTeachersQueryVariables = Exact<{
   input?: InputMaybe<GetSchoolTeachersInput>;
@@ -538,6 +637,7 @@ export type GetSchoolTeachersQuery = { __typename?: 'Query', getSchoolTeachers: 
 
 export type GetTeacherDetailsQueryVariables = Exact<{
   id: Scalars['ID']['input'];
+  schoolId: Scalars['ID']['input'];
 }>;
 
 
@@ -546,10 +646,11 @@ export type GetTeacherDetailsQuery = { __typename?: 'Query', teacher?: { __typen
 export type DeleteTeachersMutationVariables = Exact<{
   teacherIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
   schoolId: Scalars['ID']['input'];
+  soft?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
-export type DeleteTeachersMutation = { __typename?: 'Mutation', deleteTeachers: { __typename?: 'ApiResponse', ok?: boolean | null, message?: string | null } };
+export type DeleteTeachersMutation = { __typename?: 'Mutation', deleteTeachers?: { __typename?: 'ApiResponse', ok?: boolean | null, message?: string | null } | null };
 
 export type CreateTeacherMutationVariables = Exact<{
   data: CreateTeacherInput;
@@ -571,7 +672,7 @@ export type UpdateTeacherMutation = { __typename?: 'Mutation', updateTeacher?: {
 
 
 export const GetAdminDashboardStatsDocument = `
-    query GetAdminDashboardStats($schoolId: SchoolId!) {
+    query GetAdminDashboardStats($schoolId: ID!) {
   school(schoolId: $schoolId) {
     id
     name
@@ -1131,6 +1232,159 @@ useInfiniteGetSchoolStudentsQuery.getKey = (variables?: GetSchoolStudentsQueryVa
 
 useGetSchoolStudentsQuery.fetcher = (variables?: GetSchoolStudentsQueryVariables, options?: RequestInit['headers']) => fetcher<GetSchoolStudentsQuery, GetSchoolStudentsQueryVariables>(GetSchoolStudentsDocument, variables, options);
 
+export const GetStudentDetailsDocument = `
+    query GetStudentDetails($id: ID!, $schoolId: ID!) {
+  student(id: $id, schoolId: $schoolId) {
+    id
+    matricule
+    enrollmentYear
+    birthDate
+    birthPlace
+    nationality
+    fatherName
+    motherName
+    status
+    schoolClass {
+      id
+      name
+      section
+      level
+    }
+    user {
+      id
+      phoneNumber
+      email
+      username
+    }
+    profile {
+      id
+      firstname
+      lastname
+      gender
+      photo
+      address
+    }
+  }
+}
+    `;
+
+export const useGetStudentDetailsQuery = <
+      TData = GetStudentDetailsQuery,
+      TError = unknown
+    >(
+      variables: GetStudentDetailsQueryVariables,
+      options?: Omit<UseQueryOptions<GetStudentDetailsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetStudentDetailsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetStudentDetailsQuery, TError, TData>(
+      {
+    queryKey: ['GetStudentDetails', variables],
+    queryFn: fetcher<GetStudentDetailsQuery, GetStudentDetailsQueryVariables>(GetStudentDetailsDocument, variables),
+    ...options
+  }
+    )};
+
+useGetStudentDetailsQuery.getKey = (variables: GetStudentDetailsQueryVariables) => ['GetStudentDetails', variables];
+
+export const useInfiniteGetStudentDetailsQuery = <
+      TData = InfiniteData<GetStudentDetailsQuery>,
+      TError = unknown
+    >(
+      variables: GetStudentDetailsQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetStudentDetailsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetStudentDetailsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetStudentDetailsQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetStudentDetails.infinite', variables],
+      queryFn: (metaData) => fetcher<GetStudentDetailsQuery, GetStudentDetailsQueryVariables>(GetStudentDetailsDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetStudentDetailsQuery.getKey = (variables: GetStudentDetailsQueryVariables) => ['GetStudentDetails.infinite', variables];
+
+
+useGetStudentDetailsQuery.fetcher = (variables: GetStudentDetailsQueryVariables, options?: RequestInit['headers']) => fetcher<GetStudentDetailsQuery, GetStudentDetailsQueryVariables>(GetStudentDetailsDocument, variables, options);
+
+export const UpdateStudentDocument = `
+    mutation UpdateStudent($studentId: ID!, $data: CreateStudentInput!, $schoolId: ID!) {
+  updateStudent(studentId: $studentId, data: $data, schoolId: $schoolId) {
+    ok
+    message
+  }
+}
+    `;
+
+export const useUpdateStudentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateStudentMutation, TError, UpdateStudentMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateStudentMutation, TError, UpdateStudentMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateStudent'],
+    mutationFn: (variables?: UpdateStudentMutationVariables) => fetcher<UpdateStudentMutation, UpdateStudentMutationVariables>(UpdateStudentDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useUpdateStudentMutation.fetcher = (variables: UpdateStudentMutationVariables, options?: RequestInit['headers']) => fetcher<UpdateStudentMutation, UpdateStudentMutationVariables>(UpdateStudentDocument, variables, options);
+
+export const CreateListStudentDocument = `
+    mutation CreateListStudent($schoolId: ID!, $data: CreateStudentInput!) {
+  createListStudent(schoolId: $schoolId, data: $data) {
+    ok
+    message
+  }
+}
+    `;
+
+export const useCreateListStudentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateListStudentMutation, TError, CreateListStudentMutationVariables, TContext>) => {
+    
+    return useMutation<CreateListStudentMutation, TError, CreateListStudentMutationVariables, TContext>(
+      {
+    mutationKey: ['CreateListStudent'],
+    mutationFn: (variables?: CreateListStudentMutationVariables) => fetcher<CreateListStudentMutation, CreateListStudentMutationVariables>(CreateListStudentDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useCreateListStudentMutation.fetcher = (variables: CreateListStudentMutationVariables, options?: RequestInit['headers']) => fetcher<CreateListStudentMutation, CreateListStudentMutationVariables>(CreateListStudentDocument, variables, options);
+
+export const DeleteStudentsDocument = `
+    mutation DeleteStudents($schoolId: ID!, $studentIds: [ID!]!, $soft: Boolean) {
+  deleteStudents(schoolId: $schoolId, studentIds: $studentIds, soft: $soft) {
+    ok
+    message
+  }
+}
+    `;
+
+export const useDeleteStudentsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteStudentsMutation, TError, DeleteStudentsMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteStudentsMutation, TError, DeleteStudentsMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteStudents'],
+    mutationFn: (variables?: DeleteStudentsMutationVariables) => fetcher<DeleteStudentsMutation, DeleteStudentsMutationVariables>(DeleteStudentsDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useDeleteStudentsMutation.fetcher = (variables: DeleteStudentsMutationVariables, options?: RequestInit['headers']) => fetcher<DeleteStudentsMutation, DeleteStudentsMutationVariables>(DeleteStudentsDocument, variables, options);
+
 export const GetSchoolTeachersDocument = `
     query GetSchoolTeachers($input: GetSchoolTeachersInput) {
   getSchoolTeachers(input: $input) {
@@ -1215,8 +1469,8 @@ useInfiniteGetSchoolTeachersQuery.getKey = (variables?: GetSchoolTeachersQueryVa
 useGetSchoolTeachersQuery.fetcher = (variables?: GetSchoolTeachersQueryVariables, options?: RequestInit['headers']) => fetcher<GetSchoolTeachersQuery, GetSchoolTeachersQueryVariables>(GetSchoolTeachersDocument, variables, options);
 
 export const GetTeacherDetailsDocument = `
-    query GetTeacherDetails($id: ID!) {
-  teacher(id: $id) {
+    query GetTeacherDetails($id: ID!, $schoolId: ID!) {
+  teacher(id: $id, schoolId: $schoolId) {
     id
     specialization
     diploma
@@ -1308,8 +1562,8 @@ useInfiniteGetTeacherDetailsQuery.getKey = (variables: GetTeacherDetailsQueryVar
 useGetTeacherDetailsQuery.fetcher = (variables: GetTeacherDetailsQueryVariables, options?: RequestInit['headers']) => fetcher<GetTeacherDetailsQuery, GetTeacherDetailsQueryVariables>(GetTeacherDetailsDocument, variables, options);
 
 export const DeleteTeachersDocument = `
-    mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!) {
-  deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId) {
+    mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!, $soft: Boolean) {
+  deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId, soft: $soft) {
     ok
     message
   }

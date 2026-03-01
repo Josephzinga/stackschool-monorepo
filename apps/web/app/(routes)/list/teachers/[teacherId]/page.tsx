@@ -14,7 +14,6 @@ import {
   Briefcase,
   Edit,
   GraduationCap,
-  LucideIcon,
   Mail,
   MapPin,
   Phone,
@@ -29,7 +28,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/animate-ui/components/radix/tabs';
-import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import {
   AlertDialog,
@@ -45,6 +43,7 @@ import { toast } from 'sonner';
 import TimeGrid from '@/components/school/teacher/schedule-grid';
 import ClassesSection from '@/components/school/teacher/classes-section';
 import { ChartRadialPerformance } from '@/components/school/teacher/chart-performance';
+import { InfoItem } from '@/components/school/info-item';
 
 const shortHands = [
   { value: 'classes', label: 'Classes', href: '/list/classes' },
@@ -61,7 +60,7 @@ export default function TeacherDetailsPage() {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const { data, isLoading, error } = useGetTeacherDetailsQuery(
-    { id: teacherId },
+    { id: teacherId, schoolId: currentSchool?.id! },
     { enabled: !!teacherId },
   );
 
@@ -156,33 +155,32 @@ export default function TeacherDetailsPage() {
               </Avatar>
             </div>
             <div className="w-full space-y-2 md:space-y-4">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">
-                  {profile?.firstname} {profile?.lastname}
-                </h1>
-                <p className="text-muted-foreground text-sm md:text-base">
-                  {teacher.specialization || 'Enseignant'}
-                </p>
-              </div>
+              <h1 className="text-2xl md:text-3xl font-bold">
+                {profile?.firstname} {profile?.lastname}
+              </h1>
+              <p className="text-muted-foreground text-sm md:text-base">
+                {teacher.specialization || 'Enseignant'}
+              </p>
+
               <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2 gap-2 w-full pr-1">
-                  <Item icon={Phone}>
+                  <InfoItem icon={Phone}>
                     {teacher.user?.phoneNumber || 'Non renseigné'}
-                  </Item>
-                  <Item icon={Mail}>
+                  </InfoItem>
+                  <InfoItem icon={Mail}>
                     {teacher.user?.email || 'Non renseigné'}
-                  </Item>
-                  <Item icon={MapPin}>
+                  </InfoItem>
+                  <InfoItem icon={MapPin}>
                     {profile?.address || 'Adresse non renseignée'}
-                  </Item>
-                  <Item icon={ActivityIcon}>
+                  </InfoItem>
+                  <InfoItem icon={ActivityIcon}>
                     <Badge
                       variant={teacher.isActive ? 'default' : 'secondary'}
                       className="h-5 text-xs px-2"
                     >
                       {teacher.isActive ? 'Actif' : 'Inactif'}
                     </Badge>
-                  </Item>
+                  </InfoItem>
                 </div>
               </div>
             </div>
@@ -345,35 +343,6 @@ export default function TeacherDetailsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
-}
-
-function Item({
-  children,
-  icon: Icon,
-  className,
-  iconClassName,
-}: {
-  children: React.ReactNode;
-  icon: LucideIcon;
-  className?: string;
-  iconClassName?: string;
-}) {
-  if (!children) return null;
-  return (
-    <div className="flex items-center gap-1 xl:gap-3">
-      <div className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
-        <Icon className={cn('h-4 w-4 text-slate-600', iconClassName)} />
-      </div>
-      <p
-        className={cn(
-          'text-sm text-wrap font-medium text-slate-700 dark:text-slate-200',
-          className,
-        )}
-      >
-        {children}
-      </p>
     </div>
   );
 }

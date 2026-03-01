@@ -36,7 +36,7 @@ function StudentView() {
       searchTerm: search,
     },
   });
-  console.log('sort', filters);
+
   const StudentsData: StudentColumns[] =
     data?.getSchoolStudents?.data.map((s) => ({
       id: s.id,

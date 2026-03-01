@@ -2,7 +2,7 @@ import * as bcrypt from 'bcryptjs';
 import { VerifyCallback } from 'passport-google-oauth20';
 import { prisma } from '../lib/prisma';
 import { loginFormSchema } from '@stackschool/shared';
-import { safeValidateSchema } from '../utils/validate-schema.util'; // On garde l'ancien validateur pour l'instant si safeValidate n'est pas prêt
+import { safeValidateSchema } from '../utils/validate-schema.util';
 import { analyzeUserAccounts } from '../utils/account-analysis.util';
 
 /**
@@ -38,6 +38,7 @@ export default async function handleLocalAuth(
     // Recherche de l'utilisateur
     const user = await prisma.user.findFirst({
       where: {
+        isActive: true,
         OR: [
           { email: { equals: input, mode: 'insensitive' } },
           { phoneNumber: input },

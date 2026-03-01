@@ -62,8 +62,6 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     if (width < 640) {
       setColumnVisibility({
-        select: false,
-        email: false,
         phoneNumber: false,
         classes: false,
         specialization: false,
@@ -72,7 +70,6 @@ export function DataTable<TData, TValue>({
     } else if (width < 1024) {
       setColumnVisibility({
         select: true,
-        email: false,
         phoneNumber: false,
         classes: false,
         specialization: true,
@@ -112,7 +109,7 @@ export function DataTable<TData, TValue>({
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="flex h-full justify-between items-center flex-row animate-pulse px-4 w-full h-14 even:bg-slate-50 dark:even:bg-slate-950"
+                className="flex justify-between items-center flex-row animate-pulse px-4 w-full h-14 even:bg-slate-50 dark:even:bg-slate-950"
               >
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="h-5 w-25 bg-slate-700 rounded-sm" />

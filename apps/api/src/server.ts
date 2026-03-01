@@ -19,6 +19,8 @@ import graphqlMiddleware from './graphql';
 import { isAuthenticated } from './middlewares/auth';
 import routes from './routes';
 import { express as useragent } from 'express-useragent';
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
 
 config();
 
@@ -33,6 +35,9 @@ const pgPool = new pg.Pool({
 });
 
 const app = express();
+const httpServer = createServer(app);
+export const io = new Server(httpServer);
+
 app.use(helmet());
 const allowedOrigins = FRONTEND_ORIGIN;
 
@@ -129,7 +134,7 @@ passport.use(
 app.use('/api', routes);
 app.all('/graphql', isAuthenticated, graphqlMiddleware);
 app.get('/', (req, res) => {
-  res.json('message serveur connecter');
+  res.sendFile(path.resolve(__dirname, './index.html'));
 });
 
 app.use(express.static(path.resolve(process.cwd(), 'public')));
@@ -137,6 +142,6 @@ app.use(express.static(path.resolve(process.cwd(), 'public')));
 // Gestionnaire d'erreur centralisée
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`server is running on port http://localhost:${PORT}`);
 });

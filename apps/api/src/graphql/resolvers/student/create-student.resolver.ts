@@ -15,31 +15,100 @@ export const createStudentResolver: Resolvers = {
         if (!schoolId) {
           throw createServiceError('identifiant manquant');
         }
+        const birthDate = data.birthDate ? new Date(data.birthDate) : null;
+        const {
+          data: validData,
+          errors,
+          success,
+        } = safeValidateSchema(createStudentSchema, { ...data, birthDate });
 
-        const result = safeValidateSchema(createStudentSchema, data);
-
-        if (!result.success) {
-          return result.errors;
+        if (!success) {
+          return createServiceError(errors![0].message, 400, errors);
         }
         const checkedRole = await isAdmin({
           context: { userId: context.user.id, schoolId },
         });
 
         if (!checkedRole.success) {
-          throw createServiceError(checkedRole?.message!, 403);
+          return createServiceError(checkedRole?.message!, 403);
         }
 
-        const { matricule } = result.data!;
+        console.log('tout ok', checkedRole, schoolId);
 
-        const existingStudent = await prisma.student.findUnique({
-          where: {
-            matricule_schoolId: { matricule, schoolId },
-          },
+        await prisma.$transaction(async (tx) => {
+          const existingStudent = await tx.student.findUnique({
+            where: {
+              matricule_schoolId: {
+                matricule: validData?.matricule!,
+                schoolId,
+              },
+            },
+          });
+
+          if (existingStudent) {
+            throw createServiceError(
+              "C'est élève existe déjà dans l'établissement",
+            );
+          }
+
+          const user = await tx.user.create({
+            data: {
+              email: `email_student_${data?.matricule}@invalid`,
+              isActive: false,
+              profile: {
+                create: {
+                  lastname: data?.lastname,
+                  firstname: data?.firstname,
+                  gender: data?.gender,
+                },
+              },
+            },
+            select: {
+              id: true,
+              profile: {
+                select: {
+                  id: true,
+                },
+              },
+            },
+          });
+
+          const schoolUser = await tx.schoolUser.create({
+            data: {
+              userId: user?.id,
+              role: 'STUDENT',
+              schoolId,
+            },
+          });
+
+          await tx.student.create({
+            data: {
+              schoolId,
+              matricule: validData?.matricule!,
+              enrollmentYear: validData?.enrollmentYear!,
+              birthDate: new Date(validData?.birthDate!),
+              birthPlace: validData?.birthPlace,
+              fatherName: validData?.fatherName,
+              motherName: validData?.motherName,
+              nationality: validData?.nationality,
+              schoolUserId: schoolUser.id,
+              profileId: user?.profile?.id!,
+              classId: validData?.classId,
+            },
+          });
         });
-
-        if (existingStudent) {
-        }
-      } catch (e) {}
+        return {
+          ok: true,
+          message: 'Élève crée avec succés',
+        };
+      } catch (e) {
+        const message = "Erreur lors de la création de l'élève.";
+        createServiceError(message, 500, e);
+        return {
+          ok: false,
+          message,
+        };
+      }
     },
   },
 };

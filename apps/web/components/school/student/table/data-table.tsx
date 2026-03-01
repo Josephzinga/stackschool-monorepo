@@ -1,12 +1,10 @@
 'use client';
 import {
   type ColumnDef,
-  type ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 import {
@@ -19,7 +17,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Select,
   SelectContent,
@@ -45,9 +43,6 @@ export function DataTable<TData, TValue>({
   isLoading,
   meta,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
   const {
     pagination,
     setPagination,
@@ -60,23 +55,33 @@ export function DataTable<TData, TValue>({
   const { width } = useWindowSize();
 
   useEffect(() => {
-    if (width < 640) {
+    if (width < 540) {
       setColumnVisibility({
+        section: false,
+        enrollmentYear: false,
+        level: false,
+        className: false,
+        matricule: false,
         select: false,
-        email: false,
-        phoneNumber: false,
-        classes: false,
-        speciality: false,
         status: false,
       });
     } else if (width < 1024) {
       setColumnVisibility({
         select: true,
-        email: false,
-        phoneNumber: false,
-        classes: false,
-        speciality: true,
+        section: false,
+        enrollmentYear: false,
+        level: false,
+        matricule: false,
         status: true,
+      });
+    } else if (width < 1400) {
+      setColumnVisibility({
+        select: true,
+        section: false,
+        matricule: true,
+        status: true,
+        enrollmentYear: false,
+        level: true,
       });
     } else {
       setColumnVisibility({});
@@ -90,14 +95,13 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     getRowId: (row: any) => row.id,
     rowCount: meta?.total,
     manualPagination: true,
+    manualFiltering: true,
     state: {
-      columnFilters,
       columnVisibility,
       pagination,
       rowSelection,
@@ -196,7 +200,7 @@ export function DataTable<TData, TValue>({
                 table.setPageSize(Number(value));
               }}
             >
-              <SelectTrigger className="h-8 w-[70px]">
+              <SelectTrigger className="h-8 w-17">
                 <SelectValue
                   placeholder={table.getState().pagination.pageSize}
                 />
@@ -210,7 +214,7 @@ export function DataTable<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+          <div className="flex w-25 items-center justify-center text-sm font-medium">
             Page {table.getState().pagination.pageIndex + 1} sur{' '}
             {table.getPageCount()}
           </div>

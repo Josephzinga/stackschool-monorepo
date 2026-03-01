@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { studentFormSchema } from './complete-profile.schema';
+import { registerFormSchema } from './auth.schema';
 
 export const searchStudentSchema = z.object({
   searchTerm: z
@@ -10,26 +12,17 @@ export const searchStudentSchema = z.object({
 export const createStudentSchema = z.object({
   firstname: z.string().min(2, 'Le prénom est requis'),
   lastname: z.string().min(2, 'Le nom est requis'),
-  email: z
-    .string()
-    .email({ pattern: z.regexes.email, message: 'Email invalide' })
-    .optional()
-    .or(z.literal('')),
-  phoneNumber: z.string().optional(),
-  gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
-
-  matricule: z.string().min(1, 'Le matricule est requis'),
+  email: registerFormSchema.shape.email,
+  phoneNumber: registerFormSchema.shape.phoneNumber,
+  gender: z.enum(['MALE', 'FEMALE']),
+  birthDate: studentFormSchema.shape.birthDate,
+  birthPlace: studentFormSchema.shape.birthPlace.optional(),
+  matricule: studentFormSchema.shape.matricule,
   classId: z.string().min(1, 'La classe est requise'),
-  enrollmentYear: z.string().min(1, "L'année est requise"),
-
-  fatherName: z
-    .string()
-    .min(3, 'Le nom du pére dois contenir au mois 3 caractère')
-    .optional(),
-  motherName: z
-    .string()
-    .min(3, 'Le nom de la mère dois contenir au mois 3 caractère')
-    .optional(),
+  enrollmentYear: studentFormSchema.shape.enrollmentYear,
+  fatherName: studentFormSchema.shape.fatherName,
+  motherName: studentFormSchema.shape.motherName,
+  nationality: z.string().min(1, 'La nationalité est requis'),
 });
 
 export type CreateStudentValues = z.infer<typeof createStudentSchema>;

@@ -62,7 +62,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <Avatar className="w-11 h-11 rounded-xl">
-                  <AvatarImage src={`/images/${currentSchool?.logo}`} />
+                  <AvatarImage src={currentSchool?.logo ?? undefined} />
                   <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
                     <School className="h-6 w-6" />
                   </AvatarFallback>

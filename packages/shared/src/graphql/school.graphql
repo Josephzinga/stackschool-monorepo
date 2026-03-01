@@ -1,10 +1,42 @@
 type Student {
   id: ID!
   matricule: String!
+  birthDate: DateTime
+  birthPlace: DateTime
+  motherName: String
+  fatherName: String
+  enrollmentYear: String!
+  status: StudentStatus
+  disciplinaryActions: StudentDisciplinaryAction
+  nationality: String
   schoolClass: Classe
+  profile: Profile
   parents: [Parent]
-  enrollmentYear: String
   user: User
+}
+
+type StudentDisciplinaryAction {
+  id: String
+  studentId: String
+  type: DisciplinaryType
+  reason: String
+  startDate: DateTime
+  endDate: DateTime
+}
+enum DisciplinaryType {
+  SUSPENSION
+  EXPULSION
+  WARNING
+}
+enum StudentStatus {
+  ACTIVE
+  SUSPENDED
+  EXPELLED
+  TRANSFERRED
+  DROPPED_OUT
+  GRADUATED
+  INACTIVE
+  DECEASED
 }
 enum Day {
   MONDAY

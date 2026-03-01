@@ -37,8 +37,8 @@ query GetSchoolTeachers($input: GetSchoolTeachersInput) {
   }
 }
 
-query GetTeacherDetails($id: ID!) {
-  teacher(id: $id) {
+query GetTeacherDetails($id: ID!, $schoolId: ID!) {
+  teacher(id: $id, schoolId: $schoolId) {
     id
     specialization
     diploma
@@ -86,8 +86,8 @@ query GetTeacherDetails($id: ID!) {
   }
 }
 
-mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!) {
-  deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId) {
+mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!, $soft: Boolean) {
+  deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId, soft: $soft) {
     ok
     message
   }

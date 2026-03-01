@@ -44,6 +44,7 @@ router.post(
 
       const existing = await prisma.user.findFirst({
         where: {
+          isActive: true,
           OR: [{ username }, { email: safeEmail }, { phoneNumber: safePhone }],
         },
       });

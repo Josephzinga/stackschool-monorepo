@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useTable } from './table-provider';
 import { SortOrder, StudentSortField } from '@stackschool/ui';
+import { StudentTableActions } from './student-table-actions';
 
 export type StudentColumns = {
   id: string | number;
@@ -74,7 +75,7 @@ export const columns: ColumnDef<StudentColumns>[] = [
       const id = row.original.id;
 
       return (
-        <Link href={`/list/teachers/${id}`} className="block max-w-100 h-full">
+        <Link href={`/list/students/${id}`} className="block max-w-100 h-full">
           <div className="flex gap-3 items-center hover:bg-accent p-1 rounded-md transition-colors cursor-pointer">
             <Avatar className="h-10 w-10">
               <AvatarImage src={photo ?? undefined} />
@@ -116,7 +117,7 @@ export const columns: ColumnDef<StudentColumns>[] = [
     cell: ({ row }) => {
       const classeName = row.original.className;
 
-      return <p className="text-xs sm:text-sm px-2 h-5">{classeName}</p>;
+      return <p className="text-xs xl:text-sm px-2 h-5">{classeName}</p>;
     },
   },
   {
@@ -126,7 +127,7 @@ export const columns: ColumnDef<StudentColumns>[] = [
       const section = row.original.section;
       return (
         <div>
-          <p>{section || '-'}</p>
+          <p className="text-xs xl:text-sm px-2 h-5">{section || '-'}</p>
         </div>
       );
     },
@@ -171,5 +172,9 @@ export const columns: ColumnDef<StudentColumns>[] = [
         </Badge>
       );
     },
+  },
+  {
+    accessorKey: 'actions',
+    cell: ({ row }) => <StudentTableActions row={row} />,
   },
 ];

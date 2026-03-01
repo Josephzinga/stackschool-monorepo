@@ -93,7 +93,7 @@ export const columns: ColumnDef<Teacher>[] = [
     header: 'Spécialité',
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
-        {row.original.specialization.map((spec, i) => (
+        {row.original.specialization?.map((spec, i) => (
           <Badge key={i} variant="outline" className="font-normal text-xs">
             {spec}
           </Badge>

@@ -1,4 +1,4 @@
-query GetAdminDashboardStats($schoolId: SchoolId!) {
+query GetAdminDashboardStats($schoolId: ID!) {
   school(schoolId: $schoolId) {
     id
     name

@@ -5,47 +5,51 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/data_source_mapping.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/getClassesSubjects.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/getClassesSubjects.resolver.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/list.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/list.resolver.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/create-list-teacher.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/create-list-teacher.resolver.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/list.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/list.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/create-student.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/create-student.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/school-students.resolver.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/list.resolver.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/teacher.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/teacher.resolver.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/types.generated.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/types.generated.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/verify-admin.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/verify-admin.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/verify-role.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/verify-role.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/server.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/services/auth-user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/auth-user.service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/students/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/students/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/[teacherId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/[teacherId]/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/finish/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/finish/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/auth/register/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/auth/register/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/app/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/styles/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/RoleStep.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/RoleStep.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/student-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/role-form/student-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/create-student-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/create-student-form.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table-header.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/student-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/student-dialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/table-filter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/table-filter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/create-teacher-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/create-teacher-form.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/columns.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/create-teacher-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/create-teacher-form.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table-header.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-table-actions.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-dialog.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/select.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/select.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-filters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-filters.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-table-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-table-actions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/index.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/index.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/list.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/list.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/admin-dashboard.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/admin-dashboard.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/student.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/student.operation.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/teacher.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/teacher.operation.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/school.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/school.graphql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/search-all-school.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/search-all-school.graphql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/user.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/user.graphql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/utils/matricule.util.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/utils/matricule.util.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/auth.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/auth.schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/create-list-teacher.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/create-list-teacher.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/search-student.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/students.schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/ui/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/students.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/students.schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/src/generated/graphql.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/generated/graphql.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/ui/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/ui/src/lib/graphql-fetcher.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/lib/graphql-fetcher.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -403,7 +407,14 @@
       <workItem from="1772062543834" duration="9984000" />
       <workItem from="1772122593088" duration="9263000" />
       <workItem from="1772147108968" duration="10707000" />
-      <workItem from="1772158733984" duration="8455000" />
+      <workItem from="1772158733984" duration="15402000" />
+      <workItem from="1772191634778" duration="5703000" />
+      <workItem from="1772208563619" duration="10942000" />
+      <workItem from="1772221292497" duration="24554000" />
+      <workItem from="1772288475801" duration="5555000" />
+      <workItem from="1772296633884" duration="5023000" />
+      <workItem from="1772315838298" duration="3835000" />
+      <workItem from="1772369643508" duration="394000" />
     </task>
     <servers />
   </component>

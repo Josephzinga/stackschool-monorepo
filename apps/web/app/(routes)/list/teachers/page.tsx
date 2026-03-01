@@ -49,7 +49,7 @@ function TeachersView() {
       lastname: t.user?.profile?.lastname || '',
       email: t.user?.email || '',
       phoneNumber: t.user?.phoneNumber || '',
-      speciality: t.specialization ? [t.specialization] : [],
+      specialization: t.specialization ? [t.specialization] : [],
       gender: t?.user?.profile?.gender as Gender,
       diploma: t?.diploma ?? '',
       classes:
@@ -64,7 +64,7 @@ function TeachersView() {
   const meta = data?.getSchoolTeachers.meta;
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 z-10 gap-4">
+    <div className="flex flex-col h-full p-3 md:p-6 z-10 gap-3">
       <DataTableHeader />
 
       <DataTable

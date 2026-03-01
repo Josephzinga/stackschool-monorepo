@@ -6,6 +6,7 @@ export * from './store/user-store';
 export * from './lib/get-safe-me';
 export * from './lib/relation-types';
 export * from './constant/role';
+export * from './constant/student-status';
 export {
   QueryClientProvider,
   QueryClient,

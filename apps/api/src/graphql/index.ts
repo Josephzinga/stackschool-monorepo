@@ -2,20 +2,20 @@ import { createHandler } from 'graphql-http/lib/use/express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import path from 'node:path';
 import * as fs from 'node:fs';
-import { studentResolver } from './resolvers/searchSchoolStudent.resolver';
+import { studentResolver as searchStudentResolver } from './resolvers/searchSchoolStudent.resolver';
 import { searchSchoolResolver } from './resolvers/searchSchool.resolver';
 import merge from 'lodash.merge';
 import { getClassesSubjectsResolver } from './resolvers/getClassesSubjects.resolver';
 import { confirmCompleteProfileResolver } from './resolvers/confirm-complete-profile.resolver';
 import { meResolver } from './resolvers/me.resolver';
 import { schoolResolver } from './resolvers/school.resolver';
-import { listResolver } from './resolvers/list.resolver';
-import { ServiceError } from '@stackschool/shared';
-import { createTeacherResolver } from './resolvers/teacher/create-list-teacher.resolver';
-import { ZodError } from 'zod';
 import { teacherResolver } from './resolvers/teacher/teacher.resolver';
-import { teacherListResolver } from './resolvers/teacher/list.resolver';
-import { schoolStudentsResolver } from './resolvers/student/school-students.resolver';
+import { createTeacherResolver } from './resolvers/teacher/create-list-teacher.resolver';
+import { listResolver } from './resolvers/list.resolver';
+import { studentResolver } from './resolvers/student/student.resolver';
+import { createStudentResolver } from './resolvers/student/create-student.resolver';
+import { ServiceError } from '@stackschool/shared';
+import { ZodError } from 'zod';
 
 const dirPath = path.resolve(
   __dirname,
@@ -29,19 +29,20 @@ for (const file of files) {
   typeDefs += fs.readFileSync(`${dirPath}/${file}`, 'utf-8') + '\n';
 }
 
+// Fusion des resolvers
 const resolvers = merge(
   {},
   meResolver,
   schoolResolver,
+  teacherResolver,
+  createTeacherResolver,
+  createStudentResolver,
   listResolver,
   studentResolver,
+  searchStudentResolver,
   searchSchoolResolver,
   getClassesSubjectsResolver,
   confirmCompleteProfileResolver,
-  createTeacherResolver,
-  teacherResolver,
-  teacherListResolver,
-  schoolStudentsResolver,
 );
 
 // Création du schéma exécutable
@@ -56,10 +57,17 @@ const graphqlMiddleware = createHandler({
     user: req.raw.user,
   }),
   formatError: (err) => {
+    console.error(
+      "Message d'erreur graphql \n",
+      err.message,
+      'Details \n',
+      err,
+    );
     if (err instanceof ZodError) {
       return {
         message: 'Erreur de validation',
-        code: 'VALIDATION_ERROR',
+        code: 400,
+        name: 'VALIDATION_ERROR',
         details: err.issues.map((issue) => ({
           field: issue.path.join('.'),
           message: issue.message,
@@ -70,14 +78,15 @@ const graphqlMiddleware = createHandler({
     if (err instanceof ServiceError) {
       return {
         message: err.message,
-        code: err.statusCode || 'SERVICE_ERROR',
+        code: err.statusCode || 500,
         name: 'SERVICE_ERROR',
       };
     }
 
     return {
       message: err.message || 'Une erreur interne est survenue',
-      code: 'INTERNAL_SERVER_ERROR',
+      code: 500,
+      name: 'INTERNAL_SERVER_ERROR',
     };
   },
 });

@@ -1,27 +1,39 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@stackschool/ui';
+import {
+  QueryClient,
+  PersistQueryClientProvider,
+  QueryClientProvider,
+} from '@stackschool/ui';
 import { useState } from 'react';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { createIDBPersister } from '@/lib/idb-keyval-setup';
 
 export default function QueryProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // On utilise un state pour s'assurer que chaque requête a son propre QueryClient
-  // et éviter de partager les données entre différents utilisateurs sur le serveur
   const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 minute
+            staleTime: 1000 * 60 * 5, // 5 minute
+            gcTime: 1000 * 60 * 60 * 24, // 24 heure de cache
           },
         },
       }),
   );
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools
+        position="left"
+        buttonPosition="bottom-left"
+        initialIsOpen={false}
+      />
+    </QueryClientProvider>
   );
 }

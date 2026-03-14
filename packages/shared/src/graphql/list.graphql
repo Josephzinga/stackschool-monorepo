@@ -39,6 +39,13 @@ input CreateTeacherInput {
   classIds: [String!]
 }
 
+input CreateClassInput {
+  section: String
+  name: String!
+  level: String!
+  supervisorId: String
+}
+
 type StudentList {
   data: [Student!]!
   meta: PaginationMeta!
@@ -48,5 +55,15 @@ type ClassList {
   data: [Classe!]!
   meta: PaginationMeta!
 }
-
-
+input GetSubjectInput {
+  page: Int! = 0
+  limit: Int! = 10
+  searchTerm: String
+  sort: SubjectSortInput
+  classId: ID
+  teacherId: ID
+}
+type SubjectList {
+  data: [Subject!]!
+  meta: PaginationMeta!
+}

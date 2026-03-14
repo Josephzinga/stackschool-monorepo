@@ -1,17 +1,16 @@
-import { prisma } from '@stackschool/db';
+import { prisma, Prisma } from '@stackschool/db';
 import { Resolvers, StudentStatus } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
 import { checkRole, isAdmin } from '../../../lib/verify-role';
 
 export const studentResolver: Resolvers = {
   Query: {
-    getSchoolStudents: async (_, { input }, context) => {
+    getSchoolStudents: async (_, { input, schoolId }, context) => {
       if (!context.user) throw createServiceError('Non authentifié', 401);
       if (!input) {
         throw createServiceError('Données manquantes', 400);
       }
       const {
-        schoolId,
         page = 0,
         limit = 10,
         searchTerm,
@@ -19,6 +18,7 @@ export const studentResolver: Resolvers = {
         level,
         sort,
         section,
+        teacherId,
       } = input;
       const roleChecked = await checkRole({
         context: { schoolId, userId: context.user.id },
@@ -30,20 +30,23 @@ export const studentResolver: Resolvers = {
       const skip = page * limit;
       const search = searchTerm?.trim();
 
-      let whereClause: any = {
+      let whereClause: Prisma.StudentWhereInput = {
         schoolId,
-        deletedAt: null, // Par défaut, on ne montre pas les supprimés
+        deletedAt: null,
       };
 
-      if (level) {
+      if (teacherId) {
         whereClause.schoolClass = {
-          level,
+          classTeacher: {
+            some: { teacherId },
+          },
         };
       }
-      if (section) {
+
+      if (level || section) {
         whereClause.schoolClass = {
-          ...whereClause.schoolClass,
-          section,
+          ...(level && { level }),
+          ...(section !== undefined && { section }),
         };
       }
       if (classId) {
@@ -66,8 +69,8 @@ export const studentResolver: Resolvers = {
           },
         ];
       }
-      
-      let orderBy: any = {
+
+      let orderBy: Prisma.StudentOrderByWithRelationInput = {
         profile: {
           firstname: 'asc',
         },
@@ -81,7 +84,7 @@ export const studentResolver: Resolvers = {
         if (sort?.field === 'enrolementYear') {
           orderBy = {
             ...orderBy,
-            enrollmentYear: sort.order?.toLowerCase(),
+            enrollmentYear: sort.order?.toLocaleLowerCase() as Prisma.SortOrder,
           };
         }
       }
@@ -101,27 +104,7 @@ export const studentResolver: Resolvers = {
                 section: true,
               },
             },
-            schoolUser: {
-              select: {
-                user: {
-                  select: {
-                    id: true,
-                    email: true,
-                    username: true,
-                    phoneNumber: true,
-                    profile: {
-                      select: {
-                        id: true,
-                        firstname: true,
-                        lastname: true,
-                        photo: true,
-                        gender: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            schoolUser: true,
             parentStudent: true,
           },
           orderBy,
@@ -131,19 +114,6 @@ export const studentResolver: Resolvers = {
         data: students?.map((s) => ({
           ...s,
           status: s.status as StudentStatus,
-          user: {
-            profile: {
-              id: s.schoolUser.user.profile?.id!,
-              firstname: s.schoolUser.user.profile?.firstname ?? '',
-              lastname: s.schoolUser.user.profile?.lastname ?? '',
-              photo: s.schoolUser.user.profile?.photo ?? '',
-              gender: s.schoolUser.user.profile?.gender!,
-            },
-            id: s.schoolUser.user.id,
-            username: s.schoolUser.user.username ?? '',
-            email: s.schoolUser.user.email ?? '',
-            phoneNumber: s.schoolUser.user.phoneNumber ?? '',
-          },
           parents: s.parentStudent,
         })),
         meta: {
@@ -167,34 +137,18 @@ export const studentResolver: Resolvers = {
         throw createServiceError(checkedRole.message || 'Accès refusé', 403);
       }
       const student = await prisma.student.findUnique({
-        where: { id, schoolId: context.user.schoolId },
+        where: { id, schoolId: context.schoolId },
         select: {
           id: true,
           matricule: true,
           enrollmentYear: true,
           fatherName: true,
           motherName: true,
+          schoolUserId: true,
           birthDate: true,
           birthPlace: true,
           nationality: true,
           status: true,
-          profile: {
-            select: {
-              id: true,
-              firstname: true,
-              lastname: true,
-              gender: true,
-              photo: true,
-              user: {
-                select: {
-                  id: true,
-                  email: true,
-                  phoneNumber: true,
-                  username: true,
-                },
-              },
-            },
-          },
           schoolClass: true,
           parentStudent: {
             select: {
@@ -204,25 +158,7 @@ export const studentResolver: Resolvers = {
                 select: {
                   id: true,
                   profession: true,
-                  schoolUser: {
-                    select: {
-                      user: {
-                        select: {
-                          id: true,
-                          phoneNumber: true,
-                          email: true,
-                          profile: {
-                            select: {
-                              id: true,
-                              photo: true,
-                              firstname: true,
-                              lastname: true,
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
+                  schoolUserId: true,
                 },
               },
             },
@@ -234,18 +170,6 @@ export const studentResolver: Resolvers = {
       return {
         ...student,
         status: student.status as StudentStatus,
-        profile: {
-          id: student.profile.id,
-          firstname: student.profile.firstname ?? '',
-          lastname: student.profile.lastname ?? '',
-          photo: student.profile.photo ?? null,
-        },
-        user: {
-          id: student.profile.user.id,
-          email: student.profile.user.email ?? '',
-          phoneNumber: student.profile.user.phoneNumber,
-          username: student.profile.user.username ?? '',
-        },
       };
     },
   },
@@ -257,7 +181,7 @@ export const studentResolver: Resolvers = {
       const adminCheck = await isAdmin({
         context: { schoolId, userId: context.user.id },
       });
-      
+
       if (!adminCheck?.success) {
         throw createServiceError(adminCheck?.message || 'Accès refusé', 403);
       }
@@ -305,8 +229,12 @@ export const studentResolver: Resolvers = {
         throw createServiceError('Erreur lors de la mise à jour', 500, error);
       }
     },
-    
-    deleteStudents: async (_, { studentIds, schoolId, soft = true }, context) => {
+
+    deleteStudents: async (
+      _,
+      { studentIds, schoolId, soft = true },
+      context,
+    ) => {
       try {
         if (!context.user) throw createServiceError('Non authentifié', 401);
 
@@ -325,7 +253,7 @@ export const studentResolver: Resolvers = {
           },
           select: {
             id: true,
-            schoolUserId: true
+            schoolUserId: true,
           },
         });
 
@@ -342,31 +270,31 @@ export const studentResolver: Resolvers = {
             },
             data: {
               status: 'INACTIVE',
-              deletedAt: new Date()
-            }
+              deletedAt: new Date(),
+            },
           });
-          
+
           // On désactive aussi le User associé pour empêcher la connexion
-          const schoolUserIds = exist.map(s => s.schoolUserId);
+          const schoolUserIds = exist.map((s) => s.schoolUserId);
           await prisma.user.updateMany({
-             where: { memberships: { some: { id: { in: schoolUserIds } } } },
-             data: { isActive: false }
+            where: { memberships: { some: { id: { in: schoolUserIds } } } },
+            data: { isActive: false },
           });
-          
+
           return {
             ok: true,
             message: `${studentIds.length} élève(s) archivé(s)`,
           };
         } else {
           // Hard Delete
-          const schoolUserIds = exist.map(s => s.schoolUserId);
-          
+          const schoolUserIds = exist.map((s) => s.schoolUserId);
+
           await prisma.schoolUser.deleteMany({
             where: {
               id: { in: schoolUserIds },
             },
           });
-          
+
           return {
             ok: true,
             message: `${studentIds.length} élève(s) supprimé(s) définitivement`,
@@ -376,6 +304,17 @@ export const studentResolver: Resolvers = {
         const message = 'Erreur lors de la suppression.';
         throw createServiceError(message, 500, e);
       }
+    },
+  },
+  Student: {
+    user: async (parent, _, { loaders }) => {
+      return await loaders.userLoader.load(parent.schoolUserId);
+    },
+  },
+
+  Parent: {
+    user: async (parent, _, { loaders }) => {
+      return await loaders.userLoader.load(parent.schoolUserId);
     },
   },
 };

@@ -1,10 +1,7 @@
+'use client';
 import React, { useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import frLocale from '@fullcalendar/core/locales/fr';
-import { GetTeacherDetailsQuery } from '@stackschool/ui';
+import { GetTeacherDetailsQuery, Lesson } from '@stackschool/ui';
 import '@/app/styles/schedule-grid.css';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,13 +11,18 @@ import {
 } from '@/components/ui/button-group';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import TimeGrid from '@/components/school/time-grid';
 
 type OnlyLessons = Pick<
   NonNullable<GetTeacherDetailsQuery['teacher']>,
-  'lessons'
+  'classSubject'
 >;
 
-const TimeGrid = ({ lessons }: OnlyLessons) => {
+const TeacherScheduleGrid = ({
+  lessons,
+}: {
+  lessons?: (Lesson | undefined)[];
+}) => {
   const calendarRef = useRef<FullCalendar>(null);
   const [view, setView] = useState('timeGridWeek');
   const [currentDateTitle, setCurrentDateTitle] = useState('');
@@ -79,9 +81,7 @@ const TimeGrid = ({ lessons }: OnlyLessons) => {
 
   return (
     <div className="p-4 flex flex-col gap-4">
-      {/* Barre d'outils personnalisée */}
       <Card className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card p-2 rounded-lg border">
-        {/* Navigation Gauche : Aujourd'hui + Précédent/Suivant */}
         <ButtonGroup className="">
           <Button
             variant="outline"
@@ -136,36 +136,16 @@ const TimeGrid = ({ lessons }: OnlyLessons) => {
         </ButtonGroup>
       </Card>
 
-      {/* Calendrier FullCalendar */}
-      <div className="h-full w-full rounded-lg border bg-card overflow-hidden">
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView={'timeGridWeek'}
-          locale={frLocale}
-          headerToolbar={false} // On désactive la toolbar par défaut
-          eventContent={renderEventContent}
-          events={events}
-          height="auto"
-          slotMinTime="08:00:00"
-          slotMaxTime="18:00:00"
-          slotLabelClassNames="text-muted-foreground text-sm font-medium"
-          dayHeaderClassNames="text-foreground font-semibold py-2 border-none"
-          weekends={false}
-          allDaySlot={false}
-          nowIndicator={true}
-          editable={false}
-          selectable={false}
-          datesSet={(dateInfo) => {
-            setCurrentDateTitle(dateInfo.view.title);
-          }}
-          eventClick={(info) => {
-            console.log('Cours cliqué :', info.event);
-          }}
-        />
-      </div>
+      <TimeGrid
+        selectable={false}
+        editable={false}
+        events={events}
+        renderEventContent={renderEventContent}
+        calendarRef={calendarRef}
+        onDatesSet={(arg) => setCurrentDateTitle(arg.view.title)}
+      />
     </div>
   );
 };
 
-export default TimeGrid;
+export default TeacherScheduleGrid;

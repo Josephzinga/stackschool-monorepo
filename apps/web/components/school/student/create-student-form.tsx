@@ -115,9 +115,6 @@ export function CreateStudentForm({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['GetSchoolStudents'] });
       await queryClient.invalidateQueries({ queryKey: ['GetStudentDetails'] });
-      if (onSuccess) {
-        onSuccess();
-      }
     },
   });
 
@@ -137,45 +134,44 @@ export function CreateStudentForm({
   }, [firstname, lastname, setValue, initialValues]);
 
   const onSubmit = async (formData: CreateStudentValues) => {
-    try {
-      const promise = initialValues
-        ? updateMutateAsync({
-            data: {
-              ...formData,
-              gender: formData.gender as Gender,
-            },
-            schoolId: currentSchool?.id!,
-            studentId: initialValues?.id!,
-          })
-        : createMutateAsync({
-            schoolId: currentSchool?.id!,
-            data: {
-              ...formData,
-              gender: formData.gender as Gender,
-            },
-          });
+    const promise = initialValues
+      ? updateMutateAsync({
+          data: {
+            ...formData,
+            gender: formData.gender as Gender,
+          },
+          schoolId: currentSchool?.id!,
+          studentId: initialValues?.id!,
+        })
+      : createMutateAsync({
+          schoolId: currentSchool?.id!,
+          data: {
+            ...formData,
+            gender: formData.gender as Gender,
+          },
+        });
 
-      toast.promise(promise, {
-        loading: initialValues
-          ? 'Mise à jour en cours...'
-          : 'Création en cours...',
-        error: (error) => {
-          return error?.message || "Erreur lors de l'opération";
-        },
-        success: (data: any) => {
-          const response = initialValues
-            ? data.updateStudent
-            : data.createListStudent;
+    toast.promise(promise, {
+      loading: initialValues
+        ? 'Mise à jour en cours...'
+        : 'Création en cours...',
+      error: (error) => {
+        return error?.message || "Erreur lors de l'opération";
+      },
+      success: (data: any) => {
+        const response = initialValues
+          ? data.updateStudent
+          : data.createListStudent;
 
-          if (response?.ok) {
-            return response.message || 'Opération réussie';
-          }
-          return 'Opération terminée';
-        },
-        toasterId: 'dashboard',
-      });
-    } catch (error) {
-      toast.error("Erreur lors de l'opération");
+        if (response?.ok) {
+          return response.message || 'Opération réussie';
+        }
+        return 'Opération terminée';
+      },
+      toasterId: 'dashboard',
+    });
+    if (onSuccess) {
+      onSuccess();
     }
   };
 

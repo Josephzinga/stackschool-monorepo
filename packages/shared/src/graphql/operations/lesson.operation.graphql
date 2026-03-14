@@ -1,0 +1,48 @@
+query GetSchoolLessons($classId: ID, $teacherId: ID, $searchTerm: String) {
+  getLessons(
+    classId: $classId
+    teacherId: $teacherId
+    searchTerm: $searchTerm
+  ) {
+    id
+    startTime
+    endTime
+    day
+    status
+    title
+    class {
+      name
+    }
+    subject {
+      id
+      name
+    }
+    teacher {
+      id
+      specialization
+      user {
+        id
+        profile {
+          id
+          firstname
+          lastname
+        }
+      }
+    }
+  }
+}
+query GetNavigationData {
+  getClassTeacher {
+    class {
+      id
+      name
+      level
+    }
+    teacher {
+      id
+      user {
+        ...UserProfile
+      }
+    }
+  }
+}

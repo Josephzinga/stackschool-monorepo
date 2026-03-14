@@ -15,7 +15,9 @@ export function setApiBaseUrl(baseUrl: string) {
 export function getApiBaseUrl() {
   return api.defaults.baseURL;
 }
-
+export function setHeaders(headers: any) {
+  api.defaults.headers = headers;
+}
 export class ApiError extends Error {
   status?: number | null;
   data?: any;

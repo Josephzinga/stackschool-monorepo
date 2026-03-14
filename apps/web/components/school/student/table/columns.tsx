@@ -52,8 +52,9 @@ export const columns: ColumnDef<StudentColumns>[] = [
   },
   {
     accessorKey: 'info',
-    header: ({ column }) => {
+    header: () => {
       const { setFilters } = useTable();
+
       return (
         <Button
           variant="ghost"
@@ -75,8 +76,11 @@ export const columns: ColumnDef<StudentColumns>[] = [
       const id = row.original.id;
 
       return (
-        <Link href={`/list/students/${id}`} className="block max-w-100 h-full">
-          <div className="flex gap-3 items-center hover:bg-accent p-1 rounded-md transition-colors cursor-pointer">
+        <Link
+          href={`/list/students/${id}`}
+          className="block max-w-80 md:max-w-100 h-full"
+        >
+          <div className="flex gap-2 items-center hover:bg-accent rounded-md transition-colors cursor-pointer">
             <Avatar className="h-10 w-10">
               <AvatarImage src={photo ?? undefined} />
               <AvatarFallback className="bg-primary/10 text-primary text-xs">
@@ -88,8 +92,8 @@ export const columns: ColumnDef<StudentColumns>[] = [
               <span className="font-medium text-sm text-foreground">
                 {row.original.firstname} {row.original.lastname}
               </span>
-              <span className="text-xs text-muted-foreground">
-                {row.original.email}
+              <span className="text-xs tracking-tight md:tracking-normal text-wrap text-muted-foreground">
+                {row.original.email || row.original.phoneNumber}
               </span>
             </div>
           </div>

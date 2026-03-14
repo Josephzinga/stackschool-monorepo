@@ -46,7 +46,7 @@
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.9222 0.0013 286.3737);
   --muted-foreground: oklch(0.18 0.032 266.625);
-  --accent: oklch(0.939 0.013 262.378);
+  --accent: oklch(0.861 0.035 261.95);
   --accent-foreground: oklch(0.29 0.121 263.009);
   --destructive: oklch(0.6188 0.2376 25.7658);
   --destructive-foreground: oklch(1 0 0);
@@ -281,6 +281,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari et Opera */
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE et Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+}
+
+
 
 /* styles/phone-input.css */
 .phone-input-custom {

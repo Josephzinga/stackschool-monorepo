@@ -22,6 +22,7 @@ interface AppAlertDialogProps {
   cancelLabel?: string;
   isLoading?: boolean;
   variant?: 'default' | 'destructive';
+  descriptionClassName?: string;
 }
 
 export const AppAlertDialog = ({
@@ -35,6 +36,7 @@ export const AppAlertDialog = ({
   cancelLabel = 'Annuler',
   isLoading = false,
   variant = 'destructive',
+  descriptionClassName,
 }: AppAlertDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -43,7 +45,9 @@ export const AppAlertDialog = ({
           <AlertDialogTitle className="text-base sm:text-lg">
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-sm sm:text-base">
+          <AlertDialogDescription
+            className={cn('text-sm sm:text-base', descriptionClassName)}
+          >
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>

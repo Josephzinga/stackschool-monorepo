@@ -5,51 +5,107 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43d0c32e-60a4-4ef7-9ade-ab2829699ebc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/data_source_mapping.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/controllers/passport-local.controller.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/create-student.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/create-student.resolver.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/school-students.resolver.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/list.resolver.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/getClassesSubjects.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/getClassesSubjects.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/list.resolver.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/school.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/school.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/student.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/student/student.resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/create-list-teacher.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/create-list-teacher.resolver.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/teacher.resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/resolvers/teacher/teacher.resolver.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/graphql/types.generated.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/graphql/types.generated.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/lib/verify-role.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/lib/verify-role.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/auth/register.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/save-progress.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/routes/complete-profile/save-progress.route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/api/src/server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/server.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/src/services/auth-user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/services/auth-user.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/classes/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/classes/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/lessons/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/lessons/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/students/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/students/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/[teacherId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/[teacherId]/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/(routes)/list/teachers/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/styles/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/app/styles/schedule-grid.css" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/app/styles/schedule-grid.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/app-alert-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/app-alert-dialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/profile-step.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/profile-step.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/create-school-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/complete-profile/school-form/create-school-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/data-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/providers/dashboard-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/providers/dashboard-provider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/providers/protected-route.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/providers/protected-route.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/providers/queryClientProvider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/providers/queryClientProvider.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/create-student-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/create-student-form.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/columns.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table-header.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/data-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/student-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/student-dialog.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/student/table/table-filter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/student/table/table-filter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/classes-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/classes-section.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/create-teacher-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/create-teacher-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/schedule-grid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/schedule-grid.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/columns.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table-header.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/data-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-dialog.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-filters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-filters.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-table-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/school/teacher/table/teacher-table-actions.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/submit-button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/field.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/input.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/ui/textarea.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/ui/textarea.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/constant/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/constant/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/lib/data.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/lib/data.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/codegen.ts" beforeDir="false" afterPath="$PROJECT_DIR$/codegen.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/prisma.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/prisma.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251013160744_init/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251013202523_ajouter_le_model_teacher_et_staff_pour_les_information_specifique/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251013220313_init/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251014125558_init/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251014125954_change_de_photo_en_image_dans_le_model_profile/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251014130300_ajout_de_phone_dans_la_table_profile/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251015014629_init/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251015034606_update_user_model/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251015123434_rendre_lastname_et_firstname_optionnel/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251016114609_rendre_password_optionnel_dans_user_pour_la_connexion_avec_google/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251016115630_rendre_type_optionnel_dans_le_model_account/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251016115848_rendre_provider_optionnel_dans_le_model_account/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251017093800_j_ai_mapper_le_nom_de_colonne_du_model_session_pour_qu_il_puisse_correspondre_avec_pg_store/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251017094055_rendre_la_colonne_user_et_user_id_du_model_session_optionnel/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251019030855_ajouter_username_dans_le_model_user/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251019031005_rendre_email_optinnel_dans_le_model_user/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251020024023_ajouter_is_verified_dans_le_model_user_pour_whathsapp/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251020024659_ajouter_le_model_pour_la_verification_whatsapp/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251020030528_rendre_code_de_type_number_dans_verificaton_code/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251020033103_deblacer_le_phone_number_dans_user/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251020114744_changement_de_la_table_verification_code_et_email/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251023160529_ajouter_update_at_dans_le_model_de_verification/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251026193119_test/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251027020427_ajouter_la_colone_message_pour_le_message_d_invitation_et_rendre_slug_optionnel_dans_le_model_school/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251114175627_changement_de_constraint_des_table_en_relation_avec_user/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20251224043650_ajouter_la_date_de_verification_d_email_et_changer_le_type_du_email_verified_en_boolean/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260123002348_ajout_du_model_assessement_qui_generalise_les_model_exam_result_et_assingment/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260124163600_ajout_de_la_realation_attendance_school/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260124223958_ajout_de_la_relation_lesson_school/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260222120932_ajout_du_cascade_dans_class_teacher/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260223153512_modifie_la_colonne_name_en_title_du_model_lesson_et_ajout_du_colonne_cv_url_bio_dans_le_model_teacher/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260223192659_ajout_de_la_contraite_unique_de_la_relation_profile_dans_le_model_student/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260227184049_ajout_de_l_unique_contraite_name_school_id/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260227195825_ajout_du_model_student_disciplinary_action_et_status_dans_le_model_student/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260227200544_modifier_la_relation_de_discipline_en_many_to_many/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260228004331_ajout_de_la_colonne_is_active_dans_le_model_user/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260228170608_changer_la_valeur_par_default_de_is_active_a_true/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/migrations/20260301022842_ajout_de_la_constrainte_cascade_au_mode_student_dans_la_relation_avec_profile/migration.sql" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/seed-1.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/seed-1.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/db/src/prisma/seed.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/index.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/index.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/list.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/list.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/admin-dashboard.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/admin-dashboard.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/complete-profile.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/complete-profile.operation.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/student.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/student.operation.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/operations/teacher.operation.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/operations/teacher.operation.graphql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/school.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/school.graphql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/students.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/students.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/graphql/user.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/graphql/user.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/lib/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/types/graphql.type.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/types/graphql.type.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/auth.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/auth.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/src/validation/complete-profile.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/src/validation/complete-profile.schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/src/generated/graphql.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/generated/graphql.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/ui/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/ui/src/lib/graphql-fetcher.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/ui/src/lib/graphql-fetcher.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,8 +138,6 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/apps/web/lib/fonts.ts" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/client/generated/index.d.ts" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/migrations/20260114230457_relation_de_la_table_student_a_school_user/migration.sql" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/packages/db/src/prisma/photos-prisma.type.ts" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/packages/shared/src/validation/complete-profile.schema.ts" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MigrationScriptOptions">
@@ -132,10 +186,10 @@
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;web&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/apps/web/components/school/student/table&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/joseph/Projects/stackschool-monorepo/apps/api/src/types&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -162,16 +216,18 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/api/src/types" />
+      <recent name="$PROJECT_DIR$/apps/web/components/school/class/table" />
       <recent name="$PROJECT_DIR$/apps/web/components/school/student/table" />
       <recent name="$PROJECT_DIR$/apps/web" />
       <recent name="$PROJECT_DIR$/../E-commerce" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/web/components/school/subject/table" />
+      <recent name="$PROJECT_DIR$/packages/db/src/prisma/client" />
+      <recent name="$PROJECT_DIR$/apps/api/src/graphql/resolvers" />
+      <recent name="$PROJECT_DIR$/apps/web/components" />
       <recent name="$PROJECT_DIR$/apps/web/components/school/student" />
-      <recent name="$PROJECT_DIR$/apps/web/components/complete-profile/role-form" />
-      <recent name="$PROJECT_DIR$/apps/web/components/school/teacher" />
-      <recent name="$PROJECT_DIR$/packages/shared/src/graphql" />
-      <recent name="$PROJECT_DIR$/apps/web/components/school" />
     </key>
   </component>
   <component name="RunManager" selected="Docker.docker-compose.yml.web: Compose Deployment">
@@ -415,6 +471,40 @@
       <workItem from="1772296633884" duration="5023000" />
       <workItem from="1772315838298" duration="3835000" />
       <workItem from="1772369643508" duration="394000" />
+      <workItem from="1772382597427" duration="1193000" />
+      <workItem from="1772392479277" duration="5315000" />
+      <workItem from="1772403151275" duration="2138000" />
+      <workItem from="1772457078000" duration="19183000" />
+      <workItem from="1772479144728" duration="5281000" />
+      <workItem from="1772485662683" duration="4281000" />
+      <workItem from="1772497485909" duration="10141000" />
+      <workItem from="1772536786694" duration="25999000" />
+      <workItem from="1772579002380" duration="11708000" />
+      <workItem from="1772600903146" duration="7782000" />
+      <workItem from="1772707221797" duration="7110000" />
+      <workItem from="1772749989776" duration="24337000" />
+      <workItem from="1772807927089" duration="15235000" />
+      <workItem from="1772828125493" duration="12364000" />
+      <workItem from="1772846786451" duration="4890000" />
+      <workItem from="1772861817257" duration="7190000" />
+      <workItem from="1772882494958" duration="765000" />
+      <workItem from="1772887373751" duration="9830000" />
+      <workItem from="1772966084317" duration="2196000" />
+      <workItem from="1772978269914" duration="5723000" />
+      <workItem from="1773010914395" duration="12189000" />
+      <workItem from="1773024533585" duration="3885000" />
+      <workItem from="1773060789259" duration="2161000" />
+      <workItem from="1773080407397" duration="3253000" />
+      <workItem from="1773169810224" duration="3783000" />
+      <workItem from="1773178165382" duration="17961000" />
+      <workItem from="1773206141484" duration="2732000" />
+      <workItem from="1773256492100" duration="4034000" />
+      <workItem from="1773271215514" duration="9341000" />
+      <workItem from="1773294301121" duration="1481000" />
+      <workItem from="1773348778450" duration="17000000" />
+      <workItem from="1773433042705" duration="3752000" />
+      <workItem from="1773451379075" duration="11330000" />
+      <workItem from="1773471518430" duration="8232000" />
     </task>
     <servers />
   </component>

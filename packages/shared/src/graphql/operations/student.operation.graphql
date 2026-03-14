@@ -1,5 +1,5 @@
-query GetSchoolStudents($input: GetSchoolStudentsInput) {
-  getSchoolStudents(input: $input) {
+query GetSchoolStudents($input: GetSchoolStudentsInput!, $schoolId: ID!) {
+  getSchoolStudents(input: $input, schoolId: $schoolId) {
     meta {
       total
       totalPages
@@ -57,14 +57,13 @@ query GetStudentDetails($id: ID!, $schoolId: ID!) {
       phoneNumber
       email
       username
-    }
-    profile {
-      id
-      firstname
-      lastname
-      gender
-      photo
-      address
+      profile {
+        id
+        firstname
+        lastname
+        photo
+        gender
+      }
     }
   }
 }
@@ -80,7 +79,7 @@ mutation UpdateStudent(
   }
 }
 mutation CreateListStudent($schoolId: ID!, $data: CreateStudentInput!) {
-  createListStudent(schoolId: $schoolId, data: $data){
+  createListStudent(schoolId: $schoolId, data: $data) {
     ok
     message
   }

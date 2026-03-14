@@ -44,7 +44,7 @@ export default function StudentFilter() {
     setFilters((prev) => ({ ...prev, [key]: val === 'ALL' ? undefined : val }));
   };
   return (
-    <div className="flex flex-wrap items-end gap-4 p-4 bg-accent rounded-lg border shadow-lg">
+    <div className="flex flex-wrap items-end gap-4 p-4 bg-accent  rounded-lg border shadow-lg">
       <div className="flex flex-col gap-1.5">
         <Label className="text-xs font-medium text-muted-foreground font-poppins">
           Niveau

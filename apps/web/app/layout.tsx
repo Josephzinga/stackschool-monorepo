@@ -22,8 +22,8 @@ export default async function RootLayout({
       className={`${jost.variable}  ${inter.variable} ${poppins.variable} ${sans.variable}`}
     >
       <body>
-        <ThemeProvider attribute="class" enableSystem={false}>
-          <QueryProvider>
+        <QueryProvider>
+          <ThemeProvider attribute="class" enableSystem={false}>
             {children}
 
             <Toaster
@@ -31,8 +31,8 @@ export default async function RootLayout({
               className="bg-sky-500! text-lg"
               duration={4000}
             />
-          </QueryProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

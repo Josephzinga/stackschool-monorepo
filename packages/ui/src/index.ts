@@ -13,4 +13,5 @@ export {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+export { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 export * from './generated/graphql';

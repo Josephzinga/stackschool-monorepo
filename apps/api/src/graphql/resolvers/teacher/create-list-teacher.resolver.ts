@@ -52,8 +52,9 @@ export const createTeacherResolver: Resolvers = {
               data: {
                 email: data?.email || null,
                 phoneNumber: data?.phoneNumber || null,
-                username:
-                  `${data?.firstname}.${data?.lastname}.${Date.now().toString().slice(-4)}`.toLowerCase(),
+                username: `${data?.lastname}${data?.lastname}`
+                  .trim()
+                  .toLowerCase(),
                 profile: {
                   create: {
                     firstname: data?.firstname,
@@ -97,12 +98,6 @@ export const createTeacherResolver: Resolvers = {
                   diploma: data?.diploma,
                   specialization: data?.specialization,
                   isActive: true,
-                  classTeacher: {
-                    create:
-                      data?.classIds?.map((classId) => ({
-                        classId: classId!,
-                      })) || [],
-                  },
                 },
               },
             },

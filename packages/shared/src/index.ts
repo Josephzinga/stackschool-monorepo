@@ -1,5 +1,4 @@
 export { authService } from './services/auth/auth.service';
-export { schoolService } from './services/schools/schools.service';
 export { RedisService } from './services/redis/redisService';
 export * from './lib/api';
 export { z, ZodError } from 'zod';
@@ -12,3 +11,5 @@ export * from './validation/create-invitation.schema';
 export * from './validation/students.schema';
 export * from './utils/matricule.util';
 export * from './validation/create-list-teacher';
+export * from './lib/lesson-check-status';
+export * from './validation/subject-list.schema';

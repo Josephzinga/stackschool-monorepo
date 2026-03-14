@@ -16,18 +16,13 @@ import {
   GraduationCap,
   Mail,
   MapPin,
+  MoreHorizontal,
   Phone,
   Trash2,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/animate-ui/components/radix/tabs';
 import { useState } from 'react';
 import {
   AlertDialog,
@@ -40,15 +35,21 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import TimeGrid from '@/components/school/teacher/schedule-grid';
+import TeacherScheduleGrid from '@/components/school/teacher/schedule-grid';
 import ClassesSection from '@/components/school/teacher/classes-section';
-import { ChartRadialPerformance } from '@/components/school/teacher/chart-performance';
 import { InfoItem } from '@/components/school/info-item';
+import {
+  AppTabs,
+  AppTabsContent,
+  AppTabsList,
+  AppTabsTrigger,
+} from '@/components/app-tabs';
+import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 
 const shortHands = [
   { value: 'classes', label: 'Classes', href: '/list/classes' },
   { value: 'lessons', label: 'Leçons', href: '/list/lessons' },
-  { value: 'subject', label: 'Matières', href: '/list/subjects' },
+  { value: 'subject', label: 'Matières', href: '/list/subject' },
   { value: 'students', label: 'Élèves', href: '/list/students' },
 ];
 
@@ -58,6 +59,7 @@ export default function TeacherDetailsPage() {
   const teacherId = params.teacherId as string;
   const { currentSchool } = useUserStore();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [openSheet, setOpenSheet] = useState(false);
 
   const { data, isLoading, error } = useGetTeacherDetailsQuery(
     { id: teacherId, schoolId: currentSchool?.id! },
@@ -89,7 +91,6 @@ export default function TeacherDetailsPage() {
   };
 
   const handleShortcut = (href: string) => {
-    // Redirection avec filtre (ex: /list/classes?teacherId=123)
     router.push(`${href}?teacherId=${teacherId}`);
   };
 
@@ -116,10 +117,10 @@ export default function TeacherDetailsPage() {
   const profile = teacher.user?.profile;
 
   return (
-    <div className="flex-1 sm:p-4 flex flex-col xl:flex-row gap-4 ">
+    <div className="flex-1 sm:p-4 flex justify-center gap-4 ">
       {/* GAUCHE (Scrollable) */}
 
-      <Card className="w-full h-full py-2 px-3">
+      <div className="w-full h-full py-2 space-y-4 max-w-350 px-3">
         <CardHeader className=" px-2 flex flex-col gap-4">
           <div className="flex justify-between items-center w-full">
             <Button variant="ghost" size="icon" onClick={() => router.back()}>
@@ -127,7 +128,11 @@ export default function TeacherDetailsPage() {
             </Button>
 
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button
+                onClick={() => setOpenSheet(true)}
+                variant="outline"
+                size="sm"
+              >
                 <Edit className="h-4 w-4 mr-2" />
                 Modifier
               </Button>
@@ -188,136 +193,103 @@ export default function TeacherDetailsPage() {
         </CardHeader>
 
         <div className="flex-1">
-          <Tabs defaultValue="overview" className="w-full mt-4">
-            <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="overview"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-              >
-                Aperçu
-              </TabsTrigger>
-              <TabsTrigger
-                value="classes"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-              >
-                Classes ({teacher.classes?.length || 0})
-              </TabsTrigger>
-              <TabsTrigger
-                value="schedule"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-              >
-                Emploi du temps
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent
-              value="overview"
-              className="mt-6 h-full space-y-6 px-2"
-            >
-              <div className="grid h-full grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle className="text-lg">
-                      Informations Professionnelles
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <GraduationCap className="h-5 w-5 text-muted-foreground" />
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                          Diplôme
-                        </span>
-                        <span className="font-medium">
-                          {teacher.diploma || '-'}
-                        </span>
+          <AppTabs defaultValue="overview" className="">
+            <AppTabsList className="rounded-lg mb-2">
+              <AppTabsTrigger value="overview">Aperçu</AppTabsTrigger>
+              <AppTabsTrigger value="classes">
+                Classes ({teacher.classSubject?.length || 0})
+              </AppTabsTrigger>
+              <AppTabsTrigger value="schedule">Emploi du temps</AppTabsTrigger>
+            </AppTabsList>
+            <AppTabsContent value="overview">
+              <Card className="">
+                <CardHeader className="flex justify-end pt-0">
+                  <Button variant="outline" size={'icon'}>
+                    <MoreHorizontal />
+                  </Button>
+                </CardHeader>
+                <CardContent className="grid h-full grid-cols-1 md:grid-cols-2 px-2 md:px-4  gap-6">
+                  <Card className="h-full">
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        Informations Professionnelles
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <GraduationCap className="h-5 w-5 text-muted-foreground" />
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                            Diplôme
+                          </span>
+                          <span className="font-medium">
+                            {teacher.diploma || '-'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Briefcase className="h-5 w-5 text-muted-foreground" />
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                          Département
-                        </span>
-                        <span className="font-medium">
-                          {teacher.departement || '-'}
-                        </span>
+                      <div className="flex items-center gap-3">
+                        <Briefcase className="h-5 w-5 text-muted-foreground" />
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                            Département
+                          </span>
+                          <span className="font-medium">
+                            {teacher.departement || '-'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="h-5 w-5 flex items-center justify-center font-bold text-muted-foreground text-xs border rounded-full">
-                        Hr
+                      <div className="flex items-center gap-3">
+                        <div className="h-5 w-5 flex items-center justify-center font-bold text-muted-foreground text-xs border rounded-full">
+                          Hr
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                            Volume Horaire
+                          </span>
+                          <span className="font-medium">
+                            {teacher.weeklyHours}h / semaine
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                          Volume Horaire
-                        </span>
-                        <span className="font-medium">
-                          {teacher.weeklyHours}h / semaine
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Biographie</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {teacher?.bio}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Biographie</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {teacher?.bio}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            </AppTabsContent>
 
-            <TabsContent value="classes" className="mt-6 min-h-full px-2">
-              <ClassesSection classes={teacher?.classes} />
-            </TabsContent>
+            <AppTabsContent value="classes">
+              <Card>
+                <CardHeader className="flex w-full justify-end">
+                  <Button variant="outline" size="icon">
+                    <MoreHorizontal className="h-10 w-10" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <ClassesSection classSubject={teacher?.classSubject} />
+                </CardContent>
+              </Card>
+            </AppTabsContent>
 
-            <TabsContent value="schedule" className="mt-6 px-2 overflow-y-auto">
-              <TimeGrid lessons={teacher?.lessons} />
-            </TabsContent>
-          </Tabs>
+            <AppTabsContent value="schedule">
+              <TeacherScheduleGrid
+                lessons={teacher?.classSubject?.map(
+                  (cs) => cs?.lessons ?? undefined,
+                )}
+              />
+            </AppTabsContent>
+          </AppTabs>
         </div>
-      </Card>
-
-      {/* DROITE (Sticky) */}
-      <div className="w-full h-full xl:w-2/7 flex flex-col gap-4">
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold font-jost">
-              Raccourcis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              {shortHands.map((item) => (
-                <Button
-                  key={item.value}
-                  variant="outline"
-                  className="h-auto py-3 flex flex-col gap-1 hover:border-primary hover:text-primary transition-all bg-card text-foreground border-2 first:border-none last:border-none shadow-sm"
-                  onClick={() => handleShortcut(item.href)}
-                >
-                  <span className="font-medium font-poppins">{item.label}</span>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="flex-1">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold font-jost">
-              Performance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartRadialPerformance />
-          </CardContent>
-        </Card>
       </div>
-      {/* Dialog de suppression */}
 
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
         <AlertDialogContent>
@@ -343,6 +315,11 @@ export default function TeacherDetailsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Sheet open={openSheet} onOpenChange={setOpenSheet}>
+        <SheetHeader></SheetHeader>
+        <SheetContent side="right"></SheetContent>
+      </Sheet>
     </div>
   );
 }

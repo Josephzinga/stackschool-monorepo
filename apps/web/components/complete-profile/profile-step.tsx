@@ -103,6 +103,7 @@ export function ProfileStep() {
       }
 
       setProfileData(data);
+      setCurrentStep(3);
     } catch (error) {
       const { message } = parseAxiosError(error);
       console.error('Erreur sauvegarde profil:', message);

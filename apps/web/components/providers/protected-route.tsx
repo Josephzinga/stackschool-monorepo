@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useGetMeQuery, useUserStore } from '@stackschool/ui';
 import { Spinner } from '@/components/ui/spinner';
+import { api } from '@stackschool/shared';
 
 export default function ProtectedRoute({
   children,
@@ -21,6 +22,15 @@ export default function ProtectedRoute({
         router.replace('/auth/login');
       }
       return;
+    }
+
+    if (data?.me?.memberships && currentSchool) {
+      for (const member of data?.me?.memberships) {
+        if (member?.school?.id === currentSchool?.id) {
+          setCurrentSchool(member?.school);
+          api.defaults.headers.common['x-school-id'] = member?.school.id;
+        }
+      }
     }
 
     // 2. Si utilisateur connecté
@@ -76,6 +86,12 @@ export default function ProtectedRoute({
     currentSchool,
     setCurrentSchool,
   ]);
+
+  useEffect(() => {
+    if (currentSchool?.id) {
+      api.defaults.headers.common['x-school-id'] = currentSchool.id;
+    }
+  }, [currentSchool]);
 
   if (isLoading) {
     return (

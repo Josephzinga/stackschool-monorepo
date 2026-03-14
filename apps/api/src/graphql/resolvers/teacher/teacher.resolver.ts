@@ -1,18 +1,17 @@
-import { prisma } from '@stackschool/db';
-import { Day, Resolvers } from '../../types.generated';
+import { prisma, Prisma } from '@stackschool/db';
+import { Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
-import { checkRole, isAdmin } from '../../../lib/verify-role'; // Import corrigé
+import { checkRole, isAdmin } from '../../../lib/verify-role';
 
 export const teacherResolver: Resolvers = {
   Query: {
-    getSchoolTeachers: async (_, { input }, context) => {
+    getSchoolTeachers: async (_, { input }, { user, schoolId }) => {
       try {
-        if (!context.user) throw createServiceError('Non authentifié', 401);
+        if (!user) throw createServiceError('Non authentifié', 401);
         if (!input) {
           throw createServiceError('Données manquantes', 400);
         }
         const {
-          schoolId,
           page = 0,
           limit = 10,
           searchTerm,
@@ -26,7 +25,7 @@ export const teacherResolver: Resolvers = {
         const search = searchTerm?.trim();
 
         // 1. Filtre de base : L'école
-        const whereClause: any = {
+        const whereClause: Prisma.TeacherWhereInput = {
           schoolUser: { schoolId },
         };
 
@@ -44,28 +43,38 @@ export const teacherResolver: Resolvers = {
 
         if (isSupervisor) {
           // On cherche ceux qui supervisent au moins une classe
-          whereClause.supervisedClasses = { some: {} };
+          whereClause.supervisedClasses = {
+            some: {
+              id: { not: undefined },
+            },
+          };
         }
 
         if (classId) {
-          // Le prof est lié à la classe soit comme superviseur, soit comme enseignant
           whereClause.OR = [
             { supervisedClasses: { some: { id: classId } } },
-            { classTeacher: { some: { classId: classId } } },
+            { classSubjects: { some: { classId: classId } } },
           ];
-          // Attention: Si on a déjà un OR pour la recherche, il faut combiner avec AND
         }
 
         // 3. Filtre de recherche (si présent)
         if (search) {
           const searchCondition = {
             OR: [
-              { specialization: { contains: search, mode: 'insensitive' } },
+              {
+                specialization: {
+                  contains: search,
+                  mode: 'insensitive' as Prisma.QueryMode,
+                },
+              },
               {
                 schoolUser: {
                   user: {
                     profile: {
-                      lastname: { contains: search, mode: 'insensitive' },
+                      lastname: {
+                        contains: search,
+                        mode: 'insensitive' as Prisma.QueryMode,
+                      },
                     },
                   },
                 },
@@ -74,7 +83,20 @@ export const teacherResolver: Resolvers = {
                 schoolUser: {
                   user: {
                     profile: {
-                      firstname: { contains: search, mode: 'insensitive' },
+                      OR: [
+                        {
+                          firstname: {
+                            contains: search,
+                            mode: 'insensitive' as Prisma.QueryMode,
+                          },
+                        },
+                        {
+                          lastname: {
+                            contains: search,
+                            mode: 'insensitive' as Prisma.QueryMode,
+                          },
+                        },
+                      ],
                     },
                   },
                 },
@@ -91,8 +113,12 @@ export const teacherResolver: Resolvers = {
             delete whereClause.OR; // On nettoie l'ancien OR
           } else {
             // Sinon on ajoute simplement le AND avec la recherche
-            if (!whereClause.AND) whereClause.AND = [];
-            whereClause.AND.push(searchCondition);
+            const existingAnd = Array.isArray(whereClause.AND)
+              ? whereClause.AND
+              : whereClause.AND
+                ? [whereClause.AND]
+                : [];
+            whereClause.AND = [...existingAnd, searchCondition];
           }
         }
 
@@ -102,44 +128,6 @@ export const teacherResolver: Resolvers = {
             where: whereClause,
             take: limit,
             skip,
-            select: {
-              id: true,
-              diploma: true,
-              isActive: true,
-              specialization: true,
-              schoolUserId: true,
-              classTeacher: {
-                select: {
-                  class: {
-                    select: {
-                      id: true,
-                      name: true,
-                      level: true,
-                    },
-                  },
-                },
-              },
-              schoolUser: {
-                select: {
-                  user: {
-                    select: {
-                      id: true,
-                      email: true,
-                      phoneNumber: true,
-                      profile: {
-                        select: {
-                          firstname: true,
-                          lastname: true,
-                          photo: true,
-                          gender: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              supervisedClasses: true,
-            },
             orderBy: {
               schoolUser: {
                 user: {
@@ -151,17 +139,8 @@ export const teacherResolver: Resolvers = {
             },
           }),
         ]);
-
         return {
-          data: teachers.map((t) => ({
-            ...t,
-            user: t.schoolUser.user as any,
-            classes: t.classTeacher.map((c) => ({
-              id: c.class.id,
-              name: c.class.name,
-              level: c.class.level,
-            })),
-          })),
+          data: teachers,
           meta: {
             total,
             page,
@@ -170,8 +149,11 @@ export const teacherResolver: Resolvers = {
           },
         };
       } catch (error) {
-        console.error('Erreur recherche profs:', error);
-        throw createServiceError('Erreur lors de la recherche', 500, error);
+        throw createServiceError(
+          'Erreur lors de la recupération des professeurs',
+          500,
+          error,
+        );
       }
     },
 
@@ -181,73 +163,19 @@ export const teacherResolver: Resolvers = {
         context: { schoolId, userId: context.user.id },
         roles: ['TEACHER', 'ADMIN'],
       });
+      if (!checkedRole.success) {
+        throw createServiceError(
+          checkedRole.message || 'Accès refusé à cette école',
+          403,
+        );
+      }
       const teacher = await prisma.teacher.findUnique({
         where: { id },
-        include: {
-          schoolUser: {
-            include: {
-              user: {
-                include: { profile: true },
-              },
-              school: true,
-            },
-          },
-          lessons: {
-            select: {
-              id: true,
-              day: true,
-              startTime: true,
-              endTime: true,
-              title: true,
-              class: {
-                select: {
-                  id: true,
-                  name: true,
-                  level: true,
-                },
-              },
-              subject: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-          supervisedClasses: true,
-          classTeacher: {
-            include: {
-              class: {
-                select: {
-                  id: true,
-                  name: true,
-                  level: true,
-                  _count: {
-                    select: {
-                      students: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
       });
 
       if (!teacher) throw createServiceError('Enseignant introuvable', 404);
 
-      return {
-        ...teacher,
-        user: teacher.schoolUser.user as any,
-        lessons: teacher.lessons.map((lesson) => ({
-          ...lesson,
-          day: lesson.day as Day,
-        })),
-        classes: [
-          ...teacher.supervisedClasses,
-          ...teacher.classTeacher.map((ct) => ct.class),
-        ].filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i),
-      };
+      return teacher;
     },
   },
 
@@ -365,7 +293,11 @@ export const teacherResolver: Resolvers = {
   Teacher: {
     weeklyHours: async (parent) => {
       const lessons = await prisma.lesson.findMany({
-        where: { teacherId: parent.id },
+        where: {
+          classSubject: {
+            teacherId: parent.id,
+          },
+        },
       });
 
       let totalMinutes = 0;
@@ -375,6 +307,17 @@ export const teacherResolver: Resolvers = {
       });
 
       return parseFloat((totalMinutes / 60).toFixed(1));
+    },
+
+    user: async (parent, _, { loaders }) => {
+      return await loaders.userLoader.load(parent.schoolUserId);
+    },
+    classSubject: async (parent, _, { loaders }) => {
+      return await prisma.classSubjects.findMany({
+        where: {
+          teacherId: parent.id,
+        },
+      });
     },
   },
 };

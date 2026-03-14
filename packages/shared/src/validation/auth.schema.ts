@@ -190,7 +190,7 @@ export const profileSchema = z
       ['MALE', 'FEMALE', 'OTHER'],
       'Veuillez sélectionner un genre valid. MALE ou FEMALE',
     ),
-    photo: z.string().optional(),
+    photo: z.string().nullish(),
     address: z
       .string()
       .min(5, "L'adresse doit être plus précise")

@@ -39,17 +39,16 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     // Mapping Rôle -> Route de base
     const roleRoutes: Record<string, string> = {
       ADMIN: '/dashboard/admin',
-      TEACHER: '/dashboard/table',
+      TEACHER: '/dashboard/teacher',
       STUDENT: '/dashboard/student',
       PARENT: '/dashboard/parent',
     };
 
     const allowedRoute = roleRoutes[role];
-    console.log('AllowedRoute', allowedRoute);
 
     // Si on est à la racine /dashboard, on redirige vers le dashboard spécifique
     if (pathname === '/dashboard') {
-      router.replace(allowedRoute || '/dashboard');
+      router.replace(allowedRoute || '/');
       return;
     }
 
@@ -58,7 +57,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     if (pathname.startsWith('/dashboard/admin') && role !== 'ADMIN') {
       router.replace(allowedRoute || '/dashboard');
     }
-    if (pathname.startsWith('/dashboard/table') && role !== 'TEACHER') {
+    if (pathname.startsWith('/dashboard/teacher') && role !== 'TEACHER') {
       router.replace(allowedRoute || '/dashboard');
     }
     // ... ajouter d'autres règles si besoin

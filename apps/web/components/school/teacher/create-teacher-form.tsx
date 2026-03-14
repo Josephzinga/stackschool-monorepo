@@ -169,7 +169,7 @@ export function CreateTeacherForm({
 
     toast.promise(promise, {
       loading: "Création de l'enseignant en cours...",
-      success: (data) => {
+      success: (data: any) => {
         if (isEdit) {
           return isEdit
             ? data?.updateTeacher?.message

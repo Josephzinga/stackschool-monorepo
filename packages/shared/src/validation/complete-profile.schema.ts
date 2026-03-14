@@ -126,7 +126,7 @@ export const teacherSchema = z.object({
 export const StaffFormSchema = z.object({
   position: z.string().min(2, 'Le poste est requis'),
   departement: z.string().min(2, 'Le département est requis'),
-  hireDate: z.date().optional(),
+  hireDate: z.coerce.date().optional(),
 });
 
 // Schéma global pour l'étape Rôle (Union)

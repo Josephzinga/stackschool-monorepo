@@ -1,7 +1,10 @@
-import React from 'react';
+import { TableProvider } from '@/components/school/class/table/table-provider';
+import { ClassView } from '@/app/(routes)/list/classes/class-view';
 
-function ClassesListPage() {
-  return <div>ClassesListPage</div>;
+export default function Page() {
+  return (
+    <TableProvider>
+      <ClassView />
+    </TableProvider>
+  );
 }
-
-export default ClassesListPage;

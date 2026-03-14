@@ -41,12 +41,7 @@ router.post(
       }
 
       if (role) {
-        const { errors, success } = safeValidateSchema(
-          roleDataSchema,
-          role.role === 'STAFF'
-            ? { ...role.staff, hireDate: new Date(role.staff.hireDate!) }
-            : role,
-        );
+        const { errors, success } = safeValidateSchema(roleDataSchema, role);
         if (!success) {
           return next(errors);
         }

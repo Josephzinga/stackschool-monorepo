@@ -8,12 +8,12 @@
     "seed": "ts-node-dev src/prisma/seed.ts"
   },
   "devDependencies": {
-    "@prisma/adapter-pg": "^7.0.1",
+    "@prisma/adapter-pg": "^7.4.2",
     "@prisma/extension-accelerate": "^2.0.2",
-    "prisma": "^7.0.1"
+    "prisma": "^7.4.2"
   },
   "dependencies": {
-    "@prisma/client": "^7.1.0",
+    "@prisma/client": "^7.4.2",
     "@stackschool/shared": "workspace:*"
   }
 }

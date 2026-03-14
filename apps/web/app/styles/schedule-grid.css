@@ -1,5 +1,4 @@
 tr {
-    height: 35px;
     border: none;
 }
 
@@ -18,6 +17,10 @@ tr {
 }
 .fc-col-header-cell {
     background-color: var(--accent);
+    height: 40px !important;
+}
+.fc-timegrid-slot {
+    height: 90px !important ;
 }
 
 .fc-timegrid-slot-minor {

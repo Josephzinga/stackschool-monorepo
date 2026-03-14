@@ -3,6 +3,7 @@ type Student {
   matricule: String!
   birthDate: DateTime
   birthPlace: DateTime
+  schoolUserId: ID
   motherName: String
   fatherName: String
   enrollmentYear: String!
@@ -17,7 +18,7 @@ type Student {
 
 type StudentDisciplinaryAction {
   id: String
-  studentId: String
+  studentId: ID
   type: DisciplinaryType
   reason: String
   startDate: DateTime
@@ -56,25 +57,61 @@ type School {
   code: String
   logo: String
   stats: SchoolStats
-
+  settings: SchoolSettings
   teachers: [Teacher]
+  lessons: [Lesson]
+}
+
+type SchoolSettings {
+  id: ID
+  schoolId: ID
+  lessonDuration: Int
+  startHour: Int
+  endHour: Int
+  daysOfWeek: [Day]
 }
 
 type Subject {
   id: ID!
   name: String!
   code: String
-  lessons: [Lesson]
+  category: SubjectCategory
+  totalWeeklyHours: Float
+  mainTeacherId: ID
+  mainTeacher: Teacher
+  classSubject: [ClassSubject]
 }
 
+type ClassSubject {
+  id: ID!
+  coefficient: Int
+  weeklyHours: Int
+  classe: Classe!
+  teacherId: ID
+  subjectId: ID
+  classId: ID!
+  subject: Subject
+  teacher: Teacher
+  lessons: [Lesson!]
+  assessments: [Assessment!]
+}
 type Parent {
   id: ID!
   profession: String
   isDelegate: Boolean
   students: [Student]
   relationType: String
+  schoolUserId: ID
+  user: User
 }
-
+type Assessment {
+  id: ID!
+  type: AssessmentType
+  description: String
+  status: AssessmentStatus
+  weight: Float
+  maxScore: Float
+}
 type Lesson {
   id: ID!
   title: String
@@ -83,11 +120,23 @@ type Lesson {
   day: Day
   class: Classe
   subject: Subject
+  subjectId: ID
+  teacherId: String
+  teacher: Teacher
+  status: LessonStatus
 }
 
+enum LessonStatus {
+  PLANNED
+  ONGOING
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
 type Teacher {
-  id: ID!
-  schoolUserId: String!
+  id: ID
+  schoolUserId: ID
+
   diploma: String
   experience: String
   hireDate: DateTime
@@ -97,7 +146,7 @@ type Teacher {
   departement: String
   specialization: String
   lessons: [Lesson]
-  classes: [Classe]
+classSubject: [ClassSubject]
   supervisedClasses: [Classe]
   createdAt: DateTime
   updatedAt: DateTime
@@ -124,11 +173,16 @@ type Classe {
   subjects: [Subject]
   lessons: [Lesson]
   students: [Student]
+  classSubject: [ClassSubject]
+  supervisor: Teacher
+  teachers: [Teacher]
   _count: ClassCount
 }
 
 type ClassCount {
-  students: Int!
+  students: GenderStats
+  teachers: Int
+  subjects: Int
 }
 
 type GenderStats {
@@ -196,25 +250,51 @@ enum StudentSortField {
   lastname
   enrolementYear
 }
+
+enum SubjectSortField {
+  coefficient
+  name
+  ponderation
+}
 input StudentSortInput {
   field: StudentSortField
   order: SortOrder
 }
-
+input SubjectSortInput {
+  field: SubjectSortField
+  order: SortOrder
+}
 input GetSchoolStudentsInput {
-  schoolId: ID!
   page: Int! = 0
   limit: Int! = 10
 
+  teacherId: String
   sort: StudentSortInput
   classId: ID
   searchTerm: String
   level: String
   section: String
 }
+input CreateSubjectInput {
+  name: String!
+  code: String!
+  mainTeacherId: ID
+  category: SubjectCategory!
+  classSubject: [ClassSubjectInput!]
+}
+
+
+
+input ClassSubjectInput {
+  id: ID
+  teacherId: ID
+  classId: ID
+  subjectId: ID
+  coefficient: Int!
+  weeklyHours: Float
+}
 
 input GetSchoolTeachersInput {
-  schoolId: ID!
   page: Int! = 0
   limit: Int! = 10
   searchTerm: String
@@ -223,4 +303,33 @@ input GetSchoolTeachersInput {
   specialization: String
   isActive: Boolean
   isSupervisor: Boolean
+}
+input GetSchoolClassesInput {
+  page: Int! = 0
+  limit: Int! = 10
+  level: String
+  section: String
+  teacherId: String
+  searchTerm: String
+}
+enum AssessmentType {
+  EXAM
+  ASSIGNMENT
+  QUIZ
+  TEST
+  PRACTICAL
+  ORAL
+}
+
+enum AssessmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum SubjectCategory {
+  SCIENTIFIC
+  LITERARY
+  GENERAL
+  SPORT
 }

@@ -1,4 +1,4 @@
-query GetSchoolTeachers($input: GetSchoolTeachersInput) {
+query GetSchoolTeachers($input: GetSchoolTeachersInput!) {
   getSchoolTeachers(input: $input) {
     meta {
       limit
@@ -29,14 +29,32 @@ query GetSchoolTeachers($input: GetSchoolTeachersInput) {
           gender
         }
       }
-      classes {
+    classSubject {
+      classe {
+        id
+        name
+      }
+      subject {
         id
         name
       }
     }
+    }
   }
 }
-
+query GetTeachers( $input: GetSchoolTeachersInput) {
+  getSchoolTeachers( input: $input) {
+    data {
+      id
+      user {
+        profile {
+          firstname
+          lastname
+        }
+      }
+    }
+  }
+}
 query GetTeacherDetails($id: ID!, $schoolId: ID!) {
   teacher(id: $id, schoolId: $schoolId) {
     id
@@ -62,29 +80,42 @@ query GetTeacherDetails($id: ID!, $schoolId: ID!) {
         address
       }
     }
-    classes {
-      id
-      name
-      level
-      _count {
-        students
-      }
-    }
-    lessons {
-      id
-      title
-      day
-      startTime
-      endTime
-      class {
-        name
-      }
-      subject {
-        name
-      }
-    }
+   classSubject {
+     classe {
+       id
+       name
+       level
+       _count {
+         students {
+           male
+           female
+         }
+       }
+     }
+     subject {
+       id
+       name
+       code
+     }
+     lessons {
+       id
+       title
+       day
+       startTime
+       endTime
+       class {
+         name
+       }
+       subject {
+         name
+       }
+     }
+   }
+
   }
 }
+
+
 
 mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!, $soft: Boolean) {
   deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId, soft: $soft) {

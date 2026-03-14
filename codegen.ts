@@ -7,21 +7,25 @@ const config: CodegenConfig = {
   documents: ['packages/shared/src/graphql/operations/**/*.graphql'],
 
   generates: {
-    // 1. Types pour le Backend (Resolvers)
     'apps/api/src/graphql/types.generated.ts': {
       plugins: ['typescript', 'typescript-resolvers'],
       config: {
-        contextType: '@stackschool/shared#Context',
+        contextType: '@stackschool/api/src/types/graphql.type#Context',
         useIndexSignature: true,
+        enumValues: {
+          StudentStatus:
+            '@stackschool/db/src/prisma/client/generated#StudentStatus',
+          Gender: '@stackschool/db/src/prisma/client/generated#Gender',
+          Day: '@stackschool/db/src/prisma/client/generated#Day',
+        },
       },
     },
 
-    // 2. SDK Client (Types + Hooks React Query)
     'packages/ui/src/generated/graphql.ts': {
       plugins: [
         'typescript',
         'typescript-operations',
-        'typescript-react-query', // Génère les hooks useQuery
+        'typescript-react-query',
       ],
       config: {
         scalar: {
@@ -29,7 +33,6 @@ const config: CodegenConfig = {
           DateTime: 'Date',
         },
         skipTypename: false,
-        // Configuration spécifique React Query v5
         reactQueryVersion: 5,
         addInfiniteQuery: true,
 
@@ -44,3 +47,11 @@ const config: CodegenConfig = {
 };
 
 export default config;
+/*   mappers: {
+          Classe: '@stackschool/db/src/prisma/client/generated#Class',
+          Teacher: '@stackschool/db/src/prisma/client/generated#Teacher',
+          Lesson: '@stackschool/db/src/prisma/client/generated#Lesson',
+          Subject: '@stackschool/db/src/prisma/client/generated#Subject',
+          Profile: '@stackschool/db/src/prisma/client/generated#Profile',
+          Student: '@stackschool/db/src/prisma/client/generated#Student',
+        }, */

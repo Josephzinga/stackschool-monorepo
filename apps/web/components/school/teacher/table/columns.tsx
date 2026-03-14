@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { TeacherTableActions } from './teacher-table-actions';
-import { Gender } from '@stackschool/ui';
 
 export type Teacher = {
   id: string | number;
@@ -19,10 +18,9 @@ export type Teacher = {
   photo?: string;
   phoneNumber?: string;
   specialization: string[];
-  diploma: string;
-  gender: Gender;
   status: boolean;
   classes: { id: string; name: string }[];
+  subjects?: { id: string; name: string }[];
 };
 
 export const columns: ColumnDef<Teacher>[] = [
@@ -89,17 +87,24 @@ export const columns: ColumnDef<Teacher>[] = [
     },
   },
   {
-    accessorKey: 'specialization',
-    header: 'Spécialité',
-    cell: ({ row }) => (
-      <div className="flex flex-wrap gap-1">
-        {row.original.specialization?.map((spec, i) => (
-          <Badge key={i} variant="outline" className="font-normal text-xs">
-            {spec}
-          </Badge>
-        ))}
+    accessorKey: 'subjects',
+    header: () => (
+      <div>
+        <p className="font-inter font-semibold">Matières.</p>
       </div>
     ),
+    cell: ({ row }) => {
+      const subjects = [...new Set(row.original.subjects?.map((s) => s.name))];
+      return (
+        <div className="flex flex-wrap gap-1">
+          {subjects.map((sub, i) => (
+            <Badge key={i} variant="outline" className="font-normal text-xs">
+              {sub}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'phoneNumber',

@@ -1,7 +1,7 @@
 type Profile {
   id: ID!
-  firstname: String!
-  lastname: String!
+  firstname: String
+  lastname: String
   photo: String
   gender: String
   address: String
@@ -23,8 +23,8 @@ type SchoolMembership {
 
 type User {
   id: ID!
-  email: String!
-  username: String!
+  email: String
+  username: String
   phoneNumber: String
   profileCompleted: Boolean
   hasMembership: Boolean

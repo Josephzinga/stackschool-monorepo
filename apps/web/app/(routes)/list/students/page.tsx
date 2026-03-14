@@ -11,6 +11,7 @@ import {
 } from '@/components/school/student/table/table-provider';
 import { DataTableHeader } from '@/components/school/student/table/data-table-header';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useSearchParams } from 'next/navigation';
 
 export default function () {
   return (
@@ -22,18 +23,21 @@ export default function () {
 
 function StudentView() {
   const { currentSchool } = useUserStore();
+  const searchParams = useSearchParams();
+  const teacherId = searchParams.get('teacherId');
 
-  const { filters, setRowSelection, pagination, searchTerm } = useTable();
+  const { filters, pagination, searchTerm } = useTable();
 
   const search = useDebounce(500, searchTerm);
   const { data, isPending } = useGetSchoolStudentsQuery({
+    schoolId: currentSchool?.id!,
     input: {
       ...filters,
-      schoolId: currentSchool?.id!,
       sort: filters.sort,
       limit: pagination.pageSize,
       page: pagination.pageIndex,
       searchTerm: search,
+      teacherId,
     },
   });
 

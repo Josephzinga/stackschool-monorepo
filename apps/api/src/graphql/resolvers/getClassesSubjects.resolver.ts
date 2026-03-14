@@ -1,12 +1,11 @@
-import { Context } from '@stackschool/shared';
 import { prisma } from '@stackschool/db';
 import { createServiceError } from '../../utils/api-errors';
 import { Resolvers } from '../types.generated';
 
 export const getClassesSubjectsResolver: Resolvers = {
   Query: {
-    getClassSubjects: async (_: any, { filter }, context: Context) => {
-      const { schoolId, searchTerm, getSubject } = filter;
+    getClassSubjects: async (_: any, { filter }, { user, schoolId }) => {
+      const { searchTerm } = filter;
 
       if (searchTerm && searchTerm.length < 2) {
         throw createServiceError(
@@ -35,19 +34,6 @@ export const getClassesSubjectsResolver: Resolvers = {
             name: true,
             level: true,
             section: true,
-            classSubjects: getSubject
-              ? {
-                  select: {
-                    subject: {
-                      select: {
-                        id: true,
-                        name: true,
-                        code: true,
-                      },
-                    },
-                  },
-                }
-              : false,
           },
           take: 10,
           orderBy: { name: 'desc' },
@@ -57,15 +43,7 @@ export const getClassesSubjectsResolver: Resolvers = {
           return [];
         }
 
-        return classes.map((cls) => ({
-          id: cls.id,
-          name: cls.name,
-          level: cls.level,
-          section: cls.section,
-          subjects: getSubject
-            ? cls?.classSubjects?.map((cs: any) => cs?.subject)
-            : null,
-        })) as any;
+        return classes;
       } catch (e) {
         throw createServiceError(
           'Erreur lors de la recherche des classes',

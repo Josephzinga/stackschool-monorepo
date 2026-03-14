@@ -10,6 +10,7 @@ import {
   subDays,
   subMonths,
 } from 'date-fns';
+import { isAdmin } from '../../lib/verify-role';
 
 export const schoolResolver: Resolvers = {
   Query: {
@@ -195,6 +196,22 @@ export const schoolResolver: Resolvers = {
         pendingPaymentsCount: 0,
         enrollmentPerMonth: [],
       };
+    },
+    settings: async (parent, _, { user }) => {
+      if (!parent.id) return null;
+      const checked = await isAdmin({
+        context: { schoolId: parent.id, userId: user.id },
+      });
+      if (!checked.success) {
+        throw createServiceError(checked.message || 'Accès non autoriser', 403);
+      }
+
+      const settings = await prisma.schoolSettings.findUnique({
+        where: {
+          schoolId: parent.id,
+        },
+      });
+      return settings;
     },
   },
 };

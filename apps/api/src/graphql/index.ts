@@ -11,11 +11,17 @@ import { meResolver } from './resolvers/me.resolver';
 import { schoolResolver } from './resolvers/school.resolver';
 import { teacherResolver } from './resolvers/teacher/teacher.resolver';
 import { createTeacherResolver } from './resolvers/teacher/create-list-teacher.resolver';
-import { listResolver } from './resolvers/list.resolver';
 import { studentResolver } from './resolvers/student/student.resolver';
 import { createStudentResolver } from './resolvers/student/create-student.resolver';
+import { classResolver } from './resolvers/class/class.resolver';
 import { ServiceError } from '@stackschool/shared';
+import { prisma, SchoolUser } from '@stackschool/db';
 import { ZodError } from 'zod';
+import { createLoaders } from './resolvers/data-loader';
+import { createServiceError } from '../utils/api-errors';
+import { updateLessonStatusResolver } from './resolvers/class/update-lesson.resolver';
+import { lessonsResolver } from './resolvers/lessons.resolver';
+import { subjectResolver } from './resolvers/subject.resolver';
 
 const dirPath = path.resolve(
   __dirname,
@@ -37,12 +43,15 @@ const resolvers = merge(
   teacherResolver,
   createTeacherResolver,
   createStudentResolver,
-  listResolver,
   studentResolver,
+  classResolver,
   searchStudentResolver,
   searchSchoolResolver,
   getClassesSubjectsResolver,
   confirmCompleteProfileResolver,
+  updateLessonStatusResolver,
+  lessonsResolver,
+  subjectResolver,
 );
 
 // Création du schéma exécutable
@@ -53,15 +62,38 @@ const schema = makeExecutableSchema({
 
 const graphqlMiddleware = createHandler({
   schema,
-  context: (req) => ({
-    user: req.raw.user,
-  }),
+  context: async (req) => {
+    const user = req.raw.user;
+    const schoolId = req.raw.headers['x-school-id'] as string;
+    let membership: SchoolUser | null | undefined;
+    if (user && schoolId) {
+      membership = await prisma.schoolUser.findFirst({
+        where: {
+          userId: user.id,
+          schoolId: schoolId,
+        },
+      });
+
+      if (!membership) {
+        throw createServiceError('Accès refusé à cette école', 403);
+      }
+    }
+
+    return {
+      user,
+      schoolId,
+      loaders: createLoaders(prisma),
+      membership,
+    };
+  },
   formatError: (err) => {
     console.error(
       "Message d'erreur graphql \n",
       err.message,
       'Details \n',
-      err,
+      err?.code,
+      err?.status,
+      err?.statusCode,
     );
     if (err instanceof ZodError) {
       return {

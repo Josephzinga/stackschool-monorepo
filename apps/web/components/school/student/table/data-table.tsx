@@ -1,36 +1,20 @@
 'use client';
 import {
   type ColumnDef,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import * as React from 'react';
 import { useEffect } from 'react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTable } from './table-provider';
 import { PaginationMeta } from '@stackschool/ui';
 import { useWindowSize } from 'react-use';
+import AppDataTable from '@/components/table/app-data-table';
+import { DataTablePagination } from '@/components/data-table-pagination';
 
-interface DataTableProps<TData, TValue> {
+export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading: boolean;
@@ -81,7 +65,7 @@ export function DataTable<TData, TValue>({
         matricule: true,
         status: true,
         enrollmentYear: false,
-        level: true,
+        level: false,
       });
     } else {
       setColumnVisibility({});
@@ -110,7 +94,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full h-full font-poppins z-10 flex flex-col gap-4">
-      <div className="rounded-md border relative min-h-75 overflow-x-auto">
+      <div className="rounded-md mb-2 border relative min-h-75 overflow-x-auto">
         {isLoading && (
           <div className="absolute inset-0 bg-white/50 dark:bg-slate-800/70 z-50 flex flex-col backdrop-blur-sm">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -125,121 +109,9 @@ export function DataTable<TData, TValue>({
             ))}
           </div>
         )}
-
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                className="h-10 bg-slate-100 dark:bg-slate-900"
-              >
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className="font-semibold font-inter text-md whitespace-nowrap"
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className="h-14 even:bg-slate-50 dark:even:bg-slate-950 "
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  {isLoading ? 'Chargement...' : 'Aucun résultat.'}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <AppDataTable table={table} columns={columns} isLoading={isLoading} />
       </div>
-
-      <div className="flex flex-col sm:flex-row items-center justify-between px-2 gap-4">
-        <div className="text-sm text-muted-foreground order-2 sm:order-1">
-          {table.getFilteredSelectedRowModel().rows.length} sur{' '}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
-        </div>
-        <div className="flex items-center gap-4 lg:gap-8 order-1 sm:order-2 w-full sm:w-auto justify-between sm:justify-end">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-medium hidden sm:block">Lignes</p>
-            <Select
-              value={`${table.getState().pagination.pageSize}`}
-              onValueChange={(value) => {
-                table.setPageSize(Number(value));
-              }}
-            >
-              <SelectTrigger className="h-8 w-17">
-                <SelectValue
-                  placeholder={table.getState().pagination.pageSize}
-                />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex w-25 items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} sur{' '}
-            {table.getPageCount()}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage() || isLoading}
-            >
-              <span className="sr-only">Page précédente</span>
-              <IconChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage() || isLoading}
-            >
-              <span className="sr-only">Page suivante</span>
-              <IconChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <DataTablePagination table={table} isLoading={isLoading} />
     </div>
   );
 }

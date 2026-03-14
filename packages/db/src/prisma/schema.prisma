@@ -15,85 +15,95 @@ model User {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   deletedAt         DateTime?
-  emailVerifiedAt   DateTime?
-  isActive          Boolean             @default(true)
-  emailVerified     Boolean?            @default(false)
   hasMembership     Boolean?            @default(false)
   profileCompleted  Boolean?            @default(false)
   username          String?             @unique
   isVerified        Boolean?
   phoneNumber       String?             @unique
+  emailVerifiedAt   DateTime?
+  emailVerified     Boolean?            @default(false)
+  isActive          Boolean             @default(true)
   Account           Account[]
+  payments          Payment[]
   profile           Profile?
   memberships       SchoolUser[]
   sessions          Session[]
   VerificationCode  VerificationCode[]
   VerificationToken VerificationToken[]
-  payments          Payment[]
 
   @@index([email])
 }
 
 model Profile {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   firstname String?
   lastname  String?
-  address   String?
   gender    Gender?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  userId    String    @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String   @unique
   photo     String?
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  student   Student[]
+  address   String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  student   Student?
 }
 
 model School {
-  id            String    @id @default(cuid())
-  name          String
-  slug          String?   @unique
-  address       String
-  code          String?   @unique
-  planId        String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
-  inviationCode String?
-  logo          String?
-  motto         String?
-
+  id               String          @id @default(cuid())
+  name             String
+  slug             String?         @unique
+  address          String
+  code             String?         @unique
+  planId           String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?
+  inviationCode    String?
+  logo             String?
+  motto            String?
+  assessments      Assessment[]
   orangeMerchantId String?
   paymentApiKey    String?
-  walletBalance    Float     @default(0)
+  walletBalance    Float           @default(0)
+  attendances      Attendance[]
+  classes          Class[]
+  lessons          Lesson[]
   payment          Payment[]
+  memberships      SchoolUser[]
+  students         Student[]
+  Subject          Subject[]
+  subscriptions    Subscription[]
+  settings         SchoolSettings?
+}
 
-  classes       Class[]
-  lessons       Lesson[]
-  memberships   SchoolUser[]
-  students      Student[]
-  Subject       Subject[]
-  subscriptions Subscription[]
-  attendances   Attendance[]
+model SchoolSettings {
+  id String @id @default(cuid())
+
+  schoolId       String @unique
+  lessonDuration Int    @default(50) // durée d'une lesson (5O min)
+  startHour      Int    @default(8) // début de cours (8 heure)
+  endHour        Int    @default(18) // fin de cours (18 heure)
+  daysOfWeek     Day[]
+  breakStartHour Int    @default(12) // 12 heure (heure de pause)
+  breakDuration  Int    @default(60) // 60 duration de la pause (60 min)
+  school         School @relation(fields: [schoolId], references: [id])
 }
 
 /// *
 /// * pivot User <-> School
 model SchoolUser {
-  id           String         @id @default(cuid())
-  schoolId     String
-  userId       String
-  role         SchoolRole
-  isOwner      Boolean        @default(false)
-  createdAt    DateTime       @default(now())
-  class        Class[]
-  classTeacher ClassTeacher[]
-  school       School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Staff        Staff?
-  subject      Subject[]
-  teacher      Teacher?
-  Parent       Parent?
-  student      Student?
+  id        String     @id @default(cuid())
+  schoolId  String
+  userId    String
+  role      SchoolRole
+  isOwner   Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  Parent    Parent?
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Staff     Staff?
+  student   Student?
+  teacher   Teacher?
 
   @@unique([schoolId, userId])
   @@index([schoolId])
@@ -102,23 +112,21 @@ model SchoolUser {
 }
 
 /// *
-/// * Subject: utilise pivot ClassSubjects (explicit)
+/// * Subject:  pivot ClassSubjects (explicit)
 model Subject {
   id            String          @id @default(cuid())
-  name          String          @unique
+  name          String
   code          String?
+  category      SubjectCategory @default(GENERAL)
+  mainTeacherId String?
   schoolId      String
-  teacherId     String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  schoolUserId  String?
-  ClassSubjects ClassSubjects[]
+  classSubjects ClassSubjects[]
   school        School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  schoolUser    SchoolUser?     @relation(fields: [schoolUserId], references: [id])
-  teacher       Teacher?        @relation(fields: [teacherId], references: [id])
-  lessons       Lesson[]
-  assessments   Assessment[]
+  mainTeacher   Teacher?        @relation("MainTeacher", fields: [mainTeacherId], references: [id])
 
+  @@unique([name, schoolId])
   @@unique([code, schoolId])
   @@index([schoolId])
 }
@@ -126,13 +134,17 @@ model Subject {
 /// *
 /// * Pivot explicit pour Class <-> Subject
 model ClassSubjects {
-  id        String   @id @default(cuid())
-  classId   String
-  subjectId String
-  teacherId String?
-  teacher   Teacher? @relation(fields: [teacherId], references: [id])
-  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
-  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  id          String       @id @default(cuid())
+  classId     String
+  weeklyHours Int?
+  coefficient Int          @default(1)
+  subjectId   String
+  teacherId   String?
+  lessons     Lesson[]
+  assessments Assessment[]
+  class       Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject     Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher     Teacher?     @relation(fields: [teacherId], references: [id])
 
   @@unique([classId, subjectId])
   @@index([classId])
@@ -141,78 +153,52 @@ model ClassSubjects {
 }
 
 model Class {
-  id           String   @id @default(cuid())
-  name         String
-  level        String
-  section      String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  schoolId     String
-  teacherId    String?
-  supervisorId String?
-
-  school     School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  teacher    SchoolUser? @relation(fields: [teacherId], references: [id])
-  supervisor Teacher?    @relation("ClassSupervisor", fields: [supervisorId], references: [id])
-
+  id            String          @id @default(cuid())
+  name          String
+  level         String
+  section       String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  schoolId      String
+  teacherId     String?
+  supervisorId  String?
+  school        School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  supervisor    Teacher?        @relation("ClassSupervisor", fields: [supervisorId], references: [id])
   classSubjects ClassSubjects[]
-  classTeacher  ClassTeacher[]
-  lessons       Lesson[]
   students      Student[]
-  assessment    Assessment[]
 
   @@unique([name, schoolId])
   @@index([schoolId])
 }
 
 /// *
-/// * Pivot Prof <-> Classe
-model ClassTeacher {
-  id            String      @id @default(cuid())
-  classId       String
-  name          String?
-  teacherId     String
-  createdAt     DateTime    @default(now())
-  staffMemberId String?
-  schoolUserId  String?
-  class         Class       @relation(fields: [classId], references: [id], onDelete: Cascade)
-  SchoolUser    SchoolUser? @relation(fields: [schoolUserId], references: [id])
-  teacher       Teacher     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-
-  @@unique([classId, teacherId])
-  @@index([classId])
-  @@index([teacherId])
-}
-
-/// *
 /// * Etudiant
 model Student {
-  id             String        @id @default(cuid())
-  matricule      String
-  enrollmentYear String
-  birthDate      DateTime
-  deletedAt      DateTime?
-  birthPlace     String?
-  fatherName     String?
-  motherName     String?
-  nationality    String?
-  status         StudentStatus @default(ACTIVE)
-
+  id                 String                      @id @default(cuid())
   profileId          String                      @unique
-  schoolUserId       String                      @unique
+  matricule          String
+  enrollmentYear     String
+  birthDate          DateTime
   schoolId           String
   classId            String?
   createdAt          DateTime                    @default(now())
   updatedAt          DateTime                    @updatedAt
+  deletedAt          DateTime?
+  birthPlace         String?
+  fatherName         String?
+  motherName         String?
+  nationality        String?
+  schoolUserId       String                      @unique
+  status             StudentStatus               @default(ACTIVE)
+  results            AssessmentResult[]
   attendances        Attendance[]
   parentStudent      ParentStudent[]
+  payments           Payment[]
   schoolClass        Class?                      @relation(fields: [classId], references: [id])
   profile            Profile                     @relation(fields: [profileId], references: [id], onDelete: Cascade)
   school             School                      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   schoolUser         SchoolUser                  @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
   discipinaryActions StudentDisciplinaryAction[]
-  payments           Payment[]
-  results            AssessmentResult[]
 
   @@unique([matricule, schoolId])
   @@index([schoolUserId])
@@ -220,21 +206,14 @@ model Student {
 }
 
 model StudentDisciplinaryAction {
-  id        String  @id @default(cuid())
+  id        String           @id @default(cuid())
   studentId String
-  student   Student @relation(fields: [studentId], references: [id])
-
   type      DisciplinaryType
   reason    String
   startDate DateTime
   endDate   DateTime?
   createdAt DateTime         @default(now())
-}
-
-enum DisciplinaryType {
-  SUSPENSION
-  EXPULSION
-  WARNING
+  student   Student          @relation(fields: [studentId], references: [id])
 }
 
 /// *
@@ -245,8 +224,8 @@ model Parent {
   profession        String?
   isDelegate        Boolean           @default(false)
   createdAt         DateTime          @default(now())
-  contactPreference ContactPreference
   updatedAt         DateTime          @updatedAt
+  contactPreference ContactPreference
   schoolUser        SchoolUser        @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
   students          ParentStudent[]
 }
@@ -255,10 +234,10 @@ model Parent {
 /// * Parent - Student pivot
 model ParentStudent {
   id           String       @id @default(cuid())
-  parentId     String
   studentId    String
-  relationType RelationType
   createdAt    DateTime     @default(now())
+  parentId     String
+  relationType RelationType
   parent       Parent       @relation(fields: [parentId], references: [id], onDelete: Cascade)
   student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
@@ -268,17 +247,17 @@ model ParentStudent {
 model Invite {
   id          String     @id @default(cuid())
   email       String?
-  phoneNumber String?
   schoolId    String
   studentId   String?
   token       String?    @unique
-  code        String?    @unique
   relation    String?
   createdAt   DateTime   @default(now())
   expiresAt   DateTime
   used        Boolean    @default(false)
   role        SchoolRole
   message     String
+  phoneNumber String?
+  code        String?    @unique
 
   @@index([schoolId])
   @@index([studentId])
@@ -291,12 +270,12 @@ model Attendance {
   studentId String
   date      DateTime
   status    AttendanceStatus
-  schoolId  String
   createdAt DateTime         @default(now())
   teacherId String?
+  schoolId  String
+  school    School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   student   Student          @relation(fields: [studentId], references: [id])
   teacher   Teacher?         @relation(fields: [teacherId], references: [id])
-  school    School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, date])
   @@index([studentId, date])
@@ -304,61 +283,48 @@ model Attendance {
 }
 
 model Lesson {
-  id        String   @id @default(cuid())
-  title     String?
-  subtitle  String?
-  startTime DateTime
-  day       Day
-  endTime   DateTime
-  teacherId String
-  classId   String
-  subjectId String
-  schoolId  String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  subject Subject @relation(fields: [subjectId], references: [id])
-  class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
-  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  title          String?
+  subtitle       String?
+  startTime      DateTime
+  day            Day
+  endTime        DateTime
+  schoolId       String
+  classSubjectId String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  classSubject   ClassSubjects @relation(fields: [classSubjectId], references: [id])
+  school         School        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }
 
-/// *
-/// * Assessments
-
 model Assessment {
-  id          String           @id @default(cuid())
-  title       String
-  type        AssessmentType
-  description String?
-  status      AssessmentStatus @default(DRAFT)
-  weight      Float?
-  maxScore    Float
+  id             String             @id @default(cuid())
+  title          String
+  type           AssessmentType
+  description    String?
+  status         AssessmentStatus   @default(DRAFT)
+  weight         Float?
+  maxScore       Float
+  teacherId      String
+  classSubjectId String
+  schoolId       String
+  startDate      DateTime?
+  endDate        DateTime?
+  dueDate        DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  classSubject   ClassSubjects      @relation(fields: [classSubjectId], references: [id])
+  teacher        Teacher            @relation(fields: [teacherId], references: [id])
+  results        AssessmentResult[]
+  school         School             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
-  teacherId String
-  subjectId String
-  classId   String
-
-  startDate DateTime?
-  endDate   DateTime?
-  dueDate   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  class   Class              @relation(fields: [classId], references: [id], onDelete: Cascade)
-  teacher Teacher            @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  subject Subject            @relation(fields: [subjectId], references: [id])
-  results AssessmentResult[]
-
-  @@index([classId])
+  @@unique([title, classSubjectId, startDate])
+  @@index([classSubjectId])
   @@index([teacherId])
-  @@index([subjectId])
 }
 
 model AssessmentResult {
-  id           String    @id @default(cuid())
+  id           String     @id @default(cuid())
   assessmentId String
   studentId    String
   score        Float?
@@ -367,11 +333,10 @@ model AssessmentResult {
   status       String?
   submittedAt  DateTime?
   gradedAt     DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  student    Student    @relation(fields: [studentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  student      Student    @relation(fields: [studentId], references: [id])
 
   @@unique([assessmentId, studentId])
   @@index([studentId])
@@ -435,20 +400,16 @@ model Payment {
   type        PaymentType
   description String?
   providerRef String?       @unique
-
-  payerPhone String?
-  payerName  String?
-
-  payerId String?
-  payer   User?   @relation(fields: [payerId], references: [id])
-
-  schoolId  String
-  school    School  @relation(fields: [schoolId], references: [id])
-  studentId String
-  student   Student @relation(fields: [studentId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  payerPhone  String?
+  payerName   String?
+  payerId     String?
+  schoolId    String
+  studentId   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  payer       User?         @relation(fields: [payerId], references: [id])
+  school      School        @relation(fields: [schoolId], references: [id])
+  student     Student       @relation(fields: [studentId], references: [id])
 }
 
 model VerificationToken {
@@ -502,22 +463,20 @@ model Teacher {
   experience        String?
   hireDate          DateTime?
   isActive          Boolean
-  bio               String?
-  cvUrl             String?
   salary            Float?
   departement       String?
   specialization    String?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
-  deletedAt         DateTime? // Ajout du champ deletedAt
-  attendance        Attendance[]
-  classTeacher      ClassTeacher[]
-  Subject           Subject[]
-  schoolUser        SchoolUser      @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
-  lessons           Lesson[]
-  supervisedClasses Class[]         @relation("ClassSupervisor")
-  classSubjects     ClassSubjects[]
+  deletedAt         DateTime?
+  bio               String?
+  cvUrl             String?
   assessments       Assessment[]
+  attendance        Attendance[]
+  supervisedClasses Class[]         @relation("ClassSupervisor")
+  subject           Subject[]       @relation("MainTeacher")
+  classSubjects     ClassSubjects[]
+  schoolUser        SchoolUser      @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
 
   @@map("Teachers")
 }
@@ -532,6 +491,12 @@ model Staff {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   schoolUser   SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+}
+
+enum DisciplinaryType {
+  SUSPENSION
+  EXPULSION
+  WARNING
 }
 
 enum SchoolRole {
@@ -553,7 +518,7 @@ enum AssessmentType {
 
 enum AssessmentStatus {
   DRAFT
-  BUBLISHED
+  PUBLISHED
   CLOSED
 }
 
@@ -622,10 +587,25 @@ enum StudentStatus {
 }
 
 enum PaymentType {
-  TUITION // Scolarité
-  REGISTRATION // Inscription
-  CANTEEN // Cantine
-  TRANSPORT // Transport
-  UNIFORM // Tenue
+  TUITION
+  REGISTRATION
+  CANTEEN
+  TRANSPORT
+  UNIFORM
   OTHER
+}
+
+enum SubjectCategory {
+  SCIENTIFIC
+  LITERARY
+  GENERAL
+  SPORT
+}
+
+enum LessonStatus {
+  PLANNED // Prévue mais pas encore commencée
+  ONGOING // En cours (optionnel mais utile)
+  COMPLETED // Terminée (cours effectivement donné)
+  CANCELLED // Annulée (ne comptera pas)
+  POSTPONED // Reportée à une autre date
 }

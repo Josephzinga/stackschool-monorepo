@@ -12,6 +12,7 @@ import {
   Newspaper,
   NotebookPen,
   NotebookTabs,
+  NotebookTextIcon,
   ScrollText,
   Settings,
   UserRound,
@@ -53,10 +54,17 @@ export const menuItems = {
     },
     {
       icon: NotebookPen,
+      label: 'Matières',
+      href: '/list/subjects',
+      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT, ROLES.PARENT],
+    },
+    {
+      icon: NotebookTextIcon,
       label: 'Leçons',
       href: '/list/lessons',
       visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT],
     },
+
     {
       icon: Newspaper,
       label: 'Examens',

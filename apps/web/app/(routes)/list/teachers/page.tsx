@@ -29,8 +29,8 @@ function TeachersView() {
 
   const { data, isPending } = useGetSchoolTeachersQuery(
     {
+      schoolId: currentSchool?.id!,
       input: {
-        schoolId: currentSchool?.id!,
         limit: pagination.pageSize,
         page: pagination.pageIndex,
         searchTerm: search,
@@ -53,12 +53,16 @@ function TeachersView() {
       gender: t?.user?.profile?.gender as Gender,
       diploma: t?.diploma ?? '',
       classes:
-        t.classes?.map((c) => ({
-          id: c?.id!,
-          name: c?.name!,
+        t?.classSubject?.map((cs) => ({
+          id: cs?.classe.id!,
+          name: cs?.classe.name ?? '',
         })) || [],
       status: t.isActive || false,
       photo: t.user?.profile?.photo || undefined,
+      subjects: t.classSubject?.map((cs) => ({
+        id: cs?.subject.id,
+        name: cs?.subject.name,
+      })),
     })) || [];
 
   const meta = data?.getSchoolTeachers.meta;

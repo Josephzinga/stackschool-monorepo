@@ -91,22 +91,6 @@ query GetDashboardContext($input: SchoolId!) {
         id
         departement
         specialization
-        classes {
-          id
-          name
-          section
-          subjects {
-            id
-            name
-            lessons {
-              id
-              title
-              startTime
-              endTime
-              day
-            }
-          }
-        }
         supervisedClasses {
           id
           section

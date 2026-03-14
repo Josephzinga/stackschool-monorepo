@@ -1,19 +1,57 @@
 type Mutation {
   confirmCompleteProfile: UserPayload
   createListTeachers(data: CreateTeacherInput, schoolId: ID!): ApiResponse
-  updateTeacher(teacherId: ID!, data: CreateTeacherInput!, schoolId: ID!): ApiResponse
-  deleteTeachers(teacherIds: [ID!]!, schoolId: ID!, soft: Boolean = true): ApiResponse
-  deleteStudents(studentIds: [ID!]!, schoolId: ID!, soft: Boolean = true): ApiResponse
+  updateTeacher(
+    teacherId: ID!
+    data: CreateTeacherInput!
+    schoolId: ID!
+  ): ApiResponse
+  deleteTeachers(
+    teacherIds: [ID!]!
+    schoolId: ID!
+    soft: Boolean = true
+  ): ApiResponse
+  deleteStudents(
+    studentIds: [ID!]!
+    schoolId: ID!
+    soft: Boolean = true
+  ): ApiResponse
   createListStudent(data: CreateStudentInput!, schoolId: ID!): ApiResponse
-  updateStudent(studentId: ID!, data: CreateStudentInput!, schoolId: ID!): ApiResponse
+  updateStudent(
+    studentId: ID!
+    data: CreateStudentInput!
+    schoolId: ID!
+  ): ApiResponse
+  createClass(data: CreateClassInput!, schoolId: ID!): ApiResponse
+  updateClass(data: CreateClassInput!, schoolId: ID!, classId: ID!): ApiResponse
+  deleteClasses(classIds: [ID!]!, schoolId: ID!): ApiResponse
+  updateClassLesson(input: UpdateClassLessonInput!): Lesson
+  createSubject(input: CreateSubjectInput!):Subject
+  deleteSubjects(subjectIds: [ID!]!): ApiResponse
+  createClassSubject(input: ClassSubjectInput): ClassSubject
+  updateClassSubject(input: ClassSubjectInput) : ClassSubject
+  deleteClassSubjects(ids: [ID!]!): ApiResponse
 }
 
 scalar DateTime
-
+input UpdateClassLessonInput {
+  lessonId: ID!
+  targetStatus: LessonStatus
+  startTime: DateTime
+  endTime: DateTime
+  classId: ID!
+  day: Day
+}
 type ApiResponse {
   ok: Boolean
   message: String
   details: [String]
+}
+
+type ClassTeacher {
+  schoolId: ID
+  teacher: [Teacher]
+  class: [Classe]
 }
 
 type Query {
@@ -23,19 +61,17 @@ type Query {
   me: User
   school(schoolId: ID!): School!
   verifyInvitationCode(code: InvitationCodeInput!): User
-
+  getLessons(classId: ID, teacherId: ID, searchTerm: String): [Lesson]
+  getClassTeacher: ClassTeacher
   teacher(id: ID!, schoolId: ID!): Teacher
   student(id: ID!, schoolId: ID!): Student
+  class(id: ID!): Classe
 
   getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList!
 
-  getSchoolStudents(input: GetSchoolStudentsInput): StudentList!
+  getSchoolStudents(input: GetSchoolStudentsInput!, schoolId: ID!): StudentList!
 
-  getSchoolClasses(
-    schoolId: ID!
-    page: Int = 0
-    limit: Int = 10
-    searchTerm: String
-  ): ClassList!
+  getSchoolClasses(input: GetSchoolClassesInput!): ClassList!
 
+  getSchoolSubjects(input: GetSubjectInput!): SubjectList
 }

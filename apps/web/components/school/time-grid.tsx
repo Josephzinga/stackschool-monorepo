@@ -1,7 +1,10 @@
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import interactionPlugin, {
+  EventResizeDoneArg,
+} from '@fullcalendar/interaction';
+import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import frLocale from '@fullcalendar/core/locales/fr';
 import React, { useState } from 'react';
 import {
@@ -12,10 +15,10 @@ import {
   EventContentArg,
   EventDropArg,
   EventSourceInput,
+  FormatterInput,
 } from '@fullcalendar/core';
 import '@/app/styles/schedule-grid.css';
 import { useGetSchoolSettingsQuery, useUserStore } from '@stackschool/ui';
-import { Spinner } from '../ui/spinner';
 import { Card } from '@/components/ui/card';
 import {
   ButtonGroup,
@@ -23,8 +26,27 @@ import {
 } from '@/components/ui/button-group';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { LoaderFour } from '@/components/ui/loader';
 import { cn } from '@/lib/utils';
 import { dayMapping } from '@/constant';
+import { ResourceSourceInput } from '@fullcalendar/resource';
+
+interface TimeGridProps {
+  calendarRef?: React.Ref<FullCalendar>;
+  events?: EventSourceInput;
+  renderEventContent: CustomContentGenerator<EventContentArg>;
+  onDatesSet?: (arg: DatesSetArg) => void;
+  onEventClick?: (arg: EventClickArg) => void;
+  selectable: boolean;
+  editable: boolean;
+  onEventDrop?: (info: EventDropArg) => void;
+  onEventSelect?: (info: DateSelectArg) => void;
+  initialView?: string;
+  resources?: ResourceSourceInput;
+  resourceHeaderContent?: string;
+  slotLabelFormat?: FormatterInput | FormatterInput[];
+  onEventResize?: (arg: EventResizeDoneArg) => void;
+}
 
 export default function TimeGrid({
   events,
@@ -36,21 +58,15 @@ export default function TimeGrid({
   onEventDrop,
   onEventSelect,
   calendarRef,
-}: {
-  calendarRef?: React.Ref<FullCalendar>;
-  events?: EventSourceInput;
-  renderEventContent: CustomContentGenerator<EventContentArg>;
-  onDatesSet?: (arg: DatesSetArg) => void;
-  onEventClick?: (arg: EventClickArg) => void;
-  selectable: boolean;
-  editable: boolean;
-  onEventDrop?: (info: EventDropArg) => void;
-  onEventSelect?: (info: DateSelectArg) => void;
-}) {
+  initialView = 'timeGridWeek',
+  resources,
+  resourceHeaderContent,
+  slotLabelFormat,
+  onEventResize,
+}: TimeGridProps) {
   const [currentDateTitle, setCurrentDateTitle] = useState('');
-  const [view, setView] = useState('');
   const { currentSchool } = useUserStore();
-  const { data, isError, error, isPending } = useGetSchoolSettingsQuery(
+  const { data, isPending } = useGetSchoolSettingsQuery(
     {
       schoolId: currentSchool?.id!,
     },
@@ -65,9 +81,8 @@ export default function TimeGrid({
 
   if (isPending) {
     return (
-      <div>
-        <Spinner />
-        Chargement de parametre en cours
+      <div className="w-full h-full flex justify-center items-center">
+        <LoaderFour text="Chargement de parametre en cours..." />
       </div>
     );
   }
@@ -76,50 +91,53 @@ export default function TimeGrid({
     <div className="h-full w-full rounded-lg border bg-card overflow-hidden">
       <FullCalendar
         ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView={'timeGridWeek'}
+        plugins={[
+          dayGridPlugin,
+          timeGridPlugin,
+          interactionPlugin,
+          resourceTimelinePlugin,
+        ]}
+        initialView={initialView}
         locale={frLocale}
-        headerToolbar={false}
+        resources={resources}
         eventContent={renderEventContent}
         events={events}
         height="auto"
         slotMinTime={`${startHour}:00:00`}
         slotMaxTime={`${endHour}:00:00`}
-        // Définir les heures de travail
+        slotLabelFormat={slotLabelFormat}
+        headerToolbar={false}
         businessHours={{
           daysOfWeek,
           startTime: `${startHour}:00`,
           endTime: `${endHour}:00`,
         }}
-        // Désactiver la sélection pendant la pause
-        selectConstraint={{
-          start: `${startHour}:00`,
-          end: '12:00',
-        }}
         selectOverlap={false}
-        // Désactiver les événements pendant la pause
         eventConstraint={{
           start: `${startHour}:00`,
           end: '12:00',
         }}
         slotLabelClassNames="text-muted-foreground text-sm font-medium"
         dayHeaderClassNames="text-foreground font-semibold py-2 border-none h-10!"
+        resourceAreaWidth={'15%'}
         weekends={false}
         allDaySlot={false}
         nowIndicator={true}
+        firstDay={1}
+        slotMinWidth={100}
+        resourceAreaHeaderContent={resourceHeaderContent}
         editable={editable}
         selectable={selectable}
-        slotDuration={`00:${duration}:00`}
         eventResizableFromStart={true}
         datesSet={(info) => setCurrentDateTitle(info.view.title)}
         eventClick={onEventClick}
         eventDrop={onEventDrop}
         select={onEventSelect}
-        // Ajouter un style pour les heures de pause
+        eventResize={onEventResize}
         slotLaneClassNames={(arg) => {
           const hour = arg.date?.getHours();
           if (hour === 12) {
-            return 'bg-accent h-5! line-through text-muted-foreground/50';
+            return 'bg-gray-700/70 line-through text-muted-foreground/50';
           }
           return '';
         }}

@@ -13,7 +13,7 @@ import {
   Controller,
   useCompleteProfileStore,
   useForm,
-  useGetClassSubjectsQuery,
+  useGetClassAndSubjectsQuery,
   zodResolver,
 } from '@stackschool/ui';
 import {
@@ -75,7 +75,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
 
   const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;
 
-  const { data, error, isError } = useGetClassSubjectsQuery(
+  const { data, error, isError } = useGetClassAndSubjectsQuery(
     {
       input: {
         schoolId: schoolId as string,
@@ -238,7 +238,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
                 <SelectValue placeholder="Sélectionnez votre classe" />
               </SelectTrigger>
               <SelectContent className="bg-background">
-                {data?.getClassSubjects?.map((classe) => (
+                {data?.getClassAndSubjects?.map((classe) => (
                   <SelectItem key={classe?.id} value={classe?.id as string}>
                     <p className="font-semibold ">{classe?.name}</p>
                     <p>{classe?.section}</p>

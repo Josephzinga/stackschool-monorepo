@@ -22,7 +22,7 @@ export const createInvitationSchema = z
       .or(z.literal('')),
     message: z.string().optional(),
     // Champs optionnels pour pré-remplissage
-    studentId: z.string().optional(), // Pour lier un parent à un élève
+    studentId: z.string().optional(), // Pour lier un parents à un élève
     classId: z.string().optional(), // Pour pré-affecter une classe
   })
   .refine((data) => data.email || data.phoneNumber, {

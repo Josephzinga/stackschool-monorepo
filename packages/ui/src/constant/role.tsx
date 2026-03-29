@@ -23,7 +23,7 @@ export const allRoles: RoleConstant[] = [
   {
     value: 'PARENT',
     label: 'Parent',
-    description: "Je suis parent d'élève(s)",
+    description: "Je suis parents d'élève(s)",
     icon: '👨‍👩‍👧‍👦',
   },
   {

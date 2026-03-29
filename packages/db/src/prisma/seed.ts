@@ -6,7 +6,6 @@ import {
   PaymentType,
 } from '../prisma/client/generated';
 import {
-  addDays,
   addMinutes,
   getHours,
   getMinutes,
@@ -16,7 +15,7 @@ import {
 } from 'date-fns';
 
 // ID de l'école cible
-const TARGET_SCHOOL_ID = 'cmmigevcs00013ss3x5dnnucl';
+const TARGET_SCHOOL_ID = 'cmn5r3fdb00020vnvff8qo4yz';
 
 const START_HOUR = 8;
 const END_HOUR = 16;
@@ -132,14 +131,13 @@ async function main() {
   ];
 
   const classes = [];
+  let groupIndex = 1;
   for (const clsData of classesList) {
     const supervisor = teachers[Math.floor(Math.random() * teachers.length)];
-
-    const cls = await prisma.class.create({
+    const group = await prisma.group.create({
       data: {
-        ...clsData,
         schoolId,
-        supervisorId: supervisor.id,
+        name: `Group-${groupIndex}`,
         classSubjects: {
           create: subjects.map((s) => ({
             subjectId: s.id,
@@ -147,10 +145,24 @@ async function main() {
           })),
         },
       },
+    });
+    const cls = await prisma.class.create({
+      data: {
+        ...clsData,
+        schoolId,
+        supervisorId: supervisor.id,
+        groupId: group?.id,
+      },
       include: {
-        classSubjects: true,
+        group: {
+          include: {
+            classSubjects: true,
+          },
+        },
       },
     });
+
+    groupIndex++;
     classes.push(cls);
   }
   console.log(`🎓 ${classes.length} classes créées.`);
@@ -200,69 +212,65 @@ async function main() {
   // 7. Génération de l'Emploi du Temps (Passé et Futur)
   console.log("📅 Génération de l'emploi du temps...");
   let index = 0;
+  // 7. Génération de l'Emploi du Temps
+  console.log("📅 Génération de l'emploi du temps...");
+  const lessonsCreated: any[] = [];
   for (const cls of classes) {
-    for (let dayIndex = 0; dayIndex < DAYS.length; dayIndex++) {
-      const dayEnum = DAYS[dayIndex];
-      let currentHour = START_HOUR;
-      let currentMinute = 0; // Ajout des minutes
+    const firstGroup = cls.group;
 
-      while (
-        currentHour < END_HOUR ||
-        (currentHour === END_HOUR && currentMinute === 0)
-      ) {
-        // Gestion de la pause déjeuner
-        if (currentHour === 12 && currentMinute === 0) {
-          currentHour = 13; // Repasse à 13:00 après la pause
+    if (!firstGroup) {
+      console.log(`⚠️ La classe ${cls.name} n'a pas de groupe associé.`);
+      continue;
+    }
+
+    const availableSubjects = firstGroup.classSubjects;
+
+    if (availableSubjects.length === 0) {
+      console.log(`⚠️ Pas de matières pour la classe ${cls.name}, saut...`);
+      continue;
+    }
+
+    for (const dayEnum of DAYS) {
+      let currentHour = START_HOUR;
+      let currentMinute = 0;
+
+      while (currentHour < END_HOUR) {
+        // Gestion pause (12h - 13h)
+        if (currentHour === 12) {
+          currentHour = 13;
           currentMinute = 0;
           continue;
         }
 
-        // Déterminer si c'est un cours simple (1h) ou double (1h50)
         const isDoubleLesson = Math.random() > 0.5;
-
-        // Calculer les heures de début et fin
-        const dateBase = addDays(new Date(), dayIndex);
         const startTime = setMinutes(
-          setHours(dateBase, currentHour),
+          setHours(new Date(), currentHour),
           currentMinute,
         );
+        const endTime = addMinutes(startTime, isDoubleLesson ? 120 : 60);
 
-        // Calculer l'heure de fin
-        let endTime;
-        if (isDoubleLesson) {
-          // Pour un cours double : 1h50 (110 minutes)
-          endTime = addMinutes(startTime, 110);
-        } else {
-          // Pour un cours simple : 50 minutes
-          endTime = addMinutes(startTime, 50);
-        }
+        // 2. Choisir une matière au hasard parmis celles du GROUPE
+        const randomClassSubject =
+          availableSubjects[
+            Math.floor(Math.random() * availableSubjects.length)
+          ];
 
-        const randomTeacher =
-          teachers[Math.floor(Math.random() * teachers.length)];
-        const subject = subjects.find((s) => s.id === randomTeacher.subjectId);
-
-        if (!subject) continue;
-
+        // 3. Créer la leçon liée au ClassSubjectId
         const lesson = await prisma.lesson.create({
           data: {
-            title: subject.name,
+            title: `Cours de ...`, // Tu peux récupérer le nom de la matière via un find si besoin
             day: dayEnum,
             startTime,
             endTime,
             schoolId,
-            classSubject: {
-              connect: {
-                teacherId: randomTeacher.id,
-                classId_subjectId: { classId: cls.id, subjectId: subject.id },
-              },
-            },
+            // C'est ici que le lien se fait avec la nouvelle structure
+            classSubjectId: randomClassSubject.id,
           },
         });
 
-        // Mettre à jour currentHour et currentMinute pour le prochain cours
-        // Le prochain cours commence à l'heure de fin du cours actuel
         currentHour = getHours(endTime);
         currentMinute = getMinutes(endTime);
+        lessonsCreated.push(lesson);
       }
     }
   }
@@ -312,7 +320,7 @@ async function main() {
   // 9. Génération des Présences (Attendance)
   console.log('📝 Génération des présences...');
 
-  /* for (const lesson of lessonsCreated) {
+  for (const lesson of lessonsCreated) {
     // Récupérer les élèves de la classe concernée par la leçon
     const studentsInClass = createdStudents.filter(
       (s) => s.student.classId === lesson.classId,
@@ -321,10 +329,10 @@ async function main() {
     for (const { student } of studentsInClass) {
       // Probabilités : 90% Présent, 5% Absent, 5% Retard
       const rand = Math.random();
-      let status: AttendanceStatus = AttendanceStatus.PRESENT;
+      let status = 'PRESENT';
 
-      if (rand > 0.95) status = AttendanceStatus.ABSENT;
-      else if (rand > 0.9) status = AttendanceStatus.LATE;
+      if (rand > 0.95) status = 'ABSENT';
+      else if (rand > 0.9) status = 'LATE';
 
       // On ne crée pas d'entrée pour "PRESENT" si on veut économiser de la place,
       // mais pour un seed complet, on crée tout.
@@ -335,12 +343,11 @@ async function main() {
           status,
           studentId: student.id,
           schoolId,
-          teacherId: lesson.teacherId, // Le prof qui a fait l'appel
         },
       });
     }
   }
-  console.log('✅ Présences générées !'); */
+  console.log('✅ Présences générées !');
 
   console.log('🚀 Seeding terminé avec succès.');
 }

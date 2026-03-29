@@ -9,7 +9,8 @@ import {
   PaginationState,
   useReactTable,
 } from '@tanstack/react-table';
-import { DataTableProps } from '@/components/school/student/table/data-table';
+
+import { DataTableProps } from '@/types/tanstack-table';
 import { SubjectColumns } from './columns';
 import * as React from 'react';
 import { useState } from 'react';

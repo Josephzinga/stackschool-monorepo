@@ -11,7 +11,7 @@ import {
   useCompleteProfileStore,
   useFieldArray,
   useForm,
-  useGetClassSubjectsQuery,
+  useGetClassAndSubjectsQuery,
   zodResolver,
 } from '@stackschool/ui';
 import { Button } from '@/components/ui/button';
@@ -63,7 +63,7 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
     },
   });
 
-  const { data, isLoading } = useGetClassSubjectsQuery(
+  const { data, isLoading } = useGetClassAndSubjectsQuery(
     {
       input: {
         searchTerm: debouncedSearch,
@@ -117,11 +117,11 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
   };
 
   const filteredResults = useMemo(() => {
-    if (!data?.getClassSubjects) return [];
-    return data.getClassSubjects.filter(
+    if (!data?.getClassAndSubjects) return [];
+    return data.getClassAndSubjects.filter(
       (cls) => !fields?.some((assignment) => assignment.classId === cls?.id),
     );
-  }, [data?.getClassSubjects, fields]);
+  }, [data?.getClassAndSubjects, fields]);
 
   const onSubmit = async (data: TeacherFormData) => {
     try {
@@ -179,7 +179,7 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
           {/* Liste des résultats avec animation */}
           {searchQuery.length >= 2 && (
             <SearchResultsList
-              items={filteredResults}
+              items={filteredResults!}
               onSelect={openConfiguration}
               renderItem={(item) => (
                 <div className="p-3 flex items-center justify-between">

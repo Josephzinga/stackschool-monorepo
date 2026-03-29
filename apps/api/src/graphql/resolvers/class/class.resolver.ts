@@ -1,7 +1,7 @@
 import { Prisma, prisma } from '@stackschool/db';
-import { Resolvers, StudentStatus } from '../../types.generated';
+import { Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
-import { checkRole, isAdmin } from '../../../lib/verify-role';
+import { checkRole } from '../../../lib/verify-role';
 
 export const classResolver: Resolvers = {
   Query: {
@@ -24,9 +24,11 @@ export const classResolver: Resolvers = {
       let whereClause: Prisma.ClassWhereInput = { schoolId };
 
       if (teacherId) {
-        whereClause.classSubjects = {
-          some: {
-            teacherId,
+        whereClause.group = {
+          classSubjects: {
+            some: {
+              teacherId,
+            },
           },
         };
       }
@@ -110,115 +112,14 @@ export const classResolver: Resolvers = {
       }
     },
   },
-  Mutation: {
-    createClassSubject: async (_, { input }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
-      const classId = input?.classId;
-      const subjectId = input?.subjectId;
-
-      if (!classId || !subjectId) throw createServiceError('Donnée manquat');
-      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
-      if (!checked?.success) {
-        throw createServiceError(
-          checked?.message || 'Permission non accorder',
-          403,
-        );
-      }
-
-      const exist = await prisma.classSubjects.findUnique({
-        where: {
-          classId_subjectId: { classId, subjectId },
-        },
-      });
-
-      if (exist) {
-        throw createServiceError('La matière existe déjà dans cette classe.');
-      }
-
-      return await prisma.classSubjects.create({
-        data: {
-          classId,
-          subjectId,
-          teacherId: input?.teacherId,
-          coefficient: input?.coefficient,
-          weeklyHours: input?.weeklyHours,
-        },
-      });
-    },
-    updateClassSubject: async (_, { input }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
-      const id = input?.id;
-      if (!id)
-        throw createServiceError("l'identifiant de la matière est requis");
-      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
-      if (!checked?.success) {
-        throw createServiceError(
-          checked?.message || 'Permission non accorder',
-          403,
-        );
-      }
-      const exist = await prisma.classSubjects.findUnique({
-        where: {
-          id,
-        },
-      });
-
-      if (!exist) {
-        throw createServiceError('Matière introuvable.');
-      }
-      return await prisma.classSubjects.update({
-        where: {
-          id,
-        },
-        data: {
-          teacherId: input?.teacherId ?? undefined,
-          classId: input?.classId ?? undefined,
-          subjectId: input?.subjectId ?? undefined,
-          coefficient: input?.coefficient,
-          weeklyHours: input?.weeklyHours ?? undefined,
-        },
-      });
-    },
-    deleteClassSubjects: async (_, { ids }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
-      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
-      if (!checked?.success) {
-        throw createServiceError(
-          checked?.message || 'Permission non accorder',
-          403,
-        );
-      }
-
-      const classSubjects = await prisma.classSubjects.deleteMany({
-        where: {
-          id: {
-            in: [...ids],
-          },
-        },
-      });
-
-      return {
-        ok: true,
-        message: `${classSubjects?.count} supprimer avec succès.`,
-      };
-    },
-  },
-  Classe: {
-    students: async (parent, _args, { user }) => {
-      const students = await prisma.student.findMany({
+  Class: {
+    students: async (parent, _args) => {
+      return await prisma.student.findMany({
         where: { classId: parent.id },
         include: {
           schoolUser: true,
         },
       });
-
-      return students.map((s) => ({
-        ...s,
-        status: s.status as StudentStatus,
-      }));
     },
 
     _count: async (parent) => {
@@ -233,14 +134,34 @@ export const classResolver: Resolvers = {
           id: true,
         },
       });
-      const subjects = await prisma.classSubjects.count({
+      const subjects = await prisma.subject.count({
         where: {
-          classId: parent.id,
+          classSubjects: {
+            some: {
+              group: {
+                classes: {
+                  some: {
+                    id: parent.id,
+                  },
+                },
+              },
+            },
+          },
         },
       });
-      const teachers = await prisma.classSubjects.count({
+      const teachers = await prisma.teacher.count({
         where: {
-          classId: parent.id,
+          classSubjects: {
+            some: {
+              group: {
+                classes: {
+                  some: {
+                    id: parent.id,
+                  },
+                },
+              },
+            },
+          },
         },
       });
       return {
@@ -268,20 +189,17 @@ export const classResolver: Resolvers = {
       };
     },
     lessons: async (parent) => {
-      const lessons = await prisma.lesson.findMany({
+      return await prisma.lesson.findMany({
         where: {
           classSubject: {
-            classId: parent.id,
+            group: {
+              classes: {
+                some: {
+                  id: parent.id,
+                },
+              },
+            },
           },
-        },
-      });
-
-      return lessons;
-    },
-    classSubject: async (parent) => {
-      return await prisma.classSubjects.findMany({
-        where: {
-          classId: parent.id,
         },
       });
     },

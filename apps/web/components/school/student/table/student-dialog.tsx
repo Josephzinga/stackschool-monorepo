@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CreateStudentForm } from '@/components/school/student/create-student-form';
+import { CreateStudentForm } from '@/components/school/student/form/create-student-form';
 import { useGetStudentDetailsQuery, useUserStore } from '@stackschool/ui';
 import { LoaderCircleIcon } from 'lucide-react';
 
@@ -24,7 +24,7 @@ export function StudentDialog({
     setOpen(false);
   };
   const { currentSchool } = useUserStore();
-  const { data, isError, error, isPending } = useGetStudentDetailsQuery(
+  const { data, isPending } = useGetStudentDetailsQuery(
     {
       id: studentId!,
       schoolId: currentSchool?.id!,

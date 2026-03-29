@@ -3,6 +3,8 @@ node_modules
 .idea
 .vscode
 .devcontainer
+coverage
+jest-exercices
 joseph
 
 

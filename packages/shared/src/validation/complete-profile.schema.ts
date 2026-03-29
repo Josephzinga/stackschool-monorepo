@@ -2,6 +2,17 @@ import { z } from 'zod';
 import { profileSchema } from '@stackschool/shared/src';
 
 z.config(z.locales.fr());
+
+export enum RelationType {
+  FATHER = 'FATHER',
+  MOTHER = 'MOTHER',
+  GRAND_FATHER = 'GRAND_FATHER',
+  GRAND_MOTHER = 'GRAND_MOTHER',
+  UNCLE = 'UNCLE',
+  AUNT = 'AUNT',
+  OTHER = 'OTHER',
+  GUARDIAN = 'GUARDIAN',
+}
 export const createSchoolSchema = z.object({
   name: z
     .string()
@@ -44,7 +55,7 @@ export const ACADEMIC_YEAR_REGEX = /^(20\d{2})-(20\d{2})$/;
 
 export const studentFormSchema = z.object({
   matricule: z.string().min(1, 'Le matricule est requis'),
-  birthDate: z.date({
+  birthDate: z.coerce.date({
     error: ({ input }) =>
       input === undefined
         ? 'Date de naissance requis'
@@ -68,7 +79,7 @@ export const studentFormSchema = z.object({
   birthPlace: z.string().min(2, 'Le lieu de naissance est requis'),
 });
 
-// Schéma pour les informations du parent
+// Schéma pour les informations du parents
 export const parentFormSchema = z.object({
   children: z
     .array(
@@ -77,16 +88,7 @@ export const parentFormSchema = z.object({
         firstname: z.string(),
         lastname: z.string(),
         photo: z.string().optional(),
-        relation: z.enum([
-          'FATHER',
-          'MOTHER',
-          'GRAND_FATHER',
-          'GRAND_MOTHER',
-          'UNCLE',
-          'AUNT',
-          'OTHER',
-          'GUARDIAN',
-        ]),
+        relation: z.enum(RelationType),
       }),
     )
     .min(1, 'Veuillez sélectionner au moins un enfant.'),

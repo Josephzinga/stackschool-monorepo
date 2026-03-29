@@ -165,39 +165,7 @@ export const subjectResolver: Resolvers = {
       };
     },
   },
-  ClassSubject: {
-    teacher: async (parent, _, { loaders }) => {
-      if (!parent.teacherId) return null;
-      return await loaders.teacherLoader.load(parent.teacherId);
-    },
-    weeklyHours: async (parent) => {
-      const lessons = await prisma.lesson.findMany({
-        where: {
-          classSubjectId: parent.id,
-        },
-      });
 
-      console.log('Lessons', lessons);
-      let totalMinutes = 0;
-      lessons.forEach((l) => {
-        const diffMs = l.endTime.getTime() - l.startTime.getTime();
-        totalMinutes += diffMs / (1000 * 60);
-      });
-
-      return parseFloat((totalMinutes / 60).toFixed(1));
-    },
-    subject: async (parent, _, { loaders }) => {
-      if (!parent.subjectId) return null;
-      return await loaders.subjectLoader.load(parent.subjectId);
-    },
-    classe: async (parent, _, { loaders }) => {
-      if (!parent.classId) return null;
-      return await loaders.classLoader.load(parent.classId);
-    },
-    lessons: async (parent, _, { loaders }) => {
-      return await loaders.lessonsByClassSubjectLoader.load(parent.id);
-    },
-  },
   Subject: {
     classSubject: async (parent) => {
       return await prisma.classSubjects.findMany({

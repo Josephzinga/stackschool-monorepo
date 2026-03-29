@@ -101,7 +101,7 @@
   --spacing: 0.25rem;
 
     --fc-small-font-size: .85em;
-    --fc-page-bg-color: #fff;
+    --fc-page-bg-color: var(--accent);
     --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
     --fc-neutral-text-color: #808080;
     --fc-border-color: #518fcd;
@@ -119,7 +119,7 @@
     --fc-event-text-color: #fff;
     --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
 
-    --fc-more-link-bg-color: #d0d0d0;
+    --fc-more-link-bg-color: #d93f3f;
     --fc-more-link-text-color: inherit;
 
     --fc-event-resizer-thickness: 8px;
@@ -145,7 +145,7 @@
   --popover-foreground: oklch(0.9328 0.0025 228.7857);
   --primary: oklch(0.6692 0.1607 245.011);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.797 0.118 223.322);
+  --secondary: oklch(0.461 0.281 266.389);
   --secondary-foreground: oklch(0.1884 0.0128 248.5103);
   --muted: oklch(0.209 0 0);
   --muted-foreground: oklch(0.641 0.009 247.975);

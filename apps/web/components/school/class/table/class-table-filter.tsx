@@ -7,13 +7,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ClassFiltersState, useClassTable } from './table-provider';
-import { useGetClassSubjectsQuery, useUserStore } from '@stackschool/ui';
+import { useGetClassAndSubjectsQuery, useUserStore } from '@stackschool/ui';
 
 export default function ClassTableFilter() {
   const { filters, setFilters } = useClassTable();
   const { currentSchool } = useUserStore();
 
-  const { data } = useGetClassSubjectsQuery(
+  const { data } = useGetClassAndSubjectsQuery(
     {
       input: {
         schoolId: currentSchool?.id!,
@@ -24,7 +24,7 @@ export default function ClassTableFilter() {
     },
   );
 
-  const classes = data?.getClassSubjects;
+  const classes = data?.getClassAndSubjects;
 
   const hasActiveFilters = Object.keys(filters).some((v) => v !== undefined);
 

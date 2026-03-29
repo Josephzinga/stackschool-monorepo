@@ -28,8 +28,6 @@ export const createLoaders = (prisma: PrismaClient) => {
         where: { classId: { in: [...classIds] } },
         include: { subject: true, teacher: true },
       });
-
-      return classIds?.map((id) => allSubjects.filter((s) => s.classId === id));
     }),
     subjectLoader: new DataLoader(async (ids: readonly string[]) => {
       const subjects = await prisma.subject.findMany({

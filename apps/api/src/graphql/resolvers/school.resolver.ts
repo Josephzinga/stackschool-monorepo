@@ -80,11 +80,10 @@ export const schoolResolver: Resolvers = {
       };
 
       const [totalStudents, totalTeachers, totalClasses] = await Promise.all([
-        prisma.student.count({ where: { schoolId } }),
+        prisma.student.count({ where: { schoolId, status: 'ACTIVE' } }),
         prisma.teacher.count({ where: { schoolUser: { schoolId } } }),
         prisma.class.count({ where: { schoolId } }),
       ]);
-
       // --- Calcul Présence (Aujourd'hui) ---
       const todayAttendances = await prisma.attendance.groupBy({
         by: ['status'],

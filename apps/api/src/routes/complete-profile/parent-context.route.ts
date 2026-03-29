@@ -21,7 +21,7 @@ router.get('/context', isAuthenticated, async (req, res, next) => {
     }
 
     const { school } = JSON.parse(progressData);
-    console.log('school dans le contexte parent', school);
+    console.log('school dans le contexte parents', school);
     if (!school || !school.schoolId) {
       return res.status(400).json({
         ok: false,

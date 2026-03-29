@@ -1,4 +1,4 @@
-import { Day, SubjectCategory } from '@stackschool/ui';
+import { Day, SubjectCategory, TransportMode } from '@stackschool/ui';
 
 export const studentStatusLabel = {
   ACTIVE: 'Actif',
@@ -56,4 +56,22 @@ export const categoryMap = [
   { value: SubjectCategory.Literary, label: 'Litérature' },
   { value: SubjectCategory.Scientific, label: 'Science' },
   { value: SubjectCategory.Sport, label: 'Sport' },
+];
+
+export const transportMode = [
+  { value: TransportMode.Walk, label: 'Pied' },
+  { value: TransportMode.Bus, label: 'Bus' },
+  { value: TransportMode.Car, label: 'Voiture' },
+  { value: TransportMode.Moto, label: 'Moto' },
+  { value: TransportMode.Taxi, label: 'Taxi' },
+  { value: TransportMode.Other, label: 'Autre' },
+];
+
+export const dayConstant = [
+  { value: 'MONDAY', label: 'Lundi' },
+  { value: 'TUESDAY', label: 'Mardi' },
+  { value: 'WEDNESDAY', label: 'Mercredi' },
+  { value: 'THURSDAY', label: 'Jeudi' },
+  { value: 'FRIDAY', label: 'Vendredi' },
+  { value: 'SATURDAY', label: 'Samedi' },
 ];

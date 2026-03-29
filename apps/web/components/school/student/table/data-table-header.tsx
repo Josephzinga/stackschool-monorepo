@@ -103,6 +103,7 @@ export function DataTableHeader() {
             <>
               <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
                 <DataHeaderInput
+                  inputPlaceholder="Rechercher un élève..."
                   onShowFilterChange={setShowFilters}
                   hasActiveFilters={hasActiveFilters}
                   search={searchTerm}

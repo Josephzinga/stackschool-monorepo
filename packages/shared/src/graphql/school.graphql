@@ -4,13 +4,24 @@ type Student {
   birthDate: DateTime
   birthPlace: DateTime
   schoolUserId: ID
-  motherName: String
-  fatherName: String
+  enrollmentDate: DateTime
+  previousClass: String
+  studentNumber: Int
+
+  bloodGroup: String
+  birthCertificateNumber: String
+  medicalCondition: String
+  allergies: String
+
+  transportMode:  TransportMode
+  previousSchool: String
   enrollmentYear: String!
   status: StudentStatus
   disciplinaryActions: StudentDisciplinaryAction
   nationality: String
-  schoolClass: Classe
+  schoolClass: Class
+  classId: ID
+  profileId: ID
   profile: Profile
   parents: [Parent]
   user: User
@@ -81,17 +92,26 @@ type Subject {
   mainTeacher: Teacher
   classSubject: [ClassSubject]
 }
+type Room {
+  id: ID!
+  name: String!
+  code: String
+  capacity: Int
+  type: String
+  class: [Class]
+  defaultForClass: Class
+}
 
 type ClassSubject {
   id: ID!
   coefficient: Int
-  weeklyHours: Int
-  classe: Classe!
+  weeklyHours: Float
   teacherId: ID
   subjectId: ID
-  classId: ID!
+  groupId: ID!
   subject: Subject
   teacher: Teacher
+  group: Group
   lessons: [Lesson!]
   assessments: [Assessment!]
 }
@@ -118,12 +138,9 @@ type Lesson {
   startTime: DateTime
   endTime: DateTime
   day: Day
-  class: Classe
-  subject: Subject
-  subjectId: ID
-  teacherId: String
-  teacher: Teacher
-  status: LessonStatus
+  classSubject: ClassSubject!
+  status: LessonStatus!
+  room: Room
 }
 
 enum LessonStatus {
@@ -136,7 +153,6 @@ enum LessonStatus {
 type Teacher {
   id: ID
   schoolUserId: ID
-
   diploma: String
   experience: String
   hireDate: DateTime
@@ -146,8 +162,8 @@ type Teacher {
   departement: String
   specialization: String
   lessons: [Lesson]
-classSubject: [ClassSubject]
-  supervisedClasses: [Classe]
+  classSubjects: [ClassSubject]
+  supervisedClasses: [Class]
   createdAt: DateTime
   updatedAt: DateTime
 
@@ -165,18 +181,28 @@ type Staff {
   departement: String
 }
 
-type Classe {
+type Class {
   id: ID!
   name: String!
   level: String!
   section: String
   subjects: [Subject]
   lessons: [Lesson]
-  students: [Student]
-  classSubject: [ClassSubject]
+  students: [Student!]
+  defaultRoom: Room
+  groupId: ID!
+  group: Group
   supervisor: Teacher
   teachers: [Teacher]
   _count: ClassCount
+}
+
+type Group {
+  id: ID!
+  name: String!
+  type: String!
+  classes: [Class!]!
+  classSubjects: [ClassSubject]
 }
 
 type ClassCount {
@@ -283,13 +309,25 @@ input CreateSubjectInput {
   classSubject: [ClassSubjectInput!]
 }
 
+input CreateRoomInput {
+  id: ID
+  name: String!
+  capacity: Int
+  type: String
+  code: String
+  defaultClassId: String
+}
 
+input CreateGroupInput {
+  name: String!
+  classIds: [ID!]!
+}
 
 input ClassSubjectInput {
   id: ID
   teacherId: ID
-  classId: ID
-  subjectId: ID
+  groupId: ID
+  subjectId: ID!
   coefficient: Int!
   weeklyHours: Float
 }
@@ -312,6 +350,18 @@ input GetSchoolClassesInput {
   teacherId: String
   searchTerm: String
 }
+input GetSchoolRoomInput {
+  page: Int! = 0
+  limit: Int! = 10
+  classId: String
+  teacherId: String
+  searchTerm: String
+}
+
+type RoomList {
+  data: [Room]!
+  meta: PaginationMeta
+}
 enum AssessmentType {
   EXAM
   ASSIGNMENT
@@ -332,4 +382,13 @@ enum SubjectCategory {
   LITERARY
   GENERAL
   SPORT
+}
+enum TransportMode {
+  BUS
+  WALK
+  CAR
+  MOTO
+  TAXI
+  PARENT
+  OTHER
 }

@@ -6,7 +6,7 @@ import { allRoles, useCompleteProfileStore } from '@stackschool/ui';
 import { SchoolRole } from '@stackschool/shared';
 import { ParentForm } from '@/components/complete-profile/role-form/parent-form';
 import { toast } from 'sonner';
-import { TeacherForm } from './role-form/teacher-from';
+import { TeacherForm } from './role-form/teacher-form';
 import { cn } from '@/lib/utils';
 import StaffAdminForm from '@/components/complete-profile/role-form/staff-admin-form';
 import { useRouter } from 'next/navigation';

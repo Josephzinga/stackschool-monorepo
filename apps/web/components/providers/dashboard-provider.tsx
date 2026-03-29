@@ -41,7 +41,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       ADMIN: '/dashboard/admin',
       TEACHER: '/dashboard/teacher',
       STUDENT: '/dashboard/student',
-      PARENT: '/dashboard/parent',
+      PARENT: '/dashboard/parents',
     };
 
     const allowedRoute = roleRoutes[role];

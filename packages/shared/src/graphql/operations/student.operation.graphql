@@ -35,36 +35,9 @@ query GetSchoolStudents($input: GetSchoolStudentsInput!, $schoolId: ID!) {
   }
 }
 
-query GetStudentDetails($id: ID!, $schoolId: ID!) {
-  student(id: $id, schoolId: $schoolId) {
-    id
-    matricule
-    enrollmentYear
-    birthDate
-    birthPlace
-    nationality
-    fatherName
-    motherName
-    status
-    schoolClass {
-      id
-      name
-      section
-      level
-    }
-    user {
-      id
-      phoneNumber
-      email
-      username
-      profile {
-        id
-        firstname
-        lastname
-        photo
-        gender
-      }
-    }
+query GetStudentDetails($id: ID!) {
+  student(id: $id) {
+    ...StudentDetails
   }
 }
 
@@ -74,8 +47,7 @@ mutation UpdateStudent(
   $schoolId: ID!
 ) {
   updateStudent(studentId: $studentId, data: $data, schoolId: $schoolId) {
-    ok
-    message
+   ...StudentDetails
   }
 }
 mutation CreateListStudent($schoolId: ID!, $data: CreateStudentInput!) {
@@ -89,5 +61,57 @@ mutation DeleteStudents($schoolId: ID!, $studentIds: [ID!]!, $soft: Boolean) {
   deleteStudents(schoolId: $schoolId, studentIds: $studentIds, soft: $soft) {
     ok
     message
+  }
+}
+fragment StudentDetails on Student {
+  id
+  matricule
+  enrollmentYear
+  birthDate
+  birthPlace
+  nationality
+  status
+  previousClass
+  previousSchool
+  bloodGroup
+  allergies
+  medicalCondition
+  studentNumber
+  birthCertificateNumber
+  enrollmentDate
+  transportMode
+  parents {
+    id
+    profession
+    relationType
+    user {
+      phoneNumber
+      isActive
+      ...UserProfile
+      profile {
+        address
+      }
+    }
+  }
+  schoolClass {
+    id
+    name
+    section
+    level
+  }
+  user {
+    id
+    phoneNumber
+    email
+    username
+    isActive
+    profile {
+      id
+      firstname
+      lastname
+      photo
+      gender
+      address
+    }
   }
 }

@@ -1,7 +1,10 @@
 'use client';
 
 import { DataTable } from '@/components/school/teacher/table/data-table';
-import { columns, Teacher } from '@/components/school/teacher/table/columns';
+import {
+  columns,
+  TeacherColumns,
+} from '@/components/school/teacher/table/columns';
 import {
   TableProvider,
   useTable,
@@ -13,6 +16,7 @@ import {
   useUserStore,
 } from '@stackschool/ui';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useMemo } from 'react';
 
 export default function TeacherPage() {
   return (
@@ -29,7 +33,6 @@ function TeachersView() {
 
   const { data, isPending } = useGetSchoolTeachersQuery(
     {
-      schoolId: currentSchool?.id!,
       input: {
         limit: pagination.pageSize,
         page: pagination.pageIndex,
@@ -42,29 +45,25 @@ function TeachersView() {
     },
   );
 
-  const teacherData: Teacher[] =
-    data?.getSchoolTeachers.data.map((t) => ({
-      id: t.id,
-      firstname: t.user?.profile?.firstname || '',
-      lastname: t.user?.profile?.lastname || '',
-      email: t.user?.email || '',
-      phoneNumber: t.user?.phoneNumber || '',
-      specialization: t.specialization ? [t.specialization] : [],
-      gender: t?.user?.profile?.gender as Gender,
-      diploma: t?.diploma ?? '',
-      classes:
-        t?.classSubject?.map((cs) => ({
-          id: cs?.classe.id!,
-          name: cs?.classe.name ?? '',
-        })) || [],
-      status: t.isActive || false,
-      photo: t.user?.profile?.photo || undefined,
-      subjects: t.classSubject?.map((cs) => ({
-        id: cs?.subject.id,
-        name: cs?.subject.name,
-      })),
-    })) || [];
-
+  const teacherData: TeacherColumns[] = useMemo(
+    () =>
+      data?.getSchoolTeachers?.data?.map((t) => ({
+        id: t?.id ?? '',
+        firstname: t.user?.profile?.firstname || '',
+        lastname: t.user?.profile?.lastname || '',
+        email: t.user?.email || '',
+        phoneNumber: t.user?.phoneNumber || '',
+        photo: t.user?.profile?.photo ?? undefined,
+        specialization: t.specialization ? [t.specialization] : [],
+        gender: t?.user?.profile?.gender as Gender,
+        diploma: t?.diploma ?? '',
+        classes: t.classSubjects?.map((cls) => cls?.group?.classes || []) || [],
+        subjects: t?.classSubjects?.map((cls) => cls?.subject) || [],
+        status: t.isActive || false,
+      })) || [],
+    [data],
+  );
+  console.log(teacherData);
   const meta = data?.getSchoolTeachers.meta;
 
   return (

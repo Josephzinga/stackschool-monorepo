@@ -12,7 +12,14 @@ export const createTeacherSchema = z.object({
   phoneNumber: z.string().optional(),
   diploma: z.string().min(2, 'Le diplôme est requis'),
   specialization: z.string().min(2, 'La spécialité est requise'),
-  classIds: z.array(z.string()).optional(),
+  classSubjects: z
+    .array(
+      z.object({
+        classId: z.cuid(),
+        subjectId: z.cuid(),
+      }),
+    )
+    .optional(),
 });
 
 export type CreateTeacherValues = z.infer<typeof createTeacherSchema>;

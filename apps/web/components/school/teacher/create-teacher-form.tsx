@@ -48,11 +48,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Teacher } from '@/components/school/teacher/table/columns';
+import { TeacherColumns } from '@/components/school/teacher/table/columns';
 
 interface CreateTeacherFormProps {
   onSuccess?: () => void;
-  editDefaultValues?: Teacher;
+  editDefaultValues?: TeacherColumns;
 }
 type Data = Omit<CreateTeacherValues, 'gender'> & { gender: Gender };
 export function CreateTeacherForm({
@@ -77,7 +77,6 @@ export function CreateTeacherForm({
     resolver: zodResolver(createTeacherSchema),
     mode: 'onBlur',
     defaultValues: {
-      classIds: editDefaultValues?.classes?.map((cls) => cls.id) || [],
       lastname: editDefaultValues?.lastname || '',
       gender: editDefaultValues?.gender || 'MALE',
       firstname: editDefaultValues?.firstname || '',
@@ -139,12 +138,7 @@ export function CreateTeacherForm({
     if (!value) return;
     const safeData = await checkField(fieldName as string, value);
 
-    if (safeData?.status === 401) {
-      return toast.error(safeData?.message);
-    }
-
     if (!safeData?.valid) {
-      console.log('not valid', fieldName);
       setError(fieldName, {
         type: 'onBlur',
         message: safeData?.message,
@@ -153,9 +147,9 @@ export function CreateTeacherForm({
       clearErrors(fieldName);
     }
   };
+  const isEdit = !!editDefaultValues;
 
   const onSubmit = async (data: CreateTeacherInput) => {
-    const isEdit = !!editDefaultValues;
     const promise = isEdit
       ? updateMutateAsync({
           data,
@@ -193,7 +187,12 @@ export function CreateTeacherForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form
+      onSubmit={handleSubmit(onSubmit, (err) => {
+        console.log('Error', err);
+      })}
+      className="space-y-4"
+    >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
         <Field>
           <FieldLabel>Prénom</FieldLabel>
@@ -417,7 +416,7 @@ export function CreateTeacherForm({
 
       <div className="flex justify-end pt-4">
         <SubmitButton isSubmitting={isSubmitting}>
-          Créer l'enseignant
+          {isEdit ? 'Modifier' : " Créer l'enseignant"}
         </SubmitButton>
       </div>
     </form>

@@ -9,8 +9,14 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { TeacherTableActions } from './teacher-table-actions';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
-export type Teacher = {
+export type TeacherColumns = {
   id: string | number;
   firstname: string;
   lastname: string;
@@ -19,11 +25,11 @@ export type Teacher = {
   phoneNumber?: string;
   specialization: string[];
   status: boolean;
-  classes: { id: string; name: string }[];
-  subjects?: { id: string; name: string }[];
+  classes?: { id: string; name: string }[][];
+  subjects?: ({ id: string; name: string } | null | undefined)[];
 };
 
-export const columns: ColumnDef<Teacher>[] = [
+export const columns: ColumnDef<TeacherColumns>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -94,7 +100,15 @@ export const columns: ColumnDef<Teacher>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const subjects = [...new Set(row.original.subjects?.map((s) => s.name))];
+      const subjects = [
+        ...new Set(row.original.subjects?.map((cl) => cl?.name)),
+      ];
+      if (subjects?.length === 0)
+        return (
+          <span className="text-muted-foreground text-xs italic">
+            Non assignée
+          </span>
+        );
       return (
         <div className="flex flex-wrap gap-1">
           {subjects.map((sub, i) => (
@@ -138,25 +152,47 @@ export const columns: ColumnDef<Teacher>[] = [
     accessorKey: 'classes',
     header: 'Classes',
     cell: ({ row }) => {
-      const classes = row.original.classes;
-      if (!classes || classes.length === 0)
-        return <span className="text-muted-foreground text-xs">-</span>;
-
+      const classes = row.original.classes?.map((cls) =>
+        cls?.map((cl) => cl?.name),
+      );
+      const displayCount = 2;
+      let remainingCount = 0;
+      if (classes) {
+        remainingCount = classes?.length - displayCount;
+      }
+      if (classes?.length === 0)
+        return (
+          <span className="text-muted-foreground text-xs italic">
+            Non assignée
+          </span>
+        );
       return (
-        <div className="flex flex-wrap gap-1 max-w-[200px]">
-          {classes.slice(0, 2).map((cls) => (
+        <div className="flex items-center gap-1">
+          {classes?.slice(0, displayCount).map((className, index) => (
             <Badge
-              key={cls.id}
+              key={index}
               variant="outline"
-              className="px-1.5 text-[12px] h-5"
+              className="whitespace-nowrap text-xs"
             >
-              {cls.name}
+              {className}
             </Badge>
           ))}
-          {classes.length > 2 && (
-            <Badge variant="outline" className="text-[12px] px-1.5 h-5">
-              +{classes.length - 2}
-            </Badge>
+
+          {remainingCount > 0 && classes && classes?.length > 0 && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="text-xs bg-accent px-1.5 py-0.5 rounded cursor-help">
+                    + {remainingCount}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">
+                    {classes?.slice(displayCount).join(', ')}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       );

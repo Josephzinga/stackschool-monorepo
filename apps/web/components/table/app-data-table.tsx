@@ -24,7 +24,7 @@ export default function AppDataTable<TData>({
     <div>
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
+          {table?.getHeaderGroups()?.map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
               className="h-10 bg-slate-100 dark:bg-slate-900"

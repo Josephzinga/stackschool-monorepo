@@ -29,6 +29,8 @@ export default function ProtectedRoute({
         if (member?.school?.id === currentSchool?.id) {
           setCurrentSchool(member?.school);
           api.defaults.headers.common['x-school-id'] = member?.school.id;
+        } else {
+          setCurrentSchool(data?.me?.memberships[0]?.school);
         }
       }
     }
@@ -86,12 +88,6 @@ export default function ProtectedRoute({
     currentSchool,
     setCurrentSchool,
   ]);
-
-  useEffect(() => {
-    if (currentSchool?.id) {
-      api.defaults.headers.common['x-school-id'] = currentSchool.id;
-    }
-  }, [currentSchool]);
 
   if (isLoading) {
     return (

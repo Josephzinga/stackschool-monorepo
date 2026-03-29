@@ -93,7 +93,7 @@ export const columns: ColumnDef<ClassData>[] = [
     header: 'Prof. Principal',
     cell: ({ row }) => {
       const supervisor = row.original.supervisor;
-      if (!supervisor)
+      if (!supervisor?.id)
         return (
           <span className="text-muted-foreground text-xs">Non assigné</span>
         );

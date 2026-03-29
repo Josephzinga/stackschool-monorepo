@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
-import { GetTeacherDetailsQuery, Lesson } from '@stackschool/ui';
+import { LessonStatus, useGetTeacherScheduleQuery } from '@stackschool/ui';
 import '@/app/styles/schedule-grid.css';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -12,31 +12,49 @@ import {
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import TimeGrid from '@/components/school/time-grid';
+import { format } from 'date-fns';
+import { dayMapping, lessonStatusConfig } from '@/constant';
+import { Loader } from '@/components/ui/loader';
+import { Badge } from '@/components/ui/badge';
 
-type OnlyLessons = Pick<
-  NonNullable<GetTeacherDetailsQuery['teacher']>,
-  'classSubject'
->;
-
-const TeacherScheduleGrid = ({
-  lessons,
-}: {
-  lessons?: (Lesson | undefined)[];
-}) => {
+const TeacherScheduleGrid = ({ id }: { id: string }) => {
   const calendarRef = useRef<FullCalendar>(null);
   const [view, setView] = useState('timeGridWeek');
   const [currentDateTitle, setCurrentDateTitle] = useState('');
 
-  const events = lessons?.map((lesson) => ({
-    id: lesson?.id,
-    title: `${lesson?.class?.name} - ${lesson?.subject?.name}`,
-    start: lesson?.startTime,
-    end: lesson?.endTime,
-    extendedProps: {
-      className: lesson?.class?.name,
-      subject: lesson?.subject?.name,
+  const { data, isPending, isError } = useGetTeacherScheduleQuery(
+    {
+      id,
     },
-  }));
+    { enabled: !!id },
+  );
+
+  const events =
+    data?.teacher?.classSubjects?.flatMap((cs) => {
+      // On récupère le nom de la matière et des classes liées
+      const subjectName = cs?.subject?.name;
+      const className =
+        cs?.group?.type === 'SOLO'
+          ? cs.group?.classes[0]?.name
+          : cs?.group?.name;
+
+      return (
+        cs?.lessons?.map((lesson) => ({
+          id: lesson.id,
+          title: `${subjectName} (${className})`,
+          startTime: format(lesson.startTime, 'HH:mm'),
+          endTime: format(lesson.endTime, 'HH:mm'),
+          daysOfWeek: [dayMapping[lesson?.day!]],
+
+          extendedProps: {
+            status: lesson.status,
+            className,
+            subjectId: cs?.subject?.id,
+            subjectName: cs?.subject?.name,
+          },
+        })) || []
+      );
+    }) || [];
 
   const handleViewChange = (newView: string) => {
     setView(newView);
@@ -62,17 +80,35 @@ const TeacherScheduleGrid = ({
   };
 
   const renderEventContent = (eventInfo: any) => {
+    const status = eventInfo.event.extendedProps.status as LessonStatus;
+    const cfg = lessonStatusConfig[status] ?? lessonStatusConfig.PLANNED;
+    const className = eventInfo.event.extendedProps.className;
+
     return (
-      <div className="fc-event-main-frame px-1 lg:px-2 w-full!">
-        <div className="fc-event-title font-semibold">
-          <p className="font-jost text-xs ">
-            {eventInfo.event.extendedProps.className}
-          </p>
-          <p className="text-accent text-xs">
-            {eventInfo.event.extendedProps.subject}
-          </p>
+      <div className="flex flex-col h-full overflow-hidden p-1 leading-tight">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-bold text-xs md:text-sm truncate">
+            {eventInfo.event.extendedProps.subjectName}
+          </span>
+
+          {/* Badge status */}
+          <Badge
+            variant="outline"
+            className={`text-[10px] font-semibold px-1  ${cfg.badgeClass}`}
+          >
+            {cfg.label}
+          </Badge>
         </div>
-        <div className="fc-event-time text-xs text-gray-600">
+
+        <div
+          className={cn(
+            'text-[10px] mt-2 opacity-80 font-medium truncate uppercase',
+          )}
+        >
+          {className}
+        </div>
+
+        <div className="mt-auto text-sm text-gray-800 font-mono">
           {eventInfo.timeText}
         </div>
       </div>
@@ -136,14 +172,19 @@ const TeacherScheduleGrid = ({
         </ButtonGroup>
       </Card>
 
-      <TimeGrid
-        selectable={false}
-        editable={false}
-        events={events}
-        renderEventContent={renderEventContent}
-        calendarRef={calendarRef}
-        onDatesSet={(arg) => setCurrentDateTitle(arg.view.title)}
-      />
+      {isPending ? (
+        <Loader />
+      ) : (
+        <TimeGrid
+          selectable={false}
+          editable={false}
+          events={events}
+          initialView="dayGridWeek"
+          renderEventContent={renderEventContent}
+          calendarRef={calendarRef}
+          onDatesSet={(arg) => setCurrentDateTitle(arg.view.title)}
+        />
+      )}
     </div>
   );
 };

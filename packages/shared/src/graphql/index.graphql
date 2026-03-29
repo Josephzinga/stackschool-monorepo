@@ -21,57 +21,78 @@ type Mutation {
     studentId: ID!
     data: CreateStudentInput!
     schoolId: ID!
-  ): ApiResponse
-  createClass(data: CreateClassInput!, schoolId: ID!): ApiResponse
+  ): Student
+  createClass(data: CreateClassInput!): Class!
   updateClass(data: CreateClassInput!, schoolId: ID!, classId: ID!): ApiResponse
   deleteClasses(classIds: [ID!]!, schoolId: ID!): ApiResponse
-  updateClassLesson(input: UpdateClassLessonInput!): Lesson
-  createSubject(input: CreateSubjectInput!):Subject
+  createSubject(input: CreateSubjectInput!): Subject
   deleteSubjects(subjectIds: [ID!]!): ApiResponse
-  createClassSubject(input: ClassSubjectInput): ClassSubject
-  updateClassSubject(input: ClassSubjectInput) : ClassSubject
+  createClassSubject(input: ClassSubjectInput): ClassSubject!
+  updateClassSubject(input: ClassSubjectInput): ClassSubject!
   deleteClassSubjects(ids: [ID!]!): ApiResponse
-}
 
-scalar DateTime
-input UpdateClassLessonInput {
-  lessonId: ID!
-  targetStatus: LessonStatus
-  startTime: DateTime
-  endTime: DateTime
-  classId: ID!
-  day: Day
-}
-type ApiResponse {
-  ok: Boolean
-  message: String
-  details: [String]
+  createLesson(input: CreateLessonInput!): Lesson
+  updateLessonStatus(status: LessonStatus!, id: ID!): Lesson
+  updateLesson(input: UpdateLessonInput!): Lesson
+  deleteLesson(id: ID!) : ApiResponse
+
+  createRoom(input: CreateRoomInput!): Room!
+  updateRoom(input: CreateRoomInput!): Room!
+  createGroup(input: CreateGroupInput!): Group!
+
 }
 
 type ClassTeacher {
   schoolId: ID
   teacher: [Teacher]
-  class: [Classe]
+  class: [Class]
 }
 
 type Query {
   searchStudent(filter: StudentSearchInput!): [Student]
   searchSchool(filter: SchoolSearchInput!): [School!]
-  getClassSubjects(filter: StudentSearchInput!): [Classe]
+  getClassAndSubjects(filter: StudentSearchInput): [Class]
   me: User
   school(schoolId: ID!): School!
   verifyInvitationCode(code: InvitationCodeInput!): User
-  getLessons(classId: ID, teacherId: ID, searchTerm: String): [Lesson]
+  getLessons(filter: GetLessonsInput!): LessonsList
   getClassTeacher: ClassTeacher
-  teacher(id: ID!, schoolId: ID!): Teacher
-  student(id: ID!, schoolId: ID!): Student
-  class(id: ID!): Classe
-
+  teacher(id: ID!): Teacher
+  student(id: ID!): Student
+  class(id: ID!): Class
   getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList!
-
   getSchoolStudents(input: GetSchoolStudentsInput!, schoolId: ID!): StudentList!
-
   getSchoolClasses(input: GetSchoolClassesInput!): ClassList!
-
   getSchoolSubjects(input: GetSubjectInput!): SubjectList
+  getClassSubjects(classId: ID, teacherId: ID, groupId: ID): [ClassSubject!]
+  getSchoolRooms(filter: GetSchoolRoomInput!): RoomList!
+  getSchoolParents(filter: GetSchoolParentsInput): ParentList
+}
+
+input CreateLessonInput {
+  day: Day!
+  mode: CreateLessonMode!
+  startTime: DateTime!
+  endTime: DateTime!
+ subjectId: ID!
+  teacherId: ID
+  groupId: ID
+}
+enum CreateLessonMode {
+  TEACHER
+  CLASS
+}
+
+input GetLessonsInput {
+  classId: ID
+  teacherId: ID
+  searchTerm: String
+
+  limit: Int! = 6
+  page: Int! = 0
+}
+
+type LessonsList {
+  data: [Lesson!]
+  meta: PaginationMeta
 }

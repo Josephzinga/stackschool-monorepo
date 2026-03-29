@@ -7,6 +7,6 @@ export const TimeInput = ({ ...props }: React.ComponentProps<'input'>) => (
     id="time-picker-optional"
     step="1"
     {...props}
-    className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+    className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none h-9!"
   />
 );

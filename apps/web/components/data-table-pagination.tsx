@@ -14,27 +14,31 @@ import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
   isLoading?: boolean;
+  renderTotalCount?: React.ReactNode;
 }
 
 export function DataTablePagination<TData>({
   table,
   isLoading,
+  renderTotalCount,
 }: DataTablePaginationProps<TData>) {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between px-2 gap-4">
-      <div className="text-sm text-muted-foreground order-2 sm:order-1">
+      <div className="text-sm text-muted-foreground">
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
           <span>
             {table.getFilteredSelectedRowModel().rows.length} sur{' '}
             {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
           </span>
         ) : (
-          <span>
-            {table.getFilteredRowModel().rows.length} résultat(s)
-          </span>
+          <>
+            <span>{table.getFilteredRowModel().rows.length} résultat(s)</span>
+          </>
         )}
       </div>
-      
+
+      <div>{renderTotalCount}</div>
+
       <div className="flex items-center gap-4 lg:gap-8 order-1 sm:order-2 w-full sm:w-auto justify-between sm:justify-end">
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium hidden sm:block">Lignes</p>
@@ -56,12 +60,12 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        
+
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} /{' '}
           {table.getPageCount()}
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Button
             variant="outline"

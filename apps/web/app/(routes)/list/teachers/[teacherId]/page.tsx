@@ -62,7 +62,7 @@ export default function TeacherDetailsPage() {
   const [openSheet, setOpenSheet] = useState(false);
 
   const { data, isLoading, error } = useGetTeacherDetailsQuery(
-    { id: teacherId, schoolId: currentSchool?.id! },
+    { id: teacherId },
     { enabled: !!teacherId },
   );
 
@@ -197,7 +197,7 @@ export default function TeacherDetailsPage() {
             <AppTabsList className="rounded-lg mb-2">
               <AppTabsTrigger value="overview">Aperçu</AppTabsTrigger>
               <AppTabsTrigger value="classes">
-                Classes ({teacher.classSubject?.length || 0})
+                Classes ({teacher.classSubjects?.length || 0})
               </AppTabsTrigger>
               <AppTabsTrigger value="schedule">Emploi du temps</AppTabsTrigger>
             </AppTabsList>
@@ -275,17 +275,13 @@ export default function TeacherDetailsPage() {
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  <ClassesSection classSubject={teacher?.classSubject} />
+                  <ClassesSection classSubject={teacher?.classSubjects} />
                 </CardContent>
               </Card>
             </AppTabsContent>
 
             <AppTabsContent value="schedule">
-              <TeacherScheduleGrid
-                lessons={teacher?.classSubject?.map(
-                  (cs) => cs?.lessons ?? undefined,
-                )}
-              />
+              <TeacherScheduleGrid id={teacherId} />
             </AppTabsContent>
           </AppTabs>
         </div>
@@ -317,8 +313,9 @@ export default function TeacherDetailsPage() {
       </AlertDialog>
 
       <Sheet open={openSheet} onOpenChange={setOpenSheet}>
-        <SheetHeader></SheetHeader>
-        <SheetContent side="right"></SheetContent>
+        <SheetContent side="right">
+          <SheetHeader></SheetHeader>
+        </SheetContent>
       </Sheet>
     </div>
   );

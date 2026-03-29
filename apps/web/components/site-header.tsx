@@ -1,9 +1,9 @@
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { ModeToggle } from './DropMenu';
 import { SearchInput } from '@/components/search-input';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemeTogglerButton } from '@/components/animate-ui/components/buttons/theme-toogle';
 
 export function SiteHeader() {
   return (
@@ -23,7 +23,7 @@ export function SiteHeader() {
           </div>
         </div>
         <div className="flex items-center justify-end w-[25%] gap-4">
-          <ModeToggle className="w-10 h-10" />
+          <ThemeTogglerButton modes={['dark', 'light']} direction="rtl" />
           <Button
             variant="ghost"
             size="icon"

@@ -5,7 +5,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { DataTableProps } from '@/components/school/student/table/data-table';
+import { DataTableProps } from '@/types/tanstack-table';
 import AppDataTable from '@/components/table/app-data-table';
 import { DataTablePagination } from '@/components/data-table-pagination';
 import * as React from 'react';

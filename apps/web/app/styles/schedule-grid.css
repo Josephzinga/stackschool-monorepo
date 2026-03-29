@@ -9,8 +9,13 @@ tr {
     border: 2px solid var(--fc-border-color);
 }
 
-.fc-day-true {
+.fc-timegrid-slot-minor{
+    display: none;
+}
 
+
+.fc-scrollgrid-section-header .fc-scrollgrid-section-sticky{
+    background-color: var(--accent);
 }
 .fc-timegrid-axis  {
     background-color: var(--accent);

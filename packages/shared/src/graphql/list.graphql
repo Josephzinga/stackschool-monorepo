@@ -10,6 +10,20 @@ type TeacherList {
   meta: PaginationMeta!
 }
 
+scalar DateTime
+
+input UpdateLessonInput {
+  id: ID!
+  startTime: DateTime!
+  endTime: DateTime!
+  classId: ID
+  day: Day!
+}
+type ApiResponse {
+  ok: Boolean
+  message: String
+  details: [String]
+}
 enum Gender {
   MALE
   FEMALE
@@ -18,16 +32,45 @@ input CreateStudentInput {
   firstname: String!
   lastname: String!
   email: String
+  phoneNumber: String
   gender: Gender!
   classId: ID!
   matricule: String!
   birthDate: DateTime
   birthPlace: DateTime
-  motherName: String
-  fatherName: String
   enrollmentYear: String
   nationality: String
+  enrollmentDate: DateTime
+  previousClass: String
+  studentNumber: Int
+  address: String
+  bloodGroup: String
+  birthCertificateNumber: String
+  medicalCondition: String
+  allergies: String
+  parentData: UpdateStudentParentData
+  transportMode: TransportMode
+  previousSchool: String
+  status: StudentStatus
 }
+enum UpdateMode {
+  CREATE
+  CONNECT
+}
+input UpdateStudentParentData {
+  mode: UpdateMode
+  parentId: ID
+  newParent: CreateParentInput
+}
+input CreateParentInput {
+  firstname: String!
+  lastname: String!
+  phoneNumber: String!
+  address: String
+  profession: String!
+  relationType: String!
+}
+
 input CreateTeacherInput {
   firstname: String!
   lastname: String!
@@ -46,13 +89,24 @@ input CreateClassInput {
   supervisorId: String
 }
 
+input GetSchoolParentsInput {
+  page: Int! = 0
+  limit: Int! = 10
+  searchTerm: String
+}
+
+type ParentList {
+  data: [Parent!]
+  meta: PaginationMeta
+}
+
 type StudentList {
-  data: [Student!]!
+  data: [Student!]
   meta: PaginationMeta!
 }
 
 type ClassList {
-  data: [Classe!]!
+  data: [Class!]!
   meta: PaginationMeta!
 }
 input GetSubjectInput {

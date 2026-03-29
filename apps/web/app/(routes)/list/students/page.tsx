@@ -47,7 +47,7 @@ function StudentView() {
       phoneNumber: s.user?.phoneNumber ?? '',
       firstname: s.user?.profile?.firstname ?? '',
       lastname: s.user?.profile?.lastname ?? '',
-      email: s.user?.email,
+      email: s.user?.email ?? '',
       level: s.schoolClass?.level!,
       status: true,
       className: s.schoolClass?.name ?? '',

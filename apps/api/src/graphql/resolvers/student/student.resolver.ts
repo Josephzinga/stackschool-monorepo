@@ -2,11 +2,13 @@ import { prisma, Prisma } from '@stackschool/db';
 import { Resolvers, StudentStatus } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
 import { checkRole, isAdmin } from '../../../lib/verify-role';
+import { createStudentSchema, RelationType } from '@stackschool/shared';
+import { safeValidateSchema } from '../../../utils/validate-schema.util';
 
 export const studentResolver: Resolvers = {
   Query: {
-    getSchoolStudents: async (_, { input, schoolId }, context) => {
-      if (!context.user) throw createServiceError('Non authentifié', 401);
+    getSchoolStudents: async (_, { input }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
       if (!input) {
         throw createServiceError('Données manquantes', 400);
       }
@@ -21,7 +23,7 @@ export const studentResolver: Resolvers = {
         teacherId,
       } = input;
       const roleChecked = await checkRole({
-        context: { schoolId, userId: context.user.id },
+        context: { schoolId, userId: user.id },
         roles: ['ADMIN', 'TEACHER'],
       });
       if (!roleChecked.success) {
@@ -37,8 +39,12 @@ export const studentResolver: Resolvers = {
 
       if (teacherId) {
         whereClause.schoolClass = {
-          classTeacher: {
-            some: { teacherId },
+          group: {
+            some: {
+              classSubjects: {
+                some: { teacherId },
+              },
+            },
           },
         };
       }
@@ -95,18 +101,6 @@ export const studentResolver: Resolvers = {
           where: whereClause,
           take: limit,
           skip,
-          include: {
-            schoolClass: {
-              select: {
-                id: true,
-                level: true,
-                name: true,
-                section: true,
-              },
-            },
-            schoolUser: true,
-            parentStudent: true,
-          },
           orderBy,
         }),
       ]);
@@ -114,7 +108,6 @@ export const studentResolver: Resolvers = {
         data: students?.map((s) => ({
           ...s,
           status: s.status as StudentStatus,
-          parents: s.parentStudent,
         })),
         meta: {
           total,
@@ -138,32 +131,6 @@ export const studentResolver: Resolvers = {
       }
       const student = await prisma.student.findUnique({
         where: { id, schoolId: context.schoolId },
-        select: {
-          id: true,
-          matricule: true,
-          enrollmentYear: true,
-          fatherName: true,
-          motherName: true,
-          schoolUserId: true,
-          birthDate: true,
-          birthPlace: true,
-          nationality: true,
-          status: true,
-          schoolClass: true,
-          parentStudent: {
-            select: {
-              id: true,
-              relationType: true,
-              parent: {
-                select: {
-                  id: true,
-                  profession: true,
-                  schoolUserId: true,
-                },
-              },
-            },
-          },
-        },
       });
       if (!student) throw createServiceError('Élève introuvable', 404);
 
@@ -175,8 +142,24 @@ export const studentResolver: Resolvers = {
   },
 
   Mutation: {
-    updateStudent: async (_, { studentId, data, schoolId }, context) => {
+    updateStudent: async (
+      _,
+      { studentId, data: studentData, schoolId },
+      context,
+    ) => {
       if (!context.user) throw createServiceError('Non authentifié', 401);
+
+      const { success, data, errors } = safeValidateSchema(
+        createStudentSchema,
+        studentData,
+      );
+
+      if (!success)
+        throw createServiceError(
+          errors?.[0]?.message || 'Erreur de validation',
+          400,
+          errors,
+        );
 
       const adminCheck = await isAdmin({
         context: { schoolId, userId: context.user.id },
@@ -187,43 +170,138 @@ export const studentResolver: Resolvers = {
       }
 
       try {
-        const student = await prisma.student.findUnique({
-          where: { id: studentId },
-          include: { profile: true },
+        const existingStudent = await prisma.student.findUnique({
+          where: { id: studentId, schoolId },
+          include: {
+            schoolUser: {
+              select: {
+                user: true,
+              },
+            },
+          },
         });
 
-        if (!student || student.schoolId !== schoolId) {
+        if (!existingStudent || existingStudent.schoolId !== schoolId) {
           throw createServiceError('Élève introuvable dans cette école', 404);
         }
 
-        await prisma.$transaction(async (tx) => {
-          // 1. Mise à jour Profile
-          await tx.profile.update({
-            where: { id: student.profileId },
+        const {
+          firstname,
+          lastname,
+          gender,
+          address,
+          parentData,
+          matricule,
+          medicalCondition,
+          phoneNumber,
+          allergies,
+          isActive,
+          classId,
+          birthCertificateNumber,
+          birthPlace,
+          birthDate,
+          enrollmentYear,
+          nationality,
+          enrollmentDate,
+          bloodGroup,
+          previousClass,
+          previousSchool,
+          status,
+          email,
+        } = data!;
+
+        return await prisma.$transaction(async (tx) => {
+          await tx.user.update({
+            where: { id: existingStudent.schoolUser?.user?.id },
             data: {
-              firstname: data.firstname,
-              lastname: data.lastname,
-              gender: data.gender,
+              email,
+              phoneNumber,
+              profile: {
+                update: {
+                  firstname,
+                  lastname,
+                  gender,
+                  address,
+                },
+              },
             },
           });
+          if (parentData) {
+            let parentIdToLink = parentData?.parentId;
 
-          // 2. Mise à jour Student
-          await tx.student.update({
+            if (parentData?.mode === 'CREATE') {
+              let parentUser = await tx.user.findUnique({
+                where: {
+                  phoneNumber: parentData?.newParent?.phoneNumber,
+                },
+              });
+              if (!parentUser) {
+                parentUser = await tx.user.create({
+                  data: {
+                    phoneNumber: parentData.newParent?.phoneNumber,
+                    isActive: false,
+                    hasMembership: true,
+                    profileCompleted: true,
+                    profile: {
+                      create: {
+                        firstname: parentData.newParent?.firstname,
+                        lastname: parentData.newParent?.lastname,
+                        address: parentData.newParent?.address,
+                      },
+                    },
+                  },
+                });
+              }
+              const newParent = await tx.parent.create({
+                data: {
+                  profession: parentData.newParent?.profession,
+                  schoolUser: {
+                    create: {
+                      role: 'PARENT',
+                      userId: parentUser?.id,
+                      schoolId,
+                    },
+                  },
+                },
+              });
+              parentIdToLink = newParent.id;
+            }
+            if (parentIdToLink) {
+              await tx.parentStudent.upsert({
+                where: {
+                  parentId_studentId: { parentId: parentIdToLink, studentId },
+                },
+                create: {
+                  studentId,
+                  parentId: parentIdToLink,
+                  relationType: (parentData.newParent?.relationType ||
+                    'OTHER') as RelationType,
+                },
+                update: {}, // On ne change rien si le lien existe déjà
+              });
+            }
+          }
+          return await tx.student.update({
             where: { id: studentId },
             data: {
-              matricule: data.matricule,
-              classId: data.classId,
-              enrollmentYear: data.enrollmentYear ?? '',
-              birthDate: data.birthDate,
-              birthPlace: data.birthPlace,
-              nationality: data.nationality,
-              fatherName: data.fatherName,
-              motherName: data.motherName,
+              matricule: matricule,
+              classId: classId,
+              enrollmentYear: enrollmentYear ?? '',
+              birthDate: birthDate,
+              birthPlace: birthPlace,
+              nationality: nationality,
+              bloodGroup: bloodGroup,
+              allergies: allergies,
+              birthCertificateNumber: birthCertificateNumber,
+              previousSchool: previousSchool,
+              previousClass: previousClass,
+              enrollmentDate: enrollmentDate
+                ? new Date(enrollmentDate)
+                : undefined,
+              status: status ?? undefined,
             },
           });
         });
-
-        return { ok: true, message: 'Élève mis à jour avec succès' };
       } catch (error) {
         console.error('Erreur update élève:', error);
         throw createServiceError('Erreur lors de la mise à jour', 500, error);
@@ -309,6 +387,37 @@ export const studentResolver: Resolvers = {
   Student: {
     user: async (parent, _, { loaders }) => {
       return await loaders.userLoader.load(parent.schoolUserId);
+    },
+    profile: async (parent) => {
+      if (!parent?.profileId) return null;
+      return await prisma.profile.findUnique({
+        where: {
+          id: parent.profileId,
+        },
+      });
+    },
+    schoolClass: async (parent) => {
+      if (!parent?.classId) return null;
+      return await prisma.class.findUnique({
+        where: {
+          id: parent.classId,
+        },
+      });
+    },
+    parents: async (parent, _, { schoolId }) => {
+      const parentStudent = await prisma.parentStudent.findMany({
+        where: {
+          studentId: parent.id,
+        },
+        include: {
+          parent: true,
+        },
+      });
+
+      return parentStudent.map((ps) => ({
+        ...ps,
+        ...ps.parent,
+      }));
     },
   },
 

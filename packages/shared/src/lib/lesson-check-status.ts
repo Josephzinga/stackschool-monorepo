@@ -10,5 +10,5 @@ export const allowedTransitions = {
 
 export function canTransition(current: LessonStatus | null, target: string) {
   if (!current) return;
-  return allowedTransitions[current]?.includes(target);
+  return allowedTransitions[current]?.includes(target as never);
 }

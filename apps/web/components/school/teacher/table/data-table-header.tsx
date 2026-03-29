@@ -126,7 +126,7 @@ export function DataTableHeader() {
                 >
                   <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="sm:hidden">Ajouter</span>
-                  <span className="hidden sm:inline font-medium">
+                  <span className="hidden sm:inline font-semibold font-poppins">
                     Ajouter un enseignant
                   </span>
                 </Button>

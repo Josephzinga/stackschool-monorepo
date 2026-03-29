@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   GetClassSubjectTableQuery,
   GetSubjectsQuery,
@@ -41,7 +41,6 @@ export function CreateClassSubjectForm({
   const {
     handleSubmit,
     control,
-    setValue,
     register,
     formState: { errors, isDirty },
   } = useForm<CreateClassSubjectFormData>({
@@ -70,19 +69,30 @@ export function CreateClassSubjectForm({
       limit: 100,
     },
   });
+  const queryKey = ['GetClassSubjectTable', { classId }];
+  const tableData: GetClassSubjectTableQuery | undefined =
+    queryClient.getQueryData(queryKey);
+
+  const filteredSubject = useMemo(
+    () =>
+      schoolSubjects?.getSchoolSubjects?.data?.filter(
+        (sub) =>
+          !tableData?.class?.classSubject?.some(
+            (cls) => cls?.subject?.id === sub.id,
+          ),
+      ),
+    [schoolSubjects, tableData, isEdit],
+  );
   const { mutateAsync: createMutate } = useCreateClassSubjectMutation({
     onMutate: async (variables) => {
-      const queryKey = ['GetClassSubjectTable', { classId }];
-
       await queryClient.cancelQueries({ queryKey });
-      const previous: GetClassSubjectTableQuery | undefined =
-        queryClient.getQueryData(queryKey);
+
       const teachersList: GetTeachersQuery | undefined =
         queryClient.getQueryData(['GetTeachers', { input: { limit: 100 } }]);
+
       const subjectsList: GetSubjectsQuery | undefined =
         queryClient.getQueryData(['GetSubjects', { input: { limit: 100 } }]);
 
-      // 2. On trouve les objets correspondants pour extraire les noms
       const selectedTeacher = teachersList?.getSchoolTeachers?.data?.find(
         (t: any) => t.id === variables.input?.teacherId,
       );
@@ -123,7 +133,7 @@ export function CreateClassSubjectForm({
         },
       );
 
-      return { previous, queryKey };
+      return { previous: tableData, queryKey };
     },
 
     onSuccess: (data, variables, context) => {
@@ -141,15 +151,14 @@ export function CreateClassSubjectForm({
       );
     },
 
-    onError: (err, variables, context) => {
+    onError: (_, __, context) => {
       if (context?.previous) {
         queryClient.setQueryData(context.queryKey, context.previous);
       }
     },
 
-    onSettled: (data, error, variables, context) => {
-      // On invalide pour être sûr que tout est synchro avec la DB
-      //  queryClient.invalidateQueries({ queryKey: context?.queryKey });
+    onSettled: async (_, __, ___, context) => {
+      await queryClient.invalidateQueries({ queryKey: context?.queryKey });
     },
   });
   const { mutateAsync: updateMutate } = useUpdateClassSubjectMutation({
@@ -219,7 +228,7 @@ export function CreateClassSubjectForm({
                   <SelectValue placeholder="Selectionner la matière" />
                 </SelectTrigger>
                 <SelectContent>
-                  {schoolSubjects?.getSchoolSubjects?.data?.map((subject) => (
+                  {filteredSubject?.map((subject) => (
                     <SelectItem value={subject?.id!}>
                       <span className="text-sm font-poppins">
                         {subject?.name}{' '}

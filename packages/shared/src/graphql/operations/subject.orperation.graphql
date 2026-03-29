@@ -21,16 +21,12 @@ query GetSchoolSubjects($input: GetSubjectInput!) {
       }
       classSubject {
         id
-        classe {
-          id
-          name
-          level
-          section
-        }
-        teacher {
-          id
-          user {
-            ...UserProfile
+        group {
+          classes {
+            id
+            name
+            level
+            section
           }
         }
       }
@@ -39,11 +35,39 @@ query GetSchoolSubjects($input: GetSubjectInput!) {
 }
 
 query GetSubjects($input: GetSubjectInput!) {
-  getSchoolSubjects(input: $input ){
+  getSchoolSubjects(input: $input) {
     data {
       id
       name
       code
+    }
+  }
+}
+
+query GetClassSubjectOptions($classId: ID, $teacherId: ID, $groupId: ID) {
+  getClassSubjects(classId: $classId, teacherId: $teacherId, groupId: $groupId) {
+    id
+    teacher {
+      id
+      user {
+        profile {
+          firstname
+          lastname
+        }
+      }
+    }
+    group {
+      id
+      name
+      type
+      classes {
+        id
+        name
+      }
+    }
+    subject {
+      id
+      name
     }
   }
 }
@@ -62,10 +86,12 @@ mutation CreateSubject($input: CreateSubjectInput!) {
     }
     classSubject {
       id
-      classe {
-        id
-        name
-        level
+      group {
+        classes {
+          id
+          name
+          level
+        }
       }
       teacher {
         id

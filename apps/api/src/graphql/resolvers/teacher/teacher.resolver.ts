@@ -53,7 +53,19 @@ export const teacherResolver: Resolvers = {
         if (classId) {
           whereClause.OR = [
             { supervisedClasses: { some: { id: classId } } },
-            { classSubjects: { some: { classId: classId } } },
+            {
+              classSubjects: {
+                some: {
+                  group: {
+                    classes: {
+                      some: {
+                        id: classId,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           ];
         }
 
@@ -123,7 +135,7 @@ export const teacherResolver: Resolvers = {
         }
 
         const [total, teachers] = await Promise.all([
-          prisma.teacher.count({ where: whereClause }),
+          prisma.teacher.count(),
           prisma.teacher.findMany({
             where: whereClause,
             take: limit,
@@ -157,10 +169,10 @@ export const teacherResolver: Resolvers = {
       }
     },
 
-    teacher: async (_, { id, schoolId }, context) => {
-      if (!context.user) throw createServiceError('Non authentifié', 401);
+    teacher: async (_, { id }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
       const checkedRole = await checkRole({
-        context: { schoolId, userId: context.user.id },
+        context: { schoolId, userId: user.id },
         roles: ['TEACHER', 'ADMIN'],
       });
       if (!checkedRole.success) {
@@ -271,13 +283,6 @@ export const teacherResolver: Resolvers = {
               diploma: data.diploma,
               specialization: data.specialization,
               // Mise à jour des classes (Sync)
-              classTeacher: {
-                deleteMany: {}, // On supprime tout (simple et efficace pour une liste complète)
-                create:
-                  data.classIds?.map((classId) => ({
-                    classId: classId!,
-                  })) || [],
-              },
             },
           });
         });
@@ -310,12 +315,22 @@ export const teacherResolver: Resolvers = {
     },
 
     user: async (parent, _, { loaders }) => {
+      if (!parent.schoolUserId) return null;
       return await loaders.userLoader.load(parent.schoolUserId);
     },
-    classSubject: async (parent, _, { loaders }) => {
+    classSubjects: async (parent, _, { loaders }) => {
       return await prisma.classSubjects.findMany({
         where: {
           teacherId: parent.id,
+        },
+      });
+    },
+    lessons: async (parent) => {
+      return await prisma.lesson.findMany({
+        where: {
+          classSubject: {
+            teacherId: parent.id,
+          },
         },
       });
     },

@@ -3,7 +3,7 @@ import authRoutes from './auth';
 import completeProfileRoutes from './complete-profile';
 import profileRoute from './users/profile.route';
 import validateUserFieldRoute from './validationField.route';
-import uploadProfilePicture from './complete-profile/upload-profile.route';
+import uploadProfilePicture from './shools/upload-profile.route';
 import schoolsRoutes from './shools';
 
 const router = Router();

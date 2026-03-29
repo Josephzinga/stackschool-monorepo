@@ -1,0 +1,40 @@
+query GetSchoolParents($filter: GetSchoolParentsInput) {
+  getSchoolParents(filter: $filter) {
+    meta {
+      page
+      total
+      totalPages
+      limit
+    }
+    data {
+      id
+      profession
+      relationType
+      students {
+        user {
+          profile {
+            firstname
+            lastname
+          }
+        }
+        schoolClass {
+          name
+          level
+        }
+      }
+      user {
+        id
+        phoneNumber
+        email
+        isActive
+        profile {
+          id
+          firstname
+          lastname
+          address
+          photo
+        }
+      }
+    }
+  }
+}

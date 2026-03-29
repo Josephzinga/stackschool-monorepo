@@ -29,21 +29,23 @@ query GetSchoolTeachers($input: GetSchoolTeachersInput!) {
           gender
         }
       }
-    classSubject {
-      classe {
-        id
-        name
+      classSubjects {
+        group {
+          classes {
+            id
+            name
+          }
+        }
+        subject {
+          id
+          name
+        }
       }
-      subject {
-        id
-        name
-      }
-    }
     }
   }
 }
-query GetTeachers( $input: GetSchoolTeachersInput) {
-  getSchoolTeachers( input: $input) {
+query GetTeachers($input: GetSchoolTeachersInput) {
+  getSchoolTeachers(input: $input) {
     data {
       id
       user {
@@ -55,8 +57,37 @@ query GetTeachers( $input: GetSchoolTeachersInput) {
     }
   }
 }
-query GetTeacherDetails($id: ID!, $schoolId: ID!) {
-  teacher(id: $id, schoolId: $schoolId) {
+
+query GetTeacherSchedule($id: ID!) {
+  teacher(id: $id) {
+      classSubjects {
+        group {
+          id
+          type
+          name
+          classes {
+            id
+            name
+          }
+        }
+        subject {
+          id
+          name
+        }
+        lessons {
+          id
+          endTime
+          startTime
+          status
+         day
+        }
+      }
+
+  }
+}
+
+query GetTeacherDetails($id: ID!) {
+  teacher(id: $id) {
     id
     specialization
     diploma
@@ -80,42 +111,26 @@ query GetTeacherDetails($id: ID!, $schoolId: ID!) {
         address
       }
     }
-   classSubject {
-     classe {
-       id
-       name
-       level
-       _count {
-         students {
-           male
-           female
-         }
-       }
-     }
-     subject {
-       id
-       name
-       code
-     }
-     lessons {
-       id
-       title
-       day
-       startTime
-       endTime
-       class {
-         name
-       }
-       subject {
-         name
-       }
-     }
-   }
-
+    classSubjects {
+      id
+      group {
+        id
+        type
+        name
+        classes {
+          id
+          name
+          level
+        }
+      }
+      subject {
+        id
+        name
+        code
+      }
+    }
   }
 }
-
-
 
 mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!, $soft: Boolean) {
   deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId, soft: $soft) {
@@ -131,7 +146,11 @@ mutation CreateTeacher($data: CreateTeacherInput!, $schoolId: ID!) {
   }
 }
 
-mutation UpdateTeacher($teacherId: ID!, $schoolId: ID!, $data: CreateTeacherInput!) {
+mutation UpdateTeacher(
+  $teacherId: ID!
+  $schoolId: ID!
+  $data: CreateTeacherInput!
+) {
   updateTeacher(schoolId: $schoolId, teacherId: $teacherId, data: $data) {
     ok
     message

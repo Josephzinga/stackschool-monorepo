@@ -13,19 +13,21 @@ import {
 import { VisibilityState } from '@tanstack/react-table';
 
 interface DataFiltersProps {
-  search: string;
-  onSearchChange: (search: string) => void;
-  onToggleColumn: (columnId: string, isVisible: boolean) => void;
-  showFilters: boolean;
-  hasActiveFilters: boolean;
-  onShowFilterChange: (showFilters: boolean) => void;
-  columnVisibility: VisibilityState;
-  columns: Array<{ id: string; label: string }>;
+  search?: string;
+  onSearchChange?: (search: string) => void;
+  onToggleColumn?: (columnId: string, isVisible: boolean) => void;
+  showFilters?: boolean;
+  hasActiveFilters?: boolean;
+  onShowFilterChange?: (showFilters: boolean) => void;
+  columnVisibility?: VisibilityState;
+  columns?: Array<{ id: string; label: string }>;
+  inputPlaceholder?: string;
 }
 
 export default function DataHeaderInput({
   search,
   onSearchChange,
+  inputPlaceholder,
   onToggleColumn,
   columnVisibility,
   columns,
@@ -35,18 +37,18 @@ export default function DataHeaderInput({
 }: DataFiltersProps) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 lg:flex-initial">
-      <div className="relative flex-1 lg:w-96">
+      <div className="relative flex-1 max-w-100 lg:w-96">
         <Input
-          placeholder="Rechercher un enseignant..."
+          placeholder={inputPlaceholder}
           value={search}
-          onChange={(event) => onSearchChange(event.target.value)}
+          onChange={(event) => onSearchChange?.(event.target.value)}
           className="pr-8 w-full"
         />
         {search && (
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onSearchChange('')}
+            onClick={() => onSearchChange?.('')}
             className="absolute h-7 w-7 top-1/2 -translate-y-1/2 right-2 text-muted-foreground hover:text-foreground"
           >
             <X className="h-3.5 w-3.5" />
@@ -58,7 +60,7 @@ export default function DataHeaderInput({
         {/* Bouton Filtres */}
         <Button
           variant={showFilters || hasActiveFilters ? 'secondary' : 'outline'}
-          onClick={() => onShowFilterChange(!showFilters)}
+          onClick={() => onShowFilterChange?.(!showFilters)}
           className="gap-1.5 sm:gap-2 flex-1 h-10 sm:flex-initial"
         >
           <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -87,11 +89,13 @@ export default function DataHeaderInput({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="max-h-64 overflow-y-auto">
-              {columns.map((col) => (
+              {columns?.map((col) => (
                 <DropdownMenuCheckboxItem
                   key={col.id}
-                  checked={columnVisibility[col.id] !== false}
-                  onCheckedChange={(checked) => onToggleColumn(col.id, checked)}
+                  checked={columnVisibility?.[col.id] !== false}
+                  onCheckedChange={(checked) =>
+                    onToggleColumn?.(col.id, checked)
+                  }
                   className="text-xs sm:text-sm"
                 >
                   {col.label}

@@ -68,7 +68,7 @@ export function StudentTableActions({ row }: { row: Row<StudentColumns> }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
           <DropdownMenuItem onClick={() => setOpenDialog(true)}>
-            Editer
+            Modifier
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => console.log('Copy')}>
             Copier

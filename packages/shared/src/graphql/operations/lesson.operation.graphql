@@ -1,34 +1,42 @@
-query GetSchoolLessons($classId: ID, $teacherId: ID, $searchTerm: String) {
+query GetSchoolLessons($filter: GetLessonsInput!) {
   getLessons(
-    classId: $classId
-    teacherId: $teacherId
-    searchTerm: $searchTerm
+   filter: $filter
   ) {
-    id
-    startTime
-    endTime
-    day
-    status
-    title
-    class {
-      name
-    }
-    subject {
-      id
-      name
-    }
-    teacher {
-      id
-      specialization
-      user {
-        id
-        profile {
-          id
-          firstname
-          lastname
-        }
-      }
-    }
+   data {
+     id
+     startTime
+     endTime
+     day
+     status
+     title
+     classSubject {
+       group {
+         id
+         name
+         type
+         classes {
+           id
+           name
+         }
+       }
+       subject {
+         id
+         name
+       }
+       teacher {
+         id
+         specialization
+         user {
+           id
+           profile {
+             id
+             firstname
+             lastname
+           }
+         }
+       }
+     }
+   }
   }
 }
 query GetNavigationData {
@@ -44,5 +52,62 @@ query GetNavigationData {
         ...UserProfile
       }
     }
+  }
+}
+mutation CreateLesson($input: CreateLessonInput!) {
+  createLesson(input: $input) {
+    id
+    status
+    startTime
+    endTime
+    day
+    classSubject {
+      id
+      subject {
+        id
+        name
+        code
+      }
+      group {
+        classes {
+          name
+          level
+        }
+      }
+      teacher {
+        id
+        user {
+          profile {
+            firstname
+            lastname
+          }
+        }
+      }
+    }
+  }
+}
+
+mutation UpdateLessonStatus($status: LessonStatus!, $id: ID!) {
+  updateLessonStatus(status: $status, id: $id) {
+    id
+    status
+  }
+}
+
+mutation UpdateLesson($input: UpdateLessonInput!) {
+  updateLesson(input: $input) {
+    id
+    status
+    startTime
+    endTime
+    day
+  }
+}
+
+mutation DeleteLesson($id: ID!) {
+  deleteLesson(id: $id) {
+    ok
+    message
+    details
   }
 }

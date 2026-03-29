@@ -15,7 +15,8 @@ import {
   NotebookTextIcon,
   ScrollText,
   Settings,
-  UserRound,
+  Users2Icon,
+  UserSquare2,
 } from 'lucide-react';
 
 // Définition des rôles pour la clarté
@@ -41,9 +42,15 @@ export const menuItems = {
       visible: [ROLES.ADMIN, ROLES.TEACHER],
     },
     {
-      icon: UserRound,
+      icon: UserSquare2,
       label: 'Élèves',
       href: '/list/students',
+      visible: [ROLES.ADMIN, ROLES.TEACHER],
+    },
+    {
+      icon: Users2Icon,
+      label: 'Parents',
+      href: '/list/parents',
       visible: [ROLES.ADMIN, ROLES.TEACHER],
     },
     {

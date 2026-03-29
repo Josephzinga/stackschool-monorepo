@@ -18,10 +18,12 @@ import { ServiceError } from '@stackschool/shared';
 import { prisma, SchoolUser } from '@stackschool/db';
 import { ZodError } from 'zod';
 import { createLoaders } from './resolvers/data-loader';
-import { createServiceError } from '../utils/api-errors';
-import { updateLessonStatusResolver } from './resolvers/class/update-lesson.resolver';
 import { lessonsResolver } from './resolvers/lessons.resolver';
 import { subjectResolver } from './resolvers/subject.resolver';
+import { createServiceError } from '../utils/api-errors';
+import { classMutationResolver } from './resolvers/class/muation.resolver';
+import { RoomResolver } from './resolvers/room.resolver';
+import { groupResolver } from './resolvers/groups.resolver';
 
 const dirPath = path.resolve(
   __dirname,
@@ -45,13 +47,15 @@ const resolvers = merge(
   createStudentResolver,
   studentResolver,
   classResolver,
+  classMutationResolver,
   searchStudentResolver,
   searchSchoolResolver,
   getClassesSubjectsResolver,
   confirmCompleteProfileResolver,
-  updateLessonStatusResolver,
   lessonsResolver,
   subjectResolver,
+  RoomResolver,
+  groupResolver,
 );
 
 // Création du schéma exécutable
@@ -73,7 +77,6 @@ const graphqlMiddleware = createHandler({
           schoolId: schoolId,
         },
       });
-
       if (!membership) {
         throw createServiceError('Accès refusé à cette école', 403);
       }

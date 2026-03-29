@@ -13,7 +13,7 @@ const resendCodeLimiter = new RateLimiterMemory({
  * @param {Request} req - La requête Express contenant l'IP.
  * @returns {Promise<RateLimiterRes>} Promesse résolue si autorisé, rejetée si limite atteinte ou IP manquante.
  */
-export const consumeResendCode = (req: Request) => {
+export const consumeResendCode = (req: Request): Promise<RateLimiterRes> => {
   const ip = req.ip;
   if (!ip) return Promise.reject(new Error('IP manquants dans resend_code'));
 
@@ -56,11 +56,11 @@ const rateLimiter = new RateLimiterMemory({
 });
 
 /**
- * Consomme un point de limite générique par IP (ex: login).
+ * Consomme un point de limite générique par IP (ex : login).
  * Limite : 3 tentatives par 15 minutes par IP.
  *
  * @param {Request} req - La requête Express contenant l'IP.
- * @returns {Promise<RateLimiterRes>} Promesse résolue si autorisé, rejetée si limite atteinte ou IP manquante.
+ * @returns {Promise<RateLimiterRes>} Promesse résolue si autorisée, rejetée si limite atteinte ou IP manquante.
  */
 export const consumeIp = (req: Request): Promise<RateLimiterRes> => {
   const ip = req.ip;

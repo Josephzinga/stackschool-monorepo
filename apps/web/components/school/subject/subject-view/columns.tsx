@@ -11,7 +11,7 @@ export type SubjectColumns = {
     id: string;
     name: string;
     code: string;
-  };
+  } | null;
   teacher: {
     id: string;
     user: {
@@ -31,7 +31,7 @@ export const columns: ColumnDef<SubjectColumns>[] = [
       <div className="font-medium ml-2 font-inter text-sm">
         {row.original?.subject?.name}
         <span className="ml-2 text-xs text-muted-foreground">
-          [{row.original?.subject.code}]
+          [{row.original?.subject?.code}]
         </span>
       </div>
     ),

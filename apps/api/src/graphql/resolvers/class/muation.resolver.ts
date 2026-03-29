@@ -3,20 +3,19 @@ import { createServiceError } from '../../../utils/api-errors';
 import { prisma } from '@stackschool/db';
 import { isAdmin } from '../../../lib/verify-role';
 
-export const classResolver: Resolvers = {
+export const classMutationResolver: Resolvers = {
   Mutation: {
-    createClass: async (_, { data, schoolId }, context) => {
-      if (!context.user) throw createServiceError('Non authentifié', 401);
-
-      const adminCheck = await isAdmin({
-        context: { schoolId, userId: context.user.id },
-      });
-
-      if (!adminCheck?.success) {
-        throw createServiceError(adminCheck?.message || 'Accès refusé', 403);
-      }
-
+    createClass: async (_, { data }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
       try {
+        const adminCheck = await isAdmin({
+          context: { schoolId, userId: user.id },
+        });
+
+        if (!adminCheck?.success) {
+          throw createServiceError(adminCheck?.message || 'Accès refusé', 403);
+        }
+
         // Vérifier unicité
         const existing = await prisma.class.findFirst({
           where: {
@@ -29,7 +28,7 @@ export const classResolver: Resolvers = {
           throw createServiceError('Une classe avec ce nom existe déjà', 400);
         }
 
-        await prisma.class.create({
+        const classe = await prisma.class.create({
           data: {
             name: data.name,
             level: data.level,
@@ -38,11 +37,10 @@ export const classResolver: Resolvers = {
             supervisorId: data.supervisorId || undefined,
           },
         });
-
-        return { ok: true, message: 'Classe créée avec succès' };
+        console.log('Classe', classe);
+        return classe;
       } catch (error) {
         console.error('Erreur création classe:', error);
-        if ((error as any).statusCode) throw error;
         throw createServiceError('Erreur lors de la création', 500, error);
       }
     },
@@ -128,6 +126,101 @@ export const classResolver: Resolvers = {
         console.error('Erreur suppression classes:', error);
         throw createServiceError('Erreur lors de la suppression', 500, error);
       }
+    },
+
+    createClassSubject: async (_, { input }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
+      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
+      const classId = input?.classId;
+      const subjectId = input?.subjectId;
+
+      if (!classId || !subjectId) throw createServiceError('Donnée manquat');
+      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
+      if (!checked?.success) {
+        throw createServiceError(
+          checked?.message || 'Permission non accorder',
+          403,
+        );
+      }
+
+      const exist = await prisma.classSubjects.findUnique({
+        where: {
+          classId_subjectId: { classId, subjectId },
+        },
+      });
+
+      if (exist) {
+        throw createServiceError('La matière existe déjà dans cette classe.');
+      }
+
+      return await prisma.classSubjects.create({
+        data: {
+          classId,
+          subjectId,
+          teacherId: input?.teacherId,
+          coefficient: input?.coefficient,
+          weeklyHours: input?.weeklyHours,
+        },
+      });
+    },
+    updateClassSubject: async (_, { input }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
+      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
+      const id = input?.id;
+      if (!id)
+        throw createServiceError("l'identifiant de la matière est requis");
+      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
+      if (!checked?.success) {
+        throw createServiceError(
+          checked?.message || 'Permission non accorder',
+          403,
+        );
+      }
+      const exist = await prisma.classSubjects.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!exist) {
+        throw createServiceError('Matière introuvable.');
+      }
+      return await prisma.classSubjects.update({
+        where: {
+          id,
+        },
+        data: {
+          teacherId: input?.teacherId ?? undefined,
+          classId: input?.classId ?? undefined,
+          subjectId: input?.subjectId ?? undefined,
+          coefficient: input?.coefficient,
+          weeklyHours: input?.weeklyHours ?? undefined,
+        },
+      });
+    },
+    deleteClassSubjects: async (_, { ids }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
+      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
+      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
+      if (!checked?.success) {
+        throw createServiceError(
+          checked?.message || 'Permission non accorder',
+          403,
+        );
+      }
+
+      const classSubjects = await prisma.classSubjects.deleteMany({
+        where: {
+          id: {
+            in: [...ids],
+          },
+        },
+      });
+
+      return {
+        ok: true,
+        message: `${classSubjects?.count} supprimer avec succès.`,
+      };
     },
   },
 };

@@ -1,11 +1,12 @@
 import { prisma } from '@stackschool/db';
 import { createServiceError } from '../../utils/api-errors';
 import { Resolvers } from '../types.generated';
+import { checkRole } from '../../lib/verify-role';
 
 export const getClassesSubjectsResolver: Resolvers = {
   Query: {
-    getClassSubjects: async (_: any, { filter }, { user, schoolId }) => {
-      const { searchTerm } = filter;
+    getClassAndSubjects: async (_: any, { filter }, { user, schoolId }) => {
+      const searchTerm = filter?.searchTerm;
 
       if (searchTerm && searchTerm.length < 2) {
         throw createServiceError(
@@ -51,6 +52,81 @@ export const getClassesSubjectsResolver: Resolvers = {
           e,
         );
       }
+    },
+    getClassSubjects: async (
+      _,
+      { classId, teacherId, groupId },
+      { user, schoolId },
+    ) => {
+      if (!classId && !teacherId && !groupId)
+        throw createServiceError('Identifiant manquant');
+      const ids = [classId, teacherId, groupId];
+
+      if (
+        ids.filter((id) => id !== undefined && (id !== null || '')).length > 1
+      )
+        throw createServiceError('Viellez specifier un seule identifiant');
+      const checked = await checkRole({
+        context: { userId: user?.id, schoolId },
+        roles: ['TEACHER', 'ADMIN', 'PARENT'],
+      });
+
+      if (!checked.success) {
+        throw createServiceError(
+          checked?.message || 'permission non accordé',
+          403,
+        );
+      }
+      return await prisma.classSubjects.findMany({
+        where: {
+          group: {
+            id: groupId ?? undefined,
+            classes: {
+              some: {
+                id: classId ?? undefined,
+              },
+            },
+          },
+          teacherId,
+        },
+      });
+    },
+  },
+  ClassSubject: {
+    teacher: async (parent, _, { loaders }) => {
+      if (!parent.teacherId) return null;
+      return await loaders.teacherLoader.load(parent.teacherId);
+    },
+    weeklyHours: async (parent) => {
+      const lessons = await prisma.lesson.findMany({
+        where: {
+          classSubjectId: parent.id,
+        },
+      });
+
+      let totalMinutes = 0;
+      lessons.forEach((l) => {
+        const diffMs = l.endTime.getTime() - l.startTime.getTime();
+        totalMinutes += diffMs / (1000 * 60);
+      });
+
+      return parseFloat((totalMinutes / 60).toFixed(1));
+    },
+    subject: async (parent, _, { loaders }) => {
+      if (!parent.subjectId) return null;
+      return await loaders.subjectLoader.load(parent.subjectId);
+    },
+    group: async (parent) => {
+      const group = await prisma.group.findUnique({
+        where: {
+          id: parent.groupId,
+        },
+      });
+      console.log('group', group);
+      return group;
+    },
+    lessons: async (parent, _, { loaders }) => {
+      return await loaders.lessonsByClassSubjectLoader.load(parent.id);
     },
   },
 };

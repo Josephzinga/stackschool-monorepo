@@ -68,47 +68,46 @@ export default function CreateClassForm({
     });
 
   const { mutateAsync: createMutate } = useCreateClassMutation({
-    onSuccess: async () => {
+    onMutate: async (variables, context) => {
+      await queryClient.cancelQueries({ queryKey: ['GetSchoolClasses'] });
+
+      const previous = queryClient.getQueryData(['GetSchoolClasses']);
+    },
+    onSuccess: async (data, variables, onMutateResult, context) => {
       await queryClient.invalidateQueries({ queryKey: ['GetSchoolClasses'] });
-      if (onSuccess) onSuccess();
     },
   });
 
   const { mutateAsync: updateMutate } = useUpdateClassMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['GetSchoolClasses'] });
-      if (onSuccess) onSuccess();
     },
   });
 
   const onSubmit = async (data: CreateClassType) => {
-    try {
-      const isEdit = !!editDefaultValues;
+    const isEdit = !!editDefaultValues;
 
-      const promise = isEdit
-        ? updateMutate({
-            classId: editDefaultValues.id,
-            data,
-            schoolId: currentSchool?.id!,
-          })
-        : createMutate({
-            data,
-            schoolId: currentSchool?.id!,
-          });
+    const promise = isEdit
+      ? updateMutate({
+          classId: editDefaultValues.id,
+          data,
+          schoolId: currentSchool?.id!,
+        })
+      : createMutate({
+          data,
+        });
 
-      toast.promise(promise, {
-        loading: isEdit ? 'Mise à jour...' : 'Création...',
-        success: (res: any) => {
-          const response = isEdit ? res.updateClass : res.createClass;
-          if (response?.ok) return response.message;
-          throw new Error(response?.message || 'Erreur inconnue');
-        },
-        error: (error) => error.message || "Erreur lors de l'opération",
-        toasterId: 'dashboard',
-      });
-    } catch (error) {
-      toast.error("Erreur lors de l'opération");
-    }
+    toast.promise(promise, {
+      loading: isEdit ? 'Mise à jour en cours...' : 'Création en cours...',
+      success: (res: any) => {
+        return isEdit
+          ? 'Mise à jour réussie avec succès'
+          : 'Création réussie avec succès';
+      },
+      error: (error) => error.message || "Erreur lors de l'opération",
+      toasterId: 'dashboard',
+    });
+    if (onSuccess) onSuccess();
   };
 
   return (
@@ -174,7 +173,7 @@ export default function CreateClassForm({
                 </SelectTrigger>
                 <SelectContent>
                   {teachersData?.getSchoolTeachers?.data?.map((teacher) => (
-                    <SelectItem key={teacher.id} value={teacher.id}>
+                    <SelectItem key={teacher.id} value={teacher.id!}>
                       {teacher.user?.profile?.firstname}{' '}
                       {teacher.user?.profile?.lastname}
                     </SelectItem>

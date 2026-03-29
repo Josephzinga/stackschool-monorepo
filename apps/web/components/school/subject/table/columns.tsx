@@ -18,13 +18,14 @@ export type SubjectColumns = {
   id: string;
   name: string;
   category: SubjectCategory;
-  classes:
+  classes: (
     | ({
         id: string;
         name: string;
       } | null)[]
     | null
-    | undefined;
+    | undefined
+  )[];
   mainTeacher?: {
     id: string;
     firstname: string;
@@ -65,7 +66,9 @@ export const columns: ColumnDef<SubjectColumns>[] = [
     accessorKey: 'classes',
     header: 'Classe.',
     cell: ({ row }) => {
-      const classes = row.original.classes?.map((cs) => cs?.name);
+      const classes = row.original.classes?.map((cls) =>
+        cls?.map((cl) => cl?.name),
+      );
       const displayCount = 2;
       let remainingCount = 0;
       if (classes) {
@@ -89,7 +92,7 @@ export const columns: ColumnDef<SubjectColumns>[] = [
             </Badge>
           ))}
 
-          {remainingCount > 0 && (
+          {remainingCount > 0 && classes?.length > 0 && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

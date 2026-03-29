@@ -4,6 +4,7 @@ import { isAuthenticated } from '../../middlewares/auth';
 import path from 'path';
 import { validateUploadedImage } from '../../middlewares/validate-profile-picture';
 import { redisClient } from '../../lib/redis';
+import { prisma } from '@stackschool/db';
 
 const router = Router();
 
@@ -23,28 +24,50 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const uploadProfile = multer({ storage: storage });
 
 router.post(
   '/profile-picture',
   isAuthenticated,
-  upload.single('profilePicture'),
+  uploadProfile.single('profilePicture'),
   validateUploadedImage,
   async (req, res) => {
     try {
+      const isOnCompleteProfile: boolean =
+        req.body.isOnCompleteProfile || false;
+      const profileId = req.body.profileId as string;
       const user = req.user;
       if (!req.file) throw new Error('Pas de fichier après multer');
 
       const publicPath = `/images/${req.file.filename}`;
+      if (isOnCompleteProfile) {
+        const key = `pendingPhoto${user?.id}`;
 
-      const key = `pendingPhoto${user?.id}`;
+        await redisClient.set(key, publicPath);
 
-      await redisClient.set(key, publicPath);
+        return res.status(200).json({
+          ok: true,
+          message: `Image sauvegardée temporairement.`,
+          path: publicPath,
+        });
+      }
+      console.log('user', user);
+      const profile = await prisma.profile.update({
+        where: {
+          userId: user?.id,
+        },
+        data: {
+          photo: publicPath,
+        },
+        select: {
+          photo: true,
+        },
+      });
 
       return res.status(200).json({
         ok: true,
-        message: `Image sauvegardée temporairement.`,
-        path: publicPath,
+        message: 'Image sauvegardée avec succès.',
+        path: profile?.photo,
       });
     } catch (err) {
       console.error('Upload error', err);

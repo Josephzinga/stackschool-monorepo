@@ -1,5 +1,5 @@
 'use client';
-import { useGetSchoolSubjectsQuery } from '@stackschool/ui';
+import { SubjectCategory, useGetSchoolSubjectsQuery } from '@stackschool/ui';
 import {
   columns,
   SubjectColumns,
@@ -25,18 +25,14 @@ export function SubjectView() {
       id: s.id,
       code: s?.code,
       name: s?.name,
-      category: s?.category,
+      category: s?.category as SubjectCategory,
       mainTeacher: {
         id: s?.mainTeacher?.id!,
         firstname: s?.mainTeacher?.user?.profile?.firstname!,
         lastname: s?.mainTeacher?.user?.profile?.lastname!,
         photo: s?.mainTeacher?.user?.profile?.photo,
       },
-      classes: s.classSubject?.map((cs) => ({
-        id: cs?.classe.id!,
-        name: cs?.classe.name ?? '',
-        level: cs?.classe.level ?? '',
-      })),
+      classes: s.classSubject?.map((cs) => cs?.group?.classes) || [],
       totalWeeklyHours: s.totalWeeklyHours ?? 0,
     })) || [];
   return (

@@ -53,6 +53,7 @@ export default function TableHeader() {
               <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
                 <DataHeaderInput
                   hasActiveFilters={hasActiveFilters}
+                  inputPlaceholder="Rechercher une maitéres..."
                   showFilters={showFilters}
                   columns={SUBJECT_COLUMN}
                   columnVisibility={columnVisibility}

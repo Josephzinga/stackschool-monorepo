@@ -25,7 +25,7 @@ export function TeacherView({ classId }: { classId?: string }) {
   const { data } = useGetTeachersTeamQuery({
     id: classId!,
   });
-  const classSubjects = data?.class?.classSubject;
+  const classSubjects = data?.class?.group?.classSubjects;
   return (
     <Card className="gap-4 p-2">
       <CardHeader>

@@ -10,10 +10,10 @@
   "devDependencies": {
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/extension-accelerate": "^2.0.2",
-    "prisma": "^7.4.2"
+    "prisma": "^7.6.0"
   },
   "dependencies": {
-    "@prisma/client": "^7.4.2",
+    "@prisma/client": "^7.6.0",
     "@stackschool/shared": "workspace:*"
   }
 }

@@ -18,6 +18,7 @@ input UpdateLessonInput {
   endTime: DateTime!
   classId: ID
   day: Day!
+  mode: ResourceMode
 }
 type ApiResponse {
   ok: Boolean
@@ -27,6 +28,10 @@ type ApiResponse {
 enum Gender {
   MALE
   FEMALE
+}
+enum ResourceMode {
+  TEACHER
+  CLASS
 }
 input CreateStudentInput {
   firstname: String!

@@ -35,13 +35,26 @@ export const groupResolver: Resolvers = {
     },
   },
   Group: {
-    classes: async (parent, _, { loaders, schoolId }) => {
-      return await prisma.class.findMany({
+    classSubjects: async (parent) => {
+      console.log('Group.classSubjects', parent.id);
+      const classSubjects = await prisma.classSubjects.findMany({
         where: {
-          groupId: parent.id,
-          schoolId,
+          group: {
+            id: parent.id,
+          },
         },
       });
+      return classSubjects;
+    },
+    classes: async (parent) => {
+      console.log('Group.classes', parent);
+      const classes = await prisma.class.findMany({
+        where: {
+          groupId: parent.id,
+        },
+      });
+      console.log('Group.classes Classes \n', classes);
+      return classes;
     },
   },
 };

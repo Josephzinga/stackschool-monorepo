@@ -17,6 +17,8 @@ const config: CodegenConfig = {
             '@stackschool/db/src/prisma/client/generated#StudentStatus',
           Gender: '@stackschool/db/src/prisma/client/generated#Gender',
           Day: '@stackschool/db/src/prisma/client/generated#Day',
+          LessonStatus:
+            '@stackschool/db/src/prisma/client/generated#LessonStatus',
         },
       },
     },

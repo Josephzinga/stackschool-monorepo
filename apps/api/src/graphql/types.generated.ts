@@ -1,6 +1,7 @@
 import { StudentStatus } from '@stackschool/db/src/prisma/client/generated';
 import { Gender } from '@stackschool/db/src/prisma/client/generated';
 import { Day } from '@stackschool/db/src/prisma/client/generated';
+import { LessonStatus } from '@stackschool/db/src/prisma/client/generated';
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { Context } from '@stackschool/api/src/types/graphql.type';
 export type Maybe<T> = T | null;
@@ -268,9 +269,15 @@ export type GenderStats = {
 
 export type GetLessonsInput = {
   classId?: InputMaybe<Scalars['ID']['input']>;
+  department?: InputMaybe<Scalars['String']['input']>;
+  groupId?: InputMaybe<Scalars['ID']['input']>;
+  hasLessonOnly?: InputMaybe<Scalars['Boolean']['input']>;
+  level?: InputMaybe<Scalars['String']['input']>;
   limit?: Scalars['Int']['input'];
+  mode: CreateLessonMode;
   page?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  section?: InputMaybe<Scalars['String']['input']>;
   teacherId?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -333,8 +340,13 @@ export type Group = {
   classes: Array<Class>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  type: Scalars['String']['output'];
+  type?: Maybe<GroupType>;
 };
+
+export enum GroupType {
+  Multiple = 'MULTIPLE',
+  Solo = 'SOLO'
+}
 
 export type InvitationCodeInput = {
   code: Scalars['String']['input'];
@@ -342,7 +354,7 @@ export type InvitationCodeInput = {
 
 export type Lesson = {
   __typename?: 'Lesson';
-  classSubject: ClassSubject;
+  classSubject?: Maybe<ClassSubject>;
   day?: Maybe<Day>;
   endTime?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
@@ -352,17 +364,37 @@ export type Lesson = {
   title?: Maybe<Scalars['String']['output']>;
 };
 
-export enum LessonStatus {
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Ongoing = 'ONGOING',
-  Planned = 'PLANNED',
-  Postponed = 'POSTPONED'
-}
+export type LessonResources = {
+  __typename?: 'LessonResources';
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+};
+
+export { LessonStatus };
+
+export type LessonsData = {
+  __typename?: 'LessonsData';
+  events: LessonsEvents;
+  resources?: Maybe<LessonResources>;
+};
+
+export type LessonsEvents = {
+  __typename?: 'LessonsEvents';
+  endTime: Scalars['String']['output'];
+  group?: Maybe<Group>;
+  id: Scalars['ID']['output'];
+  resourceId?: Maybe<Scalars['ID']['output']>;
+  room?: Maybe<Room>;
+  startTime: Scalars['String']['output'];
+  status?: Maybe<LessonStatus>;
+  subject: Subject;
+  teacher?: Maybe<Teacher>;
+  title: Scalars['String']['output'];
+};
 
 export type LessonsList = {
   __typename?: 'LessonsList';
-  data?: Maybe<Array<Lesson>>;
+  data: LessonsData;
   meta?: Maybe<PaginationMeta>;
 };
 
@@ -674,6 +706,11 @@ export enum Relation {
   Uncle = 'UNCLE'
 }
 
+export enum ResourceMode {
+  Class = 'CLASS',
+  Teacher = 'TEACHER'
+}
+
 export type Role = {
   role?: InputMaybe<SchoolRole>;
 };
@@ -873,11 +910,11 @@ export type Teacher = {
   bio?: Maybe<Scalars['String']['output']>;
   classSubjects?: Maybe<Array<Maybe<ClassSubject>>>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
-  departement?: Maybe<Scalars['String']['output']>;
+  department?: Maybe<Scalars['String']['output']>;
   diploma?: Maybe<Scalars['String']['output']>;
   experience?: Maybe<Scalars['String']['output']>;
   hireDate?: Maybe<Scalars['DateTime']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
   isActive?: Maybe<Scalars['Boolean']['output']>;
   lessons?: Maybe<Array<Maybe<Lesson>>>;
   salary?: Maybe<Scalars['Float']['output']>;
@@ -910,6 +947,7 @@ export type UpdateLessonInput = {
   day: Day;
   endTime: Scalars['DateTime']['input'];
   id: Scalars['ID']['input'];
+  mode?: InputMaybe<ResourceMode>;
   startTime: Scalars['DateTime']['input'];
 };
 
@@ -1064,11 +1102,15 @@ export type ResolversTypes = ResolversObject<{
   GetSchoolTeachersInput: GetSchoolTeachersInput;
   GetSubjectInput: GetSubjectInput;
   Group: ResolverTypeWrapper<Group>;
+  GroupType: GroupType;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   InvitationCodeInput: InvitationCodeInput;
   Lesson: ResolverTypeWrapper<Lesson>;
+  LessonResources: ResolverTypeWrapper<LessonResources>;
   LessonStatus: LessonStatus;
+  LessonsData: ResolverTypeWrapper<LessonsData>;
+  LessonsEvents: ResolverTypeWrapper<LessonsEvents>;
   LessonsList: ResolverTypeWrapper<LessonsList>;
   MonthlyRevenue: ResolverTypeWrapper<MonthlyRevenue>;
   MonthlyStats: ResolverTypeWrapper<MonthlyStats>;
@@ -1079,6 +1121,7 @@ export type ResolversTypes = ResolversObject<{
   Profile: ResolverTypeWrapper<Profile>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Relation: Relation;
+  ResourceMode: ResourceMode;
   Role: Role;
   Room: ResolverTypeWrapper<Room>;
   RoomList: ResolverTypeWrapper<RoomList>;
@@ -1153,6 +1196,9 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int']['output'];
   InvitationCodeInput: InvitationCodeInput;
   Lesson: Lesson;
+  LessonResources: LessonResources;
+  LessonsData: LessonsData;
+  LessonsEvents: LessonsEvents;
   LessonsList: LessonsList;
   MonthlyRevenue: MonthlyRevenue;
   MonthlyStats: MonthlyStats;
@@ -1291,11 +1337,11 @@ export type GroupResolvers<ContextType = Context, ParentType extends ResolversPa
   classes?: Resolver<Array<ResolversTypes['Class']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['GroupType']>, ParentType, ContextType>;
 }>;
 
 export type LessonResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Lesson'] = ResolversParentTypes['Lesson']> = ResolversObject<{
-  classSubject?: Resolver<ResolversTypes['ClassSubject'], ParentType, ContextType>;
+  classSubject?: Resolver<Maybe<ResolversTypes['ClassSubject']>, ParentType, ContextType>;
   day?: Resolver<Maybe<ResolversTypes['Day']>, ParentType, ContextType>;
   endTime?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -1305,8 +1351,33 @@ export type LessonResolvers<ContextType = Context, ParentType extends ResolversP
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
+export type LessonResourcesResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LessonResources'] = ResolversParentTypes['LessonResources']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+}>;
+
+export type LessonStatusResolvers = EnumResolverSignature<{ CANCELLED?: any, COMPLETED?: any, ONGOING?: any, PLANNED?: any, POSTPONED?: any }, ResolversTypes['LessonStatus']>;
+
+export type LessonsDataResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LessonsData'] = ResolversParentTypes['LessonsData']> = ResolversObject<{
+  events?: Resolver<ResolversTypes['LessonsEvents'], ParentType, ContextType>;
+  resources?: Resolver<Maybe<ResolversTypes['LessonResources']>, ParentType, ContextType>;
+}>;
+
+export type LessonsEventsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LessonsEvents'] = ResolversParentTypes['LessonsEvents']> = ResolversObject<{
+  endTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  group?: Resolver<Maybe<ResolversTypes['Group']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  resourceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  room?: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType>;
+  startTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<Maybe<ResolversTypes['LessonStatus']>, ParentType, ContextType>;
+  subject?: Resolver<ResolversTypes['Subject'], ParentType, ContextType>;
+  teacher?: Resolver<Maybe<ResolversTypes['Teacher']>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+}>;
+
 export type LessonsListResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LessonsList'] = ResolversParentTypes['LessonsList']> = ResolversObject<{
-  data?: Resolver<Maybe<Array<ResolversTypes['Lesson']>>, ParentType, ContextType>;
+  data?: Resolver<ResolversTypes['LessonsData'], ParentType, ContextType>;
   meta?: Resolver<Maybe<ResolversTypes['PaginationMeta']>, ParentType, ContextType>;
 }>;
 
@@ -1532,11 +1603,11 @@ export type TeacherResolvers<ContextType = Context, ParentType extends Resolvers
   bio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   classSubjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['ClassSubject']>>>, ParentType, ContextType>;
   createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  departement?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  department?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   diploma?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   experience?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hireDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   isActive?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   lessons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Lesson']>>>, ParentType, ContextType>;
   salary?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -1589,6 +1660,10 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   GenderStats?: GenderStatsResolvers<ContextType>;
   Group?: GroupResolvers<ContextType>;
   Lesson?: LessonResolvers<ContextType>;
+  LessonResources?: LessonResourcesResolvers<ContextType>;
+  LessonStatus?: LessonStatusResolvers;
+  LessonsData?: LessonsDataResolvers<ContextType>;
+  LessonsEvents?: LessonsEventsResolvers<ContextType>;
   LessonsList?: LessonsListResolvers<ContextType>;
   MonthlyRevenue?: MonthlyRevenueResolvers<ContextType>;
   MonthlyStats?: MonthlyStatsResolvers<ContextType>;

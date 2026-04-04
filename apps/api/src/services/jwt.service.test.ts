@@ -19,16 +19,16 @@ describe('JWT Service', () => {
 
   describe('createJwtForUser', () => {
     it('devrait créer un token avec le bon payload', () => {
-      const user = { id: 1, email: 'test@example.com' };
+      const user = { id: 1, email: 'tests@example.com' };
       mockSign.mockReturnValue('signed-token');
 
       const token = createJwtForUser(user);
 
       expect(token).toBe('signed-token');
       expect(mockSign).toHaveBeenCalledWith(
-        expect.objectContaining({ userId: 1, email: 'test@example.com' }),
+        expect.objectContaining({ userId: 1, email: 'tests@example.com' }),
         'secret-key',
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });
@@ -46,7 +46,9 @@ describe('JWT Service', () => {
     });
 
     it('devrait lancer une erreur si le token est invalide', () => {
-      mockVerify.mockImplementation(() => { throw new Error('Invalid token'); });
+      mockVerify.mockImplementation(() => {
+        throw new Error('Invalid token');
+      });
 
       expect(() => verifyJwtForUser('invalid')).toThrow('Invalid token');
     });

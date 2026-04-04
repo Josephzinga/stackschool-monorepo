@@ -30,12 +30,6 @@ export const getClassesSubjectsResolver: Resolvers = {
 
         const classes = await prisma.class.findMany({
           where: whereClause,
-          select: {
-            id: true,
-            name: true,
-            level: true,
-            section: true,
-          },
           take: 10,
           orderBy: { name: 'desc' },
         });
@@ -58,8 +52,6 @@ export const getClassesSubjectsResolver: Resolvers = {
       { classId, teacherId, groupId },
       { user, schoolId },
     ) => {
-      if (!classId && !teacherId && !groupId)
-        throw createServiceError('Identifiant manquant');
       const ids = [classId, teacherId, groupId];
 
       if (
@@ -117,13 +109,11 @@ export const getClassesSubjectsResolver: Resolvers = {
       return await loaders.subjectLoader.load(parent.subjectId);
     },
     group: async (parent) => {
-      const group = await prisma.group.findUnique({
+      return await prisma.group.findUnique({
         where: {
           id: parent.groupId,
         },
       });
-      console.log('group', group);
-      return group;
     },
     lessons: async (parent, _, { loaders }) => {
       return await loaders.lessonsByClassSubjectLoader.load(parent.id);

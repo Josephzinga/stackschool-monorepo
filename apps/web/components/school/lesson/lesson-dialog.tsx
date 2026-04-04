@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import {
   Dialog,
@@ -41,6 +41,7 @@ import { toast } from 'sonner';
 import { format, getDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { useLessonStore } from '@/store/lesson-store';
 
 export type InitialData =
   | { mode: 'CREATE'; args: DateSelectArg }
@@ -48,18 +49,10 @@ export type InitialData =
   | undefined;
 
 interface LessonDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  initialData: InitialData;
-  resourceMode: 'CLASS' | 'TEACHER';
+  onSuccess: () => Promise<void>;
 }
 
-export default function LessonDialog({
-  open,
-  onOpenChange,
-  initialData,
-  resourceMode,
-}: LessonDialogProps) {
+export default function LessonDialog({ onSuccess }: LessonDialogProps) {
   const {
     register,
     control,
@@ -72,10 +65,15 @@ export default function LessonDialog({
   } = useForm<CreateLessonFormData>({
     resolver: zodResolver(createLessonSchema),
   });
-  // 1. Extraire les données proprement
-  const isUpdate = initialData?.mode === 'UPDATE';
-  const eventData = isUpdate ? initialData.args.event : null;
-  const selectionData = !isUpdate ? initialData?.args : null;
+  const {
+    resourceMode,
+    setLessonDialogOpen,
+    lessonDialogOpen,
+    selectedLessonData,
+  } = useLessonStore();
+  const isUpdate = selectedLessonData?.mode === 'UPDATE';
+  const eventData = isUpdate ? selectedLessonData.args.event : null;
+  const selectionData = !isUpdate ? selectedLessonData?.args : null;
   const subject = eventData?._def?.extendedProps?.subject;
   const teacher = eventData?._def?.extendedProps?.teacher;
   const lessonId = eventData?._def?.extendedProps.lessonId;
@@ -137,7 +135,7 @@ export default function LessonDialog({
         ? setValue('teacherId', teacher?.id)
         : setValue('groupId', eventData?.extendedProps?.groupId);
     }
-  }, [initialData, eventData, setValue, resourceMode]);
+  }, [selectedLessonData, eventData, setValue, resourceMode]);
 
   const selectedSubjectId = watch('subjectId');
   const selectedSecondaryId = watch(
@@ -167,44 +165,41 @@ export default function LessonDialog({
 
     return all.filter((cs) => cs.subject?.id === selectedSubjectId);
   }, [classSubjectData, selectedSubjectId]);
-  const filteredTeachers = resourceMode === 'TEACHER' ? filteredSecondary : [];
-  const uniqueTeachers = Array.from(
-    new Map(filteredTeachers.map((item) => [item?.teacher?.id, item])).values(),
+
+  const handleSubjectChange = useCallback(
+    (val: string, onChange: any) => {
+      onChange(val);
+      const matches =
+        classSubjectData?.getClassSubjects?.filter(
+          (cs) => cs.subject?.id === val,
+        ) || [];
+
+      if (matches.length === 1) {
+        const targetId =
+          resourceMode === 'CLASS'
+            ? matches[0].teacher?.id
+            : matches[0]?.group?.id;
+        setValue(resourceMode === 'CLASS' ? 'teacherId' : 'groupId', targetId);
+      }
+    },
+    [uniqueSubjects, selectedSubjectId],
   );
 
-  const handleSubjectChange = (val: string, onChange: any) => {
-    onChange(val);
-    const matches =
-      classSubjectData?.getClassSubjects?.filter(
-        (cs) => cs.subject?.id === val,
-      ) || [];
-
-    if (matches.length === 1) {
-      const targetId =
-        resourceMode === 'CLASS'
-          ? matches[0].teacher?.id
-          : matches[0]?.group?.id;
-      setValue(
-        resourceMode === 'CLASS' ? 'teacherId' : 'groupId',
-        targetId ?? undefined,
-      );
-    }
-  };
-
-  const handleSecondaryChange = (val: string, onChange: any) => {
-    onChange(val);
-    const matches =
-      classSubjectData?.getClassSubjects?.filter((cs) =>
-        resourceMode === 'CLASS'
-          ? cs.teacher?.id === val
-          : cs.group?.id === val,
-      ) || [];
-    console.log('matches', matches);
-    if (matches.length === 1) {
-      console.log('Subject matches', matches?.[0]?.subject?.name);
-      setValue('subjectId', matches?.[0]?.subject?.id ?? '');
-    }
-  };
+  const handleSecondaryChange = useCallback(
+    (val: string, onChange: any) => {
+      onChange(val);
+      const matches =
+        classSubjectData?.getClassSubjects?.filter((cs) =>
+          resourceMode === 'CLASS'
+            ? cs.teacher?.id === val
+            : cs.group?.id === val,
+        ) || [];
+      if (matches.length === 1) {
+        setValue('subjectId', matches?.[0]?.subject?.id ?? '');
+      }
+    },
+    [resourceMode],
+  );
   const queryClient = useQueryClient();
   const { mutateAsync: deleteMutate } = useDeleteLessonMutation({
     onSuccess: async () => {
@@ -222,6 +217,7 @@ export default function LessonDialog({
   const { mutateAsync: createMutate } = useCreateLessonMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['GetSchoolLessons'] });
+      setLessonDialogOpen(false);
     },
   });
 
@@ -229,9 +225,11 @@ export default function LessonDialog({
     const promise = isUpdate
       ? updateMutate({
           input: {
-            ...data,
+            startTime: data.startTime,
+            endTime: data.endTime,
             id: lessonId,
             day: data.day as Day,
+            mode: resourceMode,
           },
         })
       : createMutate({
@@ -268,9 +266,10 @@ export default function LessonDialog({
       error: 'Error lors de la mise à jour',
       toasterId: 'dashboard',
     });
-    onOpenChange(false);
+    setLessonDialogOpen(false);
   };
   const handleDelete = async () => {
+    console.log('handleDelete', lessonId);
     if (!lessonId) return;
 
     const promise = deleteMutate({
@@ -285,15 +284,15 @@ export default function LessonDialog({
       },
       toasterId: 'dashboard',
     });
-    onOpenChange(false);
+    setLessonDialogOpen(false);
   };
   return (
     <div>
-      <Dialog open={open} modal={false} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-110!">
+      <Dialog open={lessonDialogOpen} onOpenChange={setLessonDialogOpen}>
+        <DialogContent className="max-w-110! shadow-2xl!">
           <DialogHeader>
             <DialogTitle>
-              {initialData?.mode === 'CREATE'
+              {selectedLessonData?.mode === 'CREATE'
                 ? 'Créer une leçon'
                 : 'Modifier la leçon'}
             </DialogTitle>
@@ -526,7 +525,9 @@ export default function LessonDialog({
                     'font-semibold',
                   )}
                 >
-                  {initialData?.mode === 'UPDATE' ? 'Enregistré' : 'Créer '}
+                  {selectedLessonData?.mode === 'UPDATE'
+                    ? 'Enregistré'
+                    : 'Créer '}
                 </Button>
               </div>
             </DialogFooter>

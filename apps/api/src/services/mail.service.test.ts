@@ -12,27 +12,31 @@ describe('Mail Service', () => {
     (nodemailer.createTransport as jest.Mock).mockReturnValue({
       sendMail: mockSendMail,
     });
-    mockSendMail.mockResolvedValue({ messageId: 'test-id' });
+    mockSendMail.mockResolvedValue({ messageId: 'tests-id' });
   });
 
   it('devrait envoyer un email avec les bons paramètres', async () => {
-    const to = 'test@example.com';
+    const to = 'tests@example.com';
     const subject = 'Reset Password';
     const resetLink = 'http://example.com/reset';
 
     await sendResetPasswordEmail(to, subject, resetLink);
 
     expect(nodemailer.createTransport).toHaveBeenCalled();
-    expect(mockSendMail).toHaveBeenCalledWith(expect.objectContaining({
-      to,
-      subject,
-      html: expect.stringContaining(resetLink),
-    }));
+    expect(mockSendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to,
+        subject,
+        html: expect.stringContaining(resetLink),
+      }),
+    );
   });
 
-  it('devrait gérer les erreurs d\'envoi', async () => {
+  it("devrait gérer les erreurs d'envoi", async () => {
     mockSendMail.mockRejectedValue(new Error('SMTP Error'));
-    
-    await expect(sendResetPasswordEmail('to', 'sub', 'link')).rejects.toThrow('SMTP Error');
+
+    await expect(sendResetPasswordEmail('to', 'sub', 'link')).rejects.toThrow(
+      'SMTP Error',
+    );
   });
 });

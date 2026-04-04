@@ -1,15 +1,22 @@
 query GetSchoolLessons($filter: GetLessonsInput!) {
-  getLessons(
-   filter: $filter
-  ) {
-   data {
-     id
-     startTime
-     endTime
-     day
-     status
-     title
-     classSubject {
+  getLessons(filter: $filter) {
+    meta {
+      page
+      totalPages
+      total
+      limit
+    }
+    data {
+      resources {
+        id
+        title
+      }
+     events {
+       id
+       resourceId
+       status
+       startTime
+       endTime
        group {
          id
          name
@@ -25,18 +32,15 @@ query GetSchoolLessons($filter: GetLessonsInput!) {
        }
        teacher {
          id
-         specialization
          user {
-           id
            profile {
-             id
              firstname
              lastname
            }
          }
        }
      }
-   }
+    }
   }
 }
 query GetNavigationData {
@@ -45,9 +49,11 @@ query GetNavigationData {
       id
       name
       level
+      section
     }
     teacher {
       id
+      department
       user {
         ...UserProfile
       }

@@ -10,18 +10,6 @@ query GetSchoolParents($filter: GetSchoolParentsInput) {
       id
       profession
       relationType
-      students {
-        user {
-          profile {
-            firstname
-            lastname
-          }
-        }
-        schoolClass {
-          name
-          level
-        }
-      }
       user {
         id
         phoneNumber
@@ -35,6 +23,19 @@ query GetSchoolParents($filter: GetSchoolParentsInput) {
           photo
         }
       }
+      students {
+        user {
+          profile {
+            firstname
+            lastname
+          }
+        }
+        schoolClass {
+          name
+          level
+        }
+      }
+
     }
   }
 }

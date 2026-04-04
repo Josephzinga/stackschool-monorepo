@@ -16,7 +16,7 @@ query GetSchoolTeachers($input: GetSchoolTeachersInput!) {
       weeklyHours
       specialization
       diploma
-      departement
+      department
       experience
       isActive
       user {
@@ -31,10 +31,12 @@ query GetSchoolTeachers($input: GetSchoolTeachersInput!) {
       }
       classSubjects {
         group {
+          type
           classes {
             id
             name
           }
+
         }
         subject {
           id
@@ -95,7 +97,7 @@ query GetTeacherDetails($id: ID!) {
     bio
     hireDate
     salary
-    departement
+    department
     weeklyHours
     isActive
     createdAt

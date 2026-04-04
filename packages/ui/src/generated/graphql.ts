@@ -274,9 +274,15 @@ export type GenderStats = {
 
 export type GetLessonsInput = {
   classId?: InputMaybe<Scalars['ID']['input']>;
+  department?: InputMaybe<Scalars['String']['input']>;
+  groupId?: InputMaybe<Scalars['ID']['input']>;
+  hasLessonOnly?: InputMaybe<Scalars['Boolean']['input']>;
+  level?: InputMaybe<Scalars['String']['input']>;
   limit?: Scalars['Int']['input'];
+  mode: CreateLessonMode;
   page?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  section?: InputMaybe<Scalars['String']['input']>;
   teacherId?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -339,8 +345,13 @@ export type Group = {
   classes: Array<Class>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  type: Scalars['String']['output'];
+  type?: Maybe<GroupType>;
 };
+
+export enum GroupType {
+  Multiple = 'MULTIPLE',
+  Solo = 'SOLO'
+}
 
 export type InvitationCodeInput = {
   code: Scalars['String']['input'];
@@ -348,7 +359,7 @@ export type InvitationCodeInput = {
 
 export type Lesson = {
   __typename?: 'Lesson';
-  classSubject: ClassSubject;
+  classSubject?: Maybe<ClassSubject>;
   day?: Maybe<Day>;
   endTime?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
@@ -356,6 +367,12 @@ export type Lesson = {
   startTime?: Maybe<Scalars['DateTime']['output']>;
   status: LessonStatus;
   title?: Maybe<Scalars['String']['output']>;
+};
+
+export type LessonResources = {
+  __typename?: 'LessonResources';
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
 };
 
 export enum LessonStatus {
@@ -366,9 +383,29 @@ export enum LessonStatus {
   Postponed = 'POSTPONED'
 }
 
+export type LessonsData = {
+  __typename?: 'LessonsData';
+  events: LessonsEvents;
+  resources?: Maybe<LessonResources>;
+};
+
+export type LessonsEvents = {
+  __typename?: 'LessonsEvents';
+  endTime: Scalars['String']['output'];
+  group?: Maybe<Group>;
+  id: Scalars['ID']['output'];
+  resourceId?: Maybe<Scalars['ID']['output']>;
+  room?: Maybe<Room>;
+  startTime: Scalars['String']['output'];
+  status?: Maybe<LessonStatus>;
+  subject: Subject;
+  teacher?: Maybe<Teacher>;
+  title: Scalars['String']['output'];
+};
+
 export type LessonsList = {
   __typename?: 'LessonsList';
-  data?: Maybe<Array<Lesson>>;
+  data: LessonsData;
   meta?: Maybe<PaginationMeta>;
 };
 
@@ -680,6 +717,11 @@ export enum Relation {
   Uncle = 'UNCLE'
 }
 
+export enum ResourceMode {
+  Class = 'CLASS',
+  Teacher = 'TEACHER'
+}
+
 export type Role = {
   role?: InputMaybe<SchoolRole>;
 };
@@ -888,11 +930,11 @@ export type Teacher = {
   bio?: Maybe<Scalars['String']['output']>;
   classSubjects?: Maybe<Array<Maybe<ClassSubject>>>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
-  departement?: Maybe<Scalars['String']['output']>;
+  department?: Maybe<Scalars['String']['output']>;
   diploma?: Maybe<Scalars['String']['output']>;
   experience?: Maybe<Scalars['String']['output']>;
   hireDate?: Maybe<Scalars['DateTime']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
   isActive?: Maybe<Scalars['Boolean']['output']>;
   lessons?: Maybe<Array<Maybe<Lesson>>>;
   salary?: Maybe<Scalars['Float']['output']>;
@@ -925,6 +967,7 @@ export type UpdateLessonInput = {
   day: Day;
   endTime: Scalars['DateTime']['input'];
   id: Scalars['ID']['input'];
+  mode?: InputMaybe<ResourceMode>;
   startTime: Scalars['DateTime']['input'];
 };
 
@@ -984,16 +1027,16 @@ export type GetSchoolClassesQueryVariables = Exact<{
 }>;
 
 
-export type GetSchoolClassesQuery = { __typename?: 'Query', getSchoolClasses: { __typename?: 'ClassList', meta: { __typename?: 'PaginationMeta', limit: number, totalPages: number, total: number }, data: Array<{ __typename?: 'Class', id: string, name: string, section?: string | null, level: string, supervisor?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, username?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', id: string, lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null, _count?: { __typename?: 'ClassCount', teachers?: number | null, subjects?: number | null, students?: { __typename?: 'GenderStats', male: number, female: number } | null } | null }> } };
+export type GetSchoolClassesQuery = { __typename?: 'Query', getSchoolClasses: { __typename?: 'ClassList', meta: { __typename?: 'PaginationMeta', limit: number, totalPages: number, total: number }, data: Array<{ __typename?: 'Class', id: string, name: string, section?: string | null, level: string, supervisor?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, username?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', id: string, lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null, _count?: { __typename?: 'ClassCount', teachers?: number | null, subjects?: number | null, students?: { __typename?: 'GenderStats', male: number, female: number } | null } | null }> } };
 
-export type ClassListFragmentFragment = { __typename?: 'Class', id: string, name: string, section?: string | null, level: string, supervisor?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, username?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', id: string, lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null, _count?: { __typename?: 'ClassCount', teachers?: number | null, subjects?: number | null, students?: { __typename?: 'GenderStats', male: number, female: number } | null } | null };
+export type ClassListFragmentFragment = { __typename?: 'Class', id: string, name: string, section?: string | null, level: string, supervisor?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, username?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', id: string, lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null, _count?: { __typename?: 'ClassCount', teachers?: number | null, subjects?: number | null, students?: { __typename?: 'GenderStats', male: number, female: number } | null } | null };
 
 export type GetClassDetailsQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetClassDetailsQuery = { __typename?: 'Query', class?: { __typename?: 'Class', id: string, name: string, level: string, section?: string | null, supervisor?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', email?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, _count?: { __typename?: 'ClassCount', subjects?: number | null, teachers?: number | null, students?: { __typename?: 'GenderStats', male: number, female: number } | null } | null } | null };
+export type GetClassDetailsQuery = { __typename?: 'Query', class?: { __typename?: 'Class', id: string, name: string, level: string, section?: string | null, supervisor?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', email?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, _count?: { __typename?: 'ClassCount', subjects?: number | null, teachers?: number | null, students?: { __typename?: 'GenderStats', male: number, female: number } | null } | null } | null };
 
 export type GetClassStudentsQueryVariables = Exact<{
   classid: Scalars['ID']['input'];
@@ -1012,16 +1055,16 @@ export type GetClassSubjectTableQueryVariables = Exact<{
 }>;
 
 
-export type GetClassSubjectTableQuery = { __typename?: 'Query', class?: { __typename?: 'Class', group?: { __typename?: 'Group', classSubjects?: Array<{ __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null } | null } | null> | null } | null } | null };
+export type GetClassSubjectTableQuery = { __typename?: 'Query', class?: { __typename?: 'Class', group?: { __typename?: 'Group', classSubjects?: Array<{ __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null } | null } | null> | null } | null } | null };
 
 export type GetTeachersTeamQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetTeachersTeamQuery = { __typename?: 'Query', class?: { __typename?: 'Class', group?: { __typename?: 'Group', classSubjects?: Array<{ __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null } | null> | null } | null } | null };
+export type GetTeachersTeamQuery = { __typename?: 'Query', class?: { __typename?: 'Class', group?: { __typename?: 'Group', classSubjects?: Array<{ __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null } | null> | null } | null } | null };
 
-export type SubjectWithTeacherFragment = { __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null };
+export type SubjectWithTeacherFragment = { __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null };
 
 export type UserProfileFragment = { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null };
 
@@ -1030,7 +1073,7 @@ export type CreateClassMutationVariables = Exact<{
 }>;
 
 
-export type CreateClassMutation = { __typename?: 'Mutation', createClass: { __typename?: 'Class', id: string, name: string, section?: string | null, level: string, supervisor?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, username?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', id: string, lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null, _count?: { __typename?: 'ClassCount', teachers?: number | null, subjects?: number | null, students?: { __typename?: 'GenderStats', male: number, female: number } | null } | null } };
+export type CreateClassMutation = { __typename?: 'Mutation', createClass: { __typename?: 'Class', id: string, name: string, section?: string | null, level: string, supervisor?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, username?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', id: string, lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null, _count?: { __typename?: 'ClassCount', teachers?: number | null, subjects?: number | null, students?: { __typename?: 'GenderStats', male: number, female: number } | null } | null } };
 
 export type GetClassAndSubjectsQueryVariables = Exact<{
   input?: InputMaybe<StudentSearchInput>;
@@ -1061,14 +1104,14 @@ export type CreateClassSubjectMutationVariables = Exact<{
 }>;
 
 
-export type CreateClassSubjectMutation = { __typename?: 'Mutation', createClassSubject: { __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null } };
+export type CreateClassSubjectMutation = { __typename?: 'Mutation', createClassSubject: { __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null } };
 
 export type UpdateClassSubjectMutationVariables = Exact<{
   input?: InputMaybe<ClassSubjectInput>;
 }>;
 
 
-export type UpdateClassSubjectMutation = { __typename?: 'Mutation', updateClassSubject: { __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null } };
+export type UpdateClassSubjectMutation = { __typename?: 'Mutation', updateClassSubject: { __typename?: 'ClassSubject', id: string, coefficient?: number | null, weeklyHours?: number | null, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null } };
 
 export type DeleteClassSubjectsMutationVariables = Exact<{
   ids: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -1106,33 +1149,33 @@ export type GetDashboardContextQueryVariables = Exact<{
 }>;
 
 
-export type GetDashboardContextQuery = { __typename?: 'Query', me?: { __typename?: 'User', schoolContext?: { __typename?: 'SchoolMembership', id: string, role: string, teacher?: { __typename?: 'Teacher', id?: string | null, departement?: string | null, specialization?: string | null, supervisedClasses?: Array<{ __typename?: 'Class', id: string, section?: string | null } | null> | null } | null, staff?: { __typename?: 'Staff', id: string, position: string, departement?: string | null, schoolUserId: string } | null, parent?: { __typename?: 'Parent', id: string, isDelegate?: boolean | null, students?: Array<{ __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null> | null } | null, student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null } | null };
+export type GetDashboardContextQuery = { __typename?: 'Query', me?: { __typename?: 'User', schoolContext?: { __typename?: 'SchoolMembership', id: string, role: string, teacher?: { __typename?: 'Teacher', id: string, department?: string | null, specialization?: string | null, supervisedClasses?: Array<{ __typename?: 'Class', id: string, section?: string | null } | null> | null } | null, staff?: { __typename?: 'Staff', id: string, position: string, departement?: string | null, schoolUserId: string } | null, parent?: { __typename?: 'Parent', id: string, isDelegate?: boolean | null, students?: Array<{ __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null> | null } | null, student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null } | null };
 
 export type CreateGroupMutationVariables = Exact<{
   input: CreateGroupInput;
 }>;
 
 
-export type CreateGroupMutation = { __typename?: 'Mutation', createGroup: { __typename?: 'Group', id: string, name: string, classSubjects?: Array<{ __typename?: 'ClassSubject', subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', lastname?: string | null, firstname?: string | null } | null } | null } | null } | null> | null, classes: Array<{ __typename?: 'Class', id: string, name: string }> } };
+export type CreateGroupMutation = { __typename?: 'Mutation', createGroup: { __typename?: 'Group', id: string, name: string, classSubjects?: Array<{ __typename?: 'ClassSubject', subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', lastname?: string | null, firstname?: string | null } | null } | null } | null } | null> | null, classes: Array<{ __typename?: 'Class', id: string, name: string }> } };
 
 export type GetSchoolLessonsQueryVariables = Exact<{
   filter: GetLessonsInput;
 }>;
 
 
-export type GetSchoolLessonsQuery = { __typename?: 'Query', getLessons?: { __typename?: 'LessonsList', data?: Array<{ __typename?: 'Lesson', id: string, startTime?: any | null, endTime?: any | null, day?: Day | null, status: LessonStatus, title?: string | null, classSubject: { __typename?: 'ClassSubject', group?: { __typename?: 'Group', id: string, name: string, type: string, classes: Array<{ __typename?: 'Class', id: string, name: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string } | null, teacher?: { __typename?: 'Teacher', id?: string | null, specialization?: string | null, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null } | null } | null } | null } }> | null } | null };
+export type GetSchoolLessonsQuery = { __typename?: 'Query', getLessons?: { __typename?: 'LessonsList', meta?: { __typename?: 'PaginationMeta', page: number, totalPages: number, total: number, limit: number } | null, data: { __typename?: 'LessonsData', resources?: { __typename?: 'LessonResources', id: string, title: string } | null, events: { __typename?: 'LessonsEvents', id: string, resourceId?: string | null, status?: LessonStatus | null, startTime: string, endTime: string, group?: { __typename?: 'Group', id: string, name: string, type?: GroupType | null, classes: Array<{ __typename?: 'Class', id: string, name: string }> } | null, subject: { __typename?: 'Subject', id: string, name: string }, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null } | null } } } | null };
 
 export type GetNavigationDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNavigationDataQuery = { __typename?: 'Query', getClassTeacher?: { __typename?: 'ClassTeacher', class?: Array<{ __typename?: 'Class', id: string, name: string, level: string } | null> | null, teacher?: Array<{ __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null> | null } | null };
+export type GetNavigationDataQuery = { __typename?: 'Query', getClassTeacher?: { __typename?: 'ClassTeacher', class?: Array<{ __typename?: 'Class', id: string, name: string, level: string, section?: string | null } | null> | null, teacher?: Array<{ __typename?: 'Teacher', id: string, department?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null> | null } | null };
 
 export type CreateLessonMutationVariables = Exact<{
   input: CreateLessonInput;
 }>;
 
 
-export type CreateLessonMutation = { __typename?: 'Mutation', createLesson?: { __typename?: 'Lesson', id: string, status: LessonStatus, startTime?: any | null, endTime?: any | null, day?: Day | null, classSubject: { __typename?: 'ClassSubject', id: string, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null, group?: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', name: string, level: string }> } | null, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null } | null } } | null };
+export type CreateLessonMutation = { __typename?: 'Mutation', createLesson?: { __typename?: 'Lesson', id: string, status: LessonStatus, startTime?: any | null, endTime?: any | null, day?: Day | null, classSubject?: { __typename?: 'ClassSubject', id: string, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null, group?: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', name: string, level: string }> } | null, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null } | null } | null } | null };
 
 export type UpdateLessonStatusMutationVariables = Exact<{
   status: LessonStatus;
@@ -1161,7 +1204,7 @@ export type GetSchoolParentsQueryVariables = Exact<{
 }>;
 
 
-export type GetSchoolParentsQuery = { __typename?: 'Query', getSchoolParents?: { __typename?: 'ParentList', meta?: { __typename?: 'PaginationMeta', page: number, total: number, totalPages: number, limit: number } | null, data?: Array<{ __typename?: 'Parent', id: string, profession?: string | null, relationType?: string | null, students?: Array<{ __typename?: 'Student', user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null, schoolClass?: { __typename?: 'Class', name: string, level: string } | null } | null> | null, user?: { __typename?: 'User', id: string, phoneNumber?: string | null, email?: string | null, isActive?: boolean | null, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, address?: string | null, photo?: string | null } | null } | null }> | null } | null };
+export type GetSchoolParentsQuery = { __typename?: 'Query', getSchoolParents?: { __typename?: 'ParentList', meta?: { __typename?: 'PaginationMeta', page: number, total: number, totalPages: number, limit: number } | null, data?: Array<{ __typename?: 'Parent', id: string, profession?: string | null, relationType?: string | null, user?: { __typename?: 'User', id: string, phoneNumber?: string | null, email?: string | null, isActive?: boolean | null, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, address?: string | null, photo?: string | null } | null } | null, students?: Array<{ __typename?: 'Student', user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null, schoolClass?: { __typename?: 'Class', name: string, level: string } | null } | null> | null }> | null } | null };
 
 export type GetSchoolRoomQueryVariables = Exact<{
   filter: GetSchoolRoomInput;
@@ -1234,7 +1277,7 @@ export type GetSchoolSubjectsQueryVariables = Exact<{
 }>;
 
 
-export type GetSchoolSubjectsQuery = { __typename?: 'Query', getSchoolSubjects?: { __typename?: 'SubjectList', meta: { __typename?: 'PaginationMeta', page: number, totalPages: number, total: number, limit: number }, data: Array<{ __typename?: 'Subject', id: string, name: string, code?: string | null, category?: SubjectCategory | null, totalWeeklyHours?: number | null, mainTeacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, classSubject?: Array<{ __typename?: 'ClassSubject', id: string, group?: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', id: string, name: string, level: string, section?: string | null }> } | null } | null> | null }> } | null };
+export type GetSchoolSubjectsQuery = { __typename?: 'Query', getSchoolSubjects?: { __typename?: 'SubjectList', meta: { __typename?: 'PaginationMeta', page: number, totalPages: number, total: number, limit: number }, data: Array<{ __typename?: 'Subject', id: string, name: string, code?: string | null, category?: SubjectCategory | null, totalWeeklyHours?: number | null, mainTeacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, classSubject?: Array<{ __typename?: 'ClassSubject', id: string, group?: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', id: string, name: string, level: string, section?: string | null }> } | null } | null> | null }> } | null };
 
 export type GetSubjectsQueryVariables = Exact<{
   input: GetSubjectInput;
@@ -1250,14 +1293,14 @@ export type GetClassSubjectOptionsQueryVariables = Exact<{
 }>;
 
 
-export type GetClassSubjectOptionsQuery = { __typename?: 'Query', getClassSubjects?: Array<{ __typename?: 'ClassSubject', id: string, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null } | null, group?: { __typename?: 'Group', id: string, name: string, type: string, classes: Array<{ __typename?: 'Class', id: string, name: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string } | null }> | null };
+export type GetClassSubjectOptionsQuery = { __typename?: 'Query', getClassSubjects?: Array<{ __typename?: 'ClassSubject', id: string, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null } | null, group?: { __typename?: 'Group', id: string, name: string, type?: GroupType | null, classes: Array<{ __typename?: 'Class', id: string, name: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string } | null }> | null };
 
 export type CreateSubjectMutationVariables = Exact<{
   input: CreateSubjectInput;
 }>;
 
 
-export type CreateSubjectMutation = { __typename?: 'Mutation', createSubject?: { __typename?: 'Subject', id: string, name: string, code?: string | null, totalWeeklyHours?: number | null, mainTeacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, classSubject?: Array<{ __typename?: 'ClassSubject', id: string, group?: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', id: string, name: string, level: string }> } | null, teacher?: { __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null> | null } | null };
+export type CreateSubjectMutation = { __typename?: 'Mutation', createSubject?: { __typename?: 'Subject', id: string, name: string, code?: string | null, totalWeeklyHours?: number | null, mainTeacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null, classSubject?: Array<{ __typename?: 'ClassSubject', id: string, group?: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', id: string, name: string, level: string }> } | null, teacher?: { __typename?: 'Teacher', id: string, user?: { __typename?: 'User', id: string, email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null> | null } | null };
 
 export type DeleteSubjectsMutationVariables = Exact<{
   subjectIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -1271,28 +1314,28 @@ export type GetSchoolTeachersQueryVariables = Exact<{
 }>;
 
 
-export type GetSchoolTeachersQuery = { __typename?: 'Query', getSchoolTeachers: { __typename?: 'TeacherList', meta: { __typename?: 'PaginationMeta', limit: number, total: number, totalPages: number }, data: Array<{ __typename?: 'Teacher', id?: string | null, schoolUserId?: string | null, weeklyHours?: number | null, specialization?: string | null, diploma?: string | null, departement?: string | null, experience?: string | null, isActive?: boolean | null, supervisedClasses?: Array<{ __typename?: 'Class', id: string, name: string, level: string } | null> | null, user?: { __typename?: 'User', email?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null, gender?: string | null } | null } | null, classSubjects?: Array<{ __typename?: 'ClassSubject', group?: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', id: string, name: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string } | null } | null> | null }> } };
+export type GetSchoolTeachersQuery = { __typename?: 'Query', getSchoolTeachers: { __typename?: 'TeacherList', meta: { __typename?: 'PaginationMeta', limit: number, total: number, totalPages: number }, data: Array<{ __typename?: 'Teacher', id: string, schoolUserId?: string | null, weeklyHours?: number | null, specialization?: string | null, diploma?: string | null, department?: string | null, experience?: string | null, isActive?: boolean | null, supervisedClasses?: Array<{ __typename?: 'Class', id: string, name: string, level: string } | null> | null, user?: { __typename?: 'User', email?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null, gender?: string | null } | null } | null, classSubjects?: Array<{ __typename?: 'ClassSubject', group?: { __typename?: 'Group', type?: GroupType | null, classes: Array<{ __typename?: 'Class', id: string, name: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string } | null } | null> | null }> } };
 
 export type GetTeachersQueryVariables = Exact<{
   input?: InputMaybe<GetSchoolTeachersInput>;
 }>;
 
 
-export type GetTeachersQuery = { __typename?: 'Query', getSchoolTeachers: { __typename?: 'TeacherList', data: Array<{ __typename?: 'Teacher', id?: string | null, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null }> } };
+export type GetTeachersQuery = { __typename?: 'Query', getSchoolTeachers: { __typename?: 'TeacherList', data: Array<{ __typename?: 'Teacher', id: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null }> } };
 
 export type GetTeacherScheduleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetTeacherScheduleQuery = { __typename?: 'Query', teacher?: { __typename?: 'Teacher', classSubjects?: Array<{ __typename?: 'ClassSubject', group?: { __typename?: 'Group', id: string, type: string, name: string, classes: Array<{ __typename?: 'Class', id: string, name: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string } | null, lessons?: Array<{ __typename?: 'Lesson', id: string, endTime?: any | null, startTime?: any | null, status: LessonStatus, day?: Day | null }> | null } | null> | null } | null };
+export type GetTeacherScheduleQuery = { __typename?: 'Query', teacher?: { __typename?: 'Teacher', classSubjects?: Array<{ __typename?: 'ClassSubject', group?: { __typename?: 'Group', id: string, type?: GroupType | null, name: string, classes: Array<{ __typename?: 'Class', id: string, name: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string } | null, lessons?: Array<{ __typename?: 'Lesson', id: string, endTime?: any | null, startTime?: any | null, status: LessonStatus, day?: Day | null }> | null } | null> | null } | null };
 
 export type GetTeacherDetailsQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetTeacherDetailsQuery = { __typename?: 'Query', teacher?: { __typename?: 'Teacher', id?: string | null, specialization?: string | null, diploma?: string | null, experience?: string | null, bio?: string | null, hireDate?: any | null, salary?: number | null, departement?: string | null, weeklyHours?: number | null, isActive?: boolean | null, createdAt?: any | null, user?: { __typename?: 'User', id: string, email?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null, gender?: string | null, address?: string | null } | null } | null, classSubjects?: Array<{ __typename?: 'ClassSubject', id: string, group?: { __typename?: 'Group', id: string, type: string, name: string, classes: Array<{ __typename?: 'Class', id: string, name: string, level: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null } | null> | null } | null };
+export type GetTeacherDetailsQuery = { __typename?: 'Query', teacher?: { __typename?: 'Teacher', id: string, specialization?: string | null, diploma?: string | null, experience?: string | null, bio?: string | null, hireDate?: any | null, salary?: number | null, department?: string | null, weeklyHours?: number | null, isActive?: boolean | null, createdAt?: any | null, user?: { __typename?: 'User', id: string, email?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null, gender?: string | null, address?: string | null } | null } | null, classSubjects?: Array<{ __typename?: 'ClassSubject', id: string, group?: { __typename?: 'Group', id: string, type?: GroupType | null, name: string, classes: Array<{ __typename?: 'Class', id: string, name: string, level: string }> } | null, subject?: { __typename?: 'Subject', id: string, name: string, code?: string | null } | null } | null> | null } | null };
 
 export type DeleteTeachersMutationVariables = Exact<{
   teacherIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -2398,7 +2441,7 @@ export const GetDashboardContextDocument = `
       role
       teacher {
         id
-        departement
+        department
         specialization
         supervisedClasses {
           id
@@ -2536,14 +2579,23 @@ useCreateGroupMutation.fetcher = (variables: CreateGroupMutationVariables, optio
 export const GetSchoolLessonsDocument = `
     query GetSchoolLessons($filter: GetLessonsInput!) {
   getLessons(filter: $filter) {
+    meta {
+      page
+      totalPages
+      total
+      limit
+    }
     data {
-      id
-      startTime
-      endTime
-      day
-      status
-      title
-      classSubject {
+      resources {
+        id
+        title
+      }
+      events {
+        id
+        resourceId
+        status
+        startTime
+        endTime
         group {
           id
           name
@@ -2559,11 +2611,8 @@ export const GetSchoolLessonsDocument = `
         }
         teacher {
           id
-          specialization
           user {
-            id
             profile {
-              id
               firstname
               lastname
             }
@@ -2624,9 +2673,11 @@ export const GetNavigationDataDocument = `
       id
       name
       level
+      section
     }
     teacher {
       id
+      department
       user {
         ...UserProfile
       }
@@ -2820,18 +2871,6 @@ export const GetSchoolParentsDocument = `
       id
       profession
       relationType
-      students {
-        user {
-          profile {
-            firstname
-            lastname
-          }
-        }
-        schoolClass {
-          name
-          level
-        }
-      }
       user {
         id
         phoneNumber
@@ -2843,6 +2882,18 @@ export const GetSchoolParentsDocument = `
           lastname
           address
           photo
+        }
+      }
+      students {
+        user {
+          profile {
+            firstname
+            lastname
+          }
+        }
+        schoolClass {
+          name
+          level
         }
       }
     }
@@ -3500,7 +3551,7 @@ export const GetSchoolTeachersDocument = `
       weeklyHours
       specialization
       diploma
-      departement
+      department
       experience
       isActive
       user {
@@ -3515,6 +3566,7 @@ export const GetSchoolTeachersDocument = `
       }
       classSubjects {
         group {
+          type
           classes {
             id
             name
@@ -3711,7 +3763,7 @@ export const GetTeacherDetailsDocument = `
     bio
     hireDate
     salary
-    departement
+    department
     weeklyHours
     isActive
     createdAt

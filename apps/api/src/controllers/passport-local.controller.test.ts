@@ -17,7 +17,7 @@ jest.mock('../validations/validate');
 
 describe('handleLocalAuth', () => {
   const mockDone = jest.fn();
-  const identifier = 'test@example.com';
+  const identifier = 'tests@example.com';
   const password = 'password;/°0ML123';
 
   beforeEach(() => {

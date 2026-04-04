@@ -1,5 +1,5 @@
 import { prisma, Prisma } from '@stackschool/db';
-import { Resolvers, StudentStatus } from '../../types.generated';
+import { Resolvers, StudentStatus, TransportMode } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
 import { checkRole, isAdmin } from '../../../lib/verify-role';
 import { createStudentSchema, RelationType } from '@stackschool/shared';
@@ -118,11 +118,11 @@ export const studentResolver: Resolvers = {
       };
     },
 
-    student: async (_, { id, schoolId }, context) => {
-      if (!context.user) throw createServiceError('Non authentifié', 401);
+    student: async (_, { id }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
 
       const checkedRole = await checkRole({
-        context: { schoolId, userId: context.user.id },
+        context: { schoolId, userId: user.id },
         roles: ['TEACHER', 'ADMIN', 'PARENT'],
       });
 
@@ -130,13 +130,14 @@ export const studentResolver: Resolvers = {
         throw createServiceError(checkedRole.message || 'Accès refusé', 403);
       }
       const student = await prisma.student.findUnique({
-        where: { id, schoolId: context.schoolId },
+        where: { id, schoolId },
       });
       if (!student) throw createServiceError('Élève introuvable', 404);
 
       return {
         ...student,
         status: student.status as StudentStatus,
+        transportMode: student.transportMode as TransportMode,
       };
     },
   },

@@ -34,12 +34,11 @@ type Mutation {
   createLesson(input: CreateLessonInput!): Lesson
   updateLessonStatus(status: LessonStatus!, id: ID!): Lesson
   updateLesson(input: UpdateLessonInput!): Lesson
-  deleteLesson(id: ID!) : ApiResponse
+  deleteLesson(id: ID!): ApiResponse
 
   createRoom(input: CreateRoomInput!): Room!
   updateRoom(input: CreateRoomInput!): Room!
   createGroup(input: CreateGroupInput!): Group!
-
 }
 
 type ClassTeacher {
@@ -74,7 +73,7 @@ input CreateLessonInput {
   mode: CreateLessonMode!
   startTime: DateTime!
   endTime: DateTime!
- subjectId: ID!
+  subjectId: ID!
   teacherId: ID
   groupId: ID
 }
@@ -84,15 +83,41 @@ enum CreateLessonMode {
 }
 
 input GetLessonsInput {
-  classId: ID
+  groupId: ID
   teacherId: ID
+  classId: ID
   searchTerm: String
-
+  department: String
+  mode: CreateLessonMode!
+  hasLessonOnly: Boolean = true
+  section: String
+  level: String
   limit: Int! = 6
   page: Int! = 0
 }
-
+type LessonsData {
+  events: LessonsEvents!
+  resources: LessonResources
+}
 type LessonsList {
-  data: [Lesson!]
+  data: LessonsData!
   meta: PaginationMeta
 }
+type LessonResources {
+  id: ID!
+  title: String!
+}
+type LessonsEvents {
+  id: ID!
+  resourceId: ID
+  title: String!
+  startTime: String!
+  endTime: String!
+  status: LessonStatus
+  subject: Subject!
+  group: Group
+  teacher: Teacher
+  room: Room
+
+}
+

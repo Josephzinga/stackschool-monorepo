@@ -71,6 +71,7 @@ type School {
   settings: SchoolSettings
   teachers: [Teacher]
   lessons: [Lesson]
+
 }
 
 type SchoolSettings {
@@ -138,7 +139,7 @@ type Lesson {
   startTime: DateTime
   endTime: DateTime
   day: Day
-  classSubject: ClassSubject!
+  classSubject: ClassSubject
   status: LessonStatus!
   room: Room
 }
@@ -151,7 +152,7 @@ enum LessonStatus {
   POSTPONED
 }
 type Teacher {
-  id: ID
+  id: ID!
   schoolUserId: ID
   diploma: String
   experience: String
@@ -159,7 +160,7 @@ type Teacher {
   isActive: Boolean
   bio: String
   salary: Float
-  departement: String
+  department: String
   specialization: String
   lessons: [Lesson]
   classSubjects: [ClassSubject]
@@ -196,11 +197,14 @@ type Class {
   teachers: [Teacher]
   _count: ClassCount
 }
-
+enum GroupType {
+  SOLO
+  MULTIPLE
+}
 type Group {
   id: ID!
   name: String!
-  type: String!
+  type: GroupType
   classes: [Class!]!
   classSubjects: [ClassSubject]
 }

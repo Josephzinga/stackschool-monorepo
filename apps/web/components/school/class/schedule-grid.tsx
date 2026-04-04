@@ -1,15 +1,16 @@
 'use client';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import '@/app/styles/schedule-grid.css';
 import { Button } from '@/components/ui/button';
 import TimeGrid from '@/components/school/time-grid';
 import {
+  CreateLessonMode,
   Day,
   Lesson,
   LessonStatus,
   useGetSchoolLessonsQuery,
-  useUpdateClassLessonMutation,
+  useUpdateLessonMutation,
 } from '@stackschool/ui';
 import { useWindowSize } from 'react-use';
 import { dayMapping, lessonStatusConfig } from '@/constant';
@@ -19,7 +20,12 @@ import {
   PopoverAnchor,
   PopoverContent,
 } from '@/components/ui/popover';
-import { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import {
+  DateSelectArg,
+  EventClickArg,
+  EventDropArg,
+  EventInput,
+} from '@fullcalendar/core';
 import { format } from 'date-fns';
 import { canTransition } from '@stackschool/shared';
 import { toast } from 'sonner';
@@ -37,32 +43,51 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
 
   const { data, isError, isPending, error } = useGetSchoolLessonsQuery(
     {
-      classId: classId!,
+      filter: {
+        classId,
+        mode: CreateLessonMode.Class,
+      },
     },
     {
       enabled: !!classId,
     },
   );
-  const { mutateAsync } = useUpdateClassLessonMutation({
+  const { mutateAsync } = useUpdateLessonMutation({
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['getClassLessons'] });
     },
   });
 
-  const events = data?.getLessons?.map((lesson) => ({
-    id: lesson?.id,
-    title: lesson?.subject?.name,
-    startTime: format(lesson?.startTime, 'HH:mm'),
-    endTime: format(lesson?.endTime, 'HH:mm'),
-    daysOfWeek: [dayMapping[lesson?.day!]],
-    extendedProps: {
-      subject: lesson?.subject?.name,
-      teacher: lesson?.teacher,
-      status: lesson?.status,
-      day: lesson?.day,
-      lesson: lesson,
-    },
-  }));
+  const events: EventInput[] = useMemo(() => {
+    if (!data?.getLessons?.data.groups) return [];
+    const uniqueEvents = new Map();
+    data?.getLessons?.data?.groups?.forEach((res) => {
+      res.classSubjects?.forEach((cls) => {
+        cls?.lessons?.forEach((lesson) => {
+          if (!uniqueEvents.has(lesson.id)) {
+            uniqueEvents.set(lesson.id, {
+              id: lesson.id,
+              title: cls?.subject?.name,
+              startTime: format(new Date(lesson.startTime), 'HH:mm'),
+              endTime: format(new Date(lesson.endTime), 'HH:mm'),
+              daysOfWeek: [dayMapping[lesson.day as Day]],
+              extendedProps: {
+                subject: cls.subject,
+                status: lesson.status,
+                teacher: cls?.teacher,
+                lessonId: lesson.id,
+                groupName:
+                  res.type === 'SOLO' ? res.classes[0]?.name : res.name,
+              },
+            });
+          }
+        });
+      });
+    });
+    return Array.from(uniqueEvents.values());
+  }, [data?.getLessons?.data?.groups]);
+
+  console.log('envents', events);
   const handleEventDrop = async (info: EventDropArg) => {
     const start = info.event.start;
     const end = info.event.end;
@@ -123,13 +148,14 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
       <TimeGrid
         editable={true}
         selectable={true}
-        calendarRef={calendarRef}
-        events={events}
+        ref={calendarRef}
+        events={events ?? undefined}
         renderEventContent={renderEventContent}
         onEventClick={onEventClick}
         onDatesSet={(value) => setCurrentDateTitle(value.view.title)}
         onEventDrop={handleEventDrop}
         onEventSelect={handleSelect}
+        hideResourceViewButtons={true}
       />
 
       {selectedLesson && (
@@ -143,7 +169,7 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
               <div className="font-poppins">
                 <div>
                   <span className="text-gray-500 font-inter">Cours</span>
-                  <span> {selectedLesson?.subject?.name} — </span>
+                  <span> {selectedLesson?.classSubject?.subject?.name} — </span>
                   <span className="font-jost">
                     {lessonStatusConfig[selectedLesson?.status!].label}
                   </span>
@@ -151,7 +177,10 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
                 <p className="text-gray-500 font-inter">
                   Prof :{' '}
                   <span className="text-sm text-foreground font-meduim">
-                    {selectedLesson?.teacher?.user?.profile?.lastname}
+                    {
+                      selectedLesson?.classSubject?.teacher?.user?.profile
+                        ?.lastname
+                    }
                   </span>
                 </p>
                 <p>

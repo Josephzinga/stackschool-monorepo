@@ -47,7 +47,7 @@ export default function StudentDetailsPage() {
   const { currentSchool } = useUserStore();
 
   const { data, isPending, error } = useGetStudentDetailsQuery(
-    { id: studentId, schoolId: currentSchool?.id! },
+    { id: studentId },
     { enabled: !!studentId && !!currentSchool?.id },
   );
 

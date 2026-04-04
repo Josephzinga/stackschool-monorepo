@@ -89,7 +89,7 @@ query GetDashboardContext($input: SchoolId!) {
       role
       teacher {
         id
-        departement
+        department
         specialization
         supervisedClasses {
           id

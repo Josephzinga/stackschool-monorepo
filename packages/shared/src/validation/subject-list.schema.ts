@@ -16,9 +16,10 @@ enum SubjectCategory {
 
 export const createLessonSchema = z
   .object({
+    id: z.cuid().optional(),
     mode: z.enum(['TEACHER', 'CLASS']),
-    startTime: z.string(),
-    endTime: z.string(),
+    startTime: z.string().trim().min(4, "Vielliez entré l'heure valide"),
+    endTime: z.string().trim().min(4, "Vielliez entré l'heure valide"),
     day: z.enum([
       'MONDAY',
       'TUESDAY',
@@ -46,6 +47,19 @@ export const createLessonSchema = z
       path: ['endTime'],
     },
   );
+
+export const updateLessonSchema = z.object({
+  id: z.cuid(),
+  mode: z.enum(['TEACHER', 'CLASS']).optional(),
+  startTime: createLessonSchema.shape.startTime,
+  endTime: createLessonSchema.shape.endTime,
+  day: createLessonSchema.shape.day,
+  subjectId: z.string().optional(),
+  teacherId: z.string().optional(),
+  groupId: z.string().optional(),
+});
+
+export type UpdateLessonFormData = z.infer<typeof updateLessonSchema>;
 export type CreateLessonFormData = z.infer<typeof createLessonSchema>;
 
 export const createSubjectForm = z.object({
@@ -81,11 +95,11 @@ export const createSubjectForm = z.object({
 });
 export type CreateSubjectForm = z.infer<typeof createSubjectForm>;
 export const createClassSubjectSchema = z.object({
-  id: z.string().optional(),
+  id: z.cuid("l'id est invalide").optional(),
   classId: z
     .cuid()
     .refine((value) =>
-      value === undefined ? "L'id de la classe est requis" : 'Id invalid',
+      value === undefined ? 'La classe est requis' : 'Id invalid',
     )
     .optional(),
   teacherId: z

@@ -427,7 +427,7 @@ model Teacher {
   hireDate          DateTime?
   isActive          Boolean
   salary            Float?
-  departement       String?
+  department        String?
   specialization    String?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -669,6 +669,7 @@ enum LessonStatus {
   CANCELLED // Annulée (ne comptera pas)
   POSTPONED // Reportée à une autre date
 }
+
 enum GroupType {
   SOLO
   MULTIPLE

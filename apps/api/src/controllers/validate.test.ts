@@ -22,7 +22,7 @@ describe('validateLogin', () => {
   it('devrait retourner undefined pour des données valides', () => {
     // Cas valide
     const validData = {
-      identifier: 'test@example.com',
+      identifier: 'tests@example.com',
       password: 'password123',
     };
 

@@ -18,12 +18,15 @@ import { ServiceError } from '@stackschool/shared';
 import { prisma, SchoolUser } from '@stackschool/db';
 import { ZodError } from 'zod';
 import { createLoaders } from './resolvers/data-loader';
-import { lessonsResolver } from './resolvers/lessons.resolver';
+import { lessonsResolver } from './resolvers/lesson/lessons.resolver';
 import { subjectResolver } from './resolvers/subject.resolver';
 import { createServiceError } from '../utils/api-errors';
 import { classMutationResolver } from './resolvers/class/muation.resolver';
 import { RoomResolver } from './resolvers/room.resolver';
 import { groupResolver } from './resolvers/groups.resolver';
+import { classQueryResolver } from './resolvers/class/query.resolver';
+import { lessonMutationResolver } from './resolvers/lesson/lesson-mutation.resolver';
+import { lessonQueryResolver } from './resolvers/lesson/lesson-query.resolver';
 
 const dirPath = path.resolve(
   __dirname,
@@ -46,6 +49,9 @@ const resolvers = merge(
   createTeacherResolver,
   createStudentResolver,
   studentResolver,
+  classQueryResolver,
+  lessonMutationResolver,
+  lessonQueryResolver,
   classResolver,
   classMutationResolver,
   searchStudentResolver,

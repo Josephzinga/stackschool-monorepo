@@ -24,7 +24,7 @@ export function ClassSubjectsView({ classId }: { classId?: string }) {
     },
   );
 
-  const subjecData: SubjectColumns[] = data?.class?.classSubject || [];
+  const subjecData: SubjectColumns[] = data?.class?.group?.classSubjects || [];
 
   const totalCoefficient = useMemo(() => {
     return subjecData.reduce((acc, sub) => acc + (sub?.coefficient || 0), 0);

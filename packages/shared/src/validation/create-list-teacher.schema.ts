@@ -16,7 +16,7 @@ export const createTeacherSchema = z.object({
     .array(
       z.object({
         classId: z.cuid(),
-        subjectId: z.cuid(),
+        subjectId: z.array(z.cuid()),
       }),
     )
     .optional(),

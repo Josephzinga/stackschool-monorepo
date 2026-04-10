@@ -5,10 +5,10 @@ import '@/app/styles/schedule-grid.css';
 import { Button } from '@/components/ui/button';
 import TimeGrid from '@/components/school/time-grid';
 import {
-  CreateLessonMode,
   Day,
   Lesson,
   LessonStatus,
+  ResourceMode,
   useGetSchoolLessonsQuery,
   useUpdateLessonMutation,
 } from '@stackschool/ui';
@@ -45,7 +45,7 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
     {
       filter: {
         classId,
-        mode: CreateLessonMode.Class,
+        mode: ResourceMode.Class,
       },
     },
     {
@@ -59,35 +59,28 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
   });
 
   const events: EventInput[] = useMemo(() => {
-    if (!data?.getLessons?.data.groups) return [];
-    const uniqueEvents = new Map();
-    data?.getLessons?.data?.groups?.forEach((res) => {
-      res.classSubjects?.forEach((cls) => {
-        cls?.lessons?.forEach((lesson) => {
-          if (!uniqueEvents.has(lesson.id)) {
-            uniqueEvents.set(lesson.id, {
-              id: lesson.id,
-              title: cls?.subject?.name,
-              startTime: format(new Date(lesson.startTime), 'HH:mm'),
-              endTime: format(new Date(lesson.endTime), 'HH:mm'),
-              daysOfWeek: [dayMapping[lesson.day as Day]],
-              extendedProps: {
-                subject: cls.subject,
-                status: lesson.status,
-                teacher: cls?.teacher,
-                lessonId: lesson.id,
-                groupName:
-                  res.type === 'SOLO' ? res.classes[0]?.name : res.name,
-              },
-            });
-          }
-        });
-      });
-    });
-    return Array.from(uniqueEvents.values());
-  }, [data?.getLessons?.data?.groups]);
-
-  console.log('envents', events);
+    if (!data?.getLessons?.data.events) return [];
+    return (
+      data?.getLessons?.data?.events?.map((e) => ({
+        id: e.id,
+        title: e?.title,
+        startTime: format(new Date(e.startTime), 'HH:mm'),
+        endTime: format(new Date(e.endTime), 'HH:mm'),
+        daysOfWeek: [dayMapping[e.day as Day]],
+        extendedProps: {
+          subject: e.subject,
+          status: e.status,
+          teacher: e.teacher,
+          group: e?.group,
+          mode: 'CLASS',
+          lessonId: e.id,
+          groupName:
+            e.group?.type === 'SOLO' ? e.group.classes[0]?.name : e.group?.name,
+        },
+      })) || []
+    );
+  }, [data?.getLessons?.data?.events, isPending]);
+  console.log('events', events);
   const handleEventDrop = async (info: EventDropArg) => {
     const start = info.event.start;
     const end = info.event.end;
@@ -149,7 +142,7 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
         editable={true}
         selectable={true}
         ref={calendarRef}
-        events={events ?? undefined}
+        events={events}
         renderEventContent={renderEventContent}
         onEventClick={onEventClick}
         onDatesSet={(value) => setCurrentDateTitle(value.view.title)}
@@ -198,34 +191,40 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
                     onClick={() =>
                       updateLesson({
                         id: selectedLesson?.id,
-                        targetStatus: 'ONGOING',
+                        targetStatus: LessonStatus.Ongoing,
                       })
                     }
                   >
                     Démarrer
                   </Button>
                 )}
-                {canTransition(selectedLesson?.status, 'COMPLETED') && (
+                {canTransition(
+                  selectedLesson?.status,
+                  LessonStatus.Completed,
+                ) && (
                   <Button
                     className="text-xs px-2"
                     onClick={() =>
                       updateLesson({
                         id: selectedLesson?.id,
-                        targetStatus: 'COMPLETED',
+                        targetStatus: LessonStatus.Completed,
                       })
                     }
                   >
                     Marquer terminée
                   </Button>
                 )}
-                {canTransition(selectedLesson?.status, 'CANCELLED') && (
+                {canTransition(
+                  selectedLesson?.status,
+                  LessonStatus.Cancelled,
+                ) && (
                   <Button
                     className="text-xs px-2"
                     variant="destructive"
                     onClick={() =>
                       updateLesson({
                         id: selectedLesson?.id,
-                        targetStatus: 'CANCELLED',
+                        targetStatus: LessonStatus.Cancelled,
                       })
                     }
                   >
@@ -261,7 +260,7 @@ const renderEventContent = (eventInfo: any) => {
     <div className="flex flex-col h-full overflow-hidden p-1 leading-tight">
       <div className="flex items-center justify-between gap-2">
         <span className="font-bold text-xs md:text-sm truncate">
-          {eventInfo.event.extendedProps.subject}
+          {eventInfo.event.extendedProps.subject?.name}
         </span>
 
         {/* Badge status */}
@@ -274,7 +273,7 @@ const renderEventContent = (eventInfo: any) => {
       </div>
 
       <div className="text-[10px] opacity-80 truncate uppercase">
-        {eventInfo.event.extendedProps.teacher?.user?.profile?.lastname}
+        {eventInfo.event.extendedProps.teacher?.lastname}
       </div>
 
       <div className="mt-auto text-sm text-gray-800 font-mono">

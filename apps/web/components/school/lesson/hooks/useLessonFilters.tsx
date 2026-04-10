@@ -16,7 +16,12 @@ export const useLessonFilters = () => {
   const { data } = useGetNavigationDataQuery();
 
   const teacherData = data?.getClassTeacher?.teacher;
-  const classData = data?.getClassTeacher?.class;
+  const classData = data?.getClassTeacher?.groups?.map((g) => ({
+    id: g.id,
+    name: g.type === 'SOLO' ? g?.classes[0].name : g.name,
+    level: g.classes?.[0].level,
+    section: g.classes?.[0].section,
+  }));
 
   const uniqueLevels = useMemo(() => {
     if (!classData) return [];

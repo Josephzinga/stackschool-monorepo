@@ -1,14 +1,29 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays } from 'lucide-react';
+import {
+  LessonStatus,
+  ResourceMode,
+  useGetSchoolLessonsQuery,
+} from '@stackschool/ui';
 
-export function TodaySubjects() {
+export function TodaySubjects({ classId }: { classId?: string }) {
+  const { data } = useGetSchoolLessonsQuery({
+    filter: {
+      classId,
+      status: LessonStatus.Ongoing,
+      mode: ResourceMode.Class,
+    },
+  });
+  console.log('data', data);
   return (
     <div className="md:col-span-2">
       <Card className="h-full">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <CalendarDays className="h-5 w-5 text-lg font-poppins font-medium text-primary" />
-            Cours d'aujourd'hui
+            Cours d'ajourd'hui
           </CardTitle>
         </CardHeader>
         <CardContent>

@@ -73,7 +73,11 @@ input CreateParentInput {
   phoneNumber: String!
   address: String
   profession: String!
-  relationType: String!
+  students: ParentStudent
+}
+input ParentStudent {
+  relationType : RelationType!
+  studentIds: [ID!]!
 }
 
 input CreateTeacherInput {
@@ -84,7 +88,6 @@ input CreateTeacherInput {
   gender: Gender!
   diploma: String
   specialization: String!
-  classIds: [String!]
 }
 
 input CreateClassInput {
@@ -114,15 +117,12 @@ type ClassList {
   data: [Class!]!
   meta: PaginationMeta!
 }
-input GetSubjectInput {
-  page: Int! = 0
-  limit: Int! = 10
-  searchTerm: String
-  sort: SubjectSortInput
-  classId: ID
-  teacherId: ID
-}
+
 type SubjectList {
   data: [Subject!]!
   meta: PaginationMeta!
+}
+type SearchClassesAndSubjects {
+  searchClasses(search: String, limit: Int): [Class]
+  searchSubjects(search: String, limit: Int, classId: ID): [Subject]
 }

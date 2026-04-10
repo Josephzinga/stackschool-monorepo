@@ -3,22 +3,27 @@ import { prisma } from '@stackschool/db';
 
 export const lessonsResolver: Resolvers = {
   ClassTeacher: {
-    teacher: async (parent) => {
-      if (!parent.schoolId) return null;
+    teacher: async (parent, _, { schoolId }) => {
       const teachers = await prisma.teacher.findMany({
         where: {
           schoolUser: {
-            schoolId: parent.schoolId,
+            schoolId,
           },
         },
       });
       return teachers;
     },
-    class: async (parent) => {
-      if (!parent.schoolId) return null;
+    classes: async (parent, _, { schoolId }) => {
       return await prisma.class.findMany({
         where: {
-          schoolId: parent.schoolId,
+          schoolId,
+        },
+      });
+    },
+    groups: async (parent, _, { schoolId }) => {
+      return await prisma.group.findMany({
+        where: {
+          schoolId,
         },
       });
     },

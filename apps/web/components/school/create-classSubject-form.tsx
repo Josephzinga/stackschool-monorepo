@@ -9,10 +9,10 @@ import {
 import React, { useMemo } from 'react';
 import {
   GetClassSubjectTableQuery,
-  GetSubjectsQuery,
+  GetSubjectsOptionsQuery,
   GetTeachersQuery,
   useCreateClassSubjectMutation,
-  useGetSubjectsQuery,
+  useGetSubjectsOptionsQuery,
   useGetTeachersQuery,
   useUpdateClassSubjectMutation,
 } from '@stackschool/ui';
@@ -64,7 +64,7 @@ export function CreateClassSubjectForm({
       limit: 100,
     },
   });
-  const { data: schoolSubjects } = useGetSubjectsQuery({
+  const { data: schoolSubjects } = useGetSubjectsOptionsQuery({
     input: {
       limit: 100,
     },
@@ -77,7 +77,7 @@ export function CreateClassSubjectForm({
     () =>
       schoolSubjects?.getSchoolSubjects?.data?.filter(
         (sub) =>
-          !tableData?.class?.classSubject?.some(
+          !tableData?.class?.group?.classSubjects?.some(
             (cls) => cls?.subject?.id === sub.id,
           ),
       ),
@@ -88,10 +88,16 @@ export function CreateClassSubjectForm({
       await queryClient.cancelQueries({ queryKey });
 
       const teachersList: GetTeachersQuery | undefined =
-        queryClient.getQueryData(['GetTeachers', { input: { limit: 100 } }]);
+        queryClient.getQueryData([
+          'GetSubjectsOptions',
+          { input: { limit: 100 } },
+        ]);
 
-      const subjectsList: GetSubjectsQuery | undefined =
-        queryClient.getQueryData(['GetSubjects', { input: { limit: 100 } }]);
+      const subjectsList: GetSubjectsOptionsQuery | undefined =
+        queryClient.getQueryData([
+          'GetSubjectsOptions',
+          { input: { limit: 100 } },
+        ]);
 
       const selectedTeacher = teachersList?.getSchoolTeachers?.data?.find(
         (t: any) => t.id === variables.input?.teacherId,
@@ -127,7 +133,10 @@ export function CreateClassSubjectForm({
             ...old,
             class: {
               ...old.class,
-              classSubject: [...(old.class?.classSubject || []), optimistic],
+              classSubject: [
+                ...(old.class?.group?.classSubjects || []),
+                optimistic,
+              ],
             },
           };
         },
@@ -143,12 +152,13 @@ export function CreateClassSubjectForm({
           ...old,
           class: {
             ...old?.class,
-            classSubject: old?.class?.classSubject?.map((cls) =>
+            classSubject: old?.class?.group?.classSubjects?.map((cls) =>
               cls?.id.startsWith('temp-') ? data?.createClassSubject : cls,
             ),
           },
         }),
       );
+      onSuccess?.();
     },
 
     onError: (_, __, context) => {
@@ -166,6 +176,7 @@ export function CreateClassSubjectForm({
       await queryClient.invalidateQueries({
         queryKey: ['GetClassSubjectTable'],
       });
+      onSuccess?.();
     },
   });
 
@@ -177,6 +188,7 @@ export function CreateClassSubjectForm({
       : createMutate({
           input: data,
         });
+
     toast.promise(promise, {
       loading: isEdit ? 'Modification en cours...' : 'Ajout en cours...',
       success: (data) => {
@@ -184,9 +196,16 @@ export function CreateClassSubjectForm({
           ? `Modification reussi avec succès`
           : `Matière ajouter avec succès`;
       },
+      error: (err) => {
+        return (
+          err?.message ||
+          (isEdit
+            ? 'Erreur lors de la modification.'
+            : 'Erreur lors de la création')
+        );
+      },
       toasterId: 'dashboard',
     });
-    onSuccess?.();
   };
 
   return (
@@ -206,8 +225,8 @@ export function CreateClassSubjectForm({
                   {schoolTeachers?.getSchoolTeachers?.data?.map((teacher) => (
                     <SelectItem value={teacher?.id!}>
                       <span className="text-sm font-sans">
-                        {teacher?.user?.profile?.lastname}{' '}
-                        {teacher?.user?.profile?.firstname}
+                        {teacher?.user?.profile?.firstname}{' '}
+                        {teacher?.user?.profile?.lastname}
                       </span>
                     </SelectItem>
                   ))}

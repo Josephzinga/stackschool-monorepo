@@ -1,25 +1,32 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import '@/app/styles/schedule-grid.css';
-import TimeGrid, {renderEventContent} from '@/components/school/time-grid';
-import {Card, CardContent, CardFooter} from '@/components/ui/card';
-import {motion} from 'motion/react';
+import TimeGrid, { renderEventContent } from '@/components/school/time-grid';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { motion } from 'motion/react';
 import LessonDialog from '@/components/school/lesson/lesson-dialog';
-import {ResourceLabelContentArg} from '@fullcalendar/resource';
-import {CalendarFilter} from '@/components/school/lesson/calendar-filter';
-import {useLessonEvents} from '@/components/school/lesson/hooks/useLessonEvents';
-import {useLessonFilters} from '@/components/school/lesson/hooks/useLessonFilters';
-import {useLessonCalendar} from '@/components/school/lesson/hooks/useLessonCalendar';
-import {useLessonStore} from '@/store/lesson-store';
-import {useQueryClient} from '@tanstack/react-query';
+import { ResourceLabelContentArg } from '@fullcalendar/resource';
+import { CalendarFilter } from '@/components/school/lesson/calendar-filter';
+import { useLessonEvents } from '@/components/school/lesson/hooks/useLessonEvents';
+import { useLessonFilters } from '@/components/school/lesson/hooks/useLessonFilters';
+import { useLessonCalendar } from '@/components/school/lesson/hooks/useLessonCalendar';
+import { useLessonStore } from '@/store/lesson-store';
+import { useQueryClient } from '@tanstack/react-query';
 import LessonAlertDialog from '@/components/school/lesson/lesson-alert-dialog';
-import {LoaderOne} from '@/components/ui/loader';
+import { LoaderOne } from '@/components/ui/loader';
 
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
-import {Button} from '@/components/ui/button';
-import {IconChevronLeft, IconChevronRight} from '@tabler/icons-react';
-import {RenderResourceContent} from '@/components/school/lesson/render-resource-content';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { RenderResourceContent } from '@/components/school/lesson/render-resource-content';
+import { ResourceMode } from '@stackschool/ui';
 
 function LessonsListPage() {
   const [isDragging, setIsDragging] = useState(false);
@@ -46,6 +53,7 @@ function LessonsListPage() {
     setPagination,
     pagination,
     selectedFilter,
+    setResourceMode,
   } = useLessonStore();
   const isResourceView = currentView?.includes('resource');
   const handleResourceClick = (resourceId?: string) => {
@@ -57,18 +65,14 @@ function LessonsListPage() {
       setCurrentView(newView);
     }
   };
-
+  // Revert les changements dans le calendrier
   const handleCancelUpdate = () => {
-    // Revert les changements dans le calendrier
-
     const calendarApi = calendarRef.current?.getApi();
-    console.log('cancel update', calendarApi);
     if (calendarApi) {
-      console.log('cancel update condition');
       calendarApi.refetchEvents();
       setTargetEventDrop(null);
       setAlertOpen(false);
-    } // Rafraîchir pour revenir à l'état original
+    }
   };
 
   // Handler pour le début du drag
@@ -78,22 +82,25 @@ function LessonsListPage() {
 
   // Handler pour la fin du drag
   const handleEventDragStop = () => {
-    console.log('handle events drop');
     setIsDragging(false);
+  };
+
+  // switch le resourceMode entre CLASS et TEACHER
+  const handleSwitchMode = (mode: ResourceMode) => {
+    setSelectedFilter(null);
+    const api = calendarRef.current?.getApi();
+
+    if (api && api.view.type.toLowerCase().includes('timegrid')) {
+      api.changeView('resourceTimelineWeek');
+      setCurrentView('resourceTimelineWeek');
+    }
+    setResourceMode(mode);
   };
   const renderResourceContent = (info: ResourceLabelContentArg) => {
     return (
       <RenderResourceContent
         resource={info.resource}
         onClick={(r) => {
-          console.log(
-            'resource clicked',
-            info.resource,
-            '\t',
-            r.id,
-            'isREsource',
-            isResourceView,
-          );
           handleResourceClick(r.id);
         }}
       />
@@ -103,7 +110,7 @@ function LessonsListPage() {
   return (
     <div className="flex-1 flex justify-centerpx-2 py-4 sm:px-4 md:px-6">
       <Card className="flex flex-col gap-2 md:gap-4 w-full">
-        <CalendarFilter />
+        <CalendarFilter onModeChange={handleSwitchMode} />
 
         <CardContent className="px-1 h-full">
           {isLoading ? (
@@ -146,6 +153,7 @@ function LessonsListPage() {
                 onCalendarMount={handleCalendarMount}
                 disabledTimeGrid={!selectedFilter}
                 renderResourceContent={renderResourceContent}
+                hasFilter={!!selectedFilter}
               />
             </motion.div>
           )}
@@ -222,13 +230,8 @@ function LessonsListPage() {
 
       {/* Dialog pour la création/édition */}
       <LessonDialog
-        key={
-          (selectedLessonData?.mode === 'UPDATE'
-            ? selectedLessonData?.args.event.start?.toString()
-            : selectedLessonData?.args.start?.toString()) || 'new'
-        }
+        key={Math.random() + 1000 * 999999}
         onSuccess={async () => {
-          // Rafraîchir le calendrier après création/édition
           const calendarApi = calendarRef.current?.getApi();
           calendarApi?.refetchEvents();
           await queryClient.invalidateQueries({
@@ -240,6 +243,5 @@ function LessonsListPage() {
     </div>
   );
 }
-
 
 export default LessonsListPage;

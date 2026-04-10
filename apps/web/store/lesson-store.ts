@@ -9,7 +9,12 @@ export const useLessonStore = create<LessonState>()(
       currentView: 'resourceTimelineWeek',
       resourceMode: 'CLASS',
       selectedFilter: null,
-      advancedFilters: { level: '', section: '', department: '' },
+      advancedFilters: {
+        level: '',
+        section: '',
+        department: '',
+        status: 'ALL',
+      },
       showFilters: false,
       pagination: {
         limit: 10,
@@ -32,7 +37,12 @@ export const useLessonStore = create<LessonState>()(
         set({
           resourceMode: mode,
           selectedFilter: null,
-          advancedFilters: { level: '', section: '', department: '' },
+          advancedFilters: {
+            level: '',
+            section: '',
+            department: '',
+            status: 'ALL',
+          },
         }),
 
       setSelectedFilter: (filter) => set({ selectedFilter: filter }),
@@ -44,7 +54,12 @@ export const useLessonStore = create<LessonState>()(
 
       clearAdvancedFilters: () =>
         set({
-          advancedFilters: { level: '', section: '', department: '' },
+          advancedFilters: {
+            level: '',
+            section: '',
+            department: '',
+            status: 'ALL',
+          },
         }),
 
       setPagination: (pagination) =>
@@ -71,7 +86,12 @@ export const useLessonStore = create<LessonState>()(
       resetFilters: () =>
         set({
           selectedFilter: null,
-          advancedFilters: { level: '', section: '', department: '' },
+          advancedFilters: {
+            level: '',
+            section: '',
+            department: '',
+            status: 'ALL',
+          },
           showFilters: false,
         }),
 
@@ -80,7 +100,12 @@ export const useLessonStore = create<LessonState>()(
           currentView: 'resourceTimelineWeek',
           resourceMode: 'CLASS',
           selectedFilter: null,
-          advancedFilters: { level: '', section: '', department: '' },
+          advancedFilters: {
+            level: '',
+            section: '',
+            department: '',
+            status: 'ALL',
+          },
           showFilters: false,
           isLoading: false,
           isError: false,

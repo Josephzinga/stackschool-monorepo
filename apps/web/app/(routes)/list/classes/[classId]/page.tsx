@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { TeacherView } from '@/components/school/class/teacher-view';
 import { ClassStudentList } from '@/components/school/class/class-student-list';
 import { TodaySubjects } from '@/components/school/class/today-subjects';
-import ClassScheduleGrid from '@/components/school/class/schedule-grid';
+import ClassScheduleGrid from '@/components/school/class/schedule/schedule-grid';
 import {
   AppTabs,
   AppTabsContent,
@@ -185,7 +185,7 @@ export default function ClassDetailsPage() {
             </div>
 
             {/* Colonne Droite : Emploi du temps simplifié (Aujourd'hui) */}
-            <TodaySubjects />
+            <TodaySubjects classId={classId} />
           </div>
         </AppTabsContent>
 

@@ -6,8 +6,8 @@ import { Resolvers } from '../types.generated';
 
 export const studentResolver: Resolvers = {
   Query: {
-    searchStudent: async (_: any, { filter }, __: any) => {
-      const { schoolId } = filter;
+    searchStudent: async (_: any, { filter }, { user }) => {
+      const schoolId = filter.schoolId;
       const searchTerm = filter.searchTerm?.trim() || '';
 
       const { errors, success } = safeValidateSchema<SearchStudentParams>(
@@ -42,27 +42,8 @@ export const studentResolver: Resolvers = {
             { matricule: { contains: searchTerm, mode: 'insensitive' } },
           ],
         },
-        select: {
-          matricule: true,
-          id: true,
-          schoolClass: { select: { name: true } },
-          profile: {
-            select: {
-              lastname: true,
-              firstname: true,
-              photo: true,
-            },
-          },
-        },
       });
-      return students.map((s) => ({
-        id: s.id,
-        matricule: s.matricule,
-        firstname: s.profile.firstname as string,
-        lastname: s.profile.lastname as string,
-        photo: s.profile.photo,
-        className: s.schoolClass?.name,
-      }));
+      return students;
     },
   },
 };

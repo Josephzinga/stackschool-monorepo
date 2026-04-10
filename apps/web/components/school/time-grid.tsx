@@ -8,7 +8,6 @@ import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import frLocale from '@fullcalendar/core/locales/fr';
 import React, {
   forwardRef,
-  Ref,
   useCallback,
   useImperativeHandle,
   useRef,
@@ -29,7 +28,8 @@ import {
   useGetSchoolSettingsQuery,
   useUserStore,
 } from '@stackschool/ui';
-import { dayMapping, lessonStatusConfig } from '@/constant';
+import { dayMapping } from '@stackschool/shared';
+import { lessonStatusConfig } from '@/constant';
 import {
   ResourceApi,
   ResourceLabelContentArg,
@@ -75,7 +75,7 @@ interface TimeGridProps {
   onViewChange?: (view: ViewType) => void;
   onResourceClick?: (resource: ResourceApi) => void;
   onCalendarMount?: (calendar: FullCalendar) => void;
-  ref: Ref<FullCalendar | null>;
+  hasFilter?: boolean;
 }
 
 const TimeGrid = forwardRef<any, TimeGridProps>(
@@ -104,6 +104,7 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
       onViewChange,
       disabledTimeGrid,
       renderResourceContent,
+      hasFilter,
     },
     ref,
   ) => {
@@ -121,7 +122,7 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
       { enabled: !!currentSchool?.id },
     );
     const startHour = data?.school.settings?.startHour || '08';
-    const endHour = data?.school.settings?.endHour || '16';
+    const endHour = data?.school.settings?.endHour || '18';
     const duration = data?.school.settings?.lessonDuration || '60';
     const daysOfWeek = data?.school.settings?.daysOfWeek?.map(
       (day) => dayMapping[day!],
@@ -233,6 +234,7 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
             slotDuration={`00:${duration}:00`}
             firstDay={1}
             slotMinWidth={100}
+            lazyFetching
             resourceAreaHeaderContent={resourceHeaderContent}
             editable={editable}
             selectable={selectable}
@@ -261,7 +263,7 @@ export default TimeGrid;
 export const renderEventContent = (eventInfo: any) => {
   const status = eventInfo.event.extendedProps.status as LessonStatus;
   const cfg = lessonStatusConfig[status] ?? lessonStatusConfig.PLANNED;
-  const profile = eventInfo.event.extendedProps.teacher?.user?.profile;
+  const profile = eventInfo.event.extendedProps.teacher;
   const mode = eventInfo.event.extendedProps?.mode;
   const className = eventInfo.event.extendedProps?.groupName;
   const isDragging = eventInfo?.isDragging;

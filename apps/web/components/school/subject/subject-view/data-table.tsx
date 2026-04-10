@@ -114,7 +114,7 @@ export function DataTable<TData, TValue>({
             <DialogTitle>Modifier la matière</DialogTitle>
           </DialogHeader>
           <CreateClassSubjectForm
-            initialValues={selectedRow}
+            initialValues={selectedRow ?? undefined}
             onSuccess={() => {
               setIsEditDialogOpen(false);
             }}
@@ -127,7 +127,7 @@ export function DataTable<TData, TValue>({
         onOpenChange={setIsDeleteDialogOpen}
         descriptionClassName="text-[14px]!"
         title={'Êtes-vous absolument sûr ?'}
-        description="Cette action est irréversible. Elle supprimera définitivement cette matière dans cette classe."
+        description="Cette action est irréversible. Elle supprimera définitivement cette matière dans cette classe et tous les leçons associé."
         onConfirm={handleDelete}
         confirmLabel="Supprimer"
         variant="destructive"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTable } from './table-provider';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/animate-ui/components/buttons/button';
 import { Plus } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
@@ -112,6 +112,7 @@ export function DataTableHeader() {
                   hasActiveFilters={hasActiveFilters}
                   showFilters={showFilters}
                   columns={TEACHER_COLUMNS}
+                  inputPlaceholder="Rechercher un enseignant..."
                   columnVisibility={columnVisibility}
                   search={searchTerm}
                   onSearchChange={setSearchTerm}
@@ -122,7 +123,7 @@ export function DataTableHeader() {
                 {/* Bouton Ajouter à droite sur lg */}
                 <Button
                   onClick={() => setOpen(true)}
-                  className="w-full sm:w-auto lg:w-auto gap-1.5 sm:gap-2 h-10 bg-linear-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary lg:ml-auto"
+                  className="w-full sm:w-auto lg:w-auto gap-1.5 sm:gap-2 "
                 >
                   <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="sm:hidden">Ajouter</span>

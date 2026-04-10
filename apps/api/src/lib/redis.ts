@@ -1,13 +1,13 @@
-import { createClient } from "redis";
-import { config } from "dotenv";
+import { createClient } from 'redis';
+import { config } from 'dotenv';
 
 config();
 
 // L'URL est récupérée depuis les variables d'environnement de Docker Compose
-const REDIS_URL = process.env.REDIS_URL;
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
 if (!REDIS_URL) {
-  throw new Error("REDIS_URL is not defined in environment variables");
+  throw new Error('REDIS_URL is not defined in environment variables');
 }
 
 export const redisClient = createClient({
@@ -15,12 +15,12 @@ export const redisClient = createClient({
 });
 
 // Gérer les événements de connexion et d'erreur
-redisClient.on("connect", () => {
-  console.log("Connecté à Redis !");
+redisClient.on('connect', () => {
+  console.log('Connecté à Redis !');
 });
 
-redisClient.on("error", (err) => {
-  console.error("Erreur de connexion à Redis :", err);
+redisClient.on('error', (err) => {
+  console.error('Erreur de connexion à Redis :', err);
 });
 
 // Établir la connexion

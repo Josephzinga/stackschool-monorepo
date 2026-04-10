@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { dayConstant } from '@/constant';
+import { dayConstant } from '@stackschool/shared';
 import { useLessonStore } from '@/store/lesson-store';
 import { useLessonMutations } from '@/components/school/lesson/hooks/useLessonMutations';
 

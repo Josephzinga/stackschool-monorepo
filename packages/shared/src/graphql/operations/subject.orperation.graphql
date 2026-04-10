@@ -34,7 +34,7 @@ query GetSchoolSubjects($input: GetSubjectInput!) {
   }
 }
 
-query GetSubjects($input: GetSubjectInput!) {
+query GetSubjectsOptions($input: GetSubjectInput!) {
   getSchoolSubjects(input: $input) {
     data {
       id

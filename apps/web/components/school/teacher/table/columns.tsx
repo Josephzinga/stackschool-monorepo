@@ -200,6 +200,7 @@ export const columns: ColumnDef<TeacherColumns>[] = [
   },
   {
     id: 'actions',
+    header: 'Actions',
     cell: ({ row }) => <TeacherTableActions row={row} />,
   },
 ];

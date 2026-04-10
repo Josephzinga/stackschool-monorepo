@@ -331,6 +331,7 @@ input ClassSubjectInput {
   id: ID
   teacherId: ID
   groupId: ID
+  classId: ID
   subjectId: ID!
   coefficient: Int!
   weeklyHours: Float
@@ -365,34 +366,4 @@ input GetSchoolRoomInput {
 type RoomList {
   data: [Room]!
   meta: PaginationMeta
-}
-enum AssessmentType {
-  EXAM
-  ASSIGNMENT
-  QUIZ
-  TEST
-  PRACTICAL
-  ORAL
-}
-
-enum AssessmentStatus {
-  DRAFT
-  PUBLISHED
-  CLOSED
-}
-
-enum SubjectCategory {
-  SCIENTIFIC
-  LITERARY
-  GENERAL
-  SPORT
-}
-enum TransportMode {
-  BUS
-  WALK
-  CAR
-  MOTO
-  TAXI
-  PARENT
-  OTHER
 }

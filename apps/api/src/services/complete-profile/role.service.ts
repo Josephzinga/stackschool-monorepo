@@ -45,7 +45,7 @@ export async function handleRoleCreation(
           data: {
             schoolUserId: schoolUser.id,
             diploma: roleData.teacher.diploma,
-            departement: roleData.teacher.department,
+            department: roleData.teacher.department,
             isActive: true,
           },
         });
@@ -56,17 +56,6 @@ export async function handleRoleCreation(
           roleData.teacher.assignments.length > 0
         ) {
           for (const assignment of roleData.teacher.assignments) {
-            // Création du lien Prof <-> Classe
-            await tx.classTeacher.create({
-              data: {
-                classId: assignment.classId,
-                teacherId: teacher.id,
-                // On utilise le nom de la classe s'il est fourni dans les données Redis
-                // Sinon on laisse null (c'est un champ optionnel/redondant)
-                name: assignment.className || undefined,
-              },
-            });
-
             // Si Prof Principal (Titulaire)
             if (assignment.isMainTeacher) {
               await tx.class.update({
@@ -84,9 +73,13 @@ export async function handleRoleCreation(
                 try {
                   await tx.classSubjects.update({
                     where: {
-                      classId_subjectId: {
-                        classId: assignment.classId,
-                        subjectId: subjectID,
+                      subjectId: subjectID,
+                      group: {
+                        classes: {
+                          some: {
+                            id: assignment.classId,
+                          },
+                        },
                       },
                     },
                     data: {

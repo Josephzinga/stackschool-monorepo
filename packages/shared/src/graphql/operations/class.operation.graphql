@@ -7,7 +7,7 @@ query GetSchoolClasses($input: GetSchoolClassesInput!) {
     }
 
     data {
-     ...ClassListFragment
+      ...ClassListFragment
     }
   }
 }
@@ -47,6 +47,10 @@ query GetClassDetails($id: ID!) {
     name
     level
     section
+    group {
+      id
+      type
+    }
     supervisor {
       id
       user {
@@ -86,65 +90,57 @@ query GetClassStudents($classid: ID!) {
     }
   }
 }
-query GetSchoolClassesOptions{
-  getClassAndSubjects{
-    id
-    name
-    level
-  }
-}
+
 query GetClassSubjectTable($classId: ID!) {
   class(id: $classId) {
-   group {
-     classSubjects {
-
-         id
-         coefficient
-         weeklyHours
-         subject {
-           id
-           name
-           code
-         }
-         teacher {
-           id
-           user {
-             profile {
-               firstname
-               lastname
-           }
-         }
-       }
-     }
-   }
+    group {
+      classSubjects {
+        id
+        coefficient
+        weeklyHours
+        subject {
+          id
+          name
+          code
+        }
+        teacher {
+          id
+          user {
+            profile {
+              firstname
+              lastname
+            }
+          }
+        }
+      }
+    }
   }
 }
 
 query GetTeachersTeam($id: ID!) {
   class(id: $id) {
-   group {
-     classSubjects {
-       ...SubjectWithTeacher
-     }
-   }
+    group {
+      classSubjects {
+        ...SubjectWithTeacher
+      }
+    }
   }
 }
 fragment SubjectWithTeacher on ClassSubject {
+  id
+  coefficient
+  weeklyHours
+  teacher {
     id
-    coefficient
-    weeklyHours
-    teacher {
-      id
-      user {
-        ...UserProfile
-      }
+    user {
+      ...UserProfile
     }
-    subject {
-      id
-      name
-      code
-    }
-
+  }
+  subject {
+    id
+    name
+    code
+  }
 }
 fragment UserProfile on User {
   id
@@ -158,7 +154,7 @@ fragment UserProfile on User {
 
 mutation CreateClass($data: CreateClassInput!) {
   createClass(data: $data) {
-   ...ClassListFragment
+    ...ClassListFragment
   }
 }
 query GetClassAndSubjects($input: StudentSearchInput) {
@@ -174,6 +170,17 @@ query GetClassAndSubjects($input: StudentSearchInput) {
     }
   }
 }
+query GetClassesOptions($input: GetSchoolClassesInput!) {
+  getSchoolClasses(input: $input) {
+    data {
+      id
+      level
+      name
+      section
+    }
+  }
+}
+
 
 mutation UpdateClass($classId: ID!, $data: CreateClassInput!, $schoolId: ID!) {
   updateClass(classId: $classId, data: $data, schoolId: $schoolId) {
@@ -189,7 +196,7 @@ mutation DeleteClasses($classIds: [ID!]!, $schoolId: ID!) {
   }
 }
 
-mutation CreateClassSubject($input: ClassSubjectInput){
+mutation CreateClassSubject($input: ClassSubjectInput) {
   createClassSubject(input: $input) {
     ...SubjectWithTeacher
   }
@@ -207,5 +214,3 @@ mutation DeleteClassSubjects($ids: [ID!]!) {
     message
   }
 }
-
-

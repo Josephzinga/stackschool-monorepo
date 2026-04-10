@@ -1,113 +1,146 @@
+import { Prisma, prisma } from '@stackschool/db';
 import { Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
-import { safeValidateSchema } from '../../../utils/validate-schema.util';
-import { createStudentSchema } from '@stackschool/shared';
-import { isAdmin } from '../../../lib/verify-role';
-import { prisma } from '@stackschool/db';
+import { checkRole } from '../../../lib/verify-role';
 
-export const createStudentResolver: Resolvers = {
-  Mutation: {
-    createListStudent: async (_, { data, schoolId }, context) => {
+export const studentQueryResolver: Resolvers = {
+  Query: {
+    getSchoolStudents: async (_, { input }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
+      if (!schoolId)
+        throw createServiceError(
+          "Identifiant de l'établissement manquant",
+          400,
+        );
+      const {
+        page = 0,
+        limit = 10,
+        searchTerm,
+        classId,
+        level,
+        sort,
+        section,
+        teacherId,
+      } = input;
+      const roleChecked = await checkRole({
+        context: { schoolId, userId: user.id },
+        roles: ['ADMIN', 'TEACHER'],
+      });
+      if (!roleChecked.success) {
+        throw createServiceError(roleChecked.message!, 403);
+      }
+      const skip = page * limit;
+      const search = searchTerm?.trim();
+
+      let whereClause: Prisma.StudentWhereInput = {
+        schoolId,
+        deletedAt: null,
+      };
+
+      if (teacherId) {
+        whereClause.schoolClass = {
+          group: {
+            classSubjects: {
+              some: { teacherId },
+            },
+          },
+        };
+      }
+
+      if (level || section) {
+        whereClause.schoolClass = {
+          ...(level && { level }),
+          ...(section !== undefined && { section }),
+        };
+      }
+      if (classId) {
+        whereClause = {
+          ...whereClause,
+          ...(classId && { classId }),
+        };
+      }
+
+      if (search) {
+        whereClause.OR = [
+          { matricule: { contains: search, mode: 'insensitive' } },
+          {
+            profile: {
+              OR: [
+                { firstname: { contains: search, mode: 'insensitive' } },
+                { lastname: { contains: search, mode: 'insensitive' } },
+              ],
+            },
+          },
+        ];
+      }
+
+      let orderBy: Prisma.StudentOrderByWithRelationInput = {
+        profile: {
+          firstname: 'asc',
+        },
+      };
+      if (sort) {
+        if (sort?.field === 'lastname' || sort?.field === 'firstname') {
+          orderBy.profile = {
+            [sort.field as string]: sort.order?.toLowerCase(),
+          };
+        }
+        if (sort?.field === 'enrolementYear') {
+          orderBy = {
+            ...orderBy,
+            enrollmentYear: sort.order?.toLocaleLowerCase() as Prisma.SortOrder,
+          };
+        }
+      }
+
+      const [total, students] = await Promise.all([
+        prisma.student.count({ where: whereClause }),
+        prisma.student.findMany({
+          where: whereClause,
+          take: limit,
+          skip,
+          orderBy,
+        }),
+      ]);
+      return {
+        data: students?.map((s) => ({
+          ...s,
+          status: s.status,
+        })),
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    },
+
+    student: async (_, { id }, { user, schoolId }) => {
+      if (!user) throw createServiceError('Non authentifié', 401);
+      if (!schoolId)
+        throw createServiceError(
+          "Identifiant de l'établissement manquant",
+          400,
+        );
+
       try {
-        if (!context.user || !context.user.id) {
-          throw createServiceError('Non authentifier', 401);
-        }
-        if (!schoolId) {
-          throw createServiceError('identifiant manquant');
-        }
-        const birthDate = data.birthDate ? new Date(data.birthDate) : null;
-        const {
-          data: validData,
-          errors,
-          success,
-        } = safeValidateSchema(createStudentSchema, { ...data, birthDate });
-
-        if (!success) {
-          return createServiceError(errors![0].message, 400, errors);
-        }
-        const checkedRole = await isAdmin({
-          context: { userId: context.user.id, schoolId },
+        const checkedRole = await checkRole({
+          context: { schoolId, userId: user.id },
+          roles: ['TEACHER', 'ADMIN', 'PARENT'],
         });
 
         if (!checkedRole.success) {
-          return createServiceError(checkedRole?.message!, 403);
+          throw createServiceError(checkedRole.message || 'Accès refusé', 403);
         }
-
-        console.log('tout ok', checkedRole, schoolId);
-
-        await prisma.$transaction(async (tx) => {
-          const existingStudent = await tx.student.findUnique({
-            where: {
-              matricule_schoolId: {
-                matricule: validData?.matricule!,
-                schoolId,
-              },
-            },
-          });
-
-          if (existingStudent) {
-            throw createServiceError(
-              "C'est élève existe déjà dans l'établissement",
-            );
-          }
-
-          const user = await tx.user.create({
-            data: {
-              email: `email_student_${data?.matricule}@invalid`,
-              isActive: false,
-              profile: {
-                create: {
-                  lastname: data?.lastname,
-                  firstname: data?.firstname,
-                  gender: data?.gender,
-                },
-              },
-            },
-            select: {
-              id: true,
-              profile: {
-                select: {
-                  id: true,
-                },
-              },
-            },
-          });
-
-          const schoolUser = await tx.schoolUser.create({
-            data: {
-              userId: user?.id,
-              role: 'STUDENT',
-              schoolId,
-            },
-          });
-
-          await tx.student.create({
-            data: {
-              schoolId,
-              matricule: validData?.matricule!,
-              enrollmentYear: validData?.enrollmentYear!,
-              birthDate: new Date(validData?.birthDate!),
-              birthPlace: validData?.birthPlace,
-              fatherName: validData?.fatherName,
-              motherName: validData?.motherName,
-              nationality: validData?.nationality,
-              schoolUserId: schoolUser.id,
-              profileId: user?.profile?.id!,
-              classId: validData?.classId,
-            },
-          });
+        return await prisma.student.findUnique({
+          where: { id, schoolId },
         });
-        return {
-          ok: true,
-          message: 'Élève crée avec succés',
-        };
-      } catch (e) {
-        const message = "Erreur lors de la création de l'élève.";
-        createServiceError(message, 500, e);
-        return {
-          ok: false,
-          message,
-        };
+      } catch (err: any) {
+        throw createServiceError(
+          err?.message || 'Erreur lors de la récupération des données',
+          500,
+        );
       }
     },
   },

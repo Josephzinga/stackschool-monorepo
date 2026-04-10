@@ -47,6 +47,7 @@ export const getClassesSubjectsResolver: Resolvers = {
         );
       }
     },
+
     getClassSubjects: async (
       _,
       { classId, teacherId, groupId },
@@ -69,7 +70,7 @@ export const getClassesSubjectsResolver: Resolvers = {
           403,
         );
       }
-      return await prisma.classSubjects.findMany({
+      return prisma.classSubjects.findMany({
         where: {
           group: {
             id: groupId ?? undefined,
@@ -82,6 +83,75 @@ export const getClassesSubjectsResolver: Resolvers = {
           teacherId,
         },
       });
+    },
+
+    searchClassesAndSubjects: async (
+      _,
+      { limit, search },
+      { user, schoolId },
+    ) => {
+      return {};
+    },
+  },
+  SearchClassesAndSubjects: {
+    searchClasses: async (_, { limit = 10, search }, { schoolId }) => {
+      console.log('search', search);
+      if (!search) return null;
+      const searchTerm = search?.trim();
+      return prisma.class.findMany({
+        where: {
+          OR: [
+            {
+              name: {
+                contains: searchTerm ?? undefined,
+                mode: 'insensitive',
+              },
+            },
+            {
+              level: {
+                contains: searchTerm ?? undefined,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        },
+        take: limit ?? 20,
+      });
+    },
+
+    searchSubjects: async (
+      _,
+      { limit, search, classId },
+      { user, schoolId },
+    ) => {
+      if (!schoolId) return null;
+      const searchTerm = search?.trim();
+      const subjects = await prisma.subject.findMany({
+        where: {
+          schoolId,
+          ...(classId && {
+            classSubjects: {
+              some: {
+                group: {
+                  classes: {
+                    some: {
+                      id: classId,
+                    },
+                  },
+                },
+              },
+            },
+          }),
+          ...(search && {
+            OR: [
+              { name: { contains: searchTerm, mode: 'insensitive' } },
+              { code: { contains: searchTerm, mode: 'insensitive' } },
+            ],
+          }),
+        },
+        take: limit ?? 20,
+      });
+      return subjects;
     },
   },
   ClassSubject: {

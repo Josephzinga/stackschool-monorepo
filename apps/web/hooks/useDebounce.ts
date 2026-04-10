@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-export const useDebounce = (delay = 300, value: string | null) => {
+export const useDebounce = (value: string | null, delay = 300) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
     const handler = setTimeout(() => setDebounced(value), delay);
@@ -10,5 +10,5 @@ export const useDebounce = (delay = 300, value: string | null) => {
     return () => clearTimeout(handler);
   }, [value, delay]);
 
-  return debounced?.trim() === "" && debounced?.length > 1 ? null : debounced;
+  return debounced?.trim() === '' && debounced?.length > 1 ? null : debounced;
 };

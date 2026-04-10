@@ -10,7 +10,7 @@ const config: CodegenConfig = {
     'apps/api/src/graphql/types.generated.ts': {
       plugins: ['typescript', 'typescript-resolvers'],
       config: {
-        contextType: '@stackschool/api/src/types/graphql.type#Context',
+        contextType: '../types/context#Context',
         useIndexSignature: true,
         enumValues: {
           StudentStatus:
@@ -19,6 +19,10 @@ const config: CodegenConfig = {
           Day: '@stackschool/db/src/prisma/client/generated#Day',
           LessonStatus:
             '@stackschool/db/src/prisma/client/generated#LessonStatus',
+          TransportMode:
+            '@stackschool/db/src/prisma/client/generated#TransportMode',
+          SubjectCategory:
+            '@stackschool/db/src/prisma/client/generated#SubjectCategory',
         },
       },
     },
@@ -49,11 +53,3 @@ const config: CodegenConfig = {
 };
 
 export default config;
-/*   mappers: {
-          Classe: '@stackschool/db/src/prisma/client/generated#Class',
-          Teacher: '@stackschool/db/src/prisma/client/generated#Teacher',
-          Lesson: '@stackschool/db/src/prisma/client/generated#Lesson',
-          Subject: '@stackschool/db/src/prisma/client/generated#Subject',
-          Profile: '@stackschool/db/src/prisma/client/generated#Profile',
-          Student: '@stackschool/db/src/prisma/client/generated#Student',
-        }, */

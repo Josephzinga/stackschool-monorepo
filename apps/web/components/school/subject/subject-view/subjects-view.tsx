@@ -24,11 +24,12 @@ export function ClassSubjectsView({ classId }: { classId?: string }) {
     },
   );
 
-  const subjecData: SubjectColumns[] = data?.class?.group?.classSubjects || [];
+  // @ts-ignore
+  const subjectData: SubjectColumns[] = data?.class?.group?.classSubjects || [];
 
   const totalCoefficient = useMemo(() => {
-    return subjecData.reduce((acc, sub) => acc + (sub?.coefficient || 0), 0);
-  }, [subjecData]);
+    return subjectData.reduce((acc, sub) => acc + (sub?.coefficient || 0), 0);
+  }, [subjectData]);
 
   return (
     <div className="w-full h-full mt-3 font-poppins z-10 flex flex-col gap-4">
@@ -46,7 +47,7 @@ export function ClassSubjectsView({ classId }: { classId?: string }) {
           Ajouter une matière
         </Button>
       </div>
-      <DataTable data={subjecData} isLoading={isPending} columns={columns} />
+      <DataTable data={subjectData} isLoading={isPending} columns={columns} />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

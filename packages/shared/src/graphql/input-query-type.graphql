@@ -1,0 +1,24 @@
+input GetLessonsInput {
+  groupId: ID
+  teacherId: ID
+  classId: ID
+  searchTerm: String
+  department: String
+  mode: ResourceMode!
+  hasLessonOnly: Boolean = true
+  section: String
+  status: LessonStatus
+  level: String
+  limit: Int! = 6
+  page: Int! = 0
+}
+
+
+input GetSubjectInput {
+  page: Int! = 0
+  limit: Int! = 10
+  searchTerm: String
+  sort: SubjectSortInput
+  classId: ID
+  teacherId: ID
+}

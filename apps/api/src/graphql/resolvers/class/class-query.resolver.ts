@@ -1,5 +1,7 @@
-import { prisma } from '@stackschool/db';
+import { prisma, Prisma } from '@stackschool/db';
 import { Resolvers } from '../../types.generated';
+import { createServiceError } from '../../../utils/api-errors';
+import { checkRole } from '../../../lib/verify-role';
 
 export const classQueryResolver: Resolvers = {
   Query: {
@@ -59,12 +61,6 @@ export const classQueryResolver: Resolvers = {
           where: whereClause,
           take: limit,
           skip,
-          select: {
-            id: true,
-            name: true,
-            level: true,
-            section: true,
-          },
           orderBy: { name: 'asc' },
         }),
       ]);
@@ -82,8 +78,12 @@ export const classQueryResolver: Resolvers = {
 
     class: async (_, { id }, { user, schoolId }) => {
       try {
-        if (!user || !user.id) throw createServiceError('Non authentifié', 401);
-
+        if (!user) throw createServiceError('Non authentifié', 401);
+        if (!schoolId)
+          throw createServiceError(
+            "Identifiant de l'établissement manquant",
+            400,
+          );
         const checked = await checkRole({
           context: { userId: user.id, schoolId },
           roles: ['ADMIN', 'TEACHER'],

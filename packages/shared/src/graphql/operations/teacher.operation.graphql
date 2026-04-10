@@ -6,43 +6,7 @@ query GetSchoolTeachers($input: GetSchoolTeachersInput!) {
       totalPages
     }
     data {
-      id
-      schoolUserId
-      supervisedClasses {
-        id
-        name
-        level
-      }
-      weeklyHours
-      specialization
-      diploma
-      department
-      experience
-      isActive
-      user {
-        email
-        phoneNumber
-        profile {
-          firstname
-          lastname
-          photo
-          gender
-        }
-      }
-      classSubjects {
-        group {
-          type
-          classes {
-            id
-            name
-          }
-
-        }
-        subject {
-          id
-          name
-        }
-      }
+      ...TeacherListData
     }
   }
 }
@@ -134,27 +98,65 @@ query GetTeacherDetails($id: ID!) {
   }
 }
 
-mutation DeleteTeachers($teacherIds: [ID!]!, $schoolId: ID!, $soft: Boolean) {
-  deleteTeachers(teacherIds: $teacherIds, schoolId: $schoolId, soft: $soft) {
+mutation DeleteTeachers($teacherIds: [ID!]!, $soft: Boolean) {
+  deleteTeachers(teacherIds: $teacherIds, soft: $soft) {
     ok
     message
   }
 }
 
-mutation CreateTeacher($data: CreateTeacherInput!, $schoolId: ID!) {
-  createListTeachers(data: $data, schoolId: $schoolId) {
-    ok
-    message
+mutation CreateTeacher($input: CreateTeacherInput!) {
+  createTeacher(input: $input) {
+    ...TeacherListData
   }
+}
+
+fragment TeacherListData on Teacher {
+  id
+  schoolUserId
+  supervisedClasses {
+    id
+    name
+    level
+  }
+  weeklyHours
+  specialization
+  diploma
+  department
+  experience
+  isActive
+  user {
+    email
+    phoneNumber
+    profile {
+      firstname
+      lastname
+      photo
+      gender
+    }
+  }
+  classSubjects {
+    group {
+      type
+      classes {
+        id
+        name
+      }
+
+    }
+    subject {
+      id
+      name
+    }
+  }
+
 }
 
 mutation UpdateTeacher(
   $teacherId: ID!
-  $schoolId: ID!
   $data: CreateTeacherInput!
 ) {
-  updateTeacher(schoolId: $schoolId, teacherId: $teacherId, data: $data) {
-    ok
-    message
+  updateTeacher( teacherId: $teacherId, data: $data) {
+   ...TeacherListData
   }
 }

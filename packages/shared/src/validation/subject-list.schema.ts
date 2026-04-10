@@ -35,6 +35,7 @@ export const createLessonSchema = z
       .min(1, 'Veuillez selectionner un enseignant.')
       .optional(),
     groupId: z.cuid().min(1, 'Veuillez selectionner une classe.').optional(),
+    classId: z.cuid().min(1, 'Veuillez selectionner une classe.').optional(),
   })
   .refine(
     (data) => {

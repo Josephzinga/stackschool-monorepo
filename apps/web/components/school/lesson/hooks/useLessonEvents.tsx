@@ -8,7 +8,7 @@ import {
 } from '@stackschool/ui';
 import { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 import { format, getDay } from 'date-fns';
-import { dayMapping } from '@/constant';
+import { dayMapping } from '@stackschool/shared';
 import { toast } from 'sonner';
 import { EventResizeDoneArg } from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
@@ -25,6 +25,9 @@ export const useLessonEvents = () => {
     setLessonDialogOpen,
     setSelectedLessonData,
     currentView,
+    setResourceMode,
+    resourceMode,
+    setSelectedFilter,
   } = useLessonStore();
   const { events } = useLessonCalendar();
 
@@ -45,7 +48,7 @@ export const useLessonEvents = () => {
       const newEvent = {
         id: eventId,
         resourceId: resourceId,
-        daysOfWeek: [getDay(newStart)], // Le jour de la semaine
+        daysOfWeek: [getDay(newStart)],
         startTime: format(newStart, 'HH:mm'),
         endTime: format(newEnd, 'HH:mm'),
       };
@@ -97,7 +100,7 @@ export const useLessonEvents = () => {
         event.id,
         newStart,
         newEnd,
-        event.getResources()[0]?.id,
+        info?.event?.getResources()?.[0]?.id,
       );
 
       if (hasConflict) {

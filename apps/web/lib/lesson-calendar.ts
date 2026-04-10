@@ -1,11 +1,17 @@
 import { getDay } from 'date-fns';
 import { REFERENCE_DATE } from '@stackschool/shared';
-import { EventInput } from '@fullcalendar/core';
+
+interface Event {
+  daysOfWeek: number[];
+  startTime: string;
+  endTime: string;
+  id?: string;
+}
 
 // Convertir un événement en plage horaire absolue pour une semaine de référence
 export const getEventDateTimeRange = (
-  event: EventInput,
-  referenceDate: Date = new Date(),
+  event: Event,
+  referenceDate: Date = REFERENCE_DATE,
 ) => {
   // Trouver le prochain jour correspondant au daysOfWeek
   const eventDayOfWeek = event.daysOfWeek?.[0] ?? getDay(referenceDate);
@@ -46,8 +52,8 @@ export const doRangesOverlap = (
 
 // Vérifier les conflits pour un nouvel événement
 export const checkEventConflicts = (
-  newEvent: EventInput,
-  existingEvents: EventInput[],
+  newEvent: Event,
+  existingEvents: Event[],
   excludeEventId?: string,
   specificDate?: Date,
 ): boolean => {

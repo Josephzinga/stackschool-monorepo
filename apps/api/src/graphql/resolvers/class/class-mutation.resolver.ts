@@ -7,6 +7,11 @@ export const classMutationResolver: Resolvers = {
   Mutation: {
     createClass: async (_, { data }, { user, schoolId }) => {
       if (!user) throw createServiceError('Non authentifié', 401);
+      if (!schoolId)
+        throw createServiceError(
+          "Identifiant de l'établissement manquant",
+          400,
+        );
       try {
         const adminCheck = await isAdmin({
           context: { schoolId, userId: user.id },
@@ -143,32 +148,60 @@ export const classMutationResolver: Resolvers = {
         );
       }
 
-      const exist = await prisma.classSubjects.findUnique({
+      const exist = await prisma.classSubjects.findFirst({
         where: {
-          classId_subjectId: { classId, subjectId },
+          subjectId,
+          group: {
+            classes: {
+              some: {
+                id: classId,
+              },
+            },
+          },
         },
       });
 
       if (exist) {
         throw createServiceError('La matière existe déjà dans cette classe.');
       }
-
+      const group = await prisma.group.findFirst({
+        where: {
+          classes: {
+            some: {
+              id: classId,
+            },
+          },
+        },
+      });
       return await prisma.classSubjects.create({
         data: {
-          classId,
-          subjectId,
-          teacherId: input?.teacherId,
+          group: {
+            connect: {
+              id: group?.id!,
+            },
+          },
+          subject: {
+            connect: { id: subjectId },
+          },
+          teacher: {
+            connect: {
+              id: input?.teacherId!,
+            },
+          },
           coefficient: input?.coefficient,
           weeklyHours: input?.weeklyHours,
         },
       });
     },
+
     updateClassSubject: async (_, { input }, { user, schoolId }) => {
       if (!user) throw createServiceError('Non authentifié', 401);
       if (!schoolId) throw createServiceError('Identifiant manquant', 400);
       const id = input?.id;
+      console.log('input \n', input);
       if (!id)
         throw createServiceError("l'identifiant de la matière est requis");
+
       const checked = await isAdmin({ context: { userId: user.id, schoolId } });
       if (!checked?.success) {
         throw createServiceError(
@@ -190,9 +223,25 @@ export const classMutationResolver: Resolvers = {
           id,
         },
         data: {
-          teacherId: input?.teacherId ?? undefined,
-          classId: input?.classId ?? undefined,
-          subjectId: input?.subjectId ?? undefined,
+          teacher: {
+            ...(input?.teacherId
+              ? {
+                  connect: {
+                    id: input?.teacherId ?? undefined,
+                  },
+                }
+              : {
+                  disconnect: {},
+                }),
+          },
+
+          subject: {
+            ...(input?.subjectId && {
+              connect: {
+                id: input?.subjectId ?? undefined,
+              },
+            }),
+          },
           coefficient: input?.coefficient,
           weeklyHours: input?.weeklyHours ?? undefined,
         },
@@ -209,12 +258,21 @@ export const classMutationResolver: Resolvers = {
         );
       }
 
-      const classSubjects = await prisma.classSubjects.deleteMany({
-        where: {
-          id: {
-            in: [...ids],
+      const classSubjects = await prisma.$transaction(async (tx) => {
+        await tx.lesson.deleteMany({
+          where: {
+            classSubjectId: {
+              in: [...ids],
+            },
           },
-        },
+        });
+        return await tx.classSubjects.deleteMany({
+          where: {
+            id: {
+              in: [...ids],
+            },
+          },
+        });
       });
 
       return {

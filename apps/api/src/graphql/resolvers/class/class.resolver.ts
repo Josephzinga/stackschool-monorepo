@@ -4,14 +4,30 @@ import { Resolvers } from '../../types.generated';
 export const classResolver: Resolvers = {
   Class: {
     students: async (parent, _args) => {
-      return await prisma.student.findMany({
+      return prisma.student.findMany({
         where: { classId: parent.id },
         include: {
           schoolUser: true,
         },
       });
     },
-
+    subjects: async (parent) => {
+      return prisma.subject.findMany({
+        where: {
+          classSubjects: {
+            some: {
+              group: {
+                classes: {
+                  some: {
+                    id: parent.id,
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    },
     _count: async (parent) => {
       const student = await prisma.profile.groupBy({
         by: ['gender'],
@@ -79,7 +95,7 @@ export const classResolver: Resolvers = {
       };
     },
     lessons: async (parent) => {
-      return await prisma.lesson.findMany({
+      return prisma.lesson.findMany({
         where: {
           classSubject: {
             group: {
@@ -94,13 +110,11 @@ export const classResolver: Resolvers = {
       });
     },
     group: async (parent) => {
-      const group = await prisma.group.findUnique({
+      return await prisma.group.findUnique({
         where: {
           id: parent.groupId,
         },
       });
-
-      return group;
     },
   },
 };

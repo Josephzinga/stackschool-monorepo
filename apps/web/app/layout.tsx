@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { inter, jost, poppins, sans } from '@/lib/fonts';
 import QueryProvider from '@/components/providers/queryClientProvider';
+import { NuqsAdapter } from 'nuqs/adapters/next';
 
 /**
  * RootLayout est le composant racine de l'application.
@@ -24,7 +25,7 @@ export default async function RootLayout({
       <body>
         <QueryProvider>
           <ThemeProvider attribute="class" enableSystem={false}>
-            {children}
+            <NuqsAdapter>{children}</NuqsAdapter>
 
             <Toaster
               position="top-center"

@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/animate-ui/components/buttons/button';
 import { Plus } from 'lucide-react';
 import { useClassTable } from './table-provider';
 import { DeleteSelectedCount } from '@/components/school/delete-selected-count';
@@ -96,8 +96,10 @@ export default function DataTableHeader() {
 
                 {/* Bouton Ajouter  */}
                 <Button
+                  hoverScale={0.95}
+                  tapScale={0.9}
                   onClick={() => setOpen(true)}
-                  className="w-full sm:w-auto lg:w-auto gap-1.5 sm:gap-2 h-10 bg-linear-to-tr from-primary to-primary/50 hover:from-primary/90 hover:to-primary lg:ml-auto"
+                  className="w-full cursor-pointer sm:w-auto lg:w-auto gap-1.5 sm:gap-2 h-10 bg-linear-to-tr from-primary to-primary/50 hover:from-primary/90 hover:to-primary lg:ml-auto"
                 >
                   <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="sm:hidden">Ajouter</span>

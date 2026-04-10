@@ -1,5 +1,5 @@
 import handleOauthStrategy from './passport-social.controller';
-import { upsertOauthUser } from '../services/oauth-user.service';
+import { upsertOauthUser } from '../services/auth-user.service';
 
 // Mock du service
 jest.mock('../services/oauth-user.service');

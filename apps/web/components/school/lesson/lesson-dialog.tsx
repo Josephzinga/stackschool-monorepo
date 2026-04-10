@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import {
   Dialog,
@@ -25,10 +25,13 @@ import {
   canTransition,
   CreateLessonFormData,
   createLessonSchema,
+  dayConstant,
+  dayMapping,
 } from '@stackschool/shared';
 import {
   Day,
   LessonStatus,
+  ResourceMode,
   useCreateLessonMutation,
   useDeleteLessonMutation,
   useGetClassSubjectOptionsQuery,
@@ -36,7 +39,6 @@ import {
   useUpdateLessonStatusMutation,
   zodResolver,
 } from '@stackschool/ui';
-import { dayConstant, dayMapping } from '@/constant';
 import { toast } from 'sonner';
 import { format, getDay } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -70,29 +72,30 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
     setLessonDialogOpen,
     lessonDialogOpen,
     selectedLessonData,
+    selectedFilter,
   } = useLessonStore();
   const isUpdate = selectedLessonData?.mode === 'UPDATE';
   const eventData = isUpdate ? selectedLessonData.args.event : null;
   const selectionData = !isUpdate ? selectedLessonData?.args : null;
   const subject = eventData?._def?.extendedProps?.subject;
   const teacher = eventData?._def?.extendedProps?.teacher;
-  const lessonId = eventData?._def?.extendedProps.lessonId;
+  const lessonId = eventData?._def?.extendedProps?.lessonId;
   const lessonStatus = eventData?._def?.extendedProps?.status;
-  // Dates normalisées
+  const isClassMode = resourceMode === 'CLASS';
+  const [resourceTitle, setResourceTitle] = useState(
+    isUpdate
+      ? resourceMode === 'CLASS'
+        ? eventData?.extendedProps?.groupName
+        : `${teacher?.firstname} ${teacher?.lastname}`
+      : selectionData?.resource?.title,
+  );
+
   const start = eventData ? eventData.start : selectionData?.start;
   const end = eventData ? eventData.end : selectionData?.end;
 
-  // Ressource ID (l'ID de la colonne où on a cliqué)
   const activeResourceId = isUpdate
     ? eventData?._def.resourceIds?.[0]
-    : selectionData?.resource?._resource?.id;
-
-  // Titre de la ressource (pour le header)
-  const resourceTitle = isUpdate
-    ? resourceMode === 'CLASS'
-      ? eventData?.extendedProps?.groupName
-      : `${teacher?.user?.profile?.firstname} ${teacher?.user?.profile?.lastname}`
-    : selectionData?.resource?._resource?.title;
+    : selectionData?.resource?._resource?.id || selectedFilter?.id;
 
   const {
     data: classSubjectData,
@@ -100,13 +103,37 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
     isError,
   } = useGetClassSubjectOptionsQuery(
     {
-      groupId: resourceMode === 'CLASS' ? activeResourceId : undefined,
-      teacherId: resourceMode === 'TEACHER' ? activeResourceId : undefined,
+      groupId: isClassMode ? activeResourceId : undefined,
+      teacherId: !isClassMode ? activeResourceId : undefined,
     },
     {
       enabled: !!activeResourceId,
     },
   );
+
+  useEffect(() => {
+    if (
+      (resourceTitle?.toString()?.includes('undefined') || !resourceTitle) &&
+      activeResourceId
+    ) {
+      if (isClassMode) {
+        const group = classSubjectData?.getClassSubjects?.find(
+          (cls) => cls?.group?.id === activeResourceId,
+        )?.group;
+        setResourceTitle(
+          group?.type === 'SOLO' ? group?.classes?.[0]?.name : group?.name,
+        );
+      } else {
+        const teacher = classSubjectData?.getClassSubjects?.find(
+          (cls) => cls?.teacher?.id === activeResourceId,
+        )?.teacher;
+
+        setResourceTitle(
+          `${teacher?.user?.profile?.firstname} ${teacher?.user?.profile?.lastname}`,
+        );
+      }
+    }
+  }, [resourceTitle, activeResourceId, isClassMode]);
 
   useEffect(() => {
     if (isError) {
@@ -133,7 +160,7 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
       setValue('subjectId', subject?.id);
       resourceMode === 'CLASS'
         ? setValue('teacherId', teacher?.id)
-        : setValue('groupId', eventData?.extendedProps?.groupId);
+        : setValue('groupId', eventData?.extendedProps?.group?.id);
     }
   }, [selectedLessonData, eventData, setValue, resourceMode]);
 
@@ -212,7 +239,13 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
     },
   });
 
-  const { mutateAsync: updateMutate } = useUpdateLessonMutation();
+  const { mutateAsync: updateMutate } = useUpdateLessonMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['GetSchoolLessons'] });
+      onSuccess?.();
+      setLessonDialogOpen(false);
+    },
+  });
 
   const { mutateAsync: createMutate } = useCreateLessonMutation({
     onSuccess: async () => {
@@ -229,13 +262,14 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
             endTime: data.endTime,
             id: lessonId,
             day: data.day as Day,
-            mode: resourceMode,
+            mode: resourceMode as ResourceMode,
           },
         })
       : createMutate({
           input: {
             ...data,
             day: data?.day as Day,
+            mode: resourceMode as ResourceMode,
           },
         });
     toast.promise(promise, {
@@ -269,7 +303,6 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
     setLessonDialogOpen(false);
   };
   const handleDelete = async () => {
-    console.log('handleDelete', lessonId);
     if (!lessonId) return;
 
     const promise = deleteMutate({
@@ -316,9 +349,7 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
           </DialogHeader>
 
           <form
-            onSubmit={handleSubmit(onSubmit, (err) => {
-              console.log('Erreur', err);
-            })}
+            onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4 py-4"
           >
             <GridForm className="w-full">
@@ -519,9 +550,8 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                 )}
                 <Button
                   type="submit"
-                  disabled={!isDirty}
                   className={cn(
-                    (!isValid || !isDirty) && 'cursor-not-allowed',
+                    !isDirty && 'cursor-not-allowed',
                     'font-semibold',
                   )}
                 >

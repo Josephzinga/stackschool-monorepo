@@ -2,7 +2,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import '@/app/styles/schedule-grid.css';
-import { Button } from '@/components/ui/button';
 import TimeGrid from '@/components/school/time-grid';
 import {
   Day,
@@ -13,13 +12,9 @@ import {
   useUpdateLessonMutation,
 } from '@stackschool/ui';
 import { useWindowSize } from 'react-use';
-import { dayMapping, lessonStatusConfig } from '@/constant';
+import { lessonStatusConfig } from '@/constant';
+import { dayMapping } from '@stackschool/shared';
 import { Badge } from '@/components/ui/badge';
-import {
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-} from '@/components/ui/popover';
 import {
   DateSelectArg,
   EventClickArg,
@@ -27,15 +22,18 @@ import {
   EventInput,
 } from '@fullcalendar/core';
 import { format } from 'date-fns';
-import { canTransition } from '@stackschool/shared';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { InitialLessonData } from '@/components/school/lesson/lesson-form';
+import { ScheduleDialog } from '@/components/school/class/schedule/schedule-dialog';
 
 const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
   const calendarRef = useRef<FullCalendar>(null);
   const [view, setView] = useState('timeGridWeek');
   const [currentDateTitle, setCurrentDateTitle] = useState('');
   const [open, setOpen] = useState(false);
+  const [selectedLessonData, setSelectedLessonData] =
+    useState<InitialLessonData>();
   const { width } = useWindowSize();
   const [selectedLesson, setSelectedLesson] = useState<Lesson>();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -93,13 +91,14 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
     });
   };
 
-  const onEventClick = (info: EventClickArg) => {
-    setSelectedLesson(info.event.extendedProps.lesson);
-    setAnchorEl(info?.el);
+  const handleEventClick = (args: EventClickArg) => {
+    setSelectedLessonData({ mode: 'UPDATE', args });
+    setOpen(true);
   };
 
-  const handleSelect = async (info: DateSelectArg) => {
-    console.log('select', info.start, info.end);
+  const handleSelect = async (args: DateSelectArg) => {
+    setSelectedLessonData({ mode: 'CREATE', args });
+    setOpen(true);
   };
 
   async function updateLesson({
@@ -144,109 +143,19 @@ const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
         ref={calendarRef}
         events={events}
         renderEventContent={renderEventContent}
-        onEventClick={onEventClick}
+        onEventClick={handleEventClick}
         onDatesSet={(value) => setCurrentDateTitle(value.view.title)}
         onEventDrop={handleEventDrop}
         onEventSelect={handleSelect}
         hideResourceViewButtons={true}
       />
 
-      {selectedLesson && (
-        <Popover
-          open={Boolean(anchorEl)}
-          onOpenChange={(open) => !open && setAnchorEl(null)}
-        >
-          <PopoverAnchor virtualRef={{ current: anchorEl as any }} />
-          <PopoverContent className="shadow-popover shadow-md">
-            <div className="flex flex-col">
-              <div className="font-poppins">
-                <div>
-                  <span className="text-gray-500 font-inter">Cours</span>
-                  <span> {selectedLesson?.classSubject?.subject?.name} — </span>
-                  <span className="font-jost">
-                    {lessonStatusConfig[selectedLesson?.status!].label}
-                  </span>
-                </div>
-                <p className="text-gray-500 font-inter">
-                  Prof :{' '}
-                  <span className="text-sm text-foreground font-meduim">
-                    {
-                      selectedLesson?.classSubject?.teacher?.user?.profile
-                        ?.lastname
-                    }
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-500 font-inter">Heure:</span>{' '}
-                  {format(new Date(selectedLesson?.startTime), 'HH:mm')} -{' '}
-                  {format(new Date(selectedLesson?.endTime), 'HH:mm')}
-                </p>
-              </div>
-
-              {/* Actions, conditionnées par transition autorisée */}
-              <div className="flex gap-2 mt-4 justify-center ">
-                {canTransition(selectedLesson?.status, 'ONGOING') && (
-                  <Button
-                    className="text-xs px-2"
-                    onClick={() =>
-                      updateLesson({
-                        id: selectedLesson?.id,
-                        targetStatus: LessonStatus.Ongoing,
-                      })
-                    }
-                  >
-                    Démarrer
-                  </Button>
-                )}
-                {canTransition(
-                  selectedLesson?.status,
-                  LessonStatus.Completed,
-                ) && (
-                  <Button
-                    className="text-xs px-2"
-                    onClick={() =>
-                      updateLesson({
-                        id: selectedLesson?.id,
-                        targetStatus: LessonStatus.Completed,
-                      })
-                    }
-                  >
-                    Marquer terminée
-                  </Button>
-                )}
-                {canTransition(
-                  selectedLesson?.status,
-                  LessonStatus.Cancelled,
-                ) && (
-                  <Button
-                    className="text-xs px-2"
-                    variant="destructive"
-                    onClick={() =>
-                      updateLesson({
-                        id: selectedLesson?.id,
-                        targetStatus: LessonStatus.Cancelled,
-                      })
-                    }
-                  >
-                    Annuler
-                  </Button>
-                )}
-                {canTransition(selectedLesson?.status, 'POSTPONED') && (
-                  <Button
-                    className="text-xs px-2"
-                    onClick={() => {
-                      //openPostponeDialog(selectedLesson)
-                      console.log('Reporter');
-                    }}
-                  >
-                    Reporter
-                  </Button>
-                )}
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-      )}
+      <ScheduleDialog
+        initialData={selectedLessonData}
+        onOpenChange={setOpen}
+        open={open}
+        classId={classId}
+      />
     </div>
   );
 };

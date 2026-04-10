@@ -20,8 +20,14 @@ import React from 'react';
 import { useLessonStore } from '@/store/lesson-store';
 import { Button } from '@/components/ui/button';
 import { AnimatedButtonGroup } from '@/components/animated-button-group';
+import { LessonStatus, ResourceMode } from '@stackschool/ui';
+import { lessonStatusConfig } from '@/constant';
 
-export const CalendarFilter = () => {
+export const CalendarFilter = ({
+  onModeChange,
+}: {
+  onModeChange: (mode: ResourceMode) => void;
+}) => {
   const {
     uniqueDepartments,
     uniqueSections,
@@ -40,11 +46,18 @@ export const CalendarFilter = () => {
     advancedFilters,
     setAdvancedFilter,
     clearAdvancedFilters,
+    resetFilters,
   } = useLessonStore();
 
-  const handleClearInput = () => {
-    setSelectedFilter({ type: 'TEACHER', id: '' });
+  const handleClearInput = (mode: ResourceMode) => {
+    setSelectedFilter(null);
+    resetFilters();
   };
+  const handleSwitchMode = (mode: ResourceMode) => {
+    setSelectedFilter(null);
+    setResourceMode(mode);
+  };
+
   return (
     <div className="flex flex-col gap-3 px-2 py-2">
       {/* Ligne principale : toggles + combobox + bouton filtres */}
@@ -56,10 +69,7 @@ export const CalendarFilter = () => {
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
             }`}
-            onClick={() => {
-              setResourceMode('CLASS');
-              setSelectedFilter({ type: 'TEACHER', id: '' });
-            }}
+            onClick={() => onModeChange(ResourceMode.Class)}
           >
             Classes
           </Button>
@@ -69,7 +79,7 @@ export const CalendarFilter = () => {
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
             }`}
-            onClick={() => setResourceMode('TEACHER')}
+            onClick={() => onModeChange(ResourceMode.Teacher)}
           >
             Enseignants
           </Button>
@@ -88,14 +98,16 @@ export const CalendarFilter = () => {
               <ComboboxInput
                 placeholder="Sélectionner une classe"
                 showClear
-                onClear={handleClearInput}
+                onClear={() => handleClearInput(ResourceMode.Class)}
                 className="max-w-90"
               />
               <ComboboxContent>
                 <ComboboxEmpty>Aucune classe</ComboboxEmpty>
                 <ComboboxList>
                   {(item) => (
-                    <ComboboxItem value={item.name}>{item.name}</ComboboxItem>
+                    <ComboboxItem key={item.id} value={item.name}>
+                      {item.name}
+                    </ComboboxItem>
                   )}
                 </ComboboxList>
               </ComboboxContent>
@@ -129,6 +141,7 @@ export const CalendarFilter = () => {
                 <ComboboxList>
                   {(item) => (
                     <ComboboxItem
+                      key={item.id}
                       value={`${item.user.profile.firstname} ${item.user.profile.lastname}`}
                     >
                       {item.user.profile.firstname} {item.user.profile.lastname}
@@ -156,57 +169,87 @@ export const CalendarFilter = () => {
 
       {/* Filtres avancés (affichés conditionnellement) */}
       {showFilters && (
-        <div className="flex flex-wrap gap-2 items-center pt-1 border-t">
-          {resourceMode === 'CLASS' ? (
-            <>
+        <div className="flex gap-2">
+          <div className="flex flex-wrap gap-3 items-center w-full">
+            {resourceMode === 'CLASS' ? (
+              <>
+                <Select
+                  value={advancedFilters.level}
+                  onValueChange={(v) => setAdvancedFilter('level', v)}
+                >
+                  <SelectTrigger className="w-[160px] h-8">
+                    <SelectValue placeholder="Niveau" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueLevels.map((level) => (
+                      <SelectItem key={level} value={level}>
+                        {level}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={advancedFilters.section}
+                  onValueChange={(v) => setAdvancedFilter('section', v)}
+                >
+                  <SelectTrigger className="w-[140px] h-8">
+                    <SelectValue placeholder="Section" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueSections.map((section) => (
+                      <SelectItem key={section} value={section}>
+                        {section}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
+            ) : (
               <Select
-                value={advancedFilters.level}
-                onValueChange={(v) => setAdvancedFilter('level', v)}
+                value={advancedFilters.department}
+                onValueChange={(v) => setAdvancedFilter('department', v)}
               >
-                <SelectTrigger className="w-[160px] h-8">
-                  <SelectValue placeholder="Niveau" />
+                <SelectTrigger className="w-[180px] h-8">
+                  <SelectValue placeholder="Département" />
                 </SelectTrigger>
                 <SelectContent>
-                  {uniqueLevels.map((level) => (
-                    <SelectItem key={level} value={level}>
-                      {level}
+                  {uniqueDepartments.map((dept) => (
+                    <SelectItem key={dept} value={dept}>
+                      {dept}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Select
-                value={advancedFilters.section}
-                onValueChange={(v) => setAdvancedFilter('section', v)}
-              >
-                <SelectTrigger className="w-[140px] h-8">
-                  <SelectValue placeholder="Section" />
-                </SelectTrigger>
-                <SelectContent>
-                  {uniqueSections.map((section) => (
-                    <SelectItem key={section} value={section}>
-                      {section}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </>
-          ) : (
+            )}
             <Select
-              value={advancedFilters.department}
-              onValueChange={(v) => setAdvancedFilter('department', v)}
+              value={advancedFilters.status}
+              onValueChange={(value) => setAdvancedFilter('status', value)}
             >
-              <SelectTrigger className="w-[180px] h-8">
-                <SelectValue placeholder="Département" />
+              <SelectTrigger className="min-w-30">
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                {uniqueDepartments.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
-                  </SelectItem>
-                ))}
+                <SelectItem value={'ALL'}>Tous les status</SelectItem>
+
+                <SelectItem value={LessonStatus.Ongoing}>
+                  {lessonStatusConfig[LessonStatus.Ongoing].label}
+                </SelectItem>
+                <SelectItem value={LessonStatus.Planned}>
+                  {lessonStatusConfig[LessonStatus.Planned].label}
+                </SelectItem>
+                <SelectItem value={LessonStatus.Cancelled}>
+                  {lessonStatusConfig[LessonStatus.Cancelled].label}
+                </SelectItem>
+                <SelectItem value={LessonStatus.Postponed}>
+                  {lessonStatusConfig[LessonStatus.Postponed].label}
+                </SelectItem>
+                <SelectItem value={LessonStatus.Cancelled}>
+                  {lessonStatusConfig[LessonStatus.Completed].label}
+                </SelectItem>
               </SelectContent>
             </Select>
-          )}
+          </div>
           {(advancedFilters.level ||
             advancedFilters.section ||
             advancedFilters.department) && (

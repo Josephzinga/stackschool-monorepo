@@ -1,15 +1,9 @@
 'use client';
 import { useEffect, useMemo } from 'react';
 import { useLessonStore } from '@/store/lesson-store';
-import {
-  Day,
-  GetSchoolLessonsQuery,
-  useGetSchoolLessonsQuery,
-} from '@stackschool/ui';
+import { Day, useGetSchoolLessonsQuery } from '@stackschool/ui';
 import { format } from 'date-fns';
-import { dayMapping } from '@/constant';
-import { ResourceMode } from '@/types/lessons-types';
-import { ResourceSourceInput } from '@fullcalendar/resource';
+import { dayMapping } from '@stackschool/shared';
 import { EventInput } from '@fullcalendar/core';
 
 export const useLessonCalendar = () => {
@@ -19,12 +13,10 @@ export const useLessonCalendar = () => {
     advancedFilters,
     setLoading,
     setError,
-    isLoading: storeLoading,
     pagination,
     setPagination,
   } = useLessonStore();
 
-  // Requête API
   const { data, isPending, isError, error } = useGetSchoolLessonsQuery({
     filter: {
       groupId:
@@ -40,11 +32,12 @@ export const useLessonCalendar = () => {
       mode: resourceMode,
     },
   });
+
   useEffect(() => {
     if (!data?.getLessons?.meta) return;
     setPagination(data?.getLessons?.meta);
-  }, [data?.getLessons?.meta]);
-  // Mettre à jour l'état de chargement
+  }, [data?.getLessons]);
+
   useEffect(() => {
     setLoading(isPending);
   }, [isPending, setLoading]);
@@ -57,26 +50,35 @@ export const useLessonCalendar = () => {
   }, [isError, error, setError]);
 
   const events: EventInput[] = useMemo(() => {
-    // On crée un garde-fou ici
-    let uniqueResource: Map<any, any>;
-    if (resourceMode === 'CLASS') {
-      uniqueResource = processResources(
-        data?.getLessons?.data?.groups || [],
-        true,
-      );
-    } else {
-      uniqueResource = processResources(
-        data?.getLessons?.data?.teachers || [],
-        false,
-      );
-    }
-
-    return Array.from(uniqueResource.values());
+    return (
+      data?.getLessons?.data?.events?.map((e) => ({
+        id: e.id,
+        resourceId: e.resourceId!,
+        title: e?.title,
+        startTime: format(new Date(e.startTime), 'HH:mm'),
+        endTime: format(new Date(e.endTime), 'HH:mm'),
+        daysOfWeek: [dayMapping[e.day as Day]],
+        extendedProps: {
+          subject: e.subject,
+          status: e.status,
+          teacher: e.teacher,
+          group: e?.group,
+          mode: resourceMode,
+          lessonId: e.id,
+          groupName:
+            e.group?.type === 'SOLO' ? e.group.classes[0]?.name : e.group?.name,
+        },
+      })) || []
+    );
   }, [data, resourceMode]);
+
   const resources = useMemo(() => {
-    if (!data) return null;
-    return transformToResources(data, resourceMode);
-  }, [data]);
+    if (!data?.getLessons?.data.resources) return null;
+    return data?.getLessons?.data.resources.map((r) => ({
+      id: r.id,
+      title: r.title,
+    }));
+  }, [data?.getLessons?.data]);
 
   return {
     events,
@@ -85,77 +87,4 @@ export const useLessonCalendar = () => {
     resources,
     error,
   };
-};
-
-// Fonction utilitaire pour transformer les données en ressources
-const transformToResources = (
-  data?: GetSchoolLessonsQuery,
-  resourceMode?: ResourceMode,
-): ResourceSourceInput | undefined => {
-  if (!data?.getLessons?.data) return [];
-
-  if (resourceMode === 'CLASS') {
-    const uniqueResources = new Map();
-    data.getLessons.data.groups?.map((group) => {
-      const id = group.id;
-      if (id && !uniqueResources.has(id)) {
-        uniqueResources.set(id, {
-          id: id,
-          title: group.type === 'SOLO' ? group.classes[0]?.name : group?.name,
-        });
-      }
-    });
-    return Array.from(uniqueResources.values());
-  } else {
-    const uniqueResources = new Map();
-    data.getLessons.data.teachers?.map((teacher) => {
-      const id = teacher.id;
-      if (id && !uniqueResources.has(id)) {
-        uniqueResources.set(id, {
-          id: id,
-          title: `${teacher?.user?.profile?.firstname} ${teacher?.user?.profile?.lastname}`,
-        });
-      }
-    });
-    return Array.from(uniqueResources.values());
-  }
-};
-export const processResources = (
-  resourceArray: any[],
-  isGroup: boolean,
-  resourceMode?: ResourceMode,
-) => {
-  const uniqueEvents = new Map();
-  resourceArray?.forEach((res) => {
-    res.classSubjects?.forEach((cls: any) => {
-      cls?.lessons?.forEach((lesson: any) => {
-        // Si on n'a pas encore vu cette leçon, on l'ajoute
-        if (!uniqueEvents.has(lesson.id)) {
-          uniqueEvents.set(lesson.id, {
-            id: lesson.id,
-            resourceId: res.id, // teacher.id ou group.id
-            title: cls.subject?.name,
-            startTime: format(new Date(lesson.startTime), 'HH:mm'),
-            endTime: format(new Date(lesson.endTime), 'HH:mm'),
-            daysOfWeek: [dayMapping[lesson.day as Day]],
-            extendedProps: {
-              subject: cls.subject,
-              status: lesson.status,
-              teacher: cls?.teacher,
-              mode: resourceMode,
-              lessonId: lesson.id,
-              groupName: isGroup
-                ? res.type === 'SOLO'
-                  ? res.classes[0]?.name
-                  : res.name
-                : cls?.group?.type === 'SOLO'
-                  ? cls?.group?.classes[0]?.name
-                  : cls.group.name,
-            },
-          });
-        }
-      });
-    });
-  });
-  return uniqueEvents;
 };

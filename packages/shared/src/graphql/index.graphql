@@ -1,14 +1,12 @@
 type Mutation {
   confirmCompleteProfile: UserPayload
-  createListTeachers(data: CreateTeacherInput, schoolId: ID!): ApiResponse
+  createTeacher(input: CreateTeacherInput): Teacher
   updateTeacher(
     teacherId: ID!
     data: CreateTeacherInput!
-    schoolId: ID!
-  ): ApiResponse
+  ): Teacher
   deleteTeachers(
     teacherIds: [ID!]!
-    schoolId: ID!
     soft: Boolean = true
   ): ApiResponse
   deleteStudents(
@@ -39,18 +37,22 @@ type Mutation {
   createRoom(input: CreateRoomInput!): Room!
   updateRoom(input: CreateRoomInput!): Room!
   createGroup(input: CreateGroupInput!): Group!
+
+  createParent(input: CreateParentInput): Parent
 }
 
 type ClassTeacher {
   schoolId: ID
   teacher: [Teacher]
-  class: [Class]
+  groups: [Group!]
+  classes: [Class]
 }
 
 type Query {
-  searchStudent(filter: StudentSearchInput!): [Student]
+  searchStudent(filter: StudentSearchInput!): [Student!]
   searchSchool(filter: SchoolSearchInput!): [School!]
   getClassAndSubjects(filter: StudentSearchInput): [Class]
+  searchClassesAndSubjects(limit: Int! = 10, search: String!): SearchClassesAndSubjects
   me: User
   school(schoolId: ID!): School!
   verifyInvitationCode(code: InvitationCodeInput!): User
@@ -61,7 +63,9 @@ type Query {
   class(id: ID!): Class
   getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList!
   getSchoolStudents(input: GetSchoolStudentsInput!, schoolId: ID!): StudentList!
+
   getSchoolClasses(input: GetSchoolClassesInput!): ClassList!
+
   getSchoolSubjects(input: GetSubjectInput!): SubjectList
   getClassSubjects(classId: ID, teacherId: ID, groupId: ID): [ClassSubject!]
   getSchoolRooms(filter: GetSchoolRoomInput!): RoomList!
@@ -70,34 +74,22 @@ type Query {
 
 input CreateLessonInput {
   day: Day!
-  mode: CreateLessonMode!
+  mode: ResourceMode!
   startTime: DateTime!
   endTime: DateTime!
   subjectId: ID!
   teacherId: ID
   groupId: ID
 }
-enum CreateLessonMode {
-  TEACHER
-  CLASS
+
+type ClassAndSubject {
+  classes: [Class!]
+  subjects: [Subject!]
 }
 
-input GetLessonsInput {
-  groupId: ID
-  teacherId: ID
-  classId: ID
-  searchTerm: String
-  department: String
-  mode: CreateLessonMode!
-  hasLessonOnly: Boolean = true
-  section: String
-  level: String
-  limit: Int! = 6
-  page: Int! = 0
-}
 type LessonsData {
-  events: LessonsEvents!
-  resources: LessonResources
+  events: [LessonsEvents!]
+  resources: [LessonResources!]
 }
 type LessonsList {
   data: LessonsData!
@@ -113,11 +105,17 @@ type LessonsEvents {
   title: String!
   startTime: String!
   endTime: String!
+  day: Day!
   status: LessonStatus
   subject: Subject!
   group: Group
-  teacher: Teacher
+  teacher: LessonTeacher
   room: Room
+}
 
+type LessonTeacher {
+  id: ID!
+  firstname: String!
+  lastname: String!
 }
 

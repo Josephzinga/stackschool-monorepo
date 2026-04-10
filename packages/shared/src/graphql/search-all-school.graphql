@@ -18,6 +18,7 @@ input SchoolSearchInput {
 }
 
 input StudentSearchInput {
+   schoolId: ID
    searchTerm: String
    getSubject: Boolean
 }

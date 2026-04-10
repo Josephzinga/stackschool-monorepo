@@ -1,43 +1,6 @@
 import { Day, LessonStatus, PaginationMeta } from '@stackschool/ui';
 import { InitialData } from '@/components/school/lesson/lesson-dialog';
 
-export type EventsData = {
-  id: string;
-  resourceId?: string;
-  title: string;
-  startTime: string;
-  endTime: string;
-  daysOfWeek: number[];
-  extendedProps: {
-    subject: {
-      id: string;
-      name: string;
-      code: string | null;
-    };
-    teacher: {
-      id: string;
-      user: {
-        id: string;
-        profile: {
-          firstName: string;
-          lastName: string;
-        };
-      };
-    };
-    lessonId: string;
-    groupName: string;
-    groupId: string;
-    status: LessonStatus;
-    day: Day;
-    mode: resourceMode;
-  };
-};
-
-export type ResourceData = {
-  id: string;
-  title: string;
-};
-
 export type ResourceMode = 'CLASS' | 'TEACHER';
 export type ViewType =
   | 'resourceTimelineWeek'
@@ -49,6 +12,7 @@ export interface AdvancedFilters {
   level: string;
   section: string;
   department: string;
+  status: LessonStatus | 'ALL';
 }
 
 export interface TargetEventDrop {
@@ -99,7 +63,10 @@ export interface LessonState {
   setSelectedFilter: (
     filter: { type: ResourceMode; id: string } | null,
   ) => void;
-  setAdvancedFilter: (key: keyof AdvancedFilters, value: string) => void;
+  setAdvancedFilter: (
+    key: keyof AdvancedFilters,
+    value: string | LessonStatus,
+  ) => void;
   clearAdvancedFilters: () => void;
   toggleShowFilters: () => void;
   setPagination: (pagination?: Partial<PaginationMeta>) => void;

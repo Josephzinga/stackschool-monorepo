@@ -10,9 +10,8 @@ import { confirmCompleteProfileResolver } from './resolvers/confirm-complete-pro
 import { meResolver } from './resolvers/me.resolver';
 import { schoolResolver } from './resolvers/school.resolver';
 import { teacherResolver } from './resolvers/teacher/teacher.resolver';
-import { createTeacherResolver } from './resolvers/teacher/create-list-teacher.resolver';
 import { studentResolver } from './resolvers/student/student.resolver';
-import { createStudentResolver } from './resolvers/student/create-student.resolver';
+import { studentQueryResolver } from './resolvers/student/student-query.resolver';
 import { classResolver } from './resolvers/class/class.resolver';
 import { ServiceError } from '@stackschool/shared';
 import { prisma, SchoolUser } from '@stackschool/db';
@@ -21,12 +20,16 @@ import { createLoaders } from './resolvers/data-loader';
 import { lessonsResolver } from './resolvers/lesson/lessons.resolver';
 import { subjectResolver } from './resolvers/subject.resolver';
 import { createServiceError } from '../utils/api-errors';
-import { classMutationResolver } from './resolvers/class/muation.resolver';
+import { classMutationResolver } from './resolvers/class/class-mutation.resolver';
 import { RoomResolver } from './resolvers/room.resolver';
 import { groupResolver } from './resolvers/groups.resolver';
-import { classQueryResolver } from './resolvers/class/query.resolver';
+import { classQueryResolver } from './resolvers/class/class-query.resolver';
 import { lessonMutationResolver } from './resolvers/lesson/lesson-mutation.resolver';
 import { lessonQueryResolver } from './resolvers/lesson/lesson-query.resolver';
+import { teacherMutationResolver } from './resolvers/teacher/teacher-mutation.resolver';
+import { parentQueryResolver } from './resolvers/parent/parent-query.resolver';
+import { parentResolver } from './resolvers/parent/parent.resolver';
+import { teacherQueryResolver } from './resolvers/teacher/teacher-query.resolver';
 
 const dirPath = path.resolve(
   __dirname,
@@ -46,8 +49,9 @@ const resolvers = merge(
   meResolver,
   schoolResolver,
   teacherResolver,
-  createTeacherResolver,
-  createStudentResolver,
+  teacherMutationResolver,
+  teacherQueryResolver,
+  studentQueryResolver,
   studentResolver,
   classQueryResolver,
   lessonMutationResolver,
@@ -62,6 +66,8 @@ const resolvers = merge(
   subjectResolver,
   RoomResolver,
   groupResolver,
+  parentQueryResolver,
+  parentResolver,
 );
 
 // Création du schéma exécutable

@@ -34,7 +34,7 @@ export async function handleProfileUpdate(
 
   // 2. Upsert du Profil (Profile)
   // Crée le profil s'il n'existe pas, le met à jour sinon
-  const profile = await tx.profile.upsert({
+  await tx.profile.upsert({
     where: { userId },
     create: {
       userId,
@@ -50,5 +50,4 @@ export async function handleProfileUpdate(
       gender: profileData.gender,
     },
   });
-  console.log('profile', profile);
 }

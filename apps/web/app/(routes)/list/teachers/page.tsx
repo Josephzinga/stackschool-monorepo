@@ -29,7 +29,7 @@ export default function TeacherPage() {
 function TeachersView() {
   const { pagination, searchTerm, filters } = useTable();
   const { currentSchool } = useUserStore();
-  const search = useDebounce(500, searchTerm.length > 1 ? searchTerm : '');
+  const search = useDebounce(searchTerm.length > 1 ? searchTerm : '', 400);
 
   const { data, isPending } = useGetSchoolTeachersQuery(
     {

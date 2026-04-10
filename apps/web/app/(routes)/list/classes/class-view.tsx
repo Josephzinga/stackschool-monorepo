@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 
 export function ClassView() {
   const { searchTerm, pagination, setPagination, filters } = useClassTable();
-  const debouncedSearch = useDebounce(500, searchTerm);
+  const debouncedSearch = useDebounce(searchTerm, 400);
   const searchParams = useSearchParams();
   const teacherId = searchParams.get('teacherId');
 

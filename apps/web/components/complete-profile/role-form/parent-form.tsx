@@ -47,7 +47,7 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
   const { setRoleData, school, setCurrentStep, role } =
     useCompleteProfileStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedQuery = useDebounce(500, searchQuery);
+  const debouncedQuery = useDebounce(400, searchQuery);
   const parentData = role?.role === 'PARENT' ? role.parent : null;
 
   const [childToConfigure, setChildToConfigure] = useState<Student | null>(
@@ -58,6 +58,7 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
     handleSubmit,
     register,
     control,
+
     formState: { isSubmitting, errors },
   } = useForm<ParentFormData>({
     resolver: zodResolver(parentFormSchema),
@@ -110,15 +111,16 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
     if (!childToConfigure) return;
     append({
       id: childToConfigure.id,
+      relation: childToConfigure.matricule,
+      firstname: childToConfigure.user?.profile?.firstname,
+      lastname: childToConfigure?.user?.profile?.lastname,
+      photo: childToConfigure.user?.profile?.photo ?? undefined,
       relation: tempRelation,
-      firstname: childToConfigure.firstname,
-      lastname: childToConfigure.lastname,
-      photo: childToConfigure.photo || '',
     });
 
     setChildToConfigure(null);
     setSearchQuery('');
-    toast.success(`${childToConfigure?.firstname} ajouté !`);
+    toast.success(`${childToConfigure?.user?.profile?.firstname} ajouté !`);
   };
 
   const relationSelected = (childRelation: RelationType) => {
@@ -203,15 +205,18 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
               <div className="p-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={`/images/${student.photo}`} />
+                    <AvatarImage
+                      src={`/images/${student.user?.profile?.photo ?? undefined}`}
+                    />
                     <AvatarFallback>
-                      {student.firstname[0]}
-                      {student.lastname[0]}
+                      {student.user?.profile?.firstname[0]}
+                      {student?.user?.profile?.lastname[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium text-sm">
-                      {student.firstname} {student.lastname}
+                      {student.user?.profile?.firstname}{' '}
+                      {student?.user?.profile?.lastname}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Matricule: {student.matricule}
@@ -289,9 +294,11 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
         </Button>
         <SubmitButton
           isSubmitting={isSubmitting}
-          onClick={handleSubmit(onSubmit)}
           className="flex-1"
           disabled={fields.length === 0}
+          onClick={handleSubmit(onSubmit, (err) => {
+            console.log('Error', err);
+          })}
         >
           <Check className="mr-2 h-4 w-4" />
           Confirmer la sélection
@@ -309,7 +316,7 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
             <DialogDescription>
               Précisez votre relation avec{' '}
               <span className="font-semibold">
-                {childToConfigure?.firstname}.
+                {childToConfigure?.user?.profile?.firstname}.
               </span>
             </DialogDescription>
           </DialogHeader>

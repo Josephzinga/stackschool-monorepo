@@ -38,6 +38,7 @@ export const AppAlertDialog = ({
   variant = 'destructive',
   descriptionClassName,
 }: AppAlertDialogProps) => {
+  console.log('AlertDailog');
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="w-[95%] sm:max-w-md mx-auto rounded-lg">

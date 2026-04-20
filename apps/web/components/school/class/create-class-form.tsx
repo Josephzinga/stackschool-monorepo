@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import {
   useCreateClassMutation,
-  useGetTeachersQuery,
+  useGetTeacherOptionsQuery,
   useUpdateClassMutation,
   useUserStore,
 } from '@stackschool/ui';
@@ -61,7 +61,7 @@ export default function CreateClassForm({
   });
 
   const { data: teachersData, isLoading: isLoadingTeachers } =
-    useGetTeachersQuery({
+    useGetTeacherOptionsQuery({
       input: {
         limit: 100,
       },

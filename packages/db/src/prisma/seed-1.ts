@@ -1,8 +1,17 @@
 import { prisma } from './index';
 
 async function main() {
-  await prisma.lesson.deleteMany();
-  const subject = await prisma.subject.deleteMany();
+  const students = await prisma.student.findMany();
+  for (let i = 0; i < students.length; i++) {
+    await prisma.student.update({
+      where: {
+        id: students[i].id,
+      },
+      data: {
+        studentNumber: i + 1,
+      },
+    });
+  }
 }
 
 main()

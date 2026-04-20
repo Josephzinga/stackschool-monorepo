@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '@/app/styles/schedule-grid.css';
 import TimeGrid, { renderEventContent } from '@/components/school/time-grid';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { motion } from 'motion/react';
 import LessonDialog from '@/components/school/lesson/lesson-dialog';
 import { ResourceLabelContentArg } from '@fullcalendar/resource';
 import { CalendarFilter } from '@/components/school/lesson/calendar-filter';
@@ -25,11 +24,29 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
-import { RenderResourceContent } from '@/components/school/lesson/render-resource-content';
+import {
+  RenderResourceContent,
+  TimeGridContainer,
+} from '@/components/school/lesson/render-resource-content';
 import { ResourceMode } from '@stackschool/ui';
 
 function LessonsListPage() {
   const [isDragging, setIsDragging] = useState(false);
+
+  // SÉLECTEURS PRÉCIS (Empêche les re-renders inutiles)
+  const isLoading = useLessonStore((s) => s.isLoading);
+  const currentView = useLessonStore((s) => s.currentView);
+  const pagination = useLessonStore((s) => s.pagination);
+  const selectedFilter = useLessonStore((s) => s.selectedFilter);
+  const lessonDialogOpen = useLessonStore((s) => s.lessonDialogOpen);
+
+  const setSelectedFilter = useLessonStore((s) => s.setSelectedFilter);
+  const setCurrentView = useLessonStore((s) => s.setCurrentView);
+  const setTargetEventDrop = useLessonStore((s) => s.setTargetEventDrop);
+  const setAlertOpen = useLessonStore((s) => s.setAlertOpen);
+  const setPagination = useLessonStore((s) => s.setPagination);
+  const setResourceMode = useLessonStore((s) => s.setResourceMode);
+  const resetAll = useLessonStore((s) => s.resetAll);
 
   const {
     handleEventSelect,
@@ -39,77 +56,81 @@ function LessonsListPage() {
     handleCalendarMount,
     calendarRef,
   } = useLessonEvents();
+
   const { resourceMode } = useLessonFilters();
   const queryClient = useQueryClient();
-  const { isError, resources, events } = useLessonCalendar();
-  const {
-    selectedLessonData,
-    setSelectedFilter,
-    setCurrentView,
-    isLoading,
-    currentView,
-    setTargetEventDrop,
-    setAlertOpen,
-    setPagination,
-    pagination,
-    selectedFilter,
-    setResourceMode,
-  } = useLessonStore();
+  const { resources, events } = useLessonCalendar();
+  const renders = useRef(0);
+
+  useEffect(() => {
+    renders.current++;
+    console.log('Rendu :', renders.current);
+  });
   const isResourceView = currentView?.includes('resource');
-  const handleResourceClick = (resourceId?: string) => {
-    if (isResourceView && resourceId) {
-      const newView = currentView.includes('Week')
-        ? 'timeGridWeek'
-        : 'timeGridDay';
-      setSelectedFilter({ type: resourceMode, id: resourceId });
-      setCurrentView(newView);
-    }
-  };
-  // Revert les changements dans le calendrier
-  const handleCancelUpdate = () => {
+
+  useEffect(() => {
+    resetAll();
+  }, [resetAll]);
+
+  const handleResourceClick = useCallback(
+    (resourceId?: string) => {
+      if (isResourceView && resourceId) {
+        const newView = currentView.includes('Week')
+          ? 'timeGridWeek'
+          : 'timeGridDay';
+        setSelectedFilter({ type: resourceMode, id: resourceId });
+        setCurrentView(newView);
+      }
+    },
+    [
+      isResourceView,
+      currentView,
+      resourceMode,
+      setSelectedFilter,
+      setCurrentView,
+    ],
+  );
+
+  const handleCancelUpdate = useCallback(() => {
     const calendarApi = calendarRef.current?.getApi();
     if (calendarApi) {
       calendarApi.refetchEvents();
       setTargetEventDrop(null);
       setAlertOpen(false);
     }
-  };
+  }, [calendarRef, setTargetEventDrop, setAlertOpen]);
 
-  // Handler pour le début du drag
-  const handleEventDragStart = () => {
-    setIsDragging(true);
-  };
+  const handleEventDragStart = useCallback(() => setIsDragging(true), []);
+  const handleEventDragStop = useCallback(() => setIsDragging(false), []);
 
-  // Handler pour la fin du drag
-  const handleEventDragStop = () => {
-    setIsDragging(false);
-  };
+  const handleSwitchMode = useCallback(
+    (mode: ResourceMode) => {
+      setSelectedFilter(null);
+      const api = calendarRef.current?.getApi();
+      if (api && api.view.type.toLowerCase().includes('timegrid')) {
+        api.changeView('resourceTimelineWeek');
+        setCurrentView('resourceTimelineWeek');
+      }
+      setResourceMode(mode);
+    },
+    [calendarRef, setSelectedFilter, setCurrentView, setResourceMode],
+  );
 
-  // switch le resourceMode entre CLASS et TEACHER
-  const handleSwitchMode = (mode: ResourceMode) => {
-    setSelectedFilter(null);
-    const api = calendarRef.current?.getApi();
-
-    if (api && api.view.type.toLowerCase().includes('timegrid')) {
-      api.changeView('resourceTimelineWeek');
-      setCurrentView('resourceTimelineWeek');
-    }
-    setResourceMode(mode);
-  };
-  const renderResourceContent = (info: ResourceLabelContentArg) => {
-    return (
-      <RenderResourceContent
-        resource={info.resource}
-        onClick={(r) => {
-          handleResourceClick(r.id);
-        }}
-      />
-    );
-  };
+  const renderResourceContent = useCallback(
+    (info: ResourceLabelContentArg) => {
+      return (
+        <RenderResourceContent
+          resource={info.resource}
+          onClick={(r) => handleResourceClick(r.id)}
+        />
+      );
+    },
+    [handleResourceClick],
+  );
 
   return (
-    <div className="flex-1 flex justify-centerpx-2 py-4 sm:px-4 md:px-6">
-      <Card className="flex flex-col gap-2 md:gap-4 w-full">
+    <div className="flex justify-center px-2 pt-2 w-full">
+      <Card className="flex flex-col gap-2 md:gap-4 h-full! w-full">
         <CalendarFilter onModeChange={handleSwitchMode} />
 
         <CardContent className="px-1 h-full">
@@ -118,15 +139,7 @@ function LessonsListPage() {
               <LoaderOne />
             </div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: 0.2,
-                ease: 'linear' as const,
-              }}
-            >
+            <TimeGridContainer>
               <TimeGrid
                 editable={true}
                 initialView="resourceTimelineWeek"
@@ -134,7 +147,7 @@ function LessonsListPage() {
                 ref={calendarRef}
                 onEventClick={handleEventClick}
                 resourceHeaderContent={
-                  resourceMode === 'CLASS' ? 'Classes' : 'Enseignent'
+                  resourceMode === 'CLASS' ? 'Classes' : 'Enseignants'
                 }
                 events={events}
                 resources={resources ?? undefined}
@@ -147,20 +160,20 @@ function LessonsListPage() {
                 onEventDragStart={handleEventDragStart}
                 onEventDragStop={handleEventDragStop}
                 onResourceClick={handleResourceClick}
-                onViewChange={(view) => {
-                  setCurrentView(view);
-                }}
+                onViewChange={setCurrentView}
                 onCalendarMount={handleCalendarMount}
                 disabledTimeGrid={!selectedFilter}
                 renderResourceContent={renderResourceContent}
                 hasFilter={!!selectedFilter}
               />
-            </motion.div>
+            </TimeGridContainer>
           )}
         </CardContent>
         <CardFooter>
           <div className="flex w-full flex-col sm:flex-row items-center justify-between px-2 gap-4">
-            <div>{pagination?.total} résultat (s)</div>
+            <div className="text-sm text-muted-foreground">
+              {pagination?.total} résultat(s)
+            </div>
 
             <div className="flex items-center gap-4 lg:gap-8 order-1 sm:order-2 w-full sm:w-auto justify-between sm:justify-end">
               <div className="flex items-center gap-2">
@@ -185,41 +198,36 @@ function LessonsListPage() {
               </div>
 
               <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                {pagination?.totalPages} / {pagination?.page! + 1}
+                Page {pagination?.page! + 1} / {pagination?.totalPages}
               </div>
 
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   className="h-8 w-8 p-0"
-                  onClick={() => {
-                    const page =
-                      typeof pagination?.page === 'number'
-                        ? pagination?.page! - 1
-                        : 0;
+                  onClick={() =>
                     setPagination({
                       ...pagination,
-                      page,
-                    });
-                  }}
-                  disabled={false}
+                      page: (pagination?.page || 0) - 1,
+                    })
+                  }
+                  disabled={pagination?.page === 0}
                 >
-                  <span className="sr-only">Précédent</span>
                   <IconChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="outline"
                   className="h-8 w-8 p-0"
-                  onClick={() => {
-                    const page = pagination?.page! + 1;
+                  onClick={() =>
                     setPagination({
                       ...pagination,
-                      page,
-                    });
-                  }}
-                  disabled={pagination?.totalPages! <= pagination?.page! + 1}
+                      page: (pagination?.page || 0) + 1,
+                    })
+                  }
+                  disabled={
+                    pagination?.totalPages! <= (pagination?.page || 0) + 1
+                  }
                 >
-                  <span className="sr-only">Suivant</span>
                   <IconChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -228,17 +236,18 @@ function LessonsListPage() {
         </CardFooter>
       </Card>
 
-      {/* Dialog pour la création/édition */}
-      <LessonDialog
-        key={Math.random() + 1000 * 999999}
-        onSuccess={async () => {
-          const calendarApi = calendarRef.current?.getApi();
-          calendarApi?.refetchEvents();
-          await queryClient.invalidateQueries({
-            queryKey: ['getSchoolLessons'],
-          });
-        }}
-      />
+      {/* Dialog pour la création/édition - Monté conditionnellement */}
+      {lessonDialogOpen && (
+        <LessonDialog
+          onSuccess={async () => {
+            const calendarApi = calendarRef.current?.getApi();
+            calendarApi?.refetchEvents();
+            await queryClient.invalidateQueries({
+              queryKey: ['getSchoolLessons'],
+            });
+          }}
+        />
+      )}
       <LessonAlertDialog onCancelUpdate={handleCancelUpdate} />
     </div>
   );

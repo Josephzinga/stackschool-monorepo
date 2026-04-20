@@ -11,49 +11,36 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { useQuery, useUserStore } from '@stackschool/ui';
-import { useTable } from '@/components/school/teacher/table/table-provider';
-import { api } from '@stackschool/shared';
-
-interface TeacherFiltersProps {
-  filters: {
-    classId?: string;
-    specialization?: string;
-    isActive?: boolean;
-    isSupervisor?: boolean;
-  };
-  onChange: (filters: any) => void;
-}
+import {
+  Subject,
+  useGetClassesOptionsQuery,
+  useGetSubjectsOptionsQuery,
+} from '@stackschool/ui';
+import {
+  TeacherFiltersState,
+  useTable,
+} from '@/components/school/teacher/table/table-provider';
 
 export function TeacherFilters() {
-  const { currentSchool } = useUserStore();
   const { filters, setFilters } = useTable();
 
-  const { data } = useQuery({
-    queryKey: ['classes', currentSchool?.id],
-    queryFn: async () => {
-      const res = await api.get(
-        `/api/schools/${currentSchool?.id}/classes?pageIndex=${0}&limit=${100}`,
-      );
-      if (res.data.ok) return res.data.classes;
+  const { data: subjectsData } = useGetSubjectsOptionsQuery({
+    input: {
+      limit: 100,
     },
-    enabled: !!currentSchool?.id,
   });
 
-  // Liste des spécialités (Idéalement chargée depuis le backend ou une constante partagée)
-  const specializations = [
-    'Mathématiques',
-    'Français',
-    'Anglais',
-    'Histoire-Géo',
-    'Physique-Chimie',
-    'SVT',
-    'Philosophie',
-    'EPS',
-    'Informatique',
-  ];
+  const { data: classesData } = useGetClassesOptionsQuery({
+    input: {
+      limit: 100,
+    },
+  });
+  const classes = classesData?.getSchoolClasses.data;
+  const seenSubjects = new Map<string, Subject>();
 
-  const updateFilter = (key: string, value: any) => {
+  const subjects = subjectsData?.getSchoolSubjects?.data;
+
+  const updateFilter = (key: keyof TeacherFiltersState, value: any) => {
     setFilters({ ...filters, [key]: value === 'ALL' ? undefined : value });
   };
 
@@ -79,8 +66,8 @@ export function TeacherFilters() {
           <SelectContent>
             <SelectItem value="ALL">Toutes les classes</SelectItem>
 
-            {data?.map((cls: { id: string; name: string }) => (
-              <SelectItem key={cls.id} value={cls.id}>
+            {classes?.map((cls) => (
+              <SelectItem key={cls.id} value={cls.id!}>
                 {cls.name}
               </SelectItem>
             ))}
@@ -94,17 +81,17 @@ export function TeacherFilters() {
           Matière
         </Label>
         <Select
-          value={filters.specialization || 'ALL'}
-          onValueChange={(val) => updateFilter('specialization', val)}
+          value={filters.subjectId || 'ALL'}
+          onValueChange={(val) => updateFilter('subjectId', val)}
         >
           <SelectTrigger className="w-45 h-8 bg-white">
             <SelectValue placeholder="Toutes les matières" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Toutes les matières</SelectItem>
-            {specializations.map((spec) => (
-              <SelectItem key={spec} value={spec}>
-                {spec}
+            {subjects?.map((sub) => (
+              <SelectItem key={sub?.id} value={sub?.id!}>
+                {sub?.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -155,7 +142,7 @@ export function TeacherFilters() {
           variant="ghost"
           size="sm"
           onClick={clearFilters}
-          className="h-8 px-2 text-muted-foreground hover:text-foreground"
+          className="h-8 px-2 text-muted-foreground hover:text-foreground bg-destructive/30 hover:bg-destructive/50! cursor-pointer transition-colors duration-200"
         >
           <X className="h-4 w-4 mr-1" />
           Effacer

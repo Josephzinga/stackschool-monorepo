@@ -9,9 +9,9 @@ import {
 } from '@tanstack/react-table';
 import { PaginationMeta } from '@stackschool/ui';
 
-interface TeacherFiltersState {
+export interface TeacherFiltersState {
   classId?: string;
-  specialization?: string;
+  subjectId?: string;
   isActive?: boolean;
   isSupervisor?: boolean;
 }

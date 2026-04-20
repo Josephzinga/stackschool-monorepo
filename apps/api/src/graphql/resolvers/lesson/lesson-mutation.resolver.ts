@@ -1,6 +1,6 @@
 import { createServiceError } from '../../../utils/api-errors';
 import { Resolvers } from '../../types.generated';
-import { prisma } from '@stackschool/db';
+import { ClassSubjects, prisma, TeacherAssignment } from '@stackschool/db';
 import { checkRole } from '../../../lib/verify-role';
 import { format, parse } from 'date-fns';
 import { enUS } from 'date-fns/locale';
@@ -10,6 +10,7 @@ import {
   createLessonSchema,
   dayMapping,
   Event,
+  lessonStatusConfig,
   REFERENCE_DATE,
   updateLessonSchema,
 } from '@stackschool/shared';
@@ -37,16 +38,22 @@ export const lessonMutationResolver: Resolvers = {
         );
 
       if (!data) return null;
-      const { startTime, endTime, day, subjectId, teacherId, groupId, mode } =
-        data;
+      const {
+        startTime,
+        endTime,
+        day,
+        subjectId,
+        teacherId,
+        groupId,
+        classId,
+        mode,
+      } = data;
 
       // 1. Vérification des droits et récupération du membre
       const checked = await checkRole({
         context: { userId: user.id, schoolId },
         roles: ['TEACHER', 'ADMIN'],
       });
-
-      console.log('CheckedRole', checked);
 
       if (!checked.success || !checked.member)
         throw createServiceError(
@@ -71,39 +78,61 @@ export const lessonMutationResolver: Resolvers = {
         locale: enUS,
       });
 
-      // 2. Récupérer les infos de l'assignation (pour avoir classId et teacherId)
-      const currentCS = await prisma.classSubjects.findFirst({
+      const currentCS = await prisma.classSubjects.findUnique({
         where: {
-          subjectId,
-          groupId: groupId ?? undefined,
-          teacherId,
+          groupId_subjectId: { groupId: groupId, subjectId },
         },
-        select: { id: true, teacherId: true, groupId: true },
+        include: {
+          assignments: true,
+          subject: {
+            select: {
+              name: true,
+            },
+          },
+          group: {
+            include: {
+              classes: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       if (!currentCS)
         throw createServiceError(
-          'Assignation (matière/classe/prof) introuvable',
+          "Cette matière n'est pas enseigné dans cette Classe. ",
         );
 
-      // 3. VÉRIFICATION DES CONFLITS
+      const assignments = await prisma.teacherAssignment.findUnique({
+        where: {
+          schoolId_classSubjectId_teacherId: {
+            schoolId,
+            classSubjectId: currentCS.id,
+            teacherId,
+          },
+        },
+      });
+      if (!assignments) {
+        throw createServiceError(
+          `Le professeur n'enseigne pas ${currentCS.subject?.name} dans ${currentCS.group?.classes?.[0]?.name}`,
+        );
+      }
+
       const existingLessons = await prisma.lesson.findMany({
         where: {
           schoolId,
           day,
           OR: [
-            { classSubject: { groupId: currentCS.groupId } },
-            { classSubject: { teacherId: currentCS.teacherId } },
-          ],
-        },
-        include: {
-          classSubject: {
-            select: {
-              subjectId: true,
-              groupId: true,
-              teacherId: true,
+            {
+              teacherAssignment: {
+                classSubject: { groupId: currentCS.groupId },
+              },
             },
-          },
+            { teacherAssignmentId: teacherId },
+          ],
         },
       });
 
@@ -131,11 +160,10 @@ export const lessonMutationResolver: Resolvers = {
         );
       }
 
-      // 4. Création
       return prisma.lesson.create({
         data: {
           schoolId,
-          classSubjectId: currentCS.id,
+          teacherAssignmentId: assignments.id,
           startTime: start,
           endTime: end,
           day,
@@ -163,11 +191,6 @@ export const lessonMutationResolver: Resolvers = {
 
       const lesson = await prisma.lesson.findUnique({
         where: { id, schoolId },
-        include: {
-          classSubject: {
-            select: { teacherId: true },
-          },
-        },
       });
 
       if (!lesson) throw createServiceError('Leçon introuvable', 404);
@@ -175,7 +198,7 @@ export const lessonMutationResolver: Resolvers = {
       // Sécurité : Si prof, vérification de la propriété
       if (
         member.role === 'TEACHER' &&
-        lesson.classSubject.teacherId !== member.teacher?.id
+        lesson.teacherAssignmentId !== member.teacher?.id
       ) {
         throw createServiceError(
           "Vous n'êtes pas autorisé à modifier le statut de cette leçon",
@@ -185,12 +208,12 @@ export const lessonMutationResolver: Resolvers = {
 
       if (!canTransition(lesson.status, status)) {
         throw createServiceError(
-          `Transition de statut impossible de ${lesson.status} vers ${status}`,
+          `Transition de statut impossible ${lesson.status} vers ${status}`,
           400,
         );
       }
 
-      return await prisma.lesson.update({
+      return prisma.lesson.update({
         where: { id },
         data: { status },
       });
@@ -211,90 +234,188 @@ export const lessonMutationResolver: Resolvers = {
           errors,
         );
       }
+      try {
+        const checked = await checkRole({
+          context: { schoolId, userId: user.id },
+          roles: ['TEACHER', 'ADMIN'],
+        });
 
-      const checked = await checkRole({
-        context: { schoolId, userId: user.id },
-        roles: ['TEACHER', 'ADMIN'],
-      });
+        if (!checked.success || !checked.member)
+          throw createServiceError(
+            checked.message || 'Permission non accordée.',
+            403,
+          );
+        const member = checked.member;
+        const {
+          id,
+          day,
+          startTime,
+          endTime,
+          subjectId,
+          groupId,
+          teacherId,
+          mode,
+        } = data!;
 
-      if (!checked.success || !checked.member)
-        throw createServiceError(
-          checked.message || 'Permission non accordée.',
-          403,
-        );
-
-      const member = checked.member;
-      const { id, day, startTime, endTime } = data!;
-
-      const lesson = await prisma.lesson.findUnique({
-        where: { id, schoolId },
-        include: {
-          classSubject: {
-            select: { teacherId: true, groupId: true },
-          },
-        },
-      });
-
-      if (!lesson) throw createServiceError('Leçon introuvable', 404);
-
-      // Sécurité : Propriété pour les profs
-      if (
-        member.role === 'TEACHER' &&
-        lesson.classSubject.teacherId !== member.teacher?.id
-      ) {
-        throw createServiceError(
-          "Vous n'êtes pas autorisé à modifier cette leçon",
-          403,
-        );
-      }
-
-      const start = startTime
-        ? parse(
-            `${day || lesson.day} ${startTime}`,
-            'EEEE HH:mm',
-            REFERENCE_DATE,
-            { locale: enUS },
-          )
-        : lesson.startTime;
-      const end = endTime
-        ? parse(
-            `${day || lesson.day} ${endTime}`,
-            'EEEE HH:mm',
-            REFERENCE_DATE,
-            { locale: enUS },
-          )
-        : lesson.endTime;
-
-      // Vérification des conflits si l'heure ou le jour change
-      if (startTime || endTime || day) {
-        const conflict = await prisma.lesson.findFirst({
-          where: {
-            schoolId,
-            id: { not: id },
-            day: day || lesson.day,
-            OR: [
-              { classSubject: { groupId: lesson.classSubject.groupId } },
-              { classSubject: { teacherId: lesson.classSubject.teacherId } },
-            ],
-            startTime: { lt: end },
-            endTime: { gt: start },
+        const lesson = await prisma.lesson.findUnique({
+          where: { id, schoolId },
+          include: {
+            teacherAssignment: {
+              include: {
+                classSubject: {
+                  include: {
+                    subject: {
+                      select: {
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         });
-        if (conflict) {
+
+        if (!lesson) throw createServiceError('Leçon introuvable', 404);
+
+        if (lesson.status !== 'PLANNED') {
           throw createServiceError(
-            'Conflit détecté : la classe ou le professeur est déjà occupé sur ce créneau',
+            `Cette leçon est déjà "${lessonStatusConfig[lesson.status].label.toLocaleUpperCase()}". Vous ne pouvez plus modifier sa ressource ou son horaire.`,
+            400,
           );
         }
-      }
 
-      return await prisma.lesson.update({
-        where: { id },
-        data: {
-          startTime: start,
-          endTime: end,
-          day: (day as any) || lesson.day,
-        },
-      });
+        if (
+          member.role === 'TEACHER' &&
+          lesson.teacherAssignmentId !== member.teacher?.id
+        ) {
+          throw createServiceError(
+            "Vous n'êtes pas autorisé à modifier cette leçon",
+            403,
+          );
+        }
+        const isClassMode = mode === 'CLASS';
+
+        const targetGroupId =
+          groupId || lesson.teacherAssignment.classSubject.groupId;
+        const targetTeacherId = teacherId || lesson.teacherAssignmentId;
+        const targetSubjectId =
+          subjectId || lesson.teacherAssignment.classSubject.subjectId;
+
+        const shouldCheckClassSubject = Boolean(
+          targetGroupId !== lesson.teacherAssignment?.classSubject?.groupId ||
+          targetSubjectId !== lesson.teacherAssignment.classSubject.subjectId,
+        );
+        let currentCS: ClassSubjects | null = {
+          ...lesson.teacherAssignment.classSubject,
+        };
+        if (shouldCheckClassSubject) {
+          currentCS = await prisma.classSubjects.findUnique({
+            where: {
+              groupId_subjectId: {
+                subjectId: targetSubjectId,
+                groupId: targetGroupId,
+              },
+            },
+          });
+        }
+        if (!currentCS) {
+          throw createServiceError(
+            `Cette matière n'est pas enseigné dans cette classe`,
+          );
+        }
+        let assignment: TeacherAssignment | null = {
+          ...lesson.teacherAssignment,
+        };
+        if (targetTeacherId !== lesson.teacherAssignmentId) {
+          assignment = await prisma.teacherAssignment.findUnique({
+            where: {
+              schoolId_classSubjectId_teacherId: {
+                schoolId,
+                classSubjectId: currentCS.id,
+                teacherId: targetTeacherId,
+              },
+            },
+          });
+        }
+        if (!assignment) {
+          throw createServiceError(
+            `Cet professeur n'enseigne pas cette matière`,
+          );
+        }
+
+        const activeDay = day || lesson.day;
+
+        if (startTime || endTime || day) {
+          const existingLessons = await prisma.lesson.findMany({
+            where: {
+              schoolId,
+              day: activeDay,
+              OR: [
+                {
+                  teacherAssignment: {
+                    classSubject: {
+                      groupId: targetGroupId,
+                    },
+                  },
+                },
+                { teacherAssignmentId: targetTeacherId },
+              ],
+            },
+          });
+
+          const hasConflict = checkEventConflicts(
+            {
+              startTime: startTime || format(lesson.startTime, 'HH:mm'),
+              endTime: endTime || format(lesson.endTime, 'HH:mm'),
+              daysOfWeek: [dayMapping[activeDay]],
+            },
+            existingLessons.map((l) => ({
+              id: l.id,
+              startTime: format(l.startTime, 'HH:mm'),
+              endTime: format(l.endTime, 'HH:mm'),
+              daysOfWeek: [dayMapping[l.day]],
+            })),
+            lesson.id,
+          );
+          if (hasConflict) {
+            throw createServiceError(
+              !isClassMode
+                ? `Conflit détecté : la classe est déjà occupé sur ce créneau `
+                : 'Conflit détecté : le professeur est déjà occupé sur ce créneau',
+            );
+          }
+        }
+
+        const start = startTime
+          ? parse(
+              `${day || lesson.day} ${startTime}`,
+              'EEEE HH:mm',
+              REFERENCE_DATE,
+            )
+          : lesson.startTime;
+        const end = endTime
+          ? parse(
+              `${day || lesson.day} ${endTime}`,
+              'EEEE HH:mm',
+              REFERENCE_DATE,
+            )
+          : lesson.endTime;
+        return await prisma.lesson.update({
+          where: { id },
+          data: {
+            startTime: start,
+            endTime: end,
+            day: activeDay,
+            teacherAssignmentId: assignment.id,
+          },
+        });
+      } catch (err: any) {
+        throw createServiceError(
+          err?.message ||
+            'Une erreur est survenue lors de la mise à jour du leçon',
+        );
+      }
     },
 
     deleteLesson: async (_, { id }, { user, schoolId }) => {
@@ -317,7 +438,7 @@ export const lessonMutationResolver: Resolvers = {
       const exist = await prisma.lesson.findUnique({
         where: { id, schoolId },
         include: {
-          classSubject: { select: { teacherId: true } },
+          teacherAssignment: true,
         },
       });
 
@@ -326,7 +447,7 @@ export const lessonMutationResolver: Resolvers = {
       // Sécurité prof
       if (
         member.role === 'TEACHER' &&
-        exist.classSubject.teacherId !== member.teacher?.id
+        exist?.teacherAssignment.teacherId !== member.teacher?.id
       ) {
         throw createServiceError(
           "Vous n'êtes pas autorisé à supprimer cette leçon",

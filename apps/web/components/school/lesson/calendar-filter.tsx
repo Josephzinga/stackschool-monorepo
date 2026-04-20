@@ -21,7 +21,7 @@ import { useLessonStore } from '@/store/lesson-store';
 import { Button } from '@/components/ui/button';
 import { AnimatedButtonGroup } from '@/components/animated-button-group';
 import { LessonStatus, ResourceMode } from '@stackschool/ui';
-import { lessonStatusConfig } from '@/constant';
+import { lessonStatusConfig } from '@stackschool/shared';
 
 export const CalendarFilter = ({
   onModeChange,
@@ -40,7 +40,6 @@ export const CalendarFilter = ({
   } = useLessonFilters();
 
   const {
-    setResourceMode,
     showFilters,
     toggleShowFilters,
     advancedFilters,
@@ -49,20 +48,20 @@ export const CalendarFilter = ({
     resetFilters,
   } = useLessonStore();
 
-  const handleClearInput = (mode: ResourceMode) => {
+  const handleClearInput = () => {
     setSelectedFilter(null);
     resetFilters();
-  };
-  const handleSwitchMode = (mode: ResourceMode) => {
-    setSelectedFilter(null);
-    setResourceMode(mode);
   };
 
   return (
     <div className="flex flex-col gap-3 px-2 py-2">
       {/* Ligne principale : toggles + combobox + bouton filtres */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <AnimatedButtonGroup gap={8} direction="horizontal">
+        <AnimatedButtonGroup
+          gap={8}
+          className="flex justify-between"
+          direction="horizontal"
+        >
           <Button
             className={`px-3  text-sm h-8 rounded-md transition-all duration-200 ${
               resourceMode === 'CLASS'
@@ -85,21 +84,22 @@ export const CalendarFilter = ({
           </Button>
         </AnimatedButtonGroup>
 
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 w-full sm:min-w-50">
           {resourceMode === 'CLASS' ? (
             <Combobox
               items={classData || []}
               onValueChange={(name) => {
                 const found = classData?.find((c) => c.name === name);
-                if (found) setSelectedFilter({ type: 'CLASS', id: found.id });
+                if (found?.id)
+                  setSelectedFilter({ type: 'CLASS', id: found.id });
               }}
               itemToStringValue={(item) => item?.name || ''}
             >
               <ComboboxInput
                 placeholder="Sélectionner une classe"
                 showClear
-                onClear={() => handleClearInput(ResourceMode.Class)}
-                className="max-w-90"
+                onClear={() => handleClearInput()}
+                className=" sm:max-w-90"
               />
               <ComboboxContent>
                 <ComboboxEmpty>Aucune classe</ComboboxEmpty>

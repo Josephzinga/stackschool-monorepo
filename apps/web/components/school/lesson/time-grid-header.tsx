@@ -37,7 +37,7 @@ export function TimeGridHeader({
   hideResourceViewButtons = false,
 }: TimeGridHeaderProps) {
   return (
-    <div className="flex flex-col gap-2 p-2 border-b bg-muted/30 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-2 p-2 border shadow-sm  bg-muted/80 rounded-md mb-2 md:flex-row md:items-center md:justify-between">
       {/* Groupe gauche : navigation */}
       {showNavigation && (
         <div className="flex items-center gap-1">
@@ -77,7 +77,7 @@ export function TimeGridHeader({
       )}
       {/* Groupe droit : boutons de changement de vue */}
       {showViewButtons && (
-        <div className="flex flex-wrap gap-1 justify-center md:justify-end">
+        <div className="flex flex-wrap gap-2 md:gap-3 justify-center md:justify-end">
           <Button
             size="sm"
             variant={

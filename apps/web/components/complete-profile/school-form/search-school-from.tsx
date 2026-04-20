@@ -23,7 +23,7 @@ export const SearchSchoolFrom = () => {
     school: schoolData,
   } = useCompleteProfileStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const searchDebounce = useDebounce(400, searchQuery.trim() || null);
+  const searchDebounce = useDebounce(searchQuery.trim(), 400);
   const [schoolSelected, setSchoolSelected] = useState<SchoolSelected | null>(
     schoolData?.type === 'join' ? schoolData.schoolSelected : null,
   );

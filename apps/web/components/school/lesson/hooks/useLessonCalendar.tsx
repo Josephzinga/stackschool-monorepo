@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo } from 'react';
 import { useLessonStore } from '@/store/lesson-store';
-import { Day, useGetSchoolLessonsQuery } from '@stackschool/ui';
+import { Day, ResourceMode, useGetSchoolLessonsQuery } from '@stackschool/ui';
 import { format } from 'date-fns';
 import { dayMapping } from '@stackschool/shared';
 import { EventInput } from '@fullcalendar/core';
@@ -15,23 +15,35 @@ export const useLessonCalendar = () => {
     setError,
     pagination,
     setPagination,
+    isClassOnly,
   } = useLessonStore();
 
-  const { data, isPending, isError, error } = useGetSchoolLessonsQuery({
-    filter: {
-      groupId:
-        selectedFilter?.type === 'CLASS' ? selectedFilter?.id : undefined,
-      teacherId:
-        selectedFilter?.type === 'TEACHER' ? selectedFilter?.id : undefined,
-      level: advancedFilters.level || undefined,
-      section: advancedFilters.section || undefined,
-      department: advancedFilters.department || undefined,
-      hasLessonOnly: true,
-      limit: pagination?.limit,
-      page: pagination?.page,
-      mode: resourceMode,
+  const { data, isPending, isError, error } = useGetSchoolLessonsQuery(
+    {
+      filter: {
+        classId:
+          isClassOnly && selectedFilter?.type === 'CLASS'
+            ? selectedFilter?.id
+            : undefined,
+        teacherId:
+          selectedFilter?.type === 'TEACHER' ? selectedFilter?.id : undefined,
+        groupId:
+          !isClassOnly && selectedFilter?.type === 'CLASS'
+            ? selectedFilter?.id
+            : undefined,
+        level: advancedFilters.level || undefined,
+        section: advancedFilters.section || undefined,
+        department: advancedFilters.department || undefined,
+        hasLessonOnly: true,
+        limit: pagination?.limit,
+        page: pagination?.page,
+        mode: resourceMode as ResourceMode,
+      },
     },
-  });
+    {
+      enabled: isClassOnly ? !!selectedFilter?.id : true,
+    },
+  );
 
   useEffect(() => {
     if (!data?.getLessons?.meta) return;
@@ -42,10 +54,9 @@ export const useLessonCalendar = () => {
     setLoading(isPending);
   }, [isPending, setLoading]);
 
-  // Mettre à jour l'erreur
   useEffect(() => {
     if (isError) {
-      setError(error?.message || 'Erreur lors du chargements des leçons.');
+      setError(error || 'Erreur lors du chargements des leçons.');
     }
   }, [isError, error, setError]);
 
@@ -70,13 +81,16 @@ export const useLessonCalendar = () => {
         },
       })) || []
     );
-  }, [data, resourceMode]);
+  }, [data]);
 
   const resources = useMemo(() => {
     if (!data?.getLessons?.data.resources) return null;
     return data?.getLessons?.data.resources.map((r) => ({
       id: r.id,
       title: r.title,
+      extendedProps: {
+        weeklyHours: r.weeklyHours,
+      },
     }));
   }, [data?.getLessons?.data]);
 

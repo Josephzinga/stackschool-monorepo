@@ -16,6 +16,15 @@ export const classSubjectAssignmentSchema = z.object({
   subjectIds: z.array(z.cuid()).min(1, 'Au moins une matière est requise'),
 });
 
+export const teacherAssignmentSchema = z.object({
+  classId: z.cuid('Identifiant invalide.').min(2, 'La classe est requise'),
+  subjectIds: z
+    .array(z.cuid('Identifiant invalide.'))
+    .min(1, 'Au moins une matière est requise'),
+  teacherId: z.cuid('Identifiant invalide.').min(1, "L'enseignant est requis"),
+});
+
+export type TeacherAssignmentFormData = z.infer<typeof teacherAssignmentSchema>;
 export type CreateTeacherValues = z.infer<typeof createTeacherSchema>;
 export type ClassSubjectAssignment = z.infer<
   typeof classSubjectAssignmentSchema

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { CreateStudentValues } from '@stackschool/shared';
-import { useGetClassAndSubjectsQuery } from '@stackschool/ui';
+import { useGetClassesOptionsQuery } from '@stackschool/ui';
 import React, { useEffect, useState } from 'react';
 import {
   Popover,
@@ -40,7 +40,11 @@ export function SchoolSection({ mode }: { mode: 'QUICK_ADD' | 'FULL_EDIT' }) {
     data: classesData,
     isError: isGetClassesError,
     error: getClassesError,
-  } = useGetClassAndSubjectsQuery();
+  } = useGetClassesOptionsQuery({
+    input: {
+      limit: 100,
+    },
+  });
 
   useEffect(() => {
     if (isGetClassesError) {
@@ -78,7 +82,7 @@ export function SchoolSection({ mode }: { mode: 'QUICK_ADD' | 'FULL_EDIT' }) {
                   <SelectValue placeholder="Sélectionner une classe" />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
-                  {classesData?.getClassAndSubjects?.map((cls) => (
+                  {classesData?.getSchoolClasses.data?.map((cls) => (
                     <SelectItem key={cls?.id} value={cls?.id!}>
                       {cls?.name} {cls?.level}
                     </SelectItem>

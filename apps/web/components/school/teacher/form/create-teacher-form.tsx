@@ -17,22 +17,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import PhoneInput from 'react-phone-number-input';
 import {
   createTeacherSchema,
   CreateTeacherValues,
-  Gender,
+  GenderEnum,
 } from '@stackschool/shared';
 import 'react-phone-number-input/style.css';
-import { checkField } from '@/lib/check-profile-field';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { useQueryClient } from '@tanstack/react-query';
 import { Controller, FormProvider } from 'react-hook-form';
-import { Mail, User, User2Icon } from 'lucide-react';
+import { ProfileSubForm } from '@/components/school/form/profile-sub-form';
+
+interface EditDefaultValues extends CreateTeacherValues {
+  id: string;
+}
 
 interface CreateTeacherFormProps {
   onSuccess?: () => void;
-  editDefaultValues?: CreateTeacherValues;
+  editDefaultValues?: EditDefaultValues;
 }
 
 export function CreateTeacherForm({
@@ -52,7 +54,6 @@ export function CreateTeacherForm({
       phoneNumber: editDefaultValues?.phoneNumber || '',
       diploma: editDefaultValues?.diploma || '',
       specialization: editDefaultValues?.specialization,
-      classSubjects: editDefaultValues?.classSubjects || [],
     },
   });
 
@@ -80,23 +81,6 @@ export function CreateTeacherForm({
     },
   });
 
-  const verifiedField = async (
-    fieldName: keyof CreateTeacherValues,
-    value: string,
-  ) => {
-    if (!value) return;
-    const safeData = await checkField(fieldName as string, value);
-
-    if (!safeData?.valid) {
-      setError(fieldName, {
-        type: 'onBlur',
-        message: safeData?.message,
-      });
-    } else {
-      clearErrors(fieldName);
-    }
-  };
-
   const isEdit = !!editDefaultValues;
 
   const onSubmit = async (data: CreateTeacherInput) => {
@@ -106,7 +90,7 @@ export function CreateTeacherForm({
           teacherId: editDefaultValues?.id as string,
         })
       : createMutateAsync({
-          data,
+          input: data,
         });
 
     toast.promise(promise, {
@@ -126,66 +110,7 @@ export function CreateTeacherForm({
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Infos de base */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-          <Field>
-            <FieldLabel>Prénom</FieldLabel>
-            <Input {...register('firstname')} placeholder="Jean" icon={User} />
-            <FieldError>{errors.firstname?.message}</FieldError>
-          </Field>
-          <Field>
-            <FieldLabel>Nom</FieldLabel>
-            <Input
-              {...register('lastname')}
-              aria-invalid={!!errors.lastname}
-              placeholder="Dupont"
-              icon={User2Icon}
-            />
-            <FieldError>{errors.lastname?.message}</FieldError>
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-          <Field>
-            <FieldLabel>Email</FieldLabel>
-            <Controller
-              control={control}
-              name="email"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="email"
-                  icon={Mail}
-                  placeholder="jean.dupont@ecole.com"
-                  onBlur={(e) => {
-                    field.onBlur();
-                    verifiedField('email', e.target.value);
-                  }}
-                />
-              )}
-            />
-            <FieldError>{errors.email?.message}</FieldError>
-          </Field>
-
-          <Field>
-            <FieldLabel>Téléphone</FieldLabel>
-            <Controller
-              control={control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <PhoneInput
-                  {...field}
-                  international
-                  defaultCountry="ML"
-                  className="phone-input-custom"
-                  onBlur={() =>
-                    verifiedField('phoneNumber', watch('phoneNumber') || '')
-                  }
-                />
-              )}
-            />
-            <FieldError>{errors.phoneNumber?.message}</FieldError>
-          </Field>
-        </div>
+        <ProfileSubForm />
 
         {/* Diplôme et Spécialité */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
@@ -219,8 +144,8 @@ export function CreateTeacherForm({
                   <SelectValue placeholder="Sélectionnez le genre" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="MALE">Homme</SelectItem>
-                  <SelectItem value="FEMALE">Femme</SelectItem>
+                  <SelectItem value={GenderEnum.Female}>Homme</SelectItem>
+                  <SelectItem value={GenderEnum.Male}>Femme</SelectItem>
                 </SelectContent>
               </Select>
             )}

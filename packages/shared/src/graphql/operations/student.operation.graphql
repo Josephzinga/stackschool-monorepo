@@ -1,5 +1,5 @@
-query GetSchoolStudents($input: GetSchoolStudentsInput!, $schoolId: ID!) {
-  getSchoolStudents(input: $input, schoolId: $schoolId) {
+query GetSchoolStudents($input: GetSchoolStudentsInput!) {
+  getSchoolStudents(input: $input) {
     meta {
       total
       totalPages
@@ -22,8 +22,11 @@ query GetSchoolStudents($input: GetSchoolStudentsInput!, $schoolId: ID!) {
           address
         }
       }
-      parents {
-        id
+      parentStudent {
+        relationType
+        parent {
+          id
+        }
       }
       schoolClass {
         id
@@ -47,7 +50,7 @@ mutation UpdateStudent(
   $schoolId: ID!
 ) {
   updateStudent(studentId: $studentId, data: $data, schoolId: $schoolId) {
-   ...StudentDetails
+    ...StudentDetails
   }
 }
 mutation CreateListStudent($schoolId: ID!, $data: CreateStudentInput!) {
@@ -80,19 +83,21 @@ fragment StudentDetails on Student {
   birthCertificateNumber
   enrollmentDate
   transportMode
-  parents {
-    id
-    profession
-    relationType
-    user {
-      phoneNumber
-      isActive
-      ...UserProfile
-      profile {
-        address
-      }
-    }
-  }
+ parentStudent {
+   relationType
+   parent {
+     id
+     profession
+     user {
+       phoneNumber
+       isActive
+       ...UserProfile
+       profile {
+         address
+       }
+     }
+   }
+ }
   schoolClass {
     id
     name

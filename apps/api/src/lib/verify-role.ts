@@ -1,6 +1,8 @@
 import { prisma } from './prisma';
 import { SchoolRole } from '@stackschool/db';
 import { redisClient } from './redis';
+import { createServiceError } from '../utils/api-errors';
+import { UserInMe } from '@stackschool/shared';
 
 type SchoolUserContext = {
   schoolId: string;
@@ -25,7 +27,9 @@ export const checkRole = async (
       return { success: false, message: 'Contexte manquant' };
     }
 
-    const cacheKey = context ? `membership:${context.schoolId}:${context.userId}` : null;
+    const cacheKey = context
+      ? `membership:${context.schoolId}:${context.userId}`
+      : null;
     let membership: any = null;
 
     // 1. Essayer de récupérer depuis Redis
@@ -49,9 +53,9 @@ export const checkRole = async (
             },
         include: {
           teacher: {
-            select: { id: true } // Inclure l'ID du prof si c'est un enseignant
-          }
-        }
+            select: { id: true }, // Inclure l'ID du prof si c'est un enseignant
+          },
+        },
       });
 
       // 3. Mise en cache
@@ -64,13 +68,13 @@ export const checkRole = async (
           expiration: { type: 'EX', value: 60 }, // Cache négatif 1 min
         });
       }
-    } else if (membership === null) { // Si le cache dit explicitement null
-        return {
-            success: false,
-            message: "Accès refusé : vous n'êtes pas membre de cette école.",
-        };
+    } else if (membership === null) {
+      // Si le cache dit explicitement null
+      return {
+        success: false,
+        message: "Accès refusé : vous n'êtes pas membre de cette école.",
+      };
     }
-
 
     if (!membership) {
       return {
@@ -113,9 +117,19 @@ export const isAdmin = async (
     ...args,
     roles: ['ADMIN'],
   });
-  
+
   return {
     success: result.success,
-    message: result.message
+    message: result.message,
   };
 };
+export function checkUser(user?: UserInMe | null): asserts user is UserInMe {
+  if (!user) throw createServiceError('Non authentifié', 401);
+}
+export function checkSchoolId(
+  schoolId: string | null | undefined,
+): asserts schoolId is string {
+  if (!schoolId) {
+    throw createServiceError("Identifiant de l'établissement manquant", 400);
+  }
+}

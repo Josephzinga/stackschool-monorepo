@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 export default function DataTableSkeleton({
   isLoading,
 }: {
@@ -13,7 +15,10 @@ export default function DataTableSkeleton({
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="h-4 w-25 bg-slate-400 dark:bg-slate-700 rounded-sm"
+              className={cn(
+                'h-3.5 bg-slate-400 dark:bg-slate-700 rounded-sm',
+                i % 2 === 0 ? 'w-25' : 'w-20',
+              )}
             />
           ))}
         </div>

@@ -1,6 +1,13 @@
 import { Day, LessonStatus, PaginationMeta } from '@stackschool/ui';
 import { InitialData } from '@/components/school/lesson/lesson-dialog';
 
+export interface Event {
+  daysOfWeek: number[];
+  startTime: string;
+  endTime: string;
+  id?: string;
+}
+
 export type ResourceMode = 'CLASS' | 'TEACHER';
 export type ViewType =
   | 'resourceTimelineWeek'
@@ -20,14 +27,21 @@ export interface TargetEventDrop {
   start: string;
   end: string;
   day: Day;
+  resourceId: string;
   originalStart?: string;
   originalEnd?: string;
   originalDay?: Day;
+  originalResourceId?: string;
+  subjectId: string;
   revertFunc?: () => void;
 }
 interface Pagination {
   limit: number;
   page: number;
+}
+interface Resource {
+  id: string;
+  title: string;
 }
 export interface LessonState {
   // Vue
@@ -45,6 +59,8 @@ export interface LessonState {
   isLoading: boolean;
   isError: boolean;
   error: any;
+  isClassOnly: boolean;
+  resource: Resource;
 
   // Dialogue de confirmation
   targetEventDrop: TargetEventDrop | null;
@@ -74,6 +90,8 @@ export interface LessonState {
   setLoading: (loading: boolean) => void;
   setError: (error: any) => void;
   clearCalendarData: () => void;
+  setIsClassOnly: (isClassOnly: boolean) => void;
+  setResource: (resource: Resource) => void;
 
   // Actions mutations
   setTargetEventDrop: (drop: TargetEventDrop | null) => void;

@@ -1,14 +1,11 @@
 type Mutation {
   confirmCompleteProfile: UserPayload
   createTeacher(input: CreateTeacherInput): Teacher
-  updateTeacher(
-    teacherId: ID!
-    data: CreateTeacherInput!
-  ): Teacher
-  deleteTeachers(
-    teacherIds: [ID!]!
-    soft: Boolean = true
-  ): ApiResponse
+  createTeacherAssignment(input: CreateTeacherAssignmentInput!): ApiResponse
+  syncTeacherAssignment(input: CreateTeacherAssignmentInput!): ApiResponse
+  deleteTeacherAssignment(id: ID!, subjectIds: [ID!]): ApiResponse
+  updateTeacher(teacherId: ID!, data: CreateTeacherInput!): Teacher
+  deleteTeachers(teacherIds: [ID!]!, soft: Boolean = true): ApiResponse
   deleteStudents(
     studentIds: [ID!]!
     schoolId: ID!
@@ -25,8 +22,8 @@ type Mutation {
   deleteClasses(classIds: [ID!]!, schoolId: ID!): ApiResponse
   createSubject(input: CreateSubjectInput!): Subject
   deleteSubjects(subjectIds: [ID!]!): ApiResponse
-  createClassSubject(input: ClassSubjectInput): ClassSubject!
-  updateClassSubject(input: ClassSubjectInput): ClassSubject!
+  createClassSubject(input: ClassSubjectInput!): ClassSubject!
+  updateClassSubject(input: ClassSubjectInput!): ClassSubject!
   deleteClassSubjects(ids: [ID!]!): ApiResponse
 
   createLesson(input: CreateLessonInput!): Lesson
@@ -38,84 +35,39 @@ type Mutation {
   updateRoom(input: CreateRoomInput!): Room!
   createGroup(input: CreateGroupInput!): Group!
 
-  createParent(input: CreateParentInput): Parent
-}
+  createParent(input: CreateParentInput!): Parent!
 
-type ClassTeacher {
-  schoolId: ID
-  teacher: [Teacher]
-  groups: [Group!]
-  classes: [Class]
+  markStudentAttendance(input: MarkStudentAttendanceInput!): AttendanceRecord!
+  markEmployeeAttendance(input: MarkEmployeeAttendanceInput!): AttendanceRecord!
+  generateAttendanceSession(input: GenerateSessionInput!): AttendanceSessionPayload!
+  registerPresence(sessionId: String!): AttendanceRecord!
 }
 
 type Query {
   searchStudent(filter: StudentSearchInput!): [Student!]
   searchSchool(filter: SchoolSearchInput!): [School!]
-  getClassAndSubjects(filter: StudentSearchInput): [Class]
-  searchClassesAndSubjects(limit: Int! = 10, search: String!): SearchClassesAndSubjects
+  getClassSubjects(
+    classId: ID
+    teacherId: ID
+    groupId: ID
+    searchTerm: String
+  ): [ClassSubject!]
+  getAssignments(filter: GetAssignmentInput!): [TeacherAssignments!]
   me: User
   school(schoolId: ID!): School!
   verifyInvitationCode(code: InvitationCodeInput!): User
   getLessons(filter: GetLessonsInput!): LessonsList
-  getClassTeacher: ClassTeacher
+
   teacher(id: ID!): Teacher
   student(id: ID!): Student
   class(id: ID!): Class
-  getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList!
-  getSchoolStudents(input: GetSchoolStudentsInput!, schoolId: ID!): StudentList!
+  getSchoolTeachers(input: GetSchoolTeachersInput!): TeacherList!
+  getSchoolStudents(input: GetSchoolStudentsInput!): StudentList!
 
   getSchoolClasses(input: GetSchoolClassesInput!): ClassList!
 
   getSchoolSubjects(input: GetSubjectInput!): SubjectList
-  getClassSubjects(classId: ID, teacherId: ID, groupId: ID): [ClassSubject!]
+
   getSchoolRooms(filter: GetSchoolRoomInput!): RoomList!
-  getSchoolParents(filter: GetSchoolParentsInput): ParentList
+  getSchoolParents(filter: GetSchoolParentsInput!): ParentList
 }
-
-input CreateLessonInput {
-  day: Day!
-  mode: ResourceMode!
-  startTime: DateTime!
-  endTime: DateTime!
-  subjectId: ID!
-  teacherId: ID
-  groupId: ID
-}
-
-type ClassAndSubject {
-  classes: [Class!]
-  subjects: [Subject!]
-}
-
-type LessonsData {
-  events: [LessonsEvents!]
-  resources: [LessonResources!]
-}
-type LessonsList {
-  data: LessonsData!
-  meta: PaginationMeta
-}
-type LessonResources {
-  id: ID!
-  title: String!
-}
-type LessonsEvents {
-  id: ID!
-  resourceId: ID
-  title: String!
-  startTime: String!
-  endTime: String!
-  day: Day!
-  status: LessonStatus
-  subject: Subject!
-  group: Group
-  teacher: LessonTeacher
-  room: Room
-}
-
-type LessonTeacher {
-  id: ID!
-  firstname: String!
-  lastname: String!
-}
-

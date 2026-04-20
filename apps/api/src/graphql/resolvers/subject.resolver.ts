@@ -4,6 +4,7 @@ import { prisma, Prisma } from '@stackschool/db';
 import { isAdmin } from '../../lib/verify-role';
 import { safeValidateSchema } from '../../utils/validate-schema.util';
 import { createSubjectForm } from '@stackschool/shared';
+import { getWeeklyHours } from '../../utils/lesson-get-hours';
 
 export const subjectResolver: Resolvers = {
   Query: {
@@ -111,12 +112,22 @@ export const subjectResolver: Resolvers = {
             category: data?.category,
           },
         });
+        const group = await prisma.group.findFirst({
+          where: {
+            classes: {
+              some:{
+                id: data.classId
+              }
+            }
+          }
+        })
         if (data?.classSubject) {
           for (const cls of data?.classSubject) {
             await tx.classSubjects.create({
               data: {
+                schoolId,
                 subjectId: subject?.id,
-                classId: cls?.classId,
+               groupId: '',
                 coefficient: cls?.coefficient,
                 weeklyHours: cls?.weeklyHours,
               },
@@ -168,36 +179,20 @@ export const subjectResolver: Resolvers = {
 
   Subject: {
     classSubject: async (parent) => {
-      return await prisma.classSubjects.findMany({
+      return prisma.classSubjects.findMany({
         where: {
           subjectId: parent.id,
         },
       });
     },
 
-    totalWeeklyHours: async (parent) => {
-      const lessons = await prisma.lesson.findMany({
-        where: {
-          classSubject: {
-            subjectId: parent.id,
-          },
-        },
-      });
-      let totalMinutes = 0;
-      lessons.forEach((l) => {
-        const diffMin = l.endTime.getTime() - l.startTime.getTime();
-        totalMinutes += diffMin / (100 * 60);
-      });
-
-      return parseFloat((totalMinutes / 60).toFixed(1));
+    totalWeeklyHours: async (parent, _args, { loaders }) => {
+      const lessons = await loaders.lessonsBySubjectLoader.load(parent.id);
+      return getWeeklyHours(lessons);
     },
-    mainTeacher: async (parent) => {
+    mainTeacher: async (parent, _args, { loaders }) => {
       if (!parent.mainTeacherId) return null;
-      return await prisma.teacher.findUnique({
-        where: {
-          id: parent.mainTeacherId,
-        },
-      });
+      return await loaders.teacherLoader.load(parent.mainTeacherId);
     },
   },
 };

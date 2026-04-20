@@ -1,7 +1,6 @@
 'use client';
 
 import { Container } from '@/components/Container';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -11,27 +10,25 @@ import {
 } from '@/components/ui/card';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-  authService,
-  parseAxiosError,
-  resetPasswordSchema,
-  ResetPasswordType,
-} from '@stackschool/shared';
+import { resetPasswordSchema, ResetPasswordType } from '@stackschool/shared';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, CheckCircle2, Lock } from 'lucide-react';
+import { CheckCircle2, Lock } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { SubmitButton } from '@/components/submit-button';
+import { HandleFallBack } from '@/app/auth/reset-password/reset-password-view';
+import { onSubmit } from './reset-password-view';
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string; method?: string }>;
+}) {
   const [isSuccess, setIsSuccess] = useState(false);
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get('token');
-  const method = searchParams.get('method');
+
   const {
     register,
     handleSubmit,
@@ -43,42 +40,6 @@ export default function ResetPasswordPage() {
   });
 
   const passwordValue = watch('password');
-
-  const onSubmit = async (data: Omit<ResetPasswordType, 'token'>) => {
-    if (!token) {
-      toast.error('Token de réinitialisation manquant');
-      return;
-    }
-
-    try {
-      const res = await authService.resetPassword(
-        token,
-        data.password,
-        data.confirm,
-      );
-
-      if (res.ok) {
-        setIsSuccess(true);
-        toast.success(
-          res.data?.message || 'Mot de passe réinitialisé avec succès',
-        );
-        // Redirection après 3 secondes
-        setTimeout(() => {
-          router.push('/auth/login');
-        }, 3000);
-      }
-    } catch (error: any) {
-      const { message } = parseAxiosError(error);
-      toast.error(message || 'Erreur lors de la réinitialisation');
-
-      // Si le token est invalide, rediriger vers forgot-password
-      if (error.response?.status === 400) {
-        setTimeout(() => {
-          router.push('/auth/forgot-password');
-        }, 2000);
-      }
-    }
-  };
 
   // Vérification de la force du mot de passe
   const getPasswordStrength = (password: string) => {
@@ -110,27 +71,13 @@ export default function ResetPasswordPage() {
       </Container>
     );
   }
-
-  if (!token && !method && method === 'email') {
+  if (!isSuccess) {
     return (
-      <Container>
-        <Card className="max-w-md w-100! mx-auto text-center bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm">
-          <CardContent className="space-y-4 py-8">
-            <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
-            <h2 className="text-2xl font-bold">Lien invalide</h2>
-            <p>Le lien de réinitialisation est invalide ou a expiré.</p>
-            <Button
-              className="text-white font-semibold"
-              onClick={() => router.push('/auth/forgot-password')}
-            >
-              Demander un nouveau lien
-            </Button>
-          </CardContent>
-        </Card>
-      </Container>
+      <Suspense fallback={''}>
+        <HandleFallBack searchParams={searchParams} />
+      </Suspense>
     );
   }
-
   return (
     <Container>
       <Card className="max-w-md mx-auto w-100! font-poppins">
@@ -142,7 +89,10 @@ export default function ResetPasswordPage() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={handleSubmit((data) => onSubmit?.(data, setIsSuccess))}
+            className="space-y-4"
+          >
             {/* Champ mot de passe */}
             <Field>
               <FieldLabel>Nouveau mot de passe</FieldLabel>

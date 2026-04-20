@@ -33,20 +33,33 @@ export const classMutationResolver: Resolvers = {
           throw createServiceError('Une classe avec ce nom existe déjà', 400);
         }
 
-        const classe = await prisma.class.create({
+        const group = await prisma.group.create({
           data: {
-            name: data.name,
-            level: data.level,
-            section: data.section,
             schoolId,
-            supervisorId: data.supervisorId || undefined,
+            name: data.name,
+            type: 'SOLO',
+            classes: {
+              create: {
+                name: data.name,
+                level: data.level,
+                section: data.section,
+                schoolId,
+                supervisorId: data.supervisorId || undefined,
+              },
+            },
+          },
+          select: {
+            classes: true,
           },
         });
-        console.log('Classe', classe);
-        return classe;
-      } catch (error) {
-        console.error('Erreur création classe:', error);
-        throw createServiceError('Erreur lors de la création', 500, error);
+
+        return group.classes[0];
+      } catch (error: any) {
+        throw createServiceError(
+          error?.message || 'Erreur lors de la création',
+          500,
+          error,
+        );
       }
     },
 
@@ -131,154 +144,6 @@ export const classMutationResolver: Resolvers = {
         console.error('Erreur suppression classes:', error);
         throw createServiceError('Erreur lors de la suppression', 500, error);
       }
-    },
-
-    createClassSubject: async (_, { input }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
-      const classId = input?.classId;
-      const subjectId = input?.subjectId;
-
-      if (!classId || !subjectId) throw createServiceError('Donnée manquat');
-      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
-      if (!checked?.success) {
-        throw createServiceError(
-          checked?.message || 'Permission non accorder',
-          403,
-        );
-      }
-
-      const exist = await prisma.classSubjects.findFirst({
-        where: {
-          subjectId,
-          group: {
-            classes: {
-              some: {
-                id: classId,
-              },
-            },
-          },
-        },
-      });
-
-      if (exist) {
-        throw createServiceError('La matière existe déjà dans cette classe.');
-      }
-      const group = await prisma.group.findFirst({
-        where: {
-          classes: {
-            some: {
-              id: classId,
-            },
-          },
-        },
-      });
-      return await prisma.classSubjects.create({
-        data: {
-          group: {
-            connect: {
-              id: group?.id!,
-            },
-          },
-          subject: {
-            connect: { id: subjectId },
-          },
-          teacher: {
-            connect: {
-              id: input?.teacherId!,
-            },
-          },
-          coefficient: input?.coefficient,
-          weeklyHours: input?.weeklyHours,
-        },
-      });
-    },
-
-    updateClassSubject: async (_, { input }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
-      const id = input?.id;
-      console.log('input \n', input);
-      if (!id)
-        throw createServiceError("l'identifiant de la matière est requis");
-
-      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
-      if (!checked?.success) {
-        throw createServiceError(
-          checked?.message || 'Permission non accorder',
-          403,
-        );
-      }
-      const exist = await prisma.classSubjects.findUnique({
-        where: {
-          id,
-        },
-      });
-
-      if (!exist) {
-        throw createServiceError('Matière introuvable.');
-      }
-      return await prisma.classSubjects.update({
-        where: {
-          id,
-        },
-        data: {
-          teacher: {
-            ...(input?.teacherId
-              ? {
-                  connect: {
-                    id: input?.teacherId ?? undefined,
-                  },
-                }
-              : {
-                  disconnect: {},
-                }),
-          },
-
-          subject: {
-            ...(input?.subjectId && {
-              connect: {
-                id: input?.subjectId ?? undefined,
-              },
-            }),
-          },
-          coefficient: input?.coefficient,
-          weeklyHours: input?.weeklyHours ?? undefined,
-        },
-      });
-    },
-    deleteClassSubjects: async (_, { ids }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
-      const checked = await isAdmin({ context: { userId: user.id, schoolId } });
-      if (!checked?.success) {
-        throw createServiceError(
-          checked?.message || 'Permission non accorder',
-          403,
-        );
-      }
-
-      const classSubjects = await prisma.$transaction(async (tx) => {
-        await tx.lesson.deleteMany({
-          where: {
-            classSubjectId: {
-              in: [...ids],
-            },
-          },
-        });
-        return await tx.classSubjects.deleteMany({
-          where: {
-            id: {
-              in: [...ids],
-            },
-          },
-        });
-      });
-
-      return {
-        ok: true,
-        message: `${classSubjects?.count} supprimer avec succès.`,
-      };
     },
   },
 };

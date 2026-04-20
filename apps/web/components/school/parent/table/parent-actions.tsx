@@ -1,6 +1,6 @@
 'use client';
 
-import { Row } from '@tanstack/react-table';
+import { Row, TableMeta } from '@tanstack/react-table';
 import { ParentColumn } from './column';
 import {
   DropdownMenu,
@@ -14,11 +14,15 @@ import { IconDotsVertical } from '@tabler/icons-react';
 import { useState } from 'react';
 import { AppAlertDialog } from '@/components/app-alert-dialog';
 import { toast } from 'sonner';
-import { useUserStore } from '@stackschool/ui';
 
-export function ParentActions({ row }: { row: Row<ParentColumn> }) {
+export function ParentActions({
+  row,
+  meta,
+}: {
+  row: Row<ParentColumn>;
+  meta: TableMeta<ParentColumn>;
+}) {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const { currentSchool } = useUserStore();
 
   const handleDelete = async () => {
     // Sera implémenté avec la mutation correspondante
@@ -40,10 +44,14 @@ export function ParentActions({ row }: { row: Row<ParentColumn> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem onClick={() => console.log('Edit', row.original.id)}>
+          <DropdownMenuItem
+            onClick={() => console.log('Edit', row.original.id)}
+          >
             Editer
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => console.log('Copy', row.original.id)}>
+          <DropdownMenuItem
+            onClick={() => console.log('Copy', row.original.id)}
+          >
             Copier
           </DropdownMenuItem>
           <DropdownMenuSeparator />

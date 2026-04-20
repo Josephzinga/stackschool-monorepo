@@ -60,7 +60,6 @@ export function DataTableHeader() {
 
     const promise = mutateAsync({
       teacherIds,
-      schoolId: currentSchool.id,
     });
 
     toast.promise(promise, {
@@ -142,18 +141,20 @@ export function DataTableHeader() {
           </div>
         )}
         {/* Dialog d'ajout d'enseignant */}
-        <TeacherDialog open={open} setOpen={setOpen} />
+        {open && <TeacherDialog open={open} setOpen={setOpen} />}
 
-        <AppAlertDialog
-          open={showDeleteAlert}
-          onOpenChange={setShowDeleteAlert}
-          isLoading={isPending}
-          title={` Supprimer ${selectedCount} enseignant ${selectedCount > 1 ? 's' : ''} ?`}
-          description="Cette action est irréversible. Les données associées (cours, notes) seront également supprimées."
-          onConfirm={handleBulkDelete}
-          cancelLabel="Annuler"
-          confirmLabel="Supprimer"
-        />
+        {showDeleteAlert && (
+          <AppAlertDialog
+            open={showDeleteAlert}
+            onOpenChange={setShowDeleteAlert}
+            isLoading={isPending}
+            title={` Supprimer ${selectedCount} enseignant ${selectedCount > 1 ? 's' : ''} ?`}
+            description="Cette action est irréversible. Les données associées (cours, notes) seront également supprimées."
+            onConfirm={handleBulkDelete}
+            cancelLabel="Annuler"
+            confirmLabel="Supprimer"
+          />
+        )}
       </div>
     </div>
   );

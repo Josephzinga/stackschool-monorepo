@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreVertical } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import * as React from 'react';
 
 export type RoomColumns = {
   id: string;
@@ -28,6 +30,28 @@ export type RoomColumns = {
 } | null;
 
 export const columns: ColumnDef<RoomColumns>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        className="cursor-pointer"
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        className="cursor-pointer"
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: 'name',
     header: 'Salle',
@@ -85,7 +109,7 @@ export const columns: ColumnDef<RoomColumns>[] = [
     cell: ({ row, table }) => {
       const meta = table.options.meta;
       return (
-        <div className="flex justify-center items-center">
+        <div className="">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 cursor-pointer p-0">

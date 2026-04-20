@@ -1,120 +1,84 @@
 import { prisma } from '@stackschool/db';
 import { Resolvers } from '../../types.generated';
+import { getWeeklyHours } from '../../../utils/lesson-get-hours';
 
 export const classResolver: Resolvers = {
   Class: {
-    students: async (parent, _args) => {
-      return prisma.student.findMany({
-        where: { classId: parent.id },
-        include: {
-          schoolUser: true,
-        },
-      });
+    students: async (parent, _args, { loaders }) => {
+      return loaders.studentsByClassLoader.load(parent.id);
     },
-    subjects: async (parent) => {
-      return prisma.subject.findMany({
-        where: {
-          classSubjects: {
-            some: {
-              group: {
-                classes: {
-                  some: {
-                    id: parent.id,
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-    },
-    _count: async (parent) => {
-      const student = await prisma.profile.groupBy({
-        by: ['gender'],
-        where: {
-          student: {
-            classId: parent.id,
-          },
-        },
-        _count: {
-          id: true,
-        },
-      });
-      const subjects = await prisma.subject.count({
-        where: {
-          classSubjects: {
-            some: {
-              group: {
-                classes: {
-                  some: {
-                    id: parent.id,
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-      const teachers = await prisma.teacher.count({
-        where: {
-          classSubjects: {
-            some: {
-              group: {
-                classes: {
-                  some: {
-                    id: parent.id,
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
+    _count: async (parent, _args, { loaders }) => {
+      const counts = await loaders.classCountLoader.load(parent.id);
       return {
-        students: {
-          male: student.find((s) => s.gender === 'MALE')?._count.id || 0,
-          female: student.find((s) => s.gender === 'FEMALE')?._count.id || 0,
-        },
-        subjects,
-        teachers,
+        students: counts.students,
+        subjects: counts.subjects,
+        teachers: counts.teachers,
       };
     },
-    supervisor: async (parent) => {
-      const supervisor = await prisma.teacher.findFirst({
-        where: {
-          supervisedClasses: {
-            some: {
-              id: parent.id,
-            },
-          },
-        },
-      });
-      return {
-        ...supervisor,
-        id: supervisor?.id!,
-      };
+    supervisor: async (parent, _args, { loaders }) => {
+      return (await loaders.supervisorByClassLoader.load(parent.id)) || null;
     },
-    lessons: async (parent) => {
-      return prisma.lesson.findMany({
+
+    group: async (parent, _args, { loaders }) => {
+      return (await loaders.groupLoader.load(parent.groupId)) || null;
+    },
+
+    teachingTeamMembers: async (parent) => {
+      const assignments = await prisma.teacherAssignment.findMany({
         where: {
           classSubject: {
-            group: {
-              classes: {
-                some: {
-                  id: parent.id,
-                },
-              },
+            groupId: parent.groupId,
+          },
+        },
+        include: {
+          teacher: {
+            select: {
+              id: true,
+              schoolUserId: true,
             },
+          },
+          classSubject: {
+            include: { subject: true },
           },
         },
       });
+
+      const teamMap = new Map<string, any>();
+
+      assignments.forEach((asm) => {
+        const teacherId = asm.teacherId;
+
+        if (!teamMap.has(teacherId)) {
+          teamMap.set(teacherId, {
+            teacher: asm.teacher,
+            assignments: [],
+          });
+        }
+        teamMap.get(teacherId).assignments.push({
+          subject: asm.classSubject.subject,
+          id: asm.id,
+        });
+      });
+
+      return Array.from(teamMap.values());
     },
-    group: async (parent) => {
-      return await prisma.group.findUnique({
+
+    totalCoefficient: async (parent, _args, { prisma }) => {
+      const total = await prisma.classSubjects.aggregate({
         where: {
-          id: parent.groupId,
+          groupId: parent.groupId,
+        },
+        _sum: {
+          coefficient: true,
         },
       });
+
+      return total._sum.coefficient || 0;
+    },
+
+    totalWeeklyHours: async (parent, _args, { loaders }) => {
+      const lessons = await loaders.lessonsByGroupLoader.load(parent.groupId);
+      return getWeeklyHours(lessons);
     },
   },
 };

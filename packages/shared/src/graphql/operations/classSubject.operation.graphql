@@ -1,0 +1,55 @@
+query GetClassSubjectTable($classId: ID!) {
+  class(id: $classId) {
+    totalWeeklyHours
+    totalCoefficient
+    group {
+      classSubjects {
+        id
+        coefficient
+        weeklyHours
+        subject {
+          id
+          name
+          code
+        }
+        assignment {
+          id
+          teacher {
+            id
+            user {
+              profile {
+                firstname
+                lastname
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query GetClassSubjectsOption($classId: ID!) {
+  getClassSubjects(classId: $classId) {
+    assignment {
+      id
+    }
+    subject {
+      id
+      name
+      code
+    }
+  }
+}
+
+mutation CreateClassSubject($input: ClassSubjectInput!) {
+  createClassSubject(input: $input) {
+    ...SubjectWithTeacher
+  }
+}
+
+mutation UpdateClassSubject($input: ClassSubjectInput!) {
+  updateClassSubject(input: $input) {
+    ...SubjectWithTeacher
+  }
+}

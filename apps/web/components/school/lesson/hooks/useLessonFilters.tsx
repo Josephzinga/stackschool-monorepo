@@ -2,7 +2,10 @@
 import { useMemo } from 'react';
 
 import { useLessonStore } from '@/store/lesson-store';
-import { useGetNavigationDataQuery } from '@stackschool/ui';
+import {
+  useGetClassesOptionsQuery,
+  useGetTeacherOptionsQuery,
+} from '@stackschool/ui';
 
 export const useLessonFilters = () => {
   const {
@@ -13,14 +16,29 @@ export const useLessonFilters = () => {
     setAdvancedFilter,
     clearAdvancedFilters,
   } = useLessonStore();
-  const { data } = useGetNavigationDataQuery();
+  const { data: teachers } = useGetTeacherOptionsQuery(
+    {
+      input: {
+        limit: 100,
+      },
+    },
+    {
+      enabled: resourceMode === 'TEACHER',
+    },
+  );
 
-  const teacherData = data?.getClassTeacher?.teacher;
-  const classData = data?.getClassTeacher?.groups?.map((g) => ({
-    id: g.id,
-    name: g.type === 'SOLO' ? g?.classes[0].name : g.name,
-    level: g.classes?.[0].level,
-    section: g.classes?.[0].section,
+  const { data: classes } = useGetClassesOptionsQuery({
+    input: {
+      limit: 100,
+    },
+  });
+
+  const teacherData = teachers?.getSchoolTeachers.data;
+  const classData = classes?.getSchoolClasses.data?.map((c) => ({
+    id: c?.group?.id,
+    name: c?.group?.type === 'SOLO' ? c?.name : c.group?.name,
+    level: c.level,
+    section: c.section,
   }));
 
   const uniqueLevels = useMemo(() => {

@@ -48,7 +48,10 @@ type ButtonProps = ButtonPrimitiveProps & VariantProps<typeof buttonVariants>;
 function Button({ className, variant, size, ...props }: ButtonProps) {
   return (
     <ButtonPrimitive
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        'cursor-pointer',
+      )}
       {...props}
     />
   );

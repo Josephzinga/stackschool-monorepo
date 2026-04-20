@@ -1,5 +1,5 @@
 'use client';
-import { useGetClassAndSubjectsQuery, useUserStore } from '@stackschool/ui';
+import { useGetClassesOptionsQuery, useUserStore } from '@stackschool/ui';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -19,10 +19,10 @@ export default function StudentFilter() {
   const { filters, setFilters } = useTable();
   const { currentSchool } = useUserStore();
 
-  const { data } = useGetClassAndSubjectsQuery(
+  const { data } = useGetClassesOptionsQuery(
     {
       input: {
-        schoolId: currentSchool?.id!,
+        limit: 100,
       },
     },
     {
@@ -30,7 +30,7 @@ export default function StudentFilter() {
     },
   );
 
-  const classes = data?.getClassAndSubjects;
+  const classes = data?.getSchoolClasses.data;
 
   const hasActiveFilters = Object.keys(filters).some((v) => v !== undefined);
 

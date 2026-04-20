@@ -47,7 +47,7 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
   const { setRoleData, school, setCurrentStep, role } =
     useCompleteProfileStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedQuery = useDebounce(400, searchQuery);
+  const debouncedQuery = useDebounce(searchQuery, 400);
   const parentData = role?.role === 'PARENT' ? role.parent : null;
 
   const [childToConfigure, setChildToConfigure] = useState<Student | null>(

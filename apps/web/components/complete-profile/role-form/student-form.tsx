@@ -13,7 +13,7 @@ import {
   Controller,
   useCompleteProfileStore,
   useForm,
-  useGetClassAndSubjectsQuery,
+  useGetClassesOptionsQuery,
   zodResolver,
 } from '@stackschool/ui';
 import {
@@ -75,10 +75,10 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
 
   const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;
 
-  const { data, error, isError } = useGetClassAndSubjectsQuery(
+  const { data, error, isError } = useGetClassesOptionsQuery(
     {
       input: {
-        schoolId: schoolId as string,
+        limit: 100,
       },
     },
     {

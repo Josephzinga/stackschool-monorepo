@@ -23,21 +23,6 @@ export const studentResolver: Resolvers = {
         },
       });
     },
-    parents: async (parent, _, { schoolId }) => {
-      const parentStudent = await prisma.parentStudent.findMany({
-        where: {
-          studentId: parent.id,
-        },
-        include: {
-          parent: true,
-        },
-      });
-
-      return parentStudent.map((ps) => ({
-        ...ps,
-        ...ps.parent,
-      }));
-    },
   },
 
   Parent: {

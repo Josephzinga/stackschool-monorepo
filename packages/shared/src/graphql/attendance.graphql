@@ -1,0 +1,42 @@
+enum AttendanceStatus {
+    PRESENT
+    ABSENT
+    LATE
+    EXCUSED
+}
+
+input MarkStudentAttendanceInput {
+    studentId: String!
+    status: AttendanceStatus!
+    date: Date   # optionnel, par défaut aujourd'hui
+}
+
+input MarkEmployeeAttendanceInput {
+    schoolUserId: String!
+    status: AttendanceStatus!
+    date: Date
+}
+
+input GenerateSessionInput {
+    targetRole: String!   # TEACHER ou STAFF
+    durationMinutes: Int  # par défaut 10
+}
+
+type AttendanceSessionPayload {
+    sessionId: String!
+    qrCodeDataUrl: String!
+    secretCode: String!
+    expiresAt: DateTime!
+}
+
+type AttendanceRecord {
+    id: String
+    person: Person   # union ou interface
+    status: AttendanceStatus
+    date: DateTime
+    checkInTime: DateTime
+    recordedBy: User
+}
+union Person = Student | Teacher | Staff
+
+

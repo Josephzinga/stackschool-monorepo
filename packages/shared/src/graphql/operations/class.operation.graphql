@@ -20,14 +20,31 @@ fragment ClassListFragment on Class {
     id
     user {
       id
-      email
-      username
-      phoneNumber
       profile {
         id
         lastname
         firstname
         photo
+      }
+    }
+  }
+  group {
+    classSubjects {
+      subject {
+        id
+        name
+        code
+      }
+      assignment {
+        teacher {
+          id
+          user {
+            profile {
+              lastname
+              firstname
+            }
+          }
+        }
       }
     }
   }
@@ -47,6 +64,8 @@ query GetClassDetails($id: ID!) {
     name
     level
     section
+    totalCoefficient
+    totalWeeklyHours
     group {
       id
       type
@@ -74,66 +93,68 @@ query GetClassDetails($id: ID!) {
   }
 }
 
-query GetClassStudents($classid: ID!) {
-  class(id: $classid) {
-    students {
-      id
-      matricule
-      user {
-        profile {
-          firstname
-          lastname
-          photo
-          gender
-        }
-      }
+query GetClassStudents($input: GetSchoolStudentsInput!) {
+  getSchoolStudents(input: $input ) {
+    meta {
+      page
+      totalPages
+      total
+      limit
     }
+   data {
+     id
+     matricule
+     status
+     studentNumber
+     user {
+       profile {
+         firstname
+         lastname
+         photo
+         gender
+       }
+     }
+   }
   }
 }
 
-query GetClassSubjectTable($classId: ID!) {
+query getTeachersTeam($classId: ID!) {
   class(id: $classId) {
-    group {
-      classSubjects {
+    id
+    teachingTeamMembers {
+      teacher {
         id
-        coefficient
-        weeklyHours
+        user {
+          profile {
+            firstname
+            lastname
+            photo
+          }
+        }
+      }
+      assignments {
+        id
         subject {
           id
           name
           code
         }
-        teacher {
-          id
-          user {
-            profile {
-              firstname
-              lastname
-            }
-          }
-        }
       }
     }
   }
 }
 
-query GetTeachersTeam($id: ID!) {
-  class(id: $id) {
-    group {
-      classSubjects {
-        ...SubjectWithTeacher
-      }
-    }
-  }
-}
 fragment SubjectWithTeacher on ClassSubject {
   id
   coefficient
   weeklyHours
-  teacher {
+  assignment {
     id
-    user {
-      ...UserProfile
+    teacher {
+      id
+      user {
+        ...UserProfile
+      }
     }
   }
   subject {
@@ -157,19 +178,7 @@ mutation CreateClass($data: CreateClassInput!) {
     ...ClassListFragment
   }
 }
-query GetClassAndSubjects($input: StudentSearchInput) {
-  getClassAndSubjects(filter: $input) {
-    id
-    name
-    level
-    section
-    subjects {
-      id
-      name
-      code
-    }
-  }
-}
+
 query GetClassesOptions($input: GetSchoolClassesInput!) {
   getSchoolClasses(input: $input) {
     data {
@@ -177,10 +186,14 @@ query GetClassesOptions($input: GetSchoolClassesInput!) {
       level
       name
       section
+      group {
+        id
+        name
+        type
+      }
     }
   }
 }
-
 
 mutation UpdateClass($classId: ID!, $data: CreateClassInput!, $schoolId: ID!) {
   updateClass(classId: $classId, data: $data, schoolId: $schoolId) {
@@ -193,18 +206,6 @@ mutation DeleteClasses($classIds: [ID!]!, $schoolId: ID!) {
   deleteClasses(classIds: $classIds, schoolId: $schoolId) {
     ok
     message
-  }
-}
-
-mutation CreateClassSubject($input: ClassSubjectInput) {
-  createClassSubject(input: $input) {
-    ...SubjectWithTeacher
-  }
-}
-
-mutation UpdateClassSubject($input: ClassSubjectInput) {
-  updateClassSubject(input: $input) {
-    ...SubjectWithTeacher
   }
 }
 

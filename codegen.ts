@@ -23,6 +23,9 @@ const config: CodegenConfig = {
             '@stackschool/db/src/prisma/client/generated#TransportMode',
           SubjectCategory:
             '@stackschool/db/src/prisma/client/generated#SubjectCategory',
+          RelationType:
+            '@stackschool/db/src/prisma/client/generated#RelationType',
+          GroupType: '@stackschool/db/src/prisma/client/generated#GroupType',
         },
       },
     },
@@ -34,9 +37,10 @@ const config: CodegenConfig = {
         'typescript-react-query',
       ],
       config: {
-        scalar: {
+        scalars: {
           SchoolId: 'string',
           DateTime: 'Date',
+          Date: 'Date',
         },
         skipTypename: false,
         reactQueryVersion: 5,

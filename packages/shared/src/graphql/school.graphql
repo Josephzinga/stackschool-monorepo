@@ -13,7 +13,7 @@ type Student {
   medicalCondition: String
   allergies: String
 
-  transportMode:  TransportMode
+  transportMode: TransportMode
   previousSchool: String
   enrollmentYear: String!
   status: StudentStatus
@@ -23,7 +23,7 @@ type Student {
   classId: ID
   profileId: ID
   profile: Profile
-  parents: [Parent]
+  parentStudent: [ParentStudent]
   user: User
 }
 
@@ -34,30 +34,6 @@ type StudentDisciplinaryAction {
   reason: String
   startDate: DateTime
   endDate: DateTime
-}
-enum DisciplinaryType {
-  SUSPENSION
-  EXPULSION
-  WARNING
-}
-enum StudentStatus {
-  ACTIVE
-  SUSPENDED
-  EXPELLED
-  TRANSFERRED
-  DROPPED_OUT
-  GRADUATED
-  INACTIVE
-  DECEASED
-}
-enum Day {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
 }
 
 type School {
@@ -71,7 +47,6 @@ type School {
   settings: SchoolSettings
   teachers: [Teacher]
   lessons: [Lesson]
-
 }
 
 type SchoolSettings {
@@ -110,20 +85,26 @@ type ClassSubject {
   teacherId: ID
   subjectId: ID
   groupId: ID!
-  subject: Subject
-  teacher: Teacher
-  group: Group
-  lessons: [Lesson!]
+  subject: Subject!
+  assignment: TeacherAssignments
+  group: Group!
   assessments: [Assessment!]
 }
 type Parent {
   id: ID!
   profession: String
   isDelegate: Boolean
-  students: [Student]
-  relationType: String
+  parentStudent: [ParentStudent]
   schoolUserId: ID
   user: User
+}
+
+type ParentStudent {
+  relationType: RelationType
+  student: Student
+  studentId: ID
+  parentId: ID
+  parent: Parent
 }
 type Assessment {
   id: ID!
@@ -139,17 +120,25 @@ type Lesson {
   startTime: DateTime
   endTime: DateTime
   day: Day
-  classSubject: ClassSubject
+  teacherAssignmentId: ID!
+  teacherAssignment: TeacherAssignments
   status: LessonStatus!
   room: Room
 }
-
-enum LessonStatus {
-  PLANNED
-  ONGOING
-  COMPLETED
-  CANCELLED
-  POSTPONED
+type ClassTeacher {
+  schoolId: ID
+  teacher: [Teacher]
+  groups: [Group!]
+  classes: [Class]
+}
+type TeacherAssignments {
+  id: ID!
+  teacher: Teacher
+  teacherId: ID!
+  classSubjectId: ID!
+  classSubjects: ClassSubject
+  lessons: [Lesson!]
+  schoolId: ID
 }
 type Teacher {
   id: ID!
@@ -162,8 +151,7 @@ type Teacher {
   salary: Float
   department: String
   specialization: String
-  lessons: [Lesson]
-  classSubjects: [ClassSubject]
+  assignments: [TeacherAssignments]
   supervisedClasses: [Class]
   createdAt: DateTime
   updatedAt: DateTime
@@ -182,21 +170,30 @@ type Staff {
   departement: String
 }
 
+type TeachingTeamMember {
+  teacher: Teacher!
+  assignments: [SubjectAssignments!]!
+}
+type SubjectAssignments {
+  id: ID!
+  subject: Subject!
+}
 type Class {
   id: ID!
   name: String!
   level: String!
   section: String
-  subjects: [Subject]
-  lessons: [Lesson]
   students: [Student!]
   defaultRoom: Room
   groupId: ID!
   group: Group
+  teachingTeamMembers: [TeachingTeamMember!]
   supervisor: Teacher
-  teachers: [Teacher]
   _count: ClassCount
+  totalCoefficient: Int
+  totalWeeklyHours: Float
 }
+
 enum GroupType {
   SOLO
   MULTIPLE
@@ -271,21 +268,6 @@ type SchoolStats {
   classesOccupancy: [ClassStats!]
 }
 
-enum SortOrder {
-  ASC
-  DESC
-}
-enum StudentSortField {
-  firstname
-  lastname
-  enrolementYear
-}
-
-enum SubjectSortField {
-  coefficient
-  name
-  ponderation
-}
 input StudentSortInput {
   field: StudentSortField
   order: SortOrder
@@ -335,32 +317,6 @@ input ClassSubjectInput {
   subjectId: ID!
   coefficient: Int!
   weeklyHours: Float
-}
-
-input GetSchoolTeachersInput {
-  page: Int! = 0
-  limit: Int! = 10
-  searchTerm: String
-
-  classId: ID
-  specialization: String
-  isActive: Boolean
-  isSupervisor: Boolean
-}
-input GetSchoolClassesInput {
-  page: Int! = 0
-  limit: Int! = 10
-  level: String
-  section: String
-  teacherId: String
-  searchTerm: String
-}
-input GetSchoolRoomInput {
-  page: Int! = 0
-  limit: Int! = 10
-  classId: String
-  teacherId: String
-  searchTerm: String
 }
 
 type RoomList {

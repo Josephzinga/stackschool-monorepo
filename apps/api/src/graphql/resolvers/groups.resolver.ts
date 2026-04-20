@@ -1,7 +1,7 @@
 import { Resolvers } from '../types.generated';
 import { prisma } from '@stackschool/db';
 import { createServiceError } from '../../utils/api-errors';
-import { isAdmin } from '../../lib/verify-role';
+import { checkSchoolId, checkUser, isAdmin } from '../../lib/verify-role';
 
 export const groupResolver: Resolvers = {
   Mutation: {
@@ -10,9 +10,8 @@ export const groupResolver: Resolvers = {
       { input: { name, classIds } },
       { user, schoolId },
     ) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId) throw createServiceError('Identifiant manquant');
-
+      checkUser(user);
+      checkSchoolId(schoolId);
       const adminCheck = await isAdmin({
         context: { schoolId, userId: user.id },
       });
@@ -35,22 +34,11 @@ export const groupResolver: Resolvers = {
     },
   },
   Group: {
-    classSubjects: async (parent) => {
-      const classSubjects = await prisma.classSubjects.findMany({
-        where: {
-          group: {
-            id: parent.id,
-          },
-        },
-      });
-      return classSubjects;
+    classSubjects: async (parent, _args, { loaders }) => {
+      return await loaders.classSubjectByGroupLoader.load(parent.id);
     },
-    classes: async (parent) => {
-      return prisma.class.findMany({
-        where: {
-          groupId: parent.id,
-        },
-      });
+    classes: async (parent, _args, { loaders }) => {
+      return await loaders.classByGroupLoader.load(parent.id);
     },
   },
 };

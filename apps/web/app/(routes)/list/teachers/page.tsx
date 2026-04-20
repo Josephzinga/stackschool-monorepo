@@ -57,13 +57,19 @@ function TeachersView() {
         specialization: t.specialization ? [t.specialization] : [],
         gender: t?.user?.profile?.gender as Gender,
         diploma: t?.diploma ?? '',
-        classes: t.classSubjects?.map((cls) => cls?.group?.classes || []) || [],
-        subjects: t?.classSubjects?.map((cls) => cls?.subject) || [],
+        assignments:
+          t.assignments?.flatMap((ass) =>
+            ass?.classSubjects?.group?.classes?.map((c) => ({
+              class: c,
+              subject: ass?.classSubjects?.subject ?? undefined,
+            })),
+          ) ?? [],
         status: t.isActive || false,
+        weeklyHours: t?.weeklyHours ?? 0,
       })) || [],
     [data],
   );
-  console.log(teacherData);
+
   const meta = data?.getSchoolTeachers.meta;
 
   return (

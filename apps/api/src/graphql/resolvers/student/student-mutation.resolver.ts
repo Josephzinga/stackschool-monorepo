@@ -1,13 +1,12 @@
 import { createServiceError } from '../../../utils/api-errors';
 import { safeValidateSchema } from '../../../utils/validate-schema.util';
 import { createStudentSchema, RelationType } from '@stackschool/shared';
-import { isAdmin } from '../../../lib/verify-role';
-import { prisma } from '@stackschool/db';
+import { checkSchoolId, checkUser, isAdmin } from '../../../lib/verify-role';
 import { Resolvers } from '../../types.generated';
 
 export const studentMutationResolver: Resolvers = {
   Mutation: {
-    createListStudent: async (_, { data }, { schoolId, user }) => {
+    createListStudent: async (_, { data }, { schoolId, user, prisma }) => {
       try {
         if (!user || !user.id) {
           throw createServiceError('Non authentifier', 401);
@@ -110,11 +109,11 @@ export const studentMutationResolver: Resolvers = {
     },
     updateStudent: async (
       _,
-      { studentId, data: studentData, schoolId },
-      context,
+      { studentId, data: studentData },
+      { prisma, user, schoolId },
     ) => {
-      if (!context.user) throw createServiceError('Non authentifié', 401);
-
+      checkSchoolId(schoolId);
+      checkUser(user);
       const { success, data, errors } = safeValidateSchema(
         createStudentSchema,
         studentData,
@@ -128,7 +127,7 @@ export const studentMutationResolver: Resolvers = {
         );
 
       const adminCheck = await isAdmin({
-        context: { schoolId, userId: context.user.id },
+        context: { schoolId, userId: user.id },
       });
 
       if (!adminCheck?.success) {
@@ -175,6 +174,7 @@ export const studentMutationResolver: Resolvers = {
           status,
           email,
         } = data!;
+        console.log('data', data);
 
         return await prisma.$transaction(async (tx) => {
           await tx.user.update({
@@ -182,6 +182,7 @@ export const studentMutationResolver: Resolvers = {
             data: {
               email,
               phoneNumber,
+              isActive,
               profile: {
                 update: {
                   firstname,
@@ -250,17 +251,18 @@ export const studentMutationResolver: Resolvers = {
           return await tx.student.update({
             where: { id: studentId },
             data: {
-              matricule: matricule,
-              classId: classId,
+              matricule,
+              classId,
               enrollmentYear: enrollmentYear ?? '',
-              birthDate: birthDate,
-              birthPlace: birthPlace,
-              nationality: nationality,
-              bloodGroup: bloodGroup,
-              allergies: allergies,
+              birthDate,
+              birthPlace,
+              nationality,
+              bloodGroup,
+              allergies,
               birthCertificateNumber: birthCertificateNumber,
-              previousSchool: previousSchool,
-              previousClass: previousClass,
+              medicalCondition,
+              previousSchool,
+              previousClass,
               enrollmentDate: enrollmentDate
                 ? new Date(enrollmentDate)
                 : undefined,

@@ -1,6 +1,6 @@
 'use client';
 import { Row } from '@tanstack/react-table';
-import { Teacher } from './columns';
+import { TeacherColumns } from '@/components/school/teacher/table/columns';
 import { useDeleteTeachersMutation, useUserStore } from '@stackschool/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { TeacherDialog } from '@/components/school/teacher/table/teacher-dialog';
 import { AppAlertDialog } from '@/components/app-alert-dialog';
 
-export function TeacherTableActions({ row }: { row: Row<Teacher> }) {
+export function TeacherTableActions({ row }: { row: Row<TeacherColumns> }) {
   const teacherId = row.original.id;
   const { currentSchool } = useUserStore();
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
@@ -38,7 +38,6 @@ export function TeacherTableActions({ row }: { row: Row<Teacher> }) {
 
     const promise = mutateAsync({
       teacherIds: [teacherId] as Array<string>,
-      schoolId: currentSchool?.id!,
     });
 
     toast.promise(promise, {
@@ -90,22 +89,25 @@ export function TeacherTableActions({ row }: { row: Row<Teacher> }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AppAlertDialog
-        open={openDeleteAlert}
-        onOpenChange={setOpenDeleteAlert}
-        isLoading={isPending}
-        title="Êtes-vous absolument sûr ?"
-        description="Cette action est irréversible. Elle supprimera définitivement ce professeur et toutes les données associées de l'école."
-        onConfirm={handleDelete}
-        cancelLabel="Annuler"
-        confirmLabel="Supprimer"
-      />
-
-      <TeacherDialog
-        open={openEditDialog}
-        setOpen={setOpenEditDialog}
-        defaultValues={row.original}
-      />
+      {openDeleteAlert && (
+        <AppAlertDialog
+          open={openDeleteAlert}
+          onOpenChange={setOpenDeleteAlert}
+          isLoading={isPending}
+          title="Êtes-vous absolument sûr ?"
+          description="Cette action est irréversible. Elle supprimera définitivement ce professeur et toutes les données associées de l'école."
+          onConfirm={handleDelete}
+          cancelLabel="Annuler"
+          confirmLabel="Supprimer"
+        />
+      )}
+      {openEditDialog && (
+        <TeacherDialog
+          open={openEditDialog}
+          setOpen={setOpenEditDialog}
+          defaultValues={row.original}
+        />
+      )}
     </>
   );
 }

@@ -1,18 +1,14 @@
 import { prisma, Prisma } from '@stackschool/db';
 import { Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
-import { checkRole } from '../../../lib/verify-role';
+import { checkRole, checkSchoolId, checkUser } from '../../../lib/verify-role';
 
 export const teacherQueryResolver: Resolvers = {
   Query: {
     getSchoolTeachers: async (_, { input }, { user, schoolId }) => {
       try {
-        if (!user) throw createServiceError('Non authentifié', 401);
-        if (!schoolId)
-          throw createServiceError(
-            "Identifiant de l'établissement est manquant",
-            400,
-          );
+        checkUser(user);
+        checkSchoolId(schoolId);
 
         if (!input) {
           throw createServiceError('Données manquantes', 400);
@@ -23,7 +19,7 @@ export const teacherQueryResolver: Resolvers = {
           limit = 10,
           searchTerm,
           classId,
-          specialization,
+          subjectId,
           isActive,
           isSupervisor,
         } = input;
@@ -41,10 +37,13 @@ export const teacherQueryResolver: Resolvers = {
           whereClause.isActive = isActive;
         }
 
-        if (specialization) {
-          whereClause.specialization = {
-            contains: specialization,
-            mode: 'insensitive',
+        if (subjectId) {
+          whereClause.assignments = {
+            some: {
+              classSubject: {
+                subjectId,
+              },
+            },
           };
         }
 
@@ -61,12 +60,14 @@ export const teacherQueryResolver: Resolvers = {
           whereClause.OR = [
             { supervisedClasses: { some: { id: classId } } },
             {
-              classSubjects: {
+              assignments: {
                 some: {
-                  group: {
-                    classes: {
-                      some: {
-                        id: classId,
+                  classSubject: {
+                    group: {
+                      classes: {
+                        some: {
+                          id: classId,
+                        },
                       },
                     },
                   },

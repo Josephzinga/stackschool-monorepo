@@ -27,7 +27,6 @@ export function StudentDialog({
   const { data, isPending } = useGetStudentDetailsQuery(
     {
       id: studentId!,
-      schoolId: currentSchool?.id!,
     },
     {
       enabled: open && !!studentId && !!currentSchool?.id,
@@ -36,7 +35,7 @@ export function StudentDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-150 font-poppins max-h-[80vh] md:max-h-[90vh] overflow-y-auto bg-accent/70 backdrop-blur-2xl">
+      <DialogContent className="sm:max-w-150 font-poppins max-h-[80vh] md:max-h-[90vh]">
         {studentId && isPending ? (
           <div className="flex justify-center items-center min-h-60 h-full">
             <LoaderCircleIcon className="text-primary h-15 w-15 animate-spin" />

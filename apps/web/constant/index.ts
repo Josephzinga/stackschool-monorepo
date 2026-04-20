@@ -1,4 +1,5 @@
 import { SubjectCategory, TransportMode } from '@stackschool/ui';
+import { Calendar, Check, Clock, Play, X } from 'lucide-react';
 
 export const studentStatusLabel = {
   ACTIVE: 'Actif',
@@ -10,36 +11,37 @@ export const studentStatusLabel = {
   INACTIVE: 'Inactif',
   DECEASED: 'Décédé',
 };
+
 export const lessonStatusConfig = {
   PLANNED: {
     label: 'Planifiée',
     badgeClass: 'bg-blue-100 text-blue-800',
     eventClass: 'border-blue-400 bg-blue-50',
-    icon: 'calendar', // ou composant icône
+    icon: Calendar, // ou composant icône
   },
   ONGOING: {
     label: 'En cours',
-    badgeClass: 'bg-green-100 text-green-800',
+    badgeClass: 'bg-green-100 text-green-900',
     eventClass: 'border-green-400 bg-green-50',
-    icon: 'play',
+    icon: Play,
   },
   COMPLETED: {
     label: 'Terminée',
     badgeClass: 'bg-emerald-100 text-emerald-800',
     eventClass: 'border-emerald-400 bg-emerald-50',
-    icon: 'check',
+    icon: Check,
   },
   CANCELLED: {
     label: 'Annulée',
     badgeClass: 'bg-red-100 text-red-800',
     eventClass: 'border-red-400 bg-red-50 line-through',
-    icon: 'x',
+    icon: X,
   },
   POSTPONED: {
     label: 'Reportée',
     badgeClass: 'bg-orange-100 text-orange-800',
     eventClass: 'border-orange-400 bg-orange-50',
-    icon: 'clock',
+    icon: Clock,
   },
 } as const;
 

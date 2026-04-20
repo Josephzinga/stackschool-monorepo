@@ -6,14 +6,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   GetClassSubjectTableQuery,
   GetSubjectsOptionsQuery,
-  GetTeachersQuery,
+  GetTeacherOptionsQuery,
   useCreateClassSubjectMutation,
   useGetSubjectsOptionsQuery,
-  useGetTeachersQuery,
+  useGetTeacherOptionsQuery,
   useUpdateClassSubjectMutation,
 } from '@stackschool/ui';
 import { Controller, useForm } from 'react-hook-form';
@@ -28,26 +28,48 @@ import {
   createClassSubjectSchema,
 } from '@stackschool/shared';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from '@/components/ui/combobox';
+import { cn } from '@/lib/utils';
 
+export interface InitialValues {
+  id: string;
+  classId?: string;
+  coefficient?: number | null;
+  weeklyHours?: number | null;
+  subjectId?: string;
+  teacherId?: string;
+}
+
+interface CreateClassSubjectFormProps {
+  classId?: string;
+  initialValues?: InitialValues;
+  onSuccess?: () => void;
+}
 export function CreateClassSubjectForm({
   classId,
   initialValues,
   onSuccess,
-}: {
-  classId?: string;
-  initialValues?: CreateClassSubjectFormData;
-  onSuccess?: () => void;
-}) {
+}: CreateClassSubjectFormProps) {
+  const isEdit = !!initialValues?.id;
   const {
     handleSubmit,
     control,
+    setError,
+    clearErrors,
     register,
     formState: { errors, isDirty },
   } = useForm<CreateClassSubjectFormData>({
     resolver: zodResolver(createClassSubjectSchema),
     mode: 'onBlur',
     defaultValues: {
-      id: initialValues?.id,
+      id: initialValues?.id ?? '',
       classId: initialValues?.classId || classId!,
       coefficient: initialValues?.coefficient || 1,
       weeklyHours: initialValues?.weeklyHours || 2,
@@ -56,10 +78,9 @@ export function CreateClassSubjectForm({
     },
   });
 
-  const isEdit = !!initialValues?.id;
   const queryClient = useQueryClient();
 
-  const { data: schoolTeachers } = useGetTeachersQuery({
+  const { data: teachersData } = useGetTeacherOptionsQuery({
     input: {
       limit: 100,
     },
@@ -69,6 +90,14 @@ export function CreateClassSubjectForm({
       limit: 100,
     },
   });
+
+  const teachers =
+    teachersData?.getSchoolTeachers?.data.map((t) => ({
+      id: t.id,
+      firstname: t.user?.profile?.firstname,
+      lastname: t.user?.profile?.lastname,
+    })) || [];
+
   const queryKey = ['GetClassSubjectTable', { classId }];
   const tableData: GetClassSubjectTableQuery | undefined =
     queryClient.getQueryData(queryKey);
@@ -83,11 +112,22 @@ export function CreateClassSubjectForm({
       ),
     [schoolSubjects, tableData, isEdit],
   );
+
+  useEffect(() => {
+    if (filteredSubject && filteredSubject.length <= 0) {
+      setError('subjectId', {
+        message:
+          "Tous les matière de l'établissements sont déjà assigné dans cette classe.",
+      });
+    } else {
+      clearErrors('subjectId');
+    }
+  }, []);
   const { mutateAsync: createMutate } = useCreateClassSubjectMutation({
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey });
 
-      const teachersList: GetTeachersQuery | undefined =
+      const teachersList: GetTeacherOptionsQuery | undefined =
         queryClient.getQueryData([
           'GetSubjectsOptions',
           { input: { limit: 100 } },
@@ -174,7 +214,7 @@ export function CreateClassSubjectForm({
   const { mutateAsync: updateMutate } = useUpdateClassSubjectMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ['GetClassSubjectTable'],
+        queryKey: ['GetClassSubjectTable', 'getTeachersTeam'],
       });
       onSuccess?.();
     },
@@ -189,9 +229,11 @@ export function CreateClassSubjectForm({
           input: data,
         });
 
+    console.log('DAta', data);
+
     toast.promise(promise, {
       loading: isEdit ? 'Modification en cours...' : 'Ajout en cours...',
-      success: (data) => {
+      success: (data: any) => {
         return isEdit
           ? `Modification reussi avec succès`
           : `Matière ajouter avec succès`;
@@ -209,29 +251,52 @@ export function CreateClassSubjectForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+    <form
+      onSubmit={handleSubmit(onSubmit, (err) => {
+        console.log('Erreur', err);
+      })}
+      className="flex flex-col gap-2"
+    >
       <GridForm>
         <Field>
-          <FieldLabel>Professeur</FieldLabel>
+          <FieldLabel>Enseignant</FieldLabel>
           <Controller
             control={control}
             name="teacherId"
-            render={({ field: { onChange, value } }) => (
-              <Select onValueChange={onChange} value={value}>
-                <SelectTrigger className="h-10!">
-                  <SelectValue placeholder="Selectionner un professeur" />
-                </SelectTrigger>
-                <SelectContent>
-                  {schoolTeachers?.getSchoolTeachers?.data?.map((teacher) => (
-                    <SelectItem value={teacher?.id!}>
-                      <span className="text-sm font-sans">
-                        {teacher?.user?.profile?.firstname}{' '}
-                        {teacher?.user?.profile?.lastname}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            render={({ field }) => (
+              <Combobox
+                items={teachers}
+                disabled={!!initialValues?.teacherId}
+                value={field.value}
+                onValueChange={field.onChange}
+                itemToStringLabel={(itemValue) => {
+                  const teacher = teachers.find((t) => t.id === itemValue);
+                  return teacher
+                    ? `${teacher.firstname} ${teacher.lastname}`
+                    : '';
+                }}
+              >
+                <ComboboxInput
+                  aria-invalid={!!errors.teacherId}
+                  disabled={!!initialValues?.teacherId}
+                  showClear
+                  placeholder="Sélectionner un enseignant"
+                  className={cn(
+                    'h-10!',
+                    !!initialValues?.teacherId && 'hover:cursor-not-allowed',
+                  )}
+                />
+                <ComboboxContent className="z-50">
+                  <ComboboxEmpty>Aucun enseignant trouvé</ComboboxEmpty>
+                  <ComboboxList>
+                    {(item) => (
+                      <ComboboxItem key={item.id} value={item.id}>
+                        {item.firstname} {item.lastname}
+                      </ComboboxItem>
+                    )}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
             )}
           />
           <FieldError>{errors.teacherId?.message}</FieldError>
@@ -243,7 +308,7 @@ export function CreateClassSubjectForm({
             name="subjectId"
             render={({ field: { onChange, value } }) => (
               <Select onValueChange={onChange} value={value}>
-                <SelectTrigger className="h-10!">
+                <SelectTrigger disabled={isEdit} className="h-10!">
                   <SelectValue placeholder="Selectionner la matière" />
                 </SelectTrigger>
                 <SelectContent>
@@ -259,6 +324,7 @@ export function CreateClassSubjectForm({
               </Select>
             )}
           />
+
           <FieldError>{errors.subjectId?.message}</FieldError>
         </Field>
       </GridForm>

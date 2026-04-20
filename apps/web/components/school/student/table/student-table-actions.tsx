@@ -83,21 +83,25 @@ export function StudentTableActions({ row }: { row: Row<StudentColumns> }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <StudentDialog
-        open={openDialog}
-        setOpen={setOpenDialog}
-        studentId={row.original.id?.toString()}
-      />
-      <AppAlertDialog
-        open={openDeleteDialog}
-        onOpenChange={setOpenDeleteDialog}
-        title={'Êtes-vous absolument sûr ?'}
-        description="Cette action est irréversible. Elle supprimera définitivement cet élève et toutes les données associées de l'école."
-        onConfirm={handleDelete}
-        isLoading={isPending}
-        confirmLabel="Supprimer"
-        variant="destructive"
-      />
+      {openDialog && (
+        <StudentDialog
+          open={openDialog}
+          setOpen={setOpenDialog}
+          studentId={row.original.id?.toString()}
+        />
+      )}
+      {openDeleteDialog && (
+        <AppAlertDialog
+          open={openDeleteDialog}
+          onOpenChange={setOpenDeleteDialog}
+          title={'Êtes-vous absolument sûr ?'}
+          description="Cette action est irréversible. Elle supprimera définitivement cet élève et toutes les données associées de l'école."
+          onConfirm={handleDelete}
+          isLoading={isPending}
+          confirmLabel="Supprimer"
+          variant="destructive"
+        />
+      )}
     </div>
   );
 }

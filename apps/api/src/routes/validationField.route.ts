@@ -18,10 +18,10 @@ router.get('/user-field', isAuthenticated, async (req, res) => {
       });
     }
 
-    const { email, phoneNumber } = parseResult.data;
+    const { email, phoneNumber, selfCheck = true } = parseResult.data;
 
     // check email uniqueness
-    if (email && user?.email !== email) {
+    if (selfCheck ? email && user?.email !== email : email) {
       const existingUser = await prisma.user.findUnique({ where: { email } });
 
       if (existingUser) {
@@ -35,13 +35,15 @@ router.get('/user-field', isAuthenticated, async (req, res) => {
     }
 
     if (
-      phoneNumber &&
-      user?.phoneNumber?.replace(/\s+/g, '') !==
-        phoneNumber?.replace(/\s+/g, '')
+      selfCheck
+        ? phoneNumber &&
+          user?.phoneNumber?.replace(/\s+/g, '') !==
+            phoneNumber?.replace(/\s+/g, '')
+        : phoneNumber
     ) {
       const existingUser = await prisma.user.findUnique({
         where: {
-          phoneNumber: phoneNumber.replace(/\s+/g, ''),
+          phoneNumber: phoneNumber?.replace(/\s+/g, ''),
         },
       });
 

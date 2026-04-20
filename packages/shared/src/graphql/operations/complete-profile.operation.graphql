@@ -25,19 +25,7 @@ query SearchSchool($input: SchoolSearchInput!) {
   }
 }
 
-query GetClassAndSubjects($input: StudentSearchInput) {
-  getClassAndSubjects(filter: $input) {
-    id
-    name
-    level
-    section
-    subjects {
-      id
-      name
-      code
-    }
-  }
-}
+
 
 mutation ConfirmCompleteProfile {
   confirmCompleteProfile {
@@ -106,17 +94,19 @@ query GetDashboardContext($input: SchoolId!) {
       parent {
         id
         isDelegate
-        students {
-          id
-          user {
-            id
-            profile {
-              lastname
-              firstname
-              photo
-            }
-          }
-          matricule
+        parentStudent{
+         student {
+           id
+           user {
+             id
+             profile {
+               lastname
+               firstname
+               photo
+             }
+           }
+           matricule
+         }
         }
       }
       student {

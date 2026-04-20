@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import {
   useCreateRoomMutation,
-  useGetSchoolClassesOptionsQuery,
+  useGetClassesOptionsQuery,
   useUpdateRoomMutation,
 } from '@stackschool/ui';
 import { Button } from '@/components/ui/button';
@@ -50,7 +50,11 @@ export function RoomForm({
   const isEdit = !!initialValues;
 
   const queryClient = useQueryClient();
-  const { data } = useGetSchoolClassesOptionsQuery();
+  const { data } = useGetClassesOptionsQuery({
+    input: {
+      limit: 100,
+    },
+  });
   const { mutateAsync: createMutate } = useCreateRoomMutation({
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['GetSchoolRoom'] });
@@ -144,7 +148,7 @@ export function RoomForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {data?.getClassAndSubjects?.map((cls) => (
+                {data?.getSchoolClasses.data?.map((cls) => (
                   <SelectItem value={cls?.id!} key={cls?.id}>
                     {cls?.name} ({cls?.level})
                   </SelectItem>

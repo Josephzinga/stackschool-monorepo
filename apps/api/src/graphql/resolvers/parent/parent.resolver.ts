@@ -3,30 +3,46 @@ import { prisma } from '@stackschool/db';
 
 export const parentResolver: Resolvers = {
   Parent: {
-    students: async (parent) => {
-      const students = await prisma.student.findMany({
+    parentStudent: async (parent) =>
+      prisma.parentStudent.findMany({
         where: {
-          parentStudent: {
+          parentId: parent.id,
+        },
+      }),
+
+    user: async (parent, _, { schoolId }) => {
+      if (!parent.schoolUserId) return null;
+      const user = await prisma.user.findFirst({
+        where: {
+          memberships: {
             some: {
-              parentId: parent.id,
+              schoolId: schoolId ?? undefined,
+              id: parent.schoolUserId,
             },
           },
         },
       });
-      return students;
+      return user;
     },
-    user: async (parent) => {
-      if (!parent?.schoolUserId) return null;
-      const schoolUser = await prisma.schoolUser.findUnique({
+  },
+
+  ParentStudent: {
+    student: async (parent) => {
+      if (!parent.studentId) return null;
+      return prisma.student.findUnique({
         where: {
-          id: parent.schoolUserId,
-        },
-        include: {
-          user: true,
+          id: parent.studentId,
         },
       });
+    },
+    parent: async (parent) => {
+      if (!parent.parentId) return null;
 
-      return schoolUser?.user;
+      return prisma.parent.findUnique({
+        where: {
+          id: parent.parentId,
+        },
+      });
     },
   },
 };

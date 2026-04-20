@@ -6,6 +6,7 @@ declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     openEdit: (data: TData) => void;
     openDelete: (data: TData) => void;
+    openAdd?: (data: TData) => void;
   }
 }
 export interface DataTableProps<TData, TValue> {

@@ -1,3 +1,4 @@
+'use client';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useMemo, useState } from 'react';
@@ -11,7 +12,7 @@ import {
   useCompleteProfileStore,
   useFieldArray,
   useForm,
-  useGetClassAndSubjectsQuery,
+  useGetClassesOptionsQuery,
   zodResolver,
 } from '@stackschool/ui';
 import { Button } from '@/components/ui/button';
@@ -63,18 +64,17 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
     },
   });
 
-  const { data, isLoading } = useGetClassAndSubjectsQuery(
+  const { data: classes, isLoading } = useGetClassesOptionsQuery(
     {
       input: {
         searchTerm: debouncedSearch,
-        schoolId: schoolId as string,
       },
     },
     {
       enabled: !!schoolId && debouncedSearch?.length! >= 2,
     },
   );
-
+  const classesData = classes?.getSchoolClasses.data;
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'assignments',
@@ -117,11 +117,11 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
   };
 
   const filteredResults = useMemo(() => {
-    if (!data?.getClassAndSubjects) return [];
-    return data.getClassAndSubjects.filter(
+    if (!classesData) return [];
+    return classesData.filter(
       (cls) => !fields?.some((assignment) => assignment.classId === cls?.id),
     );
-  }, [data?.getClassAndSubjects, fields]);
+  }, [classesData, fields]);
 
   const onSubmit = async (data: TeacherFormData) => {
     try {

@@ -45,14 +45,21 @@ query GetSubjectsOptions($input: GetSubjectInput!) {
 }
 
 query GetClassSubjectOptions($classId: ID, $teacherId: ID, $groupId: ID) {
-  getClassSubjects(classId: $classId, teacherId: $teacherId, groupId: $groupId) {
+  getClassSubjects(
+    classId: $classId
+    teacherId: $teacherId
+    groupId: $groupId
+  ) {
     id
-    teacher {
+    assignment {
       id
-      user {
-        profile {
-          firstname
-          lastname
+      teacher {
+        id
+        user {
+          profile {
+            firstname
+            lastname
+          }
         }
       }
     }
@@ -93,10 +100,13 @@ mutation CreateSubject($input: CreateSubjectInput!) {
           level
         }
       }
-      teacher {
+      assignment {
         id
-        user {
-          ...UserProfile
+        teacher {
+          id
+          user {
+            ...UserProfile
+          }
         }
       }
     }

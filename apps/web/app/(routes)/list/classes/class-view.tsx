@@ -2,11 +2,12 @@
 
 import { useGetSchoolClassesQuery } from '@stackschool/ui';
 import { DataTable } from '@/components/school/class/table/data-table'; // À créer ou adapter
-import { columns } from '@/components/school/class/table/columns';
+import { ClassData, columns } from '@/components/school/class/table/columns';
 import { useDebounce } from '@/hooks/useDebounce';
 import DataTableHeader from '@/components/school/class/table/data-table-header';
 import { useClassTable } from '@/components/school/class/table/table-provider';
 import { useSearchParams } from 'next/navigation';
+import { useMemo } from 'react';
 
 export function ClassView() {
   const { searchTerm, pagination, setPagination, filters } = useClassTable();
@@ -25,28 +26,37 @@ export function ClassView() {
     },
   });
 
-  const classesData =
-    data?.getSchoolClasses?.data?.map((c) => ({
-      ...c,
-      supervisor: {
-        id: c.supervisor?.user?.id,
-        email: c.supervisor?.user?.email ?? null,
-        username: c.supervisor?.user?.username ?? '',
-        phoneNumber: c.supervisor?.user?.phoneNumber ?? '',
-        profile: {
-          id: c.supervisor?.user?.profile?.id,
-          firstname: c.supervisor?.user?.profile?.firstname ?? '',
-          lastname: c.supervisor?.user?.profile?.lastname ?? '',
-          photo: c.supervisor?.user?.profile?.photo ?? undefined,
+  const classesData: ClassData[] = useMemo(
+    () =>
+      data?.getSchoolClasses?.data?.map((c) => ({
+        ...c,
+        supervisor: {
+          id: c.supervisor?.user?.id,
+          profile: {
+            id: c.supervisor?.user?.profile?.id,
+            firstname: c.supervisor?.user?.profile?.firstname ?? '',
+            lastname: c.supervisor?.user?.profile?.lastname ?? '',
+            photo: c.supervisor?.user?.profile?.photo ?? undefined,
+          },
         },
-      },
-      _count: {
-        students:
-          (c?._count?.students?.male || 0) + (c?._count?.students?.female || 0),
-        subjects: c._count?.subjects || 0,
-        teachers: c._count?.teachers || 0,
-      },
-    })) || [];
+        teachers:
+          c.teachers?.map((t) => ({
+            id: t?.id ?? '',
+            firstname: t?.user?.profile?.firstname ?? '',
+            lastname: t?.user?.profile?.lastname ?? '',
+          })) || [],
+        subjects: c.subjects,
+        _count: {
+          students:
+            (c?._count?.students?.male || 0) +
+            (c?._count?.students?.female || 0),
+          subjects: c._count?.subjects || 0,
+          teachers: c._count?.teachers || 0,
+        },
+      })) || [],
+    [data],
+  );
+
   const meta = data?.getSchoolClasses.meta;
 
   return (

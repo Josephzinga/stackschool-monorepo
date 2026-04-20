@@ -10,7 +10,7 @@ query GetSchoolTeachers($input: GetSchoolTeachersInput!) {
     }
   }
 }
-query GetTeachers($input: GetSchoolTeachersInput) {
+query GetTeacherOptions($input: GetSchoolTeachersInput!) {
   getSchoolTeachers(input: $input) {
     data {
       id
@@ -26,6 +26,7 @@ query GetTeachers($input: GetSchoolTeachersInput) {
 
 query GetTeacherSchedule($id: ID!) {
   teacher(id: $id) {
+    assignments {
       classSubjects {
         group {
           id
@@ -40,15 +41,15 @@ query GetTeacherSchedule($id: ID!) {
           id
           name
         }
-        lessons {
-          id
-          endTime
-          startTime
-          status
-         day
-        }
       }
-
+      lessons {
+        id
+        endTime
+        startTime
+        status
+        day
+      }
+    }
   }
 }
 
@@ -77,22 +78,24 @@ query GetTeacherDetails($id: ID!) {
         address
       }
     }
-    classSubjects {
-      id
-      group {
+    assignments {
+      classSubjects {
         id
-        type
-        name
-        classes {
+        group {
+          id
+          type
+          name
+          classes {
+            id
+            name
+            level
+          }
+        }
+        subject {
           id
           name
-          level
+          code
         }
-      }
-      subject {
-        id
-        name
-        code
       }
     }
   }
@@ -110,7 +113,21 @@ mutation CreateTeacher($input: CreateTeacherInput!) {
     ...TeacherListData
   }
 }
+mutation CreateTeacherAssignment($input: CreateTeacherAssignmentInput!) {
+  createTeacherAssignment(input: $input) {
+    ok
+    message
+    details
+  }
+}
 
+mutation SyncTeacherAssignment($input: CreateTeacherAssignmentInput!){
+  syncTeacherAssignment(input: $input ) {
+    ok
+    message
+    details
+  }
+}
 fragment TeacherListData on Teacher {
   id
   schoolUserId
@@ -135,28 +152,25 @@ fragment TeacherListData on Teacher {
       gender
     }
   }
-  classSubjects {
-    group {
-      type
-      classes {
+  assignments {
+    classSubjects {
+      group {
+        type
+        classes {
+          id
+          name
+        }
+      }
+      subject {
         id
         name
       }
-
-    }
-    subject {
-      id
-      name
     }
   }
-
 }
 
-mutation UpdateTeacher(
-  $teacherId: ID!
-  $data: CreateTeacherInput!
-) {
-  updateTeacher( teacherId: $teacherId, data: $data) {
-   ...TeacherListData
+mutation UpdateTeacher($teacherId: ID!, $data: CreateTeacherInput!) {
+  updateTeacher(teacherId: $teacherId, data: $data) {
+    ...TeacherListData
   }
 }

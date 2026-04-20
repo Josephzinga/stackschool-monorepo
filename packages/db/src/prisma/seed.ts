@@ -15,10 +15,10 @@ import {
 } from 'date-fns';
 
 // ID de l'école cible
-const TARGET_SCHOOL_ID = 'cmn5r3fdb00020vnvff8qo4yz';
+const TARGET_SCHOOL_ID = 'cmnygyyr60000lpqp97pebqtb';
 
 const START_HOUR = 8;
-const END_HOUR = 16;
+const END_HOUR = 17;
 const DAYS: Day[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
 const LESSON_DURATION = 50; // minutes
 const BREAK_START = 12;
@@ -58,6 +58,8 @@ async function main() {
   await prisma.lesson.deleteMany();
   await prisma.student.deleteMany();
   await prisma.class.deleteMany();
+  await prisma.classSubjects.deleteMany();
+  await prisma.group.deleteMany();
   await prisma.subject.deleteMany();
   await prisma.teacher.deleteMany();
 
@@ -131,6 +133,7 @@ async function main() {
   ];
 
   const classes = [];
+  let assignments: any[] = [];
   let groupIndex = 1;
   for (const clsData of classesList) {
     const supervisor = teachers[Math.floor(Math.random() * teachers.length)];
@@ -140,10 +143,13 @@ async function main() {
         name: `Group-${groupIndex}`,
         classSubjects: {
           create: subjects.map((s) => ({
+            schoolId,
             subjectId: s.id,
-            teacherId: teachers.find((t) => t.subjectId === s.id)?.id,
           })),
         },
+      },
+      include: {
+        classSubjects: true,
       },
     });
     const cls = await prisma.class.create({
@@ -165,8 +171,25 @@ async function main() {
     groupIndex++;
     classes.push(cls);
   }
-  console.log(`🎓 ${classes.length} classes créées.`);
 
+  let teacherIndex = 0;
+  for (const classe of classes) {
+    const randomClassSubject =
+      classe.group.classSubjects[
+        Math.floor(Math.random() * classe.group.classSubjects.length)
+      ];
+    const assignment = await prisma.teacherAssignment.create({
+      data: {
+        schoolId,
+        teacherId: teachers[Math.floor(Math.random() * teachers.length)]?.id,
+        classSubjectId: randomClassSubject.id,
+      },
+    });
+    assignments.push(assignment);
+    teacherIndex++;
+  }
+  console.log(`🎓 ${classes.length} classes créées.`);
+  console.log(`${assignments?.length}  crée avec succés.`);
   // 6. Création des Élèves
   const createdStudents = [];
   for (const cls of classes) {
@@ -215,21 +238,8 @@ async function main() {
   // 7. Génération de l'Emploi du Temps
   console.log("📅 Génération de l'emploi du temps...");
   const lessonsCreated: any[] = [];
-  for (const cls of classes) {
-    const firstGroup = cls.group;
 
-    if (!firstGroup) {
-      console.log(`⚠️ La classe ${cls.name} n'a pas de groupe associé.`);
-      continue;
-    }
-
-    const availableSubjects = firstGroup.classSubjects;
-
-    if (availableSubjects.length === 0) {
-      console.log(`⚠️ Pas de matières pour la classe ${cls.name}, saut...`);
-      continue;
-    }
-
+  for (const assignment of assignments) {
     for (const dayEnum of DAYS) {
       let currentHour = START_HOUR;
       let currentMinute = 0;
@@ -250,13 +260,11 @@ async function main() {
         const endTime = addMinutes(startTime, isDoubleLesson ? 120 : 60);
 
         // 2. Choisir une matière au hasard parmis celles du GROUPE
-        const randomClassSubject =
-          availableSubjects[
-            Math.floor(Math.random() * availableSubjects.length)
-          ];
 
+        let lesson: any = {};
         // 3. Créer la leçon liée au ClassSubjectId
-        const lesson = await prisma.lesson.create({
+
+        lesson = await prisma.lesson.create({
           data: {
             title: `Cours de ...`, // Tu peux récupérer le nom de la matière via un find si besoin
             day: dayEnum,
@@ -264,7 +272,7 @@ async function main() {
             endTime,
             schoolId,
             // C'est ici que le lien se fait avec la nouvelle structure
-            classSubjectId: randomClassSubject.id,
+            teacherAssignmentId: assignment?.id,
           },
         });
 

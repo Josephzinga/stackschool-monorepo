@@ -30,6 +30,11 @@ export const useLessonStore = create<LessonState>()(
       alertOpen: false,
       lessonDialogOpen: false,
       selectedLessonData: undefined,
+      isClassOnly: false,
+      resource: {
+        id: '',
+        name: '',
+      },
 
       setCurrentView: (view) => set({ currentView: view }),
 
@@ -44,7 +49,10 @@ export const useLessonStore = create<LessonState>()(
             status: 'ALL',
           },
         }),
-
+      setIsClassOnly: (isClassOnly: boolean) => {
+        return set({ isClassOnly: isClassOnly });
+      },
+      setResource: (resource) => set({ resource }),
       setSelectedFilter: (filter) => set({ selectedFilter: filter }),
 
       setAdvancedFilter: (key, value) =>

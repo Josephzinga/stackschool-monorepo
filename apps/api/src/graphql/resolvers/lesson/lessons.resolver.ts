@@ -1,9 +1,12 @@
 import { Resolvers } from '../../types.generated';
 import { prisma } from '@stackschool/db';
+import { createServiceError } from '../../../utils/api-errors';
 
 export const lessonsResolver: Resolvers = {
   ClassTeacher: {
     teacher: async (parent, _, { schoolId }) => {
+      if (!schoolId)
+        throw createServiceError("Identifiant de l'établissement manquant");
       const teachers = await prisma.teacher.findMany({
         where: {
           schoolUser: {
@@ -14,14 +17,18 @@ export const lessonsResolver: Resolvers = {
       return teachers;
     },
     classes: async (parent, _, { schoolId }) => {
-      return await prisma.class.findMany({
+      if (!schoolId)
+        throw createServiceError("Identifiant de l'établissement manquant");
+      return prisma.class.findMany({
         where: {
           schoolId,
         },
       });
     },
     groups: async (parent, _, { schoolId }) => {
-      return await prisma.group.findMany({
+      if (!schoolId)
+        throw createServiceError("Identifiant de l'établissement manquant");
+      return prisma.group.findMany({
         where: {
           schoolId,
         },
@@ -29,9 +36,12 @@ export const lessonsResolver: Resolvers = {
     },
   },
   Lesson: {
-    classSubject: async (parent) => {
-      const classSubject = await prisma.classSubjects.findFirst({
+    teacherAssignment: async (parent, _, { schoolId }) => {
+      if (!schoolId)
+        throw createServiceError("Identifiant de l'établissement manquant");
+      return prisma.teacherAssignment.findFirst({
         where: {
+          schoolId,
           lessons: {
             some: {
               id: parent.id,
@@ -39,7 +49,6 @@ export const lessonsResolver: Resolvers = {
           },
         },
       });
-      return classSubject;
     },
   },
 };

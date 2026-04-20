@@ -1,10 +1,5 @@
 'use client';
 
-import { SectionCards } from '@/components/section-cards';
-import { ChartAreaInteractive } from '@/components/chart-area-interactive';
-import { DataTable } from '@/components/data-table';
-import data from '@/app/dashboard/data.json';
-
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -51,7 +46,7 @@ export default function TeacherDashboard() {
               <ChartAreaInteractive />
             </div>
             <DataTable data={data} />
-        
+
           */}
           </div>
         </div>

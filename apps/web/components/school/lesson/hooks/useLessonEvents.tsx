@@ -14,26 +14,26 @@ import { EventResizeDoneArg } from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
 import { checkEventConflicts } from '@/lib/lesson-calendar';
 import { useLessonCalendar } from '@/components/school/lesson/hooks/useLessonCalendar';
+import { Event } from '@/types/lessons-types';
 
 export const useLessonEvents = () => {
   const calendarRef = useRef<FullCalendar | null>(null);
 
   const {
-    setCurrentView,
     setTargetEventDrop,
     setAlertOpen,
     setLessonDialogOpen,
     setSelectedLessonData,
-    currentView,
-    setResourceMode,
-    resourceMode,
-    setSelectedFilter,
+    resource,
+    setResource,
+    selectedFilter,
   } = useLessonStore();
-  const { events } = useLessonCalendar();
+  const { events, resources } = useLessonCalendar();
 
   const updateMutate = useUpdateLessonMutation();
   const createMutate = useCreateLessonMutation();
-  const handleCalendarMount = useCallback((calendar: any) => {
+
+  const handleCalendarMount = useCallback((calendar: FullCalendar) => {
     calendarRef.current = calendar;
   }, []);
 
@@ -54,7 +54,7 @@ export const useLessonEvents = () => {
       };
 
       // Filtrer les événements existants par ressource
-      const relevantEvents = events.filter(
+      const relevantEvents: Event[] = events.filter(
         (event) => event.resourceId === resourceId,
       );
 
@@ -80,11 +80,24 @@ export const useLessonEvents = () => {
         toast.error('Veuillez sélectionner une ressource');
         return;
       }
+      if (
+        !args.resource &&
+        resources &&
+        resources[0]?.id === selectedFilter?.id
+      ) {
+        setResource({ id: selectedFilter?.id, title: resources[0].title });
+      }
 
       setSelectedLessonData({ mode: 'CREATE', args });
       setLessonDialogOpen(true);
     },
-    [setSelectedLessonData, setLessonDialogOpen],
+    [
+      setSelectedLessonData,
+      setLessonDialogOpen,
+      selectedFilter,
+      setResource,
+      resources,
+    ],
   );
 
   const handleEventDrop = useCallback(
@@ -94,7 +107,8 @@ export const useLessonEvents = () => {
       const newEnd = event.end;
 
       if (!newStart || !newEnd) return;
-
+      const resourceId = event.getResources()?.[0]?.id || resource.id;
+      const subjectId = event.extendedProps?.subject?.id;
       // Vérifier les conflits avec la date réelle
       const hasConflict = checkConflicts(
         event.id,
@@ -104,8 +118,10 @@ export const useLessonEvents = () => {
       );
 
       if (hasConflict) {
-        revert(); // Annuler le déplacement visuel
-        toast.error('Ce créneau est déjà occupé par un autre cours');
+        revert();
+        toast.error('Ce créneau est déjà occupé par un autre cours', {
+          toasterId: 'dashboard',
+        });
         return;
       }
 
@@ -123,6 +139,8 @@ export const useLessonEvents = () => {
         start: format(newStart, 'HH:mm'),
         end: format(newEnd, 'HH:mm'),
         day: newDay,
+        resourceId,
+        subjectId,
         originalStart: format(oldEvent.start!, 'HH:mm'),
         originalEnd: format(oldEvent.end!, 'HH:mm'),
         originalDay: oldDay,
@@ -133,9 +151,6 @@ export const useLessonEvents = () => {
     [checkConflicts, setTargetEventDrop, setAlertOpen],
   );
 
-  // Handler pour le resize
-
-  // Handler pour le resize
   const handleEventResize = useCallback(
     (info: EventResizeDoneArg) => {
       const { event, oldEvent, revert } = info;
@@ -151,18 +166,21 @@ export const useLessonEvents = () => {
         toast.error("La durée minimum d'un cours est de 30 minutes");
         return;
       }
-
+      const resourceId = event.getResources()?.[0]?.id;
+      const subjectId = event.extendedProps?.subject?.id;
       // Vérifier les conflits
       const hasConflict = checkConflicts(
         event.id,
         newStart,
         newEnd,
-        event.getResources()[0]?.id,
+        resourceId,
       );
 
       if (hasConflict) {
         revert();
-        toast.error('Ce créneau est déjà occupé par un autre cours');
+        toast.error('Ce créneau est déjà occupé par un autre cours', {
+          toasterId: 'dashboard',
+        });
         return;
       }
 
@@ -176,6 +194,8 @@ export const useLessonEvents = () => {
         start: format(newStart, 'HH:mm'),
         end: format(newEnd, 'HH:mm'),
         day: newDay,
+        resourceId,
+        subjectId,
         originalStart: format(oldEvent.start!, 'HH:mm'),
         originalEnd: format(oldEvent.end!, 'HH:mm'),
         originalDay: Object.keys(dayMapping).find(
@@ -188,17 +208,6 @@ export const useLessonEvents = () => {
     [checkConflicts, setTargetEventDrop, setAlertOpen],
   );
 
-  // Handler pour annuler la mise à jour
-  const handleCancelUpdate = () => {
-    // Revert les changements dans le calendrier
-    console.log('handleCancelUpdate', handleCancelUpdate);
-    const calendarApi = calendarRef.current?.getApi();
-    calendarApi?.refetchEvents(); // Rafraîchir pour revenir à l'état original
-    setTargetEventDrop(null);
-    console.log('handleCancelUpdate', calendarApi);
-    setAlertOpen(false);
-  };
-
   return {
     calendarRef,
     handleCalendarMount,
@@ -208,6 +217,5 @@ export const useLessonEvents = () => {
     handleEventResize,
     updateMutate,
     createMutate,
-    handleCancelUpdate,
   };
 };

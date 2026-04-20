@@ -3,6 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { useTable } from './table-provider';
 import { Button } from '@/components/ui/button';
+import { Button as AnimateButton } from '@/components/animate-ui/components/buttons/button';
 import { Filter, Plus, Settings2, Trash2, X } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
@@ -17,6 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { parseAsString, useQueryState } from 'nuqs';
+import { ParentDialog } from '@/components/school/parent/parent-dialog';
 
 const PARENT_COLUMNS = [
   { id: 'info', label: 'Parents' },
@@ -27,9 +30,11 @@ const PARENT_COLUMNS = [
 ];
 
 export function DataTableHeader() {
+  const [searchTerm, setSearchTerm] = useQueryState(
+    'search',
+    parseAsString.withDefault(''),
+  );
   const {
-    searchTerm,
-    setSearchTerm,
     filters,
     setFilters,
     rowSelection,
@@ -39,6 +44,7 @@ export function DataTableHeader() {
   } = useTable();
   const [showFilters, setShowFilters] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const { currentSchool } = useUserStore();
 
   const hasActiveFilters = Object.values(filters).some((v) => v !== undefined);
@@ -147,33 +153,40 @@ export function DataTableHeader() {
             </>
           )}
         </div>
-        <Button
-          onClick={() => console.log('Add Parent')}
-          className="gap-3 w-14 sm:w-30 h-full md:w-60"
+        <AnimateButton
+          onClick={() => setDialogOpen(true)}
+          className="gap-3 w-14 sm:w-30 h-full md:w-60 cursor-pointer"
         >
           <Plus className="h-8 w-8" />
           <span className="hidden sm:block font-poppins font-semibold">
             Ajouter
           </span>
-        </Button>
+        </AnimateButton>
       </div>
 
       {showFilters && !selectedCount && (
         <div className="p-4 bg-slate-50 rounded-lg border">
           {/* Composant de filtre parent à venir */}
-          <p className="text-sm text-muted-foreground">Filtres avancés des parents bientôt disponibles</p>
+          <p className="text-sm text-muted-foreground">
+            Filtres avancés des parents bientôt disponibles
+          </p>
         </div>
       )}
 
-      <AppAlertDialog
-        open={showDeleteAlert}
-        onOpenChange={setShowDeleteAlert}
-        title={`Supprimer ${selectedCount} parent(s) ?`}
-        description="Cette action est irréversible. Les liens avec les élèves seront également supprimés."
-        onConfirm={handleBulkDelete}
-        confirmLabel="Supprimer"
-        variant="destructive"
-      />
+      {showDeleteAlert && (
+        <AppAlertDialog
+          open={showDeleteAlert}
+          onOpenChange={setShowDeleteAlert}
+          title={`Supprimer ${selectedCount} parent(s) ?`}
+          description="Cette action est irréversible. Les liens avec les élèves seront également supprimés."
+          onConfirm={handleBulkDelete}
+          confirmLabel="Supprimer"
+          variant="destructive"
+        />
+      )}
+      {dialogOpen && (
+        <ParentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      )}
     </div>
   );
 }

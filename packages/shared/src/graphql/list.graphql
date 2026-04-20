@@ -11,15 +11,9 @@ type TeacherList {
 }
 
 scalar DateTime
+scalar Date
 
-input UpdateLessonInput {
-  id: ID!
-  startTime: DateTime!
-  endTime: DateTime!
-  classId: ID
-  day: Day!
-  mode: ResourceMode
-}
+
 type ApiResponse {
   ok: Boolean
   message: String
@@ -58,10 +52,7 @@ input CreateStudentInput {
   previousSchool: String
   status: StudentStatus
 }
-enum UpdateMode {
-  CREATE
-  CONNECT
-}
+
 input UpdateStudentParentData {
   mode: UpdateMode
   parentId: ID
@@ -71,13 +62,54 @@ input CreateParentInput {
   firstname: String!
   lastname: String!
   phoneNumber: String!
-  address: String
+  isDelegate: Boolean
+  email: String
+  address: String!
   profession: String!
-  students: ParentStudent
+  children: [ParentStudentInput!]
 }
-input ParentStudent {
-  relationType : RelationType!
-  studentIds: [ID!]!
+input ParentStudentInput {
+  id: ID!
+  relationType: RelationType!
+
+}
+type ClassAndSubject {
+  classes: [Class!]
+  subjects: [Subject!]
+}
+
+type LessonsData {
+  events: [LessonsEvents!]
+  resources: [LessonResources!]
+}
+type LessonsList {
+  data: LessonsData!
+  meta: PaginationMeta
+}
+type LessonResources {
+  id: ID!
+  title: String!
+  weeklyHours: Int
+}
+type LessonsEvents {
+  id: ID!
+  resourceId: ID
+  title: String!
+  startTime: String!
+  endTime: String!
+  day: Day!
+  status: LessonStatus
+  subject: Subject!
+  group: Group
+  teacher: LessonTeacher
+  room: Room
+}
+
+type LessonTeacher {
+  id: ID!
+  firstname: String!
+  lastname: String!
+  weeklyHours: Float
 }
 
 input CreateTeacherInput {
@@ -101,6 +133,7 @@ input GetSchoolParentsInput {
   page: Int! = 0
   limit: Int! = 10
   searchTerm: String
+  studentId: String
 }
 
 type ParentList {
@@ -114,7 +147,7 @@ type StudentList {
 }
 
 type ClassList {
-  data: [Class!]!
+  data: [Class!]
   meta: PaginationMeta!
 }
 

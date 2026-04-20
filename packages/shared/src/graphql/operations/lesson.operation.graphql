@@ -10,59 +10,42 @@ query GetSchoolLessons($filter: GetLessonsInput!) {
       resources {
         id
         title
+        weeklyHours
       }
-     events {
-       id
-       resourceId
-       title
-       status
-       startTime
-       day
-       endTime
-       group {
-         id
-         name
-         type
-         classes {
-           id
-           name
-         }
-       }
-       subject {
-         id
-         name
-       }
-       teacher {
-         id
-        firstname
-         lastname
-       }
-     }
-    }
-  }
-}
-query GetNavigationData {
-  getClassTeacher {
-   groups {
-     id
-     type
-     name
-     classes {
-       id
-       name
-       level
-       section
-     }
-   }
-    teacher {
-      id
-      department
-      user {
-        ...UserProfile
+      events {
+        id
+        resourceId
+        title
+        status
+        startTime
+        day
+        endTime
+        group {
+          id
+          name
+          type
+          classes {
+            id
+            name
+          }
+        }
+        subject {
+          id
+          name
+        }
+        teacher {
+          id
+          firstname
+          lastname
+          weeklyHours
+        }
       }
     }
   }
 }
+
+
+
 mutation CreateLesson($input: CreateLessonInput!) {
   createLesson(input: $input) {
     id
@@ -70,25 +53,30 @@ mutation CreateLesson($input: CreateLessonInput!) {
     startTime
     endTime
     day
-    classSubject {
-      id
-      subject {
+    teacherAssignment {
+      classSubjects {
         id
-        name
-        code
-      }
-      group {
-        classes {
+        subject {
+          id
           name
-          level
+          code
         }
-      }
-      teacher {
-        id
-        user {
-          profile {
-            firstname
-            lastname
+        group {
+          classes {
+            name
+            level
+          }
+        }
+        assignment {
+          id
+          teacher {
+            id
+            user {
+              profile {
+                firstname
+                lastname
+              }
+            }
           }
         }
       }

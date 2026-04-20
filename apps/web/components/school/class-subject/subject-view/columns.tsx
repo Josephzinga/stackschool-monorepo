@@ -1,7 +1,7 @@
 'use client';
 import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
-import { SubjectViewAction } from '@/components/school/subject/subject-view/subject-view-action';
+import { SubjectViewAction } from '@/components/school/class-subject/subject-view/subject-view-action';
 
 export type SubjectColumns = {
   id: string;
@@ -14,13 +14,13 @@ export type SubjectColumns = {
   } | null;
   teacher: {
     id: string;
-    user: {
+    user?: {
       profile: {
         firstname: string;
         lastname: string;
       };
     };
-  };
+  } | null;
 } | null;
 
 export const columns: ColumnDef<SubjectColumns>[] = [
@@ -38,7 +38,7 @@ export const columns: ColumnDef<SubjectColumns>[] = [
   },
   {
     accessorKey: 'coefficient',
-    header: 'Coeff.',
+    header: 'Coefficient',
     cell: ({ row }) => (
       <Badge variant="secondary" className="font-medium font-inter">
         {row.original?.coefficient || 0}
@@ -47,19 +47,28 @@ export const columns: ColumnDef<SubjectColumns>[] = [
   },
   {
     accessorKey: 'weeklyHours',
-    header: 'Heures/Semaine',
+    header: 'H/S',
     cell: ({ row }) => (
-      <span className="text-sm">{row.original?.weeklyHours || 0}h</span>
+      <span className="text-sm font-semibold">
+        {row.original?.weeklyHours || 0} h
+      </span>
     ),
   },
   {
     accessorKey: 'teacher',
     header: 'Enseignant',
-    cell: ({ row }) => (
-      <span className="text-sm">
-        {row.original?.teacher?.user?.profile?.lastname || 'Non assigné'}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const profile = row.original?.teacher?.user?.profile;
+      if (!profile)
+        return (
+          <span className="italic opacity-80 text-[12px]">Non assigné</span>
+        );
+      return (
+        <span className="text-sm">
+          {profile?.firstname} {profile?.lastname}
+        </span>
+      );
+    },
   },
   {
     id: 'actions',

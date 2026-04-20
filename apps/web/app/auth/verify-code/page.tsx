@@ -27,14 +27,14 @@ import {
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import Link from 'next/link';
 import { Spinner } from '@/components/ui/spinner';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { useEffect, useState } from 'react';
 
 export default function VerifyCode() {
-  const search = useSearchParams();
-  const token = search.get('token');
+  //  const search = useSearchParams();
+  //   const token = search.get('token');
   const router = useRouter();
   const [countdown, setCountdown] = useState(0);
 

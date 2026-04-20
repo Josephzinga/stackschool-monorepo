@@ -23,15 +23,14 @@ import {
   EventSourceInput,
 } from '@fullcalendar/core';
 import '@/app/styles/schedule-grid.css';
+import { lessonStatusConfig } from '@/constant';
 import {
   LessonStatus,
   useGetSchoolSettingsQuery,
   useUserStore,
 } from '@stackschool/ui';
 import { dayMapping } from '@stackschool/shared';
-import { lessonStatusConfig } from '@/constant';
 import {
-  ResourceApi,
   ResourceLabelContentArg,
   ResourceSourceInput,
 } from '@fullcalendar/resource';
@@ -73,7 +72,7 @@ interface TimeGridProps {
   onEventDragStart?: () => void;
   onEventDragStop?: () => void;
   onViewChange?: (view: ViewType) => void;
-  onResourceClick?: (resource: ResourceApi) => void;
+  onResourceClick?: (resourceId: string) => void;
   onCalendarMount?: (calendar: FullCalendar) => void;
   hasFilter?: boolean;
 }
@@ -121,6 +120,7 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
       },
       { enabled: !!currentSchool?.id },
     );
+
     const startHour = data?.school.settings?.startHour || '08';
     const endHour = data?.school.settings?.endHour || '18';
     const duration = data?.school.settings?.lessonDuration || '60';
@@ -201,6 +201,8 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
             locale={frLocale}
             resources={resources}
             eventContent={renderEventContent}
+            eventBorderColor="black"
+            eventClassNames="rounded-[6px]!"
             events={events}
             height="auto"
             eventDragStart={onEventDragStart}
@@ -238,6 +240,7 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
             resourceAreaHeaderContent={resourceHeaderContent}
             editable={editable}
             selectable={selectable}
+            selectMirror={true}
             datesSet={(info) => setCurrentDateTitle(info.view.title)}
             eventClick={onEventClick}
             eventDrop={onEventDrop}
@@ -279,9 +282,6 @@ export const renderEventContent = (eventInfo: any) => {
         <span className="font-bold text-xs truncate">
           {eventInfo.event.extendedProps.subject?.name}
         </span>
-        {eventInfo.event.extendedProps.status === 'CANCELLED' && (
-          <span className="text-[10px] line-through opacity-50">Annulé</span>
-        )}
       </div>
 
       <div
@@ -302,8 +302,13 @@ export const renderEventContent = (eventInfo: any) => {
       <div className="w-full flex justify-end">
         <Badge
           variant="outline"
-          className={cn('text-[9px] font-semibold px-1 py-0', cfg.badgeClass)}
+          className={cn(
+            'flex items-center gap-0.5 text-[9px] font-semibold px-1 py-px',
+            cfg.badgeClass,
+          )}
         >
+          {' '}
+          <cfg.icon />
           {cfg.label}
         </Badge>
       </div>

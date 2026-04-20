@@ -89,5 +89,12 @@ export const meResolver: Resolvers = {
         staff: membership.Staff as any,
       };
     },
+    profile: async (parent) => {
+      return prisma.profile.findUnique({
+        where: {
+          userId: parent.id,
+        },
+      });
+    },
   },
 };

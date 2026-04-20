@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CreateTeacherForm } from '@/components/school/teacher/create-teacher-form';
+import { CreateTeacherForm } from '@/components/school/teacher/form/create-teacher-form';
 import { CreateTeacherValues } from '@stackschool/shared';
 
 export function TeacherDialog({

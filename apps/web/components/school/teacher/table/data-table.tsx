@@ -51,13 +51,19 @@ export function DataTable<TData, TValue>({
         specialization: false,
         status: false,
       });
-    } else if (width < 1024) {
+    } else if (width < 1200) {
       setColumnVisibility({
         select: true,
         phoneNumber: false,
         classes: false,
         specialization: true,
+        status: false,
+      });
+    } else if (width < 1500) {
+      setColumnVisibility({
+        phoneNumber: true,
         status: true,
+        classes: true,
       });
     } else {
       setColumnVisibility({});

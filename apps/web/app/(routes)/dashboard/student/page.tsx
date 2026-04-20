@@ -1,7 +1,7 @@
 import { SectionCards } from '@/components/section-cards';
 import { ChartAreaInteractive } from '@/components/chart-area-interactive';
 import { DataTable } from '@/components/data-table';
-import data from '@/app/dashboard/data.json';
+import data from '../data.json';
 
 export default function StudentDashboard() {
   return (

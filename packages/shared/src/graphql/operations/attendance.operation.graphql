@@ -1,0 +1,26 @@
+mutation MarkStudentAttendance($input: MarkStudentAttendanceInput!) {
+  markStudentAttendance(input: $input) {
+    id
+    date
+    checkInTime
+    recordedBy {
+      id
+      profile {
+        firstname
+        lastname
+      }
+    }
+    person {
+      ... on Student {
+        id
+        schoolClass {
+          name
+        }
+        profile {
+          firstname
+          lastname
+        }
+      }
+    }
+  }
+}

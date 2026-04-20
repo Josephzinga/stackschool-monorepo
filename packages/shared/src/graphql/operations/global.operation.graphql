@@ -1,0 +1,50 @@
+
+
+query GetClassesAndTeachers($limit: Int!) {
+  getSchoolTeachers(input: { limit: $limit }) {
+    data {
+      id
+      user {
+        ...UserProfile
+      }
+    }
+  }
+  getSchoolClasses(input: { limit: $limit }) {
+    data {
+      id
+      name
+      level
+    }
+  }
+}
+
+query GetAssignments($filter: GetAssignmentInput!) {
+  getAssignments(filter: $filter) {
+    id
+    teacher {
+      id
+      department
+      user {
+        ...UserProfile
+      }
+    }
+    classSubjects {
+      subject {
+        id
+        name
+        code
+      }
+      group {
+        id
+        type
+        name
+        classes {
+          id
+          name
+          level
+          section
+        }
+      }
+    }
+  }
+}

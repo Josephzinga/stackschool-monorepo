@@ -3,7 +3,10 @@
 import * as z from 'zod';
 
 z.config(z.locales.fr());
-
+export enum GenderEnum {
+  Female = 'FEMALE',
+  Male = 'MALE',
+}
 export const loginFormSchema = z.object({
   identifier: z
     .string()
@@ -68,8 +71,7 @@ export const registerFormSchema = z
       ),
 
     email: z
-      .string()
-      .trim()
+
       .email({
         pattern: z.regexes.email,
         message: 'Veuillez entrer un email valide.',
@@ -187,7 +189,7 @@ export const profileSchema = z
       .min(3, 'Le nom doit contenir au moins 3 caractères')
       .max(30, 'Le nom  ne peut pas dépasser 30 caractères.'),
     gender: z.enum(
-      ['MALE', 'FEMALE', 'OTHER'],
+      GenderEnum,
       'Veuillez sélectionner un genre valid. MALE ou FEMALE',
     ),
     photo: z.string().nullish(),
@@ -196,8 +198,6 @@ export const profileSchema = z
       .min(5, "L'adresse doit être plus précise")
       .max(200, "L'adresse est trop longue"),
     email: z
-      .string()
-      .trim()
       .email({
         pattern: z.regexes.email,
         message: 'Veuillez entrer un email valide.',

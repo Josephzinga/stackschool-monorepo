@@ -7,16 +7,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ClassFiltersState, useClassTable } from './table-provider';
-import { useGetClassAndSubjectsQuery, useUserStore } from '@stackschool/ui';
+import { useGetClassesOptionsQuery, useUserStore } from '@stackschool/ui';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 export default function ClassTableFilter() {
   const { filters, setFilters } = useClassTable();
   const { currentSchool } = useUserStore();
 
-  const { data } = useGetClassAndSubjectsQuery(
+  const { data } = useGetClassesOptionsQuery(
     {
       input: {
-        schoolId: currentSchool?.id!,
+        limit: 100,
       },
     },
     {
@@ -24,7 +26,7 @@ export default function ClassTableFilter() {
     },
   );
 
-  const classes = data?.getClassAndSubjects;
+  const classes = data?.getSchoolClasses.data;
 
   const hasActiveFilters = Object.keys(filters).some((v) => v !== undefined);
 
@@ -52,11 +54,14 @@ export default function ClassTableFilter() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Toutes les niveaux</SelectItem>
-            {uniqueLevel?.map((level) => (
-              <SelectItem key={level} value={level!}>
-                {level}
-              </SelectItem>
-            ))}
+            {uniqueLevel?.map((level) => {
+              if (!level) return;
+              return (
+                <SelectItem key={level} value={level}>
+                  {level}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -73,14 +78,29 @@ export default function ClassTableFilter() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Toutes les sections</SelectItem>
-            {uniqueSection?.map((section, i) => (
-              <SelectItem value={section!} key={section}>
-                {section}
-              </SelectItem>
-            ))}
+            {uniqueSection?.map((section, i) => {
+              if (!section) return;
+              return (
+                <SelectItem value={section!} key={section}>
+                  {section}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
+
+      {hasActiveFilters && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setFilters({})}
+          className="h-8 px-2 text-muted-foreground hover:text-foreground bg-destructive/30 hover:bg-destructive/50! cursor-pointer transition-colors duration-200"
+        >
+          <X className="h-4 w-4 mr-1" />
+          Effacer
+        </Button>
+      )}
     </div>
   );
 }

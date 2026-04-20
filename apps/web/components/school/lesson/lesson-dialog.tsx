@@ -1,9 +1,10 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { TimeInput } from '@/components/time-input';
 import { Button } from '@/components/ui/button';
+import { Button as AnimateButton } from '@/components/animate-ui/components/buttons/button';
 import {
   canTransition,
   CreateLessonFormData,
@@ -31,19 +33,13 @@ import {
 import {
   Day,
   LessonStatus,
-  ResourceMode,
-  useCreateLessonMutation,
-  useDeleteLessonMutation,
-  useGetClassSubjectOptionsQuery,
-  useUpdateLessonMutation,
-  useUpdateLessonStatusMutation,
+  useGetAssignmentsQuery,
   zodResolver,
 } from '@stackschool/ui';
-import { toast } from 'sonner';
 import { format, getDay } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useQueryClient } from '@tanstack/react-query';
 import { useLessonStore } from '@/store/lesson-store';
+import { useLessonMutations } from '@/components/school/lesson/hooks/useLessonMutations';
 
 export type InitialData =
   | { mode: 'CREATE'; args: DateSelectArg }
@@ -56,6 +52,16 @@ interface LessonDialogProps {
 
 export default function LessonDialog({ onSuccess }: LessonDialogProps) {
   const {
+    resourceMode,
+    setLessonDialogOpen,
+    lessonDialogOpen,
+    selectedLessonData,
+    resource,
+    setResource,
+  } = useLessonStore();
+  const isClassMode = resourceMode === 'CLASS';
+  const isUpdate = selectedLessonData?.mode === 'UPDATE';
+  const {
     register,
     control,
     handleSubmit,
@@ -67,73 +73,41 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
   } = useForm<CreateLessonFormData>({
     resolver: zodResolver(createLessonSchema),
   });
-  const {
-    resourceMode,
-    setLessonDialogOpen,
-    lessonDialogOpen,
-    selectedLessonData,
-    selectedFilter,
-  } = useLessonStore();
-  const isUpdate = selectedLessonData?.mode === 'UPDATE';
+
+  const { handleDelete, handleSubmitForm, handleUpdateStatus } =
+    useLessonMutations();
+
   const eventData = isUpdate ? selectedLessonData.args.event : null;
   const selectionData = !isUpdate ? selectedLessonData?.args : null;
   const subject = eventData?._def?.extendedProps?.subject;
   const teacher = eventData?._def?.extendedProps?.teacher;
   const lessonId = eventData?._def?.extendedProps?.lessonId;
   const lessonStatus = eventData?._def?.extendedProps?.status;
-  const isClassMode = resourceMode === 'CLASS';
-  const [resourceTitle, setResourceTitle] = useState(
-    isUpdate
-      ? resourceMode === 'CLASS'
-        ? eventData?.extendedProps?.groupName
-        : `${teacher?.firstname} ${teacher?.lastname}`
-      : selectionData?.resource?.title,
-  );
+
+  const resourceTitle = isUpdate
+    ? resourceMode === 'CLASS'
+      ? eventData?.extendedProps?.groupName
+      : `${teacher?.firstname} ${teacher?.lastname}`
+    : selectionData?.resource?.title || resource.title;
 
   const start = eventData ? eventData.start : selectionData?.start;
   const end = eventData ? eventData.end : selectionData?.end;
 
   const activeResourceId = isUpdate
     ? eventData?._def.resourceIds?.[0]
-    : selectionData?.resource?._resource?.id || selectedFilter?.id;
-
-  const {
-    data: classSubjectData,
-    isPending,
-    isError,
-  } = useGetClassSubjectOptionsQuery(
+    : selectionData?.resource?._resource?.id || resource.id;
+  console.log('ActiveResourceId', activeResourceId);
+  const { data, isError, isPending } = useGetAssignmentsQuery(
     {
-      groupId: isClassMode ? activeResourceId : undefined,
-      teacherId: !isClassMode ? activeResourceId : undefined,
+      filter: {
+        groupId: isClassMode ? activeResourceId : undefined,
+        teacherId: !isClassMode ? activeResourceId : undefined,
+      },
     },
-    {
-      enabled: !!activeResourceId,
-    },
+    { enabled: !!activeResourceId },
   );
 
-  useEffect(() => {
-    if (
-      (resourceTitle?.toString()?.includes('undefined') || !resourceTitle) &&
-      activeResourceId
-    ) {
-      if (isClassMode) {
-        const group = classSubjectData?.getClassSubjects?.find(
-          (cls) => cls?.group?.id === activeResourceId,
-        )?.group;
-        setResourceTitle(
-          group?.type === 'SOLO' ? group?.classes?.[0]?.name : group?.name,
-        );
-      } else {
-        const teacher = classSubjectData?.getClassSubjects?.find(
-          (cls) => cls?.teacher?.id === activeResourceId,
-        )?.teacher;
-
-        setResourceTitle(
-          `${teacher?.user?.profile?.firstname} ${teacher?.user?.profile?.lastname}`,
-        );
-      }
-    }
-  }, [resourceTitle, activeResourceId, isClassMode]);
+  const classSubjectData = data?.getAssignments;
 
   useEffect(() => {
     if (isError) {
@@ -151,6 +125,7 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
     setValue('startTime', start ? format(start, 'HH:mm') : '');
     setValue('endTime', end ? format(end, 'HH:mm') : '');
     setValue('mode', resourceMode);
+
     const day = Object.keys(dayMapping).find(
       (key) => dayMapping[key as Day] === getDay(start!),
     );
@@ -158,200 +133,133 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
 
     if (isUpdate) {
       setValue('subjectId', subject?.id);
-      resourceMode === 'CLASS'
-        ? setValue('teacherId', teacher?.id)
-        : setValue('groupId', eventData?.extendedProps?.group?.id);
+
+      setValue('teacherId', teacher?.id);
+      setValue('groupId', eventData?.extendedProps?.group?.id);
+    } else {
+      if (!activeResourceId) return;
+      isClassMode
+        ? setValue('groupId', activeResourceId)
+        : setValue('teacherId', activeResourceId);
     }
-  }, [selectedLessonData, eventData, setValue, resourceMode]);
+  }, [selectedLessonData, eventData, setValue, resourceMode, activeResourceId]);
 
   const selectedSubjectId = watch('subjectId');
-  const selectedSecondaryId = watch(
-    resourceMode === 'CLASS' ? 'teacherId' : 'groupId',
-  );
+  const selectedSecondaryId = watch(isClassMode ? 'teacherId' : 'groupId');
 
   // Filtrage des matières
   const filteredSubjects = useMemo(() => {
-    const all = classSubjectData?.getClassSubjects || [];
+    const all = classSubjectData || [];
     if (!selectedSecondaryId || selectedSecondaryId === '') return all;
 
-    return all.filter((cs) =>
+    return all.filter((ass) =>
       resourceMode === 'CLASS'
-        ? cs?.teacher?.id === selectedSecondaryId
-        : cs?.group?.id === selectedSecondaryId,
+        ? ass.teacher?.id === selectedSecondaryId
+        : ass.classSubjects?.group.id === selectedSecondaryId,
     );
   }, [classSubjectData, selectedSecondaryId, resourceMode]);
-
+  // garder les unique matières
   const uniqueSubjects = Array.from(
-    new Map(filteredSubjects?.map((item) => [item.subject?.id, item])).values(),
+    new Map(
+      filteredSubjects?.map((item) => [item.classSubjects?.subject?.id, item]),
+    ).values(),
   );
 
   // Filtrage de la "ressource secondaire" (Prof ou Classe)
   const filteredSecondary = useMemo(() => {
-    const all = classSubjectData?.getClassSubjects || [];
+    const all = classSubjectData || [];
     if (!selectedSubjectId || selectedSubjectId === '') return all;
 
-    return all.filter((cs) => cs.subject?.id === selectedSubjectId);
+    return all.filter(
+      (ass) => ass.classSubjects?.subject?.id === selectedSubjectId,
+    );
   }, [classSubjectData, selectedSubjectId]);
+  const uniqueSecondary = Array.from(
+    new Map(
+      filteredSecondary?.map((item) => {
+        return isClassMode
+          ? [item.teacher?.id, item]
+          : [item.classSubjects?.group?.id, item];
+      }),
+    ).values(),
+  );
 
+  // filtre l'input de professeur ou classe selon leur matière enseigné
   const handleSubjectChange = useCallback(
     (val: string, onChange: any) => {
       onChange(val);
       const matches =
-        classSubjectData?.getClassSubjects?.filter(
-          (cs) => cs.subject?.id === val,
+        classSubjectData?.filter(
+          (cs) => cs.classSubjects?.subject?.id === val,
         ) || [];
 
       if (matches.length === 1) {
         const targetId =
           resourceMode === 'CLASS'
             ? matches[0].teacher?.id
-            : matches[0]?.group?.id;
+            : matches[0]?.classSubjects?.group?.id;
         setValue(resourceMode === 'CLASS' ? 'teacherId' : 'groupId', targetId);
       }
     },
     [uniqueSubjects, selectedSubjectId],
   );
-
+  // filtre l'input de professeur ou classe selon la classe ou le professeur sélectionné
   const handleSecondaryChange = useCallback(
     (val: string, onChange: any) => {
       onChange(val);
       const matches =
-        classSubjectData?.getClassSubjects?.filter((cs) =>
-          resourceMode === 'CLASS'
+        classSubjectData?.filter((cs) =>
+          isClassMode
             ? cs.teacher?.id === val
-            : cs.group?.id === val,
+            : cs?.classSubjects?.group?.id === val,
         ) || [];
       if (matches.length === 1) {
-        setValue('subjectId', matches?.[0]?.subject?.id ?? '');
+        setValue('subjectId', matches?.[0]?.classSubjects?.subject?.id ?? '');
       }
     },
     [resourceMode],
   );
-  const queryClient = useQueryClient();
-  const { mutateAsync: deleteMutate } = useDeleteLessonMutation({
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['GetSchoolLessons'] });
-    },
-  });
-  const { mutateAsync: updateStatusMutate } = useUpdateLessonStatusMutation({
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['GetSchoolLessons'] });
-    },
-  });
-
-  const { mutateAsync: updateMutate } = useUpdateLessonMutation({
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['GetSchoolLessons'] });
-      onSuccess?.();
-      setLessonDialogOpen(false);
-    },
-  });
-
-  const { mutateAsync: createMutate } = useCreateLessonMutation({
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['GetSchoolLessons'] });
-      setLessonDialogOpen(false);
-    },
-  });
 
   const onSubmit = async (data: CreateLessonFormData) => {
-    const promise = isUpdate
-      ? updateMutate({
-          input: {
-            startTime: data.startTime,
-            endTime: data.endTime,
-            id: lessonId,
-            day: data.day as Day,
-            mode: resourceMode as ResourceMode,
-          },
-        })
-      : createMutate({
-          input: {
-            ...data,
-            day: data?.day as Day,
-            mode: resourceMode as ResourceMode,
-          },
-        });
-    toast.promise(promise, {
-      loading: isUpdate ? 'Modification en cours...' : 'Création en cours...',
-      success: 'Création réussie avec succès',
-      error: (err) => {
-        return (
-          err?.message ||
-          (isUpdate
-            ? 'Erreur lors de la mise à jour du leçon'
-            : 'Erreur lors de la création du leçon')
-        );
-      },
-    });
+    await handleSubmitForm(data, lessonId, isUpdate);
+    onSuccess?.();
   };
 
-  const handleStatusChange = async (newStatus: LessonStatus) => {
-    if (!lessonId) return;
-
-    const promise = updateStatusMutate({
-      status: newStatus,
-      id: lessonId,
-    });
-
-    toast.promise(promise, {
-      loading: 'Mise à jour en cours..',
-      success: 'Mise à jour réussi avec succès',
-      error: 'Error lors de la mise à jour',
-      toasterId: 'dashboard',
-    });
-    setLessonDialogOpen(false);
-  };
-  const handleDelete = async () => {
-    if (!lessonId) return;
-
-    const promise = deleteMutate({
-      id: lessonId,
-    });
-
-    toast.promise(promise, {
-      loading: 'Suppression en cours...',
-      success: 'Leçon supprimer avec succès.',
-      error: (err) => {
-        return err?.message || 'Erreur lors de la suppression de leçon.';
-      },
-      toasterId: 'dashboard',
-    });
-    setLessonDialogOpen(false);
-  };
   return (
-    <div>
-      <Dialog open={lessonDialogOpen} onOpenChange={setLessonDialogOpen}>
-        <DialogContent className="max-w-110! shadow-2xl!">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedLessonData?.mode === 'CREATE'
-                ? 'Créer une leçon'
-                : 'Modifier la leçon'}
-            </DialogTitle>
-            <div className="text-sm opacity-80">
-              {resourceMode === 'CLASS' ? (
-                <>
-                  Classe :{' '}
-                  <span className="text-primary font-medium">
-                    {resourceTitle}
-                  </span>
-                </>
-              ) : (
-                <>
-                  Enseignant :{' '}
-                  <span className="text-primary font-medium">
-                    {resourceTitle}
-                  </span>
-                </>
-              )}
-            </div>
-          </DialogHeader>
+    <Dialog open={lessonDialogOpen} onOpenChange={setLessonDialogOpen}>
+      <DialogContent className="max-w-110! shadow-2xl! px-3 md:px-4">
+        <DialogHeader>
+          <DialogTitle>
+            {selectedLessonData?.mode === 'CREATE'
+              ? 'Créer une leçon'
+              : 'Modifier la leçon'}
+          </DialogTitle>
+          <DialogDescription className="text-sm font-poppins font-semibold opacity-80">
+            {resourceMode === 'CLASS' ? (
+              <>
+                Classe :{' '}
+                <span className="text-primary font-medium">
+                  {resourceTitle}
+                </span>
+              </>
+            ) : (
+              <>
+                Enseignant :{' '}
+                <span className="text-primary font-medium">
+                  {resourceTitle}
+                </span>
+              </>
+            )}
+          </DialogDescription>
+        </DialogHeader>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-4 py-4"
-          >
+        <form
+          onSubmit={handleSubmit(onSubmit, (err) => {
+            console.log('Erreur', err);
+          })}
+          className="flex flex-col justify-center gap-4"
+        >
+          <div className="space-y-2">
             <GridForm className="w-full">
               <Field>
                 <FieldLabel>Matière</FieldLabel>
@@ -373,7 +281,7 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                           <>
                             <Button
                               variant="ghost"
-                              onClick={() => setValue('subjectId', '')}
+                              onClick={() => setValue('groupId', '')}
                             >
                               Toute les matières
                             </Button>
@@ -382,10 +290,10 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                         )}
                         {uniqueSubjects?.map((cls) => (
                           <SelectItem
-                            key={cls?.subject?.id}
-                            value={cls?.subject?.id!}
+                            key={cls?.classSubjects?.subject?.id}
+                            value={cls?.classSubjects?.subject?.id!}
                           >
-                            {cls?.subject?.name}
+                            {cls?.classSubjects?.subject?.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -408,17 +316,21 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                         handleSecondaryChange(val, field.onChange)
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger
+                        aria-invalid={
+                          isClassMode ? !!errors.teacherId : !!errors.groupId
+                        }
+                      >
                         <SelectValue
                           placeholder={
-                            resourceMode === 'CLASS'
-                              ? 'Selectionner un enseignant'
-                              : 'Selectionner une classe'
+                            isClassMode
+                              ? 'Sélectionner un enseignant'
+                              : 'Sélectionner une classe'
                           }
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {selectedSecondaryId && selectedSecondaryId !== '' && (
+                        {selectedSubjectId && selectedSubjectId !== '' && (
                           <>
                             <Button
                               onClick={() => {
@@ -426,39 +338,45 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                               }}
                               variant="ghost"
                             >
-                              Tous les enseignant
+                              {isClassMode
+                                ? '  Tous les enseignant'
+                                : 'Tous les classes'}
                             </Button>
                             <SelectSeparator />
                           </>
                         )}
-                        {filteredSecondary.map((cs) => (
+                        {uniqueSecondary?.map((cs) => (
                           <SelectItem
                             key={
-                              resourceMode === 'CLASS'
+                              isClassMode
                                 ? cs?.teacher?.id
-                                : cs.group?.id
+                                : cs?.classSubjects?.group?.id
                             }
                             value={
-                              resourceMode === 'CLASS'
+                              isClassMode
                                 ? cs?.teacher?.id!
-                                : cs?.group?.id!
+                                : cs?.classSubjects?.group?.id!
                             }
                           >
-                            {resourceMode === 'CLASS'
+                            {isClassMode
                               ? `${cs?.teacher?.user?.profile?.firstname} ${cs.teacher?.user?.profile?.lastname}`
-                              : cs?.group?.type === 'SOLO'
-                                ? cs.group?.classes[0]?.name
-                                : cs.group?.name}
+                              : cs?.classSubjects?.group?.type === 'SOLO'
+                                ? cs.classSubjects?.group?.classes[0]?.name
+                                : cs?.classSubjects?.group?.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
-                <FieldError>{errors?.teacherId?.message}</FieldError>
+                <FieldError>
+                  {isClassMode
+                    ? errors?.teacherId?.message
+                    : errors.groupId?.message}
+                </FieldError>
               </Field>
             </GridForm>
-            <Field>
+            <Field className="">
               <FieldLabel>Jour</FieldLabel>
               <Controller
                 control={control}
@@ -498,72 +416,75 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                 <FieldError>{errors.endTime?.message}</FieldError>
               </Field>
             </GridForm>
+          </div>
 
-            <DialogFooter className="flex justify-between items-center">
-              <div className="flex items-center gap-2 w-full">
-                {isUpdate && (
-                  <>
-                    {canTransition(lessonStatus, 'ONGOING') && (
-                      <Button
-                        type="button"
-                        className="text-xs px-2 bg-emerald-600 hover:bg-emerald-700"
-                        onClick={() => handleStatusChange(LessonStatus.Ongoing)}
-                      >
-                        Démarrer
-                      </Button>
-                    )}
-                    {canTransition(lessonStatus, 'COMPLETED') && (
-                      <Button
-                        type="button"
-                        className="text-xs px-2"
-                        onClick={() =>
-                          handleStatusChange(LessonStatus.Completed)
-                        }
-                      >
-                        Marquer terminée
-                      </Button>
-                    )}
-                    {canTransition(lessonStatus, 'CANCELLED') && (
-                      <Button
-                        className="text-xs px-2 bg-gray-600 hover:bg-gray-700"
-                        type="button"
-                        onClick={() =>
-                          handleStatusChange(LessonStatus.Cancelled)
-                        }
-                      >
-                        Annuler
-                      </Button>
-                    )}
-                  </>
-                )}
-              </div>
-              <div className="flex gap-2">
-                {isUpdate && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    className="text-xs px-2"
-                    onClick={handleDelete}
-                  >
-                    Supprimer
-                  </Button>
-                )}
-                <Button
-                  type="submit"
-                  className={cn(
-                    !isDirty && 'cursor-not-allowed',
-                    'font-semibold',
+          <DialogFooter className="flex flex-row md:justify-between items-center w-full">
+            <div className="flex items-center gap-2">
+              {isUpdate && (
+                <>
+                  {canTransition(lessonStatus, 'ONGOING') && (
+                    <Button
+                      type="button"
+                      className="text-xs px-2 bg-emerald-600 hover:bg-emerald-700"
+                      onClick={() =>
+                        handleUpdateStatus(LessonStatus.Ongoing, lessonId)
+                      }
+                    >
+                      Démarrer
+                    </Button>
                   )}
+                  {canTransition(lessonStatus, 'COMPLETED') && (
+                    <Button
+                      type="button"
+                      className="text-xs px-2"
+                      onClick={() =>
+                        handleUpdateStatus(LessonStatus.Completed, lessonId)
+                      }
+                    >
+                      Marquer terminée
+                    </Button>
+                  )}
+                  {canTransition(lessonStatus, 'CANCELLED') && (
+                    <Button
+                      className="text-xs px-2 bg-gray-600 hover:bg-gray-700"
+                      type="button"
+                      onClick={() =>
+                        handleUpdateStatus(LessonStatus.Cancelled, lessonId)
+                      }
+                    >
+                      Annuler
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="flex gap-2 ">
+              {isUpdate && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  className="text-xs px-2"
+                  onClick={() => handleDelete(lessonId)}
                 >
-                  {selectedLessonData?.mode === 'UPDATE'
-                    ? 'Enregistré'
-                    : 'Créer '}
+                  Supprimer
                 </Button>
-              </div>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+              )}
+              <AnimateButton
+                hoverScale={1.02}
+                type="submit"
+                className={cn(
+                  !isDirty && 'cursor-not-allowed',
+                  'font-semibold',
+                )}
+              >
+                {selectedLessonData?.mode === 'UPDATE'
+                  ? 'Enregistré'
+                  : 'Créer '}
+              </AnimateButton>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -9,17 +9,19 @@ import {
   ComboboxList,
 } from '@/components/ui/combobox';
 import React from 'react';
-import { useGetNavigationDataQuery } from '@stackschool/ui';
+import { useGetClassesAndTeachersQuery } from '@stackschool/ui';
 import { useSubjectTable } from '@/components/school/subject/table/table-provider';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 export function SubjectFilter() {
   const { filters, setFilters } = useSubjectTable();
-  const { data } = useGetNavigationDataQuery();
+  const { data } = useGetClassesAndTeachersQuery({
+    limit: 100,
+  });
 
-  const teachers = data?.getClassTeacher?.teacher;
-  const classes = data?.getClassTeacher?.class;
+  const teachers = data?.getSchoolTeachers.data;
+  const classes = data?.getSchoolClasses.data;
 
   const hasActiveFilters = Object.keys(filters).some((v) => v !== undefined);
 

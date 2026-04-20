@@ -19,7 +19,7 @@ import {
   AppTabsList,
   AppTabsTrigger,
 } from '@/components/app-tabs';
-import { ClassSubjectsView } from '@/components/school/subject/subject-view/subjects-view';
+import { ClassSubjectsView } from '@/components/school/class-subject/subject-view/subjects-view';
 
 export default function ClassDetailsPage() {
   const params = useParams();
@@ -60,12 +60,12 @@ export default function ClassDetailsPage() {
   return (
     <div className="flex-1 p-2 md:p-4 flex flex-col gap-6 max-w-7xl mx-auto w-full">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className=" flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div>
+          <div className="">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl md:text-3xl font-bold">
                 {classData.name}
@@ -78,6 +78,9 @@ export default function ClassDetailsPage() {
                   Section {classData.section}
                 </Badge>
               )}
+              <Badge variant="outline" className="text-xs md:text-sm">
+                2025 - 2026
+              </Badge>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1">
               <Users className="h-4 w-4" />
@@ -191,14 +194,7 @@ export default function ClassDetailsPage() {
 
         {/* CONTENU ÉLÈVES */}
         <AppTabsContent value="students" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Liste des Élèves</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ClassStudentList classData={classData} />
-            </CardContent>
-          </Card>
+          <ClassStudentList classId={classId} />
         </AppTabsContent>
         {/* CONTENU MATIÈRE */}
         <AppTabsContent value="subjects">

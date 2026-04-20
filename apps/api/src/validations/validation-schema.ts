@@ -28,4 +28,5 @@ export const validateUserFieldSchema = z.object({
       message: 'Numéro invalide (format international recommandé, ex: +223...)',
     })
     .optional(),
+  selfCheck: z.boolean().optional(),
 });

@@ -4,14 +4,11 @@ import { Container } from '@/components/Container';
 import { Spinner } from '@/components/ui/spinner';
 import { authService } from '@stackschool/shared';
 import { LucideOctagonX } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function AuthFinish() {
-  const search = useSearchParams();
   const router = useRouter();
-  const from = search?.get('from') ?? '';
-  const provider = search?.get('provider') ?? '';
 
   const [status, setStatus] = useState<
     'loading' | 'ok' | 'need_onboar' | 'error'
@@ -28,7 +25,7 @@ export default function AuthFinish() {
           // si le profile est manquant
           if (!profile || profile.firstname === '' || profile.lastname === '') {
             setStatus('need_onboar');
-            router.replace(`/auth/complete-profile?provider=${provider}`);
+            router.replace(`/auth/complete-profile`);
             return;
           }
           setStatus('ok');
@@ -43,11 +40,7 @@ export default function AuthFinish() {
 
           if (data2?.user) {
             if (!data2?.user.profile || !data2.user?.profile.fistname) {
-              router.replace(
-                `/auth/complete-profile?provider=${encodeURIComponent(
-                  provider,
-                )}`,
-              );
+              router.replace(`/auth/complete-profile?`);
               return;
             }
             router.replace('/dashboard');
@@ -66,7 +59,7 @@ export default function AuthFinish() {
       }
     };
     checkAuth();
-  }, [router, provider, from]);
+  }, [router]);
 
   return (
     <Container>
@@ -75,7 +68,7 @@ export default function AuthFinish() {
           <>
             <Spinner className="absolut w-10 md:w-15 h-10 md:h-15 left-1/2 mt-4" />
             <span className="text-xl animate-pulse font-medium px-3">
-              Verification de la connexion via {provider || 'le fourniseur'}…
+              Verification de la connexion via …
             </span>
           </>
         )}

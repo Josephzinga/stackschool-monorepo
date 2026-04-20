@@ -1,12 +1,6 @@
 import { getDay } from 'date-fns';
 import { REFERENCE_DATE } from '@stackschool/shared';
-
-interface Event {
-  daysOfWeek: number[];
-  startTime: string;
-  endTime: string;
-  id?: string;
-}
+import { Event } from '@/types/lessons-types';
 
 // Convertir un événement en plage horaire absolue pour une semaine de référence
 export const getEventDateTimeRange = (

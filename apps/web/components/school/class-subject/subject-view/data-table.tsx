@@ -20,11 +20,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CreateClassSubjectForm } from '@/components/school/create-classSubject-form';
+import { CreateClassSubjectForm } from '@/components/school/class-subject/create-classSubject-form';
 import { AppAlertDialog } from '@/components/app-alert-dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteClassSubjectsMutation } from '@stackschool/ui';
 import { toast } from 'sonner';
+import DataTableSkeleton from '@/components/skeleton';
 
 export function DataTable<TData, TValue>({
   columns,
@@ -68,7 +69,10 @@ export function DataTable<TData, TValue>({
       await queryClient.invalidateQueries({
         queryKey: ['GetClassSubjectTable'],
       });
-      await queryClient.invalidateQueries({ queryKey: ['GetClassDetails'] });
+      await queryClient.invalidateQueries({
+        queryKey: ['GetClassDetails'],
+      });
+      await queryClient.invalidateQueries({ queryKey: ['getTeachersTeam'] });
     },
   });
   const handleDelete = async () => {
@@ -91,21 +95,11 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="rounded-md mb-2 border relative min-h-75 overflow-x-auto">
-        {isLoading && (
-          <div className="absolute inset-0 bg-white/50 dark:bg-slate-800/70 z-50 flex flex-col backdrop-blur-sm">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex justify-between items-center flex-row animate-pulse px-4 w-full h-14 even:bg-slate-50 dark:even:bg-slate-950"
-              >
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="h-5 w-25 bg-slate-700 rounded-sm" />
-                ))}
-              </div>
-            ))}
-          </div>
+        {isLoading ? (
+          <DataTableSkeleton />
+        ) : (
+          <AppDataTable table={table} columns={columns} />
         )}
-        <AppDataTable table={table} columns={columns} isLoading={isLoading} />
       </div>
       <DataTablePagination table={table} />
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

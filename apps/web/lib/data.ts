@@ -3,6 +3,7 @@ import {
   CalendarDays,
   CircleUserRound,
   GraduationCap,
+  HotelIcon,
   IceCream,
   LayoutDashboard,
   ListChecks,
@@ -71,7 +72,12 @@ export const menuItems = {
       href: '/list/lessons',
       visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT],
     },
-
+    {
+      icon: HotelIcon,
+      label: 'Salles',
+      href: '/list/rooms',
+      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT],
+    },
     {
       icon: Newspaper,
       label: 'Examens',

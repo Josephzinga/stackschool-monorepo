@@ -15,7 +15,7 @@ import { isAdmin } from '../../lib/verify-role';
 export const schoolResolver: Resolvers = {
   Query: {
     school: async (_: any, { schoolId }, context) => {
-      const userId = context.user.id;
+      const userId = context?.user.id;
 
       if (!userId) {
         throw createServiceError('Non authentifié', 401);

@@ -61,12 +61,14 @@ export function RoomDataTable<TData, TValue>({
     ...selectedRow,
     defaultClassId: selectedRow?.defaultForClass?.id,
   };
-  console.log('initialValues', initialValues);
   return (
     <div className="w-full h-full font-poppins z-10 flex flex-col gap-4">
       <div className="rounded-md mb-2 border relative min-h-75 overflow-x-auto">
-        <DataTableSkeleton isLoading={isLoading} />
-        <AppDataTable table={table} columns={columns} isLoading={isLoading} />
+        {isLoading ? (
+          <DataTableSkeleton />
+        ) : (
+          <AppDataTable table={table} columns={columns} />
+        )}
       </div>
       <DataTablePagination table={table} isLoading={isLoading} />
 

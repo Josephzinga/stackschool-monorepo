@@ -1,18 +1,4 @@
-enum Relation {
-   FATHER
-   MOTHER
-   GUARDIAN
-   UNCLE
-   OTHER
-   GRAND_MOTHER
-   GRAND_FATHER
-   AUNT
-}
-enum ContactPreference {
-   WHATSAPP
-   EMAIL
-   PHONE
-}
+
 input SchoolSearchInput {
    searchTerm: String
 }
@@ -21,12 +7,9 @@ input StudentSearchInput {
    schoolId: ID
    searchTerm: String
    getSubject: Boolean
+   limit: Int 
 }
 
-input ChildInput {
-   studentId: ID!
-   relation: Relation
-}
 
 
 

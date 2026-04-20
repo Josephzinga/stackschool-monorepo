@@ -1,41 +1,109 @@
+enum SchoolRole {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+  STAFF
+}
+enum LessonStatus {
+  PLANNED
+  ONGOING
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
 enum AssessmentType {
-    EXAM
-    ASSIGNMENT
-    QUIZ
-    TEST
-    PRACTICAL
-    ORAL
+  EXAM
+  ASSIGNMENT
+  QUIZ
+  TEST
+  PRACTICAL
+  ORAL
 }
 
 enum AssessmentStatus {
-    DRAFT
-    PUBLISHED
-    CLOSED
+  DRAFT
+  PUBLISHED
+  CLOSED
 }
 
 enum SubjectCategory {
-    SCIENTIFIC
-    LITERARY
-    GENERAL
-    SPORT
+  SCIENTIFIC
+  LITERARY
+  GENERAL
+  SPORT
 }
 enum TransportMode {
-    BUS
-    WALK
-    CAR
-    MOTO
-    TAXI
-    PARENT
-    OTHER
+  BUS
+  WALK
+  CAR
+  MOTO
+  TAXI
+  PARENT
+  OTHER
 }
 
 enum RelationType {
-    FATHER
-    MOTHER
-    GUARDIAN
-    UNCLE
-    OTHER
-    GRAND_MOTHER
-    GRAND_FATHER
-    AUNT
+  FATHER
+  MOTHER
+  GUARDIAN
+  UNCLE
+  OTHER
+  GRAND_MOTHER
+  GRAND_FATHER
+  AUNT
+}
+
+enum UpdateMode {
+  CREATE
+  CONNECT
+}
+
+enum ContactPreference {
+  WHATSAPP
+  EMAIL
+  PHONE
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+enum StudentSortField {
+  firstname
+  lastname
+  enrolementYear
+}
+
+enum SubjectSortField {
+  coefficient
+  name
+  ponderation
+}
+
+enum DisciplinaryType {
+  SUSPENSION
+  EXPULSION
+  WARNING
+}
+
+enum StudentStatus {
+  ACTIVE
+  SUSPENDED
+  EXPELLED
+  TRANSFERRED
+  DROPPED_OUT
+  GRADUATED
+  INACTIVE
+  DECEASED
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }

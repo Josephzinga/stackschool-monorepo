@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { GroupForm } from '@/components/school/group/group-form';
 
 export default function GroupsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +36,6 @@ export default function GroupsPage() {
           <DialogHeader>
             <DialogTitle></DialogTitle>
           </DialogHeader>
-          <GroupForm />
         </DialogContent>
       </Dialog>
     </div>

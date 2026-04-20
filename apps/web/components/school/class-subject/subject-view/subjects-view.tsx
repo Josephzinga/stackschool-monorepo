@@ -1,9 +1,9 @@
 'use client';
 import { columns, SubjectColumns } from './columns';
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useGetClassSubjectTableQuery } from '@stackschool/ui';
-import { DataTable } from '@/components/school/subject/subject-view/data-table';
+import { DataTable } from '@/components/school/class-subject/subject-view/data-table';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CreateClassSubjectForm } from '@/components/school/create-classSubject-form';
+import { CreateClassSubjectForm } from '@/components/school/class-subject/create-classSubject-form';
 
 export function ClassSubjectsView({ classId }: { classId?: string }) {
   const [open, setOpen] = useState(false);
@@ -24,23 +24,34 @@ export function ClassSubjectsView({ classId }: { classId?: string }) {
     },
   );
 
-  // @ts-ignore
-  const subjectData: SubjectColumns[] = data?.class?.group?.classSubjects || [];
-
-  const totalCoefficient = useMemo(() => {
-    return subjectData.reduce((acc, sub) => acc + (sub?.coefficient || 0), 0);
-  }, [subjectData]);
+  const subjectData: SubjectColumns[] =
+    data?.class?.group?.classSubjects?.map((cls) => ({
+      id: cls?.id ?? '',
+      coefficient: cls?.coefficient || 0,
+      weeklyHours: cls?.weeklyHours || 0,
+      subject: {
+        id: cls?.subject.id!,
+        name: cls?.subject?.name ?? '',
+        code: cls?.subject?.code ?? '',
+      },
+      teacher: cls?.assignment?.teacher || null,
+    })) || [];
 
   return (
     <div className="w-full h-full mt-3 font-poppins z-10 flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <div className="flex gap-4">
-          <h2 className="text-lg opacity-80 font-semibold font-sans">
+          <h2 className="text-lg  opacity-80 font-semibold font-sans">
             Total des coefficients:{' '}
-            <span className="text-white">{totalCoefficient}</span>
+            <span className="text-white">
+              {data?.class?.totalCoefficient || 0}
+            </span>
           </h2>
           <h2 className="text-lg opacity-80 font-semibold font-sans">
             Total des heures:{' '}
+            <span className="text-white">
+              {data?.class?.totalWeeklyHours || 0}
+            </span>
           </h2>
         </div>
         <Button onClick={() => setOpen(true)} className="font-semibold">
@@ -49,7 +60,7 @@ export function ClassSubjectsView({ classId }: { classId?: string }) {
       </div>
       <DataTable data={subjectData} isLoading={isPending} columns={columns} />
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog modal={false} open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Ajouter une matière à cette classe</DialogTitle>

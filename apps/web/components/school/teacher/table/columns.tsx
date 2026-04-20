@@ -5,16 +5,16 @@ import { ArrowUpDown } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import * as React from 'react';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { TeacherTableActions } from './teacher-table-actions';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 export type TeacherColumns = {
   id: string | number;
@@ -23,10 +23,15 @@ export type TeacherColumns = {
   email: string;
   photo?: string;
   phoneNumber?: string;
-  specialization: string[];
   status: boolean;
-  classes?: { id: string; name: string }[][];
-  subjects?: ({ id: string; name: string } | null | undefined)[];
+  assignments: (
+    | {
+        subject: { id: string; name: string } | undefined;
+        class: { id: string; name: string };
+      }
+    | undefined
+  )[];
+  weeklyHours?: number;
 };
 
 export const columns: ColumnDef<TeacherColumns>[] = [
@@ -93,34 +98,6 @@ export const columns: ColumnDef<TeacherColumns>[] = [
     },
   },
   {
-    accessorKey: 'subjects',
-    header: () => (
-      <div>
-        <p className="font-inter font-semibold">Matières.</p>
-      </div>
-    ),
-    cell: ({ row }) => {
-      const subjects = [
-        ...new Set(row.original.subjects?.map((cl) => cl?.name)),
-      ];
-      if (subjects?.length === 0)
-        return (
-          <span className="text-muted-foreground text-xs italic">
-            Non assignée
-          </span>
-        );
-      return (
-        <div className="flex flex-wrap gap-1">
-          {subjects.map((sub, i) => (
-            <Badge key={i} variant="outline" className="font-normal text-xs">
-              {sub}
-            </Badge>
-          ))}
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: 'phoneNumber',
     header: 'Téléphone',
     cell: ({ row }) => (
@@ -128,6 +105,134 @@ export const columns: ColumnDef<TeacherColumns>[] = [
         {row.original.phoneNumber || '-'}
       </span>
     ),
+  },
+  {
+    accessorKey: 'assignments.subject',
+    header: () => (
+      <div>
+        <p className="font-inter font-semibold">Matières.</p>
+      </div>
+    ),
+    cell: ({ row }) => {
+      const [open, setOpen] = useState(false);
+      const subjects = [
+        ...new Set(row.original.assignments?.map((ass) => ass?.subject?.name)),
+      ];
+
+      if (subjects?.length === 0)
+        return (
+          <span className="text-muted-foreground text-xs italic">
+            Non assignée
+          </span>
+        );
+
+      const firstSubject = subjects[0];
+      const remainingCount = subjects.length - 1;
+      return (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger
+            disabled={!remainingCount}
+            asChild
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+          >
+            <button
+              onClick={() => setOpen(true)}
+              className="text-xs border px-2 py-1 rounded-lg hover:bg-accent transition"
+            >
+              {firstSubject}
+              {remainingCount > 0 && (
+                <span className="text-blue-600 ml-1">{` +${remainingCount}`}</span>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-48 px-2"
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+          >
+            <ul className="space-y-1 text-xs">
+              {subjects.map((c, index) => (
+                <li
+                  key={`sub-${index}`}
+                  className="px-2 py-1 rounded-md hover:bg-muted"
+                >
+                  {c}
+                </li>
+              ))}
+            </ul>
+          </PopoverContent>
+        </Popover>
+      );
+    },
+  },
+
+  {
+    accessorKey: 'assignments.class',
+    header: 'Classes',
+    cell: ({ row }) => {
+      const [open, setOpen] = useState(false);
+      const classes = [
+        ...new Set(
+          row.original.assignments
+            ?.map((ass) => ass?.class?.name?.trim())
+            ?.filter(Boolean),
+        ),
+      ];
+
+      if (classes.length === 0) {
+        return (
+          <span className="text-muted-foreground text-xs italic">
+            Non assignée
+          </span>
+        );
+      }
+
+      const firstClass = classes[0];
+      const remainingCount = classes.length - 1;
+
+      return (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger
+            disabled={!remainingCount}
+            asChild
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+          >
+            <button
+              onClick={() => setOpen(true)}
+              className="text-xs border px-2 py-1 rounded-lg hover:bg-accent transition"
+            >
+              {firstClass}
+              {remainingCount > 0 && (
+                <span className="text-blue-600 ml-1">{` +${remainingCount}`}</span>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-48 px-2"
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+          >
+            <ul className="space-y-1 text-xs">
+              {classes.map((c, index) => (
+                <li key={index} className="px-2 py-1 rounded-md hover:bg-muted">
+                  {c}
+                </li>
+              ))}
+            </ul>
+          </PopoverContent>
+        </Popover>
+      );
+    },
+  },
+
+  {
+    accessorKey: 'weeklyHours',
+    header: 'H/sem',
+    cell: ({ row }) => {
+      return <span>{row.original.weeklyHours} h</span>;
+    },
   },
   {
     accessorKey: 'status',
@@ -148,56 +253,7 @@ export const columns: ColumnDef<TeacherColumns>[] = [
       );
     },
   },
-  {
-    accessorKey: 'classes',
-    header: 'Classes',
-    cell: ({ row }) => {
-      const classes = row.original.classes?.map((cls) =>
-        cls?.map((cl) => cl?.name),
-      );
-      const displayCount = 2;
-      let remainingCount = 0;
-      if (classes) {
-        remainingCount = classes?.length - displayCount;
-      }
-      if (classes?.length === 0)
-        return (
-          <span className="text-muted-foreground text-xs italic">
-            Non assignée
-          </span>
-        );
-      return (
-        <div className="flex items-center gap-1">
-          {classes?.slice(0, displayCount).map((className, index) => (
-            <Badge
-              key={index}
-              variant="outline"
-              className="whitespace-nowrap text-xs"
-            >
-              {className}
-            </Badge>
-          ))}
 
-          {remainingCount > 0 && classes && classes?.length > 0 && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-xs bg-accent px-1.5 py-0.5 rounded cursor-help">
-                    + {remainingCount}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">
-                    {classes?.slice(displayCount).join(', ')}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-      );
-    },
-  },
   {
     id: 'actions',
     header: 'Actions',

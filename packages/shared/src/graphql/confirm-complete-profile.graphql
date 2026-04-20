@@ -1,10 +1,4 @@
-enum SchoolRole {
-  ADMIN
-  TEACHER
-  STUDENT
-  PARENT
-  STAFF
-}
+
 input Role {
   role: SchoolRole
 }

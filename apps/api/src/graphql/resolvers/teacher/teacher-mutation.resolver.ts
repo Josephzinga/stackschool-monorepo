@@ -1,20 +1,18 @@
-import { prisma } from '@stackschool/db';
 import { createServiceError } from '../../../utils/api-errors';
 import { Resolvers } from '../../types.generated';
-import { isAdmin } from '../../../lib/verify-role';
+import { checkSchoolId, checkUser, isAdmin } from '../../../lib/verify-role';
 import { safeValidateSchema } from '../../../utils/validate-schema.util';
-import { createTeacherSchema } from '@stackschool/shared';
+import {
+  createTeacherSchema,
+  teacherAssignmentSchema,
+} from '@stackschool/shared';
 
 export const teacherMutationResolver: Resolvers = {
   Mutation: {
-    createTeacher: async (_, { input }, { user, schoolId }) => {
+    createTeacher: async (_, { input }, { user, schoolId, prisma }) => {
       try {
-        if (!user) throw createServiceError('Non authentifié', 401);
-
-        if (!schoolId) {
-          return createServiceError('identifiant manquant', 400);
-        }
-
+        checkUser(user);
+        checkSchoolId(schoolId);
         const { success, errors, data } = safeValidateSchema(
           createTeacherSchema,
           input,
@@ -38,7 +36,6 @@ export const teacherMutationResolver: Resolvers = {
         return await prisma.$transaction(async (tx) => {
           let userId: string;
 
-          // 1. Gestion de l'utilisateur (Existant ou Nouveau)
           const existingUser = await tx.user.findFirst({
             where: {
               OR: [
@@ -71,7 +68,6 @@ export const teacherMutationResolver: Resolvers = {
             userId = newUser.id;
           }
 
-          // 2. Vérifier si déjà membre de cette école
           const existingMember = await tx.schoolUser.findUnique({
             where: { schoolId_userId: { schoolId, userId } },
             select: {
@@ -90,7 +86,6 @@ export const teacherMutationResolver: Resolvers = {
             );
           }
 
-          // 3. Création SchoolUser + Teacher + Liens Classes
           const schoolUser = await tx.schoolUser.create({
             data: {
               role: 'TEACHER',
@@ -122,11 +117,9 @@ export const teacherMutationResolver: Resolvers = {
       }
     },
 
-    deleteTeachers: async (_, { teacherIds }, { schoolId, user }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId)
-        throw createServiceError("Identifiant de l'établissement manquant");
-
+    deleteTeachers: async (_, { teacherIds }, { schoolId, user, prisma }) => {
+      checkSchoolId(schoolId);
+      checkUser(user);
       const adminCheck = await isAdmin({
         context: { schoolId, userId: user.id },
       });
@@ -167,11 +160,13 @@ export const teacherMutationResolver: Resolvers = {
       }
     },
 
-    updateTeacher: async (_, { teacherId, data }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId)
-        throw createServiceError("Identifiant de l'établissement manquant");
-
+    updateTeacher: async (
+      _,
+      { teacherId, data },
+      { user, schoolId, prisma },
+    ) => {
+      checkSchoolId(schoolId);
+      checkUser(user);
       const adminCheck = await isAdmin({
         context: { schoolId, userId: user.id },
       });
@@ -194,7 +189,6 @@ export const teacherMutationResolver: Resolvers = {
         }
 
         return await prisma.$transaction(async (tx) => {
-          // 1. Mise à jour User/Profile
           await tx.user.update({
             where: { id: teacher.schoolUser.userId },
             data: {
@@ -210,19 +204,187 @@ export const teacherMutationResolver: Resolvers = {
             },
           });
 
-          // 2. Mise à jour Teacher
           return await tx.teacher.update({
             where: { id: teacherId },
             data: {
               diploma: data.diploma,
               specialization: data.specialization,
-              // Mise à jour des classes (Sync)
             },
           });
         });
       } catch (error) {
         console.error('Erreur update prof:', error);
         throw createServiceError('Erreur lors de la mise à jour', 500, error);
+      }
+    },
+
+    createTeacherAssignment: async (
+      _,
+      { input },
+      { user, schoolId, prisma },
+    ) => {
+      checkUser(user);
+      checkSchoolId(schoolId);
+
+      const {
+        success: ok,
+        errors,
+        data,
+      } = safeValidateSchema(teacherAssignmentSchema, input);
+      if (!ok) {
+        throw createServiceError(
+          errors?.[0]?.message || 'Erreur de validation',
+          400,
+          errors,
+        );
+      }
+      const { success, message } = await isAdmin({
+        context: { schoolId, userId: user.id },
+      });
+
+      if (!success) {
+        throw createServiceError(message || 'Permission non accordée.');
+      }
+      const { subjectIds, teacherId, classId } = data!;
+
+      try {
+        const existingClassSubjects = await prisma.classSubjects.findMany({
+          where: {
+            schoolId,
+            group: { classes: { some: { id: classId } } },
+            subjectId: { in: subjectIds },
+          },
+          include: { subject: true },
+        });
+
+        if (existingClassSubjects.length !== subjectIds.length) {
+          throw createServiceError(
+            'Certaines matières sont introuvables pour cette classe.',
+          );
+        }
+
+        const conflicts = await prisma.teacherAssignment.findMany({
+          where: {
+            schoolId,
+            classSubjectId: { in: existingClassSubjects.map((cs) => cs.id) },
+          },
+          select: {
+            classSubject: { select: { subject: true } },
+          },
+        });
+
+        if (conflicts.length > 0) {
+          const conflictNames = conflicts
+            .map((c) => c.classSubject.subject.name)
+            .join(', ');
+          throw createServiceError(
+            `Les matières suivantes ont déjà un enseignant : ${conflictNames}`,
+          );
+        }
+
+        const dataToCreate = existingClassSubjects.map((cs) => ({
+          schoolId,
+          teacherId,
+          classSubjectId: cs.id,
+        }));
+
+        const result = await prisma.teacherAssignment.createMany({
+          data: dataToCreate,
+        });
+
+        return {
+          ok: true,
+          message: `${result.count} assignation(s) créée(s) avec succès`,
+        };
+      } catch (err: any) {
+        throw createServiceError(
+          err?.message || "Erreur lors de la création de l'assignation",
+          err?.statusCode || 500,
+        );
+      }
+    },
+
+    deleteTeacherAssignment: async (_, { id }, { user, prisma, schoolId }) => {
+      checkUser(user);
+      checkSchoolId(schoolId);
+
+      try {
+        const lessonsCount = await prisma.lesson.count({
+          where: { teacherAssignmentId: id },
+        });
+
+        if (lessonsCount > 0) {
+          throw createServiceError(
+            `Impossible de supprimer : ${lessonsCount} leçon(s) sont liées à ce professeur. Supprimez les leçons d'abord.`,
+          );
+        }
+
+        await prisma.teacherAssignment.delete({
+          where: { id, schoolId },
+        });
+
+        return { ok: true, message: 'Assignation supprimée avec succès' };
+      } catch (err: any) {
+        throw createServiceError(
+          err.message || 'Erreur lors de la suppression',
+        );
+      }
+    },
+    syncTeacherAssignment: async (_, { input }, { user, prisma, schoolId }) => {
+      checkUser(user);
+      checkSchoolId(schoolId);
+      try {
+        // À l'intérieur de ton resolver syncTeacherAssignments
+        const { teacherId, classId, subjectIds } = input;
+
+        return await prisma.$transaction(async (tx) => {
+          // 1. Récupérer les IDs de jonction (ClassSubjects) pour cette classe
+          const classSubjects = await tx.classSubjects.findMany({
+            where: {
+              subjectId: { in: subjectIds },
+              group: { classes: { some: { id: classId } } },
+            },
+          });
+          const targetCSIds = classSubjects.map((cs) => cs.id);
+
+          // 2. Récupérer les assignations actuelles
+          const currentAssignments = await tx.teacherAssignment.findMany({
+            where: {
+              teacherId,
+              classSubject: { group: { classes: { some: { id: classId } } } },
+            },
+          });
+          const currentCSIds = currentAssignments.map((a) => a.classSubjectId);
+
+          // 3. Calculer les deltas
+          const toAdd = targetCSIds.filter((id) => !currentCSIds.includes(id));
+          const toDelete = currentAssignments.filter(
+            (a) => !targetCSIds.includes(a.classSubjectId),
+          );
+
+          // 4. Appliquer les changements
+          if (toDelete.length > 0) {
+            await tx.teacherAssignment.deleteMany({
+              where: { id: { in: toDelete.map((a) => a.id) } },
+            });
+          }
+
+          if (toAdd.length > 0) {
+            await tx.teacherAssignment.createMany({
+              data: toAdd.map((csId) => ({
+                teacherId,
+                classSubjectId: csId,
+                schoolId, // Important pour ton multi-tenant
+              })),
+            });
+          }
+
+          return { ok: true };
+        });
+      } catch (err: any) {
+        throw createServiceError(
+          err?.message || 'Erreur lors de la misse à jour des assignation',
+        );
       }
     },
   },

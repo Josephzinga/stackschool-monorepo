@@ -16,6 +16,7 @@ jest.mock('@stackschool/db', () => ({
       findMany: jest.fn(),
       create: jest.fn(),
       findUnique: jest.fn(),
+      update: jest.fn(),
     },
   },
 }));
@@ -54,12 +55,13 @@ describe('Lesson Mutations', () => {
 
   describe('createLesson', () => {
     it('should create a lesson successfully as ADMIN', async () => {
-      mockPrisma.classSubjects.findFirst({
-        where: {
-          id: mockClassSubjectId,
-          teacherId: mockTeacherId,
-          groupId: mockClassId,
-        },
+      mockPrisma.classSubjects.findFirst.mockResolvedValue({
+        id: mockClassSubjectId,
+        subjectId: mockClassSubjectId,
+        teacherId: mockTeacherId,
+        groupId: mockClassId,
+        weeklyHours: null,
+        coefficient: 0,
       });
 
       mockPrisma.lesson.findMany.mockResolvedValue([]); // No existing lessons
@@ -70,7 +72,7 @@ describe('Lesson Mutations', () => {
         endTime: parse('MONDAY 09:00', 'EEEE HH:mm', REFERENCE_DATE),
         day: 'MONDAY',
         schoolId: mockSchoolId,
-        classSubjectId: mockClassSubjectId,
+        classSubject: { teacherId: mockTeacherId },
         status: LessonStatus.PLANNED,
         subtitle: null,
         roomId: null,
@@ -137,11 +139,24 @@ describe('Lesson Mutations', () => {
         id: mockClassSubjectId,
         teacherId: mockTeacherId,
         groupId: mockClassId,
+        weeklyHours: null,
+        coefficient: 0,
+        subjectId: '',
       });
       mockPrisma.lesson.findMany.mockResolvedValue([
         {
           startTime: parse('MONDAY 08:30', 'EEEE HH:mm', REFERENCE_DATE),
           endTime: parse('MONDAY 09:30', 'EEEE HH:mm', REFERENCE_DATE),
+          id: '',
+          schoolId: mockSchoolId,
+          title: null,
+          subtitle: null,
+          status: 'PLANNED',
+          day: 'MONDAY',
+          roomId: null,
+          classSubjectId: mockClassSubjectId,
+          createdAt: undefined,
+          updatedAt: undefined,
         },
       ]); // Conflict
 
@@ -199,17 +214,34 @@ describe('Lesson Mutations', () => {
     beforeEach(() => {
       mockPrisma.lesson.findUnique.mockResolvedValue({
         id: mockLessonId,
-        status: 'UPCOMING',
-        classSubject: { teacherId: mockClassSubjectTeacherId },
+        status: LessonStatus.PLANNED,
+        classSubject: { teacherId: mockTeacherId },
+        title: null,
+        subtitle: null,
+        startTime: parse('MONDAY 08:00 ', 'EEEE HH:mm', REFERENCE_DATE),
+        endTime: parse('MONDAY 10:00 ', 'EEEE HH:mm', REFERENCE_DATE),
+        schoolId: mockSchoolId,
+        roomId: '',
+        createdAt: parse('MONDAY 08:00 ', 'EEEE HH:mm', REFERENCE_DATE),
+        updatedAt: undefined,
       });
       mockPrisma.lesson.update.mockResolvedValue({
         id: mockLessonId,
-        status: 'ONGOING',
+        status: LessonStatus.PLANNED,
+        title: null,
+        subtitle: null,
+        startTime: parse('MONDAY 08:00 ', 'EEEE HH:mm', REFERENCE_DATE),
+        endTime: parse('MONDAY 10:00 ', 'EEEE HH:mm', REFERENCE_DATE),
+        schoolId: mockSchoolId,
+        roomId: '',
+        classSubject: { teacherId: mockTeacherId },
+        createdAt: parse('MONDAY 08:00 ', 'EEEE HH:mm', REFERENCE_DATE),
+        updatedAt: undefined,
       });
     });
 
     it('should update lesson status successfully as ADMIN', async () => {
-      const result = await lessonMutationResolver.Mutation.updateLessonStatus(
+      const result = lessonMutationResolver.Mutation.updateLessonStatus(
         {},
         { id: mockLessonId, status: 'ONGOING' },
         mockContext,
@@ -255,7 +287,16 @@ describe('Lesson Mutations', () => {
       mockPrisma.lesson.findUnique.mockResolvedValue({
         id: mockLessonId,
         status: 'COMPLETED', // Cannot transition from COMPLETED to ONGOING
-        classSubject: { teacherId: mockClassSubjectTeacherId },
+        classSubjectId: mockClassSubjectId,
+        createdAt: undefined,
+        updatedAt: undefined,
+        schoolId: '',
+        title: null,
+        subtitle: null,
+        startTime: undefined,
+        day: 'MONDAY',
+        endTime: undefined,
+        roomId: null,
       });
 
       await expect(

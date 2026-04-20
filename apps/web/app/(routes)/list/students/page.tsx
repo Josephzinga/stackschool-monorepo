@@ -1,6 +1,6 @@
 'use client';
 import { DataTable } from '@/components/school/student/table/data-table';
-import { useGetSchoolStudentsQuery, useUserStore } from '@stackschool/ui';
+import { useGetSchoolStudentsQuery } from '@stackschool/ui';
 import {
   columns,
   StudentColumns,
@@ -22,15 +22,13 @@ export default function () {
 }
 
 function StudentView() {
-  const { currentSchool } = useUserStore();
   const searchParams = useSearchParams();
   const teacherId = searchParams.get('teacherId');
 
   const { filters, pagination, searchTerm } = useTable();
 
-  const search = useDebounce(500, searchTerm);
+  const search = useDebounce(searchTerm, 400);
   const { data, isPending } = useGetSchoolStudentsQuery({
-    schoolId: currentSchool?.id!,
     input: {
       ...filters,
       sort: filters.sort,

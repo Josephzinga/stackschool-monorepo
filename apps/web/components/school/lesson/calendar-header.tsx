@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLessonStore } from '@/store/lesson-store';
 
 import React from 'react';
-import { useLessonEvents } from './hooks/useLessonEvents';
+import { useLessonEvents } from '@/components/school/lesson/hooks/useLessonEvents';
 
 export const CalendarHeader = () => {
   const { currentView } = useLessonStore();

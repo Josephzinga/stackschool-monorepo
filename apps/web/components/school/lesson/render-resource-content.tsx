@@ -3,14 +3,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Clock, MapPin, User } from 'lucide-react';
+import { Clock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion } from 'motion/react';
 
 interface ResourceWithDetails {
   id: string;
   title: string;
-  teacherName?: string;
-  totalHours: number;
+  totalHours?: number;
   lessons?: Array<{
     subject: string;
     day: string;
@@ -67,12 +67,6 @@ export function RenderResourceContent({
       <PopoverContent className="w-80 p-3">
         <div className="space-y-2">
           <h4 className="font-semibold">{resource.title}</h4>
-          {resource.teacherName && (
-            <div className="flex items-center gap-2 text-sm">
-              <User className="h-3.5 w-3.5 text-muted-foreground" />
-              <span>{resource.teacherName}</span>
-            </div>
-          )}
           <div className="flex items-center gap-2 text-sm">
             <Clock className="h-3.5 w-3.5 text-muted-foreground" />
             <span>{resource.totalHours} heures cette semaine</span>
@@ -102,3 +96,21 @@ export function RenderResourceContent({
     </Popover>
   );
 }
+
+export const TimeGridContainer = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{
+      duration: 0.5,
+      delay: 0.2,
+      ease: 'linear' as const,
+    }}
+  >
+    {children}
+  </motion.div>
+);

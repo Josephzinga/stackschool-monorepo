@@ -20,7 +20,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   const schoolId = currentSchool?.id;
-  console.log('SchoolId', schoolId);
   const { data, isLoading, error } = useGetDashboardContextQuery(
     { input: schoolId },
     {

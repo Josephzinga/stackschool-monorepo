@@ -14,7 +14,8 @@ import {
 import React, { useState } from 'react';
 import {
   useCreateSubjectMutation,
-  useGetNavigationDataQuery,
+  useGetClassesOptionsQuery,
+  useGetTeacherOptionsQuery,
 } from '@stackschool/ui';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -52,7 +53,20 @@ export default function SubjectForm({
   const [tempClass, setTempClass] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
-  const { data } = useGetNavigationDataQuery({}, { enabled: !initialValues });
+  const { data: classesData } = useGetClassesOptionsQuery({
+    input: {
+      limit: 100,
+    },
+  });
+
+  const { data: teacherData } = useGetTeacherOptionsQuery({
+    input: {
+      limit: 100,
+    },
+  });
+
+  const teachers = teacherData?.getSchoolTeachers.data;
+  const classes = classesData?.getSchoolClasses.data;
   const { mutateAsync } = useCreateSubjectMutation({
     onMutate: async (newSubject) => {
       await queryClient.cancelQueries({ queryKey: ['GetSchoolSubjects'] });
@@ -106,9 +120,6 @@ export default function SubjectForm({
     });
     if (onSuccess) onSuccess();
   };
-
-  const teachers = data?.getClassTeacher?.teacher;
-  const classes = data?.getClassTeacher?.class;
 
   const { fields, append, remove } = useFieldArray({
     control: control,

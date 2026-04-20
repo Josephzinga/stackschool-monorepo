@@ -7,7 +7,6 @@ import {
   Gender,
   GetStudentDetailsQuery,
   StudentStatus,
-  TransportMode,
   UpdateMode,
   useCreateListStudentMutation,
   useUpdateStudentMutation,
@@ -73,7 +72,7 @@ export function CreateStudentForm({
       allergies: initialValues?.allergies || '',
       parentData: {
         mode: 'CONNECT',
-        parentId: initialValues?.parents?.map((p) => p?.id)[0],
+        parentId: initialValues?.parentStudent?.map((p) => p?.parent?.id)[0],
       },
     },
   });
@@ -114,7 +113,7 @@ export function CreateStudentForm({
       allergies: initialValues?.allergies || '',
       parentData: {
         mode: 'CONNECT',
-        parentId: initialValues?.parents?.map((p) => p?.id)[0],
+        parentId: initialValues?.parentStudent?.map((p) => p?.parent?.id)[0],
       },
     });
   }, [initialValues]);
@@ -149,7 +148,7 @@ export function CreateStudentForm({
             ...formData,
             gender: formData.gender as Gender,
             status: formData?.status as StudentStatus | undefined,
-            transportMode: formData.transportMode as TransportMode,
+            transportMode: formData?.transportMode,
             parentData: {
               ...formData?.parentData,
               mode: formData?.parentData?.mode as UpdateMode,
@@ -165,6 +164,7 @@ export function CreateStudentForm({
             gender: formData.gender as Gender,
           },
         });
+    console.log('StudentData', formData);
 
     toast.promise(promise, {
       loading: initialValues
@@ -202,7 +202,11 @@ export function CreateStudentForm({
         <SchoolSection mode={mode} />
 
         {mode === 'FULL_EDIT' && (
-          <FamilySection parentsData={initialValues?.parents || []} />
+          <FamilySection
+            parentsData={
+              initialValues?.parentStudent?.map((ps) => ps?.parent) || []
+            }
+          />
         )}
         {mode === 'FULL_EDIT' && <SanteSection />}
         <div className="flex justify-end pt-4">

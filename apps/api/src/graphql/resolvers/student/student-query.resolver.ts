@@ -1,17 +1,13 @@
-import { Prisma, prisma } from '@stackschool/db';
+import { Prisma } from '@stackschool/db';
 import { Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
-import { checkRole } from '../../../lib/verify-role';
+import { checkRole, checkSchoolId, checkUser } from '../../../lib/verify-role';
 
 export const studentQueryResolver: Resolvers = {
   Query: {
-    getSchoolStudents: async (_, { input }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId)
-        throw createServiceError(
-          "Identifiant de l'établissement manquant",
-          400,
-        );
+    getSchoolStudents: async (_, { input }, { user, schoolId, prisma }) => {
+      checkUser(user);
+      checkSchoolId(schoolId);
       const {
         page = 0,
         limit = 10,
@@ -115,14 +111,36 @@ export const studentQueryResolver: Resolvers = {
         },
       };
     },
+    searchStudent: async (_: any, { filter }, { user, prisma }) => {
+      const schoolId = filter.schoolId;
+      const searchTerm = filter.searchTerm?.trim() || '';
+      const limit = filter.limit ?? undefined;
+      checkSchoolId(schoolId);
 
-    student: async (_, { id }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId)
-        throw createServiceError(
-          "Identifiant de l'établissement manquant",
-          400,
-        );
+      const students = await prisma.student.findMany({
+        where: {
+          schoolId,
+          OR: [
+            {
+              profile: {
+                firstname: { contains: searchTerm, mode: 'insensitive' },
+              },
+            },
+            {
+              profile: {
+                lastname: { contains: searchTerm, mode: 'insensitive' },
+              },
+            },
+            { matricule: { contains: searchTerm, mode: 'insensitive' } },
+          ],
+        },
+        take: limit,
+      });
+      return students;
+    },
+    student: async (_, { id }, { user, schoolId, prisma }) => {
+      checkUser(user);
+      checkSchoolId(schoolId);
 
       try {
         const checkedRole = await checkRole({

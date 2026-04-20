@@ -1,14 +1,13 @@
 import { prisma, Prisma } from '@stackschool/db';
 import { Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
-import { checkRole } from '../../../lib/verify-role';
+import { checkRole, checkSchoolId, checkUser } from '../../../lib/verify-role';
 
 export const classQueryResolver: Resolvers = {
   Query: {
     getSchoolClasses: async (_, { input }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId) throw createServiceError('Identifiant manquant', 400);
-
+      checkUser(user);
+      checkSchoolId(schoolId);
       const {
         searchTerm,
         section,
@@ -27,7 +26,9 @@ export const classQueryResolver: Resolvers = {
         whereClause.group = {
           classSubjects: {
             some: {
-              teacherId,
+              assignments: {
+                teacherId,
+              },
             },
           },
         };
@@ -77,13 +78,9 @@ export const classQueryResolver: Resolvers = {
     },
 
     class: async (_, { id }, { user, schoolId }) => {
+      checkUser(user);
+      checkSchoolId(schoolId);
       try {
-        if (!user) throw createServiceError('Non authentifié', 401);
-        if (!schoolId)
-          throw createServiceError(
-            "Identifiant de l'établissement manquant",
-            400,
-          );
         const checked = await checkRole({
           context: { userId: user.id, schoolId },
           roles: ['ADMIN', 'TEACHER'],
@@ -103,10 +100,11 @@ export const classQueryResolver: Resolvers = {
         if (!classData || classData.schoolId !== schoolId) {
           throw createServiceError('Accès refusé ou classe introuvable', 400);
         }
-        console.log('ClassData', classData);
         return classData!;
-      } catch (e) {
-        throw createServiceError('Erreur lors la recupération des classes.');
+      } catch (e: any) {
+        throw createServiceError(
+          e?.message || 'Erreur lors la recupération des classes.',
+        );
       }
     },
   },

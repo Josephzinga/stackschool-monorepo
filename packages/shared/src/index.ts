@@ -1,5 +1,6 @@
-export { authService } from './services/auth/auth.service';
 export { RedisService } from './services/redis/redisService';
+
+export { authServices } from './services/auth/authServices';
 export * from './lib/api';
 export { z, ZodError } from 'zod';
 export * from './types';

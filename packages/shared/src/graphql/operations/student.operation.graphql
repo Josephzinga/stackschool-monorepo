@@ -43,7 +43,28 @@ query GetStudentDetails($id: ID!) {
     ...StudentDetails
   }
 }
-
+query GetStudentForAttendance($input: GetSchoolStudentsInput!, $date: Date) {
+  getSchoolStudents(input: $input) {
+    data {
+      id
+      user {
+        email
+        profile {
+          firstname
+          lastname
+          photo
+        }
+      }
+      schoolClass {
+        id
+        name
+      }
+      attendances(date: $date) {
+        status
+      }
+    }
+  }
+}
 mutation UpdateStudent(
   $studentId: ID!
   $data: CreateStudentInput!

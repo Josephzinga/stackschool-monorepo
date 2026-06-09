@@ -7,7 +7,7 @@ import { Text } from '@/components/ui/text';
 import * as React from 'react';
 import { Pressable, type TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { authService, loginFormSchema, LoginFormType, parseAxiosError } from '@stackschool/shared';
+import { authServices, loginFormSchema, LoginFormType, parseAxiosError } from '@stackschool/shared';
 import Toast from 'react-native-toast-message';
 import { FieldError } from './field';
 import { Lock, Mail } from 'lucide-react-native';
@@ -34,7 +34,7 @@ export function SignInForm() {
   async function onSubmit(data: LoginFormType) {
     console.log('unsubmit');
     try {
-      const res = await authService.login(data);
+      const res = await authServices.login(data);
       console.log('response ok', res);
       if (res.ok) {
         Toast.show({

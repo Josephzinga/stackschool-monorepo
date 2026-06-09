@@ -1,155 +1,85 @@
 'use client';
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
 
-interface Person {
-  id: string;
-  name: string;
-  role: string;
-  class?: string;
-  attended?: boolean;
-  status?: string;
+import {
+  type ColumnDef,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import { DataTablePagination } from '@/components/data-table-pagination';
+import AppDataTable from '@/components/table/app-data-table';
+import { FormProvider, useForm } from 'react-hook-form';
+import {
+  AttendanceFormType,
+  attendanceSchema,
+} from '@/app/(routes)/list/attendances/page1';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { AttendanceMode } from '@/types/attendance';
+import { AttendanceStatus } from '@stackschool/ui';
+
+interface AttendanceTableProps<T> {
+  columns: ColumnDef<T>[];
+  data: T[];
+  isLoading?: boolean;
 }
 
-export function ManualAttendanceTable({
-  date,
-  roleFilter,
-  classFilter,
-}: {
-  date: Date;
-  roleFilter: string;
-  classFilter?: string;
-}) {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [bulkStatus, setBulkStatus] = useState<'PRESENT' | 'ABSENT' | 'LATE'>(
-    'PRESENT',
-  );
-
-  const members = [];
-
-  const markManual = useMutation({
-    mutationFn: (variables: { userIds: string[]; status: string }) => {
-      console.log('variables', variables);
-    },
-
-    onSuccess: () => {
-      toast.error('Pointage enregistré');
-      setSelectedIds([]);
-    },
-    onError: (error) => {
-      toast.error(error?.message);
-    },
+export function AttendanceTable<T>({
+  columns,
+  data,
+  isLoading,
+}: AttendanceTableProps<T>) {
+  const methods = useForm<AttendanceFormType>({
+    resolver: zodResolver(attendanceSchema),
   });
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(
-        members?.filter((m) => !m.attended).map((m) => m.id) || [],
-      );
-    } else {
-      setSelectedIds([]);
-    }
-  };
+  const [currentStatus, setCurrentStatus] = useState<
+    Array<{ id: string; userType: AttendanceMode; status: AttendanceStatus }>
+  >([]);
 
-  const handleSubmit = () => {
-    if (selectedIds.length === 0) return;
-    markManual.mutate({ userIds: selectedIds, status: bulkStatus });
+  const { handleSubmit } = methods;
+  const queryClient = useQueryClient();
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    meta: {
+      onChange: (data, status) => {
+        queryClient.getQueryData(['']);
+        setCurrentStatus((prev) => [
+          ...prev,
+          { id: data?.id, userType: data?.userType, status },
+        ]);
+        console.log(data, 'status', status);
+      },
+    },
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+  console.log('currentStatus', currentStatus);
+  const onSubmit = (data: AttendanceFormType) => {
+    handleSubmit(currentStatus);
   };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-2">
-          <Select
-            value={bulkStatus}
-            onValueChange={(val) => setBulkStatus(val as any)}
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="PRESENT">Présent</SelectItem>
-              <SelectItem value="ABSENT">Absent</SelectItem>
-              <SelectItem value="LATE">Retard</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={handleSubmit} disabled={selectedIds.length === 0}>
-            Marquer {selectedIds.length} personne(s)
-          </Button>
+  if (isLoading) {
+    return (
+      <div className="rounded-md border">
+        <div className="h-96 flex items-center justify-center text-muted-foreground">
+          Chargement...
         </div>
       </div>
+    );
+  }
 
-      <div className="border rounded-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={
-                    selectedIds.length > 0 &&
-                    selectedIds.length ===
-                      members?.filter((m) => !m.attended).length
-                  }
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
-              <TableHead>Nom</TableHead>
-              <TableHead>Rôle</TableHead>
-              <TableHead>Classe</TableHead>
-              <TableHead>Statut</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {members?.map((person) => (
-              <TableRow key={person.id}>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedIds.includes(person.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked)
-                        setSelectedIds((prev) => [...prev, person.id]);
-                      else
-                        setSelectedIds((prev) =>
-                          prev.filter((id) => id !== person.id),
-                        );
-                    }}
-                    disabled={person.attended}
-                  />
-                </TableCell>
-                <TableCell>{person.name}</TableCell>
-                <TableCell>{person.role}</TableCell>
-                <TableCell>{person.class || '-'}</TableCell>
-                <TableCell>
-                  {person.attended ? (
-                    <Badge variant="outline">Présent</Badge>
-                  ) : (
-                    <span className="text-muted-foreground">Non pointé</span>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+  return (
+    <FormProvider {...methods}>
+      <div className="space-y-4">
+        <div className="rounded-md border">
+          <AppDataTable table={table} columns={columns} />
+        </div>
+        <DataTablePagination table={table} />
       </div>
-    </div>
+    </FormProvider>
   );
 }

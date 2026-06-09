@@ -83,21 +83,15 @@
     --fc-border-color: #518fcd;
 
     --fc-button-text-color: #fff;
-    --fc-button-bg-color: var(--primary);
     --fc-button-border-color: #2C3E50;
     --fc-button-hover-bg-color: #1e2b37;
     --fc-button-hover-border-color: #1a252f;
     --fc-button-active-bg-color: #1a252f;
     --fc-button-active-border-color: #151e27;
-
-    --fc-event-bg-color: #3788d8;
-    --fc-event-border-color: #3788d8;
     --fc-event-text-color: #fff;
     --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
-
     --fc-more-link-bg-color: #d93f3f;
     --fc-more-link-text-color: inherit;
-
     --fc-event-resizer-thickness: 8px;
     --fc-event-resizer-dot-total-width: 8px;
     --fc-event-resizer-dot-border-width: 1px;
@@ -107,9 +101,6 @@
     --fc-highlight-color: rgba(188, 232, 241, 0.3);
     --fc-today-bg-color: rgba(189, 226, 231, 0.76);
     --fc-now-indicator-color: red;
-
-
-
 }
 
 .dark {

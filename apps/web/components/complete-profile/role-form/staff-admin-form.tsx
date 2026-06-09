@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useCompleteProfileStore, zodResolver } from '@stackschool/ui';
 import { Briefcase, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { StaffFormSchema, StaffFormValues } from '@stackschool/shared';
+import { StaffFormSchema, StaffFormDataType } from '@stackschool/shared';
 import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Calendar } from '@/components/ui/calendar';
@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   role: 'ADMIN' | 'STAFF';
-  onSubmit: (data: StaffFormValues) => void;
+  onSubmit: (data: StaffFormDataType) => void;
   onBack: () => void;
   isLoading?: boolean;
 }
@@ -36,7 +36,7 @@ export default function StaffAdminForm({
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<StaffFormValues>({
+  } = useForm<StaffFormDataType>({
     resolver: zodResolver(StaffFormSchema),
     defaultValues: {
       position: isAdmin

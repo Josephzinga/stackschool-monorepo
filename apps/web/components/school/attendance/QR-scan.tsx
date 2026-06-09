@@ -1,54 +1,73 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function ScanPage() {
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get('sessionId');
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
-  );
-  const [message, setMessage] = useState('');
+import { useState } from 'react';
+import { ScanLine } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-  const mutation = useMutation({
-    mutationFn: () => {
-      return new Promise((resolve) => setTimeout(() => resolve, 1000));
-    },
-    onSuccess: () => {
-      setStatus('success');
-      setMessage('Présence enregistrée avec succès !');
-    },
-    onError: (error: any) => {
-      setStatus('error');
-      setMessage(error.message || 'Erreur lors de l’enregistrement');
-    },
-  });
+interface ScannerDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onScan: (badgeId: string) => void;
+  isLoading?: boolean;
+}
 
-  useEffect(() => {
-    if (sessionId) {
-      mutation.mutate({ sessionId });
-    } else {
-      setStatus('error');
-      setMessage('Session invalide');
+export function ScannerDialog({
+  open,
+  onOpenChange,
+  onScan,
+  isLoading,
+}: ScannerDialogProps) {
+  const [badgeId, setBadgeId] = useState('');
+
+  const handleScan = () => {
+    if (badgeId.trim()) {
+      onScan(badgeId.trim());
+      setBadgeId('');
     }
-  }, [sessionId]);
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Présence</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {status === 'loading' && <p>Enregistrement en cours...</p>}
-          {status === 'success' && (
-            <p className="text-green-600">✅ {message}</p>
-          )}
-          {status === 'error' && <p className="text-red-600">❌ {message}</p>}
-        </CardContent>
-      </Card>
-    </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="gap-2">
+          <ScanLine className="h-4 w-4" />
+          Scanner un badge
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Scanner un badge élève</DialogTitle>
+          <DialogDescription>
+            Saisissez l'ID du badge ou utilisez le lecteur de codes-barres
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="badgeId">ID du badge</Label>
+            <Input
+              id="badgeId"
+              placeholder="Scannez ou saisissez l'ID..."
+              value={badgeId}
+              onChange={(e) => setBadgeId(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleScan()}
+              autoFocus
+            />
+          </div>
+          <Button onClick={handleScan} disabled={isLoading} className="w-full">
+            {isLoading ? 'Validation...' : 'Valider la présence'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

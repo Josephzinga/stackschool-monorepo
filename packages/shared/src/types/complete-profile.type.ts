@@ -1,10 +1,10 @@
 import type { Account, Gender, Profile, School, User } from '@stackschool/db';
 import {
   CreateSchoolType,
-  ParentFormData,
-  StaffFormValues,
-  StudentFormData,
-  TeacherFormData,
+  ParentFormDataType,
+  StaffFormDataType,
+  StudentFormDataType,
+  TeacherFormDataType,
 } from '../validation/complete-profile.schema';
 
 type CreateSchoolPayload = {
@@ -38,27 +38,27 @@ export type RoleData =
 
 type StudentData = {
   role: 'STUDENT';
-  student: StudentFormData;
+  student: StudentFormDataType;
 };
 
 type ParentData = {
   role: 'PARENT';
-  parent: ParentFormData;
+  parent: ParentFormDataType;
 };
 
 type TeacherData = {
   role: 'TEACHER';
-  teacher: TeacherFormData;
+  teacher: TeacherFormDataType;
 };
 
 type StaffData = {
   role: 'STAFF';
-  staff: StaffFormValues;
+  staff: StaffFormDataType;
 };
 
 type AdminData = {
   role: 'ADMIN';
-  admin: StaffFormValues;
+  admin: StaffFormDataType;
 };
 
 export interface ProfileData {

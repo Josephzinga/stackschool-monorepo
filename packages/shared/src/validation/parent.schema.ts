@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createTeacherSchema } from './create-list-teacher.schema';
-import { RelationType } from './complete-profile.schema';
+import { RelationTypeEnum } from './complete-profile.schema';
 
 export const createParentSchema = z.object({
   firstname: createTeacherSchema.shape.firstname,
@@ -12,7 +12,7 @@ export const createParentSchema = z.object({
   children: z.array(
     z.object({
       id: z.string('Veillez selectionner un élève'),
-      relationType: z.enum(RelationType),
+      relationType: z.enum(RelationTypeEnum),
     }),
   ),
 });

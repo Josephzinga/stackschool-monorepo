@@ -31,7 +31,7 @@ type AttendanceSessionPayload {
 
 type AttendanceRecord {
     id: String
-    person: Person   # union ou interface
+    person: Person
     status: AttendanceStatus
     date: DateTime
     checkInTime: DateTime

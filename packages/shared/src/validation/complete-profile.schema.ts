@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { profileSchema } from '@stackschool/shared/src';
+import { profileSchema } from '../../src';
 
 z.config(z.locales.fr());
 
-export enum RelationType {
+export enum RelationTypeEnum {
   FATHER = 'FATHER',
   MOTHER = 'MOTHER',
   GRAND_FATHER = 'GRAND_FATHER',
@@ -88,7 +88,7 @@ export const parentFormSchema = z.object({
         firstname: z.string(),
         lastname: z.string(),
         photo: z.string().optional(),
-        relation: z.enum(RelationType),
+        relation: z.enum(RelationTypeEnum),
       }),
     )
     .min(1, 'Veuillez sélectionner au moins un enfant.'),
@@ -156,12 +156,12 @@ export const roleDataSchema = z.discriminatedUnion('role', [
 ]);
 
 // Types inférés
-export type StaffFormValues = z.infer<typeof StaffFormSchema>;
+export type StaffFormDataType = z.infer<typeof StaffFormSchema>;
 export type InvitationFormData = z.infer<typeof invitationSchema>;
 export type CreateSchoolType = z.infer<typeof createSchoolSchema>;
-export type StudentFormData = z.infer<typeof studentFormSchema>;
-export type ParentFormData = z.infer<typeof parentFormSchema>;
-export type TeacherFormData = z.infer<typeof teacherSchema>;
-export type ProfileFormData = z.infer<typeof profileSchema>;
-export type SchoolData = z.infer<typeof schoolDataSchema>;
-export type RoleData = z.infer<typeof roleDataSchema>;
+export type StudentFormDataType = z.infer<typeof studentFormSchema>;
+export type ParentFormDataType = z.infer<typeof parentFormSchema>;
+export type TeacherFormDataType = z.infer<typeof teacherSchema>;
+export type ProfileFormDataType = z.infer<typeof profileSchema>;
+export type SchoolDataType = z.infer<typeof schoolDataSchema>;
+export type RoleDataType = z.infer<typeof roleDataSchema>;

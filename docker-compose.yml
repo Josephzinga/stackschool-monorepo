@@ -20,7 +20,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: infra/docker/dockerfile.api
+      dockerfile: infra/docker/api.dockerfile
     container_name: stackschool-api
     volumes:
       - ./apps/api:/app/apps/api
@@ -40,11 +40,16 @@ services:
     depends_on:
       - db
       - redis
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '3'
 
   web:
     build:
       context: .
-      dockerfile: infra/docker/dockerfile.web
+      dockerfile: infra/docker/web.dockerfile
     container_name: stackschool-web
     volumes:
       - ./apps/web:/app/apps/web

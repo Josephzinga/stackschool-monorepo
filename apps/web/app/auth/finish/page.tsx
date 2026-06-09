@@ -2,7 +2,7 @@
 
 import { Container } from '@/components/Container';
 import { Spinner } from '@/components/ui/spinner';
-import { authService } from '@stackschool/shared';
+import { authServices } from '@stackschool/shared';
 import { LucideOctagonX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -18,7 +18,7 @@ export default function AuthFinish() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const data = await authService.getMe();
+        const data = await authServices.getMe();
         // si connecté
         if (data?.user) {
           const profile = data.user?.profile;
@@ -33,10 +33,10 @@ export default function AuthFinish() {
           return;
         }
         // sin non connecté, on tente de rafrechire la session
-        const refreshData = await authService.refresh();
+        const refreshData = await authServices.refresh();
         // si le rafrechisement reuissi
         if (refreshData.ok) {
-          const data2 = await authService.getMe();
+          const data2 = await authServices.getMe();
 
           if (data2?.user) {
             if (!data2?.user.profile || !data2.user?.profile.fistname) {

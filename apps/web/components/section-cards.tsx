@@ -59,7 +59,7 @@ export function SectionCards({ stats }: { stats?: SchoolStats | null }) {
   const revenueBadge = badgeMap[revenueTrend.trend];
 
   return (
-    <div className="flex flex-col justify-between md:flex-row gap-2 w-full flex-wrap">
+    <div className="flex flex-col justify-between sm:flex-row gap-2 w-full flex-wrap">
       {/* Carte Élèves */}
       <UserCard
         DescriptionIcon={Users2Icon}

@@ -15,6 +15,7 @@ export default function ProtectedRoute({
   const { setUser, currentSchool, user, setCurrentSchool } = useUserStore();
 
   const { data, isLoading, error } = useGetMeQuery({}, { retry: false });
+  let currentUser = '';
 
   useEffect(() => {
     if (!isLoading && (!data?.me || error)) {
@@ -28,6 +29,7 @@ export default function ProtectedRoute({
       for (const member of data?.me?.memberships) {
         if (member?.school?.id === currentSchool?.id) {
           setCurrentSchool(member?.school);
+
           api.defaults.headers.common['x-school-id'] = member?.school.id;
         } else {
           setCurrentSchool(data?.me?.memberships[0]?.school);
@@ -50,12 +52,12 @@ export default function ProtectedRoute({
         router.replace('/auth/complete-profile');
         return;
       }
-
+      console.log('data', data.me.memberships);
       // Cas B : Profil complet
       if (isProfileComplete) {
         // Redirection depuis les pages d'auth
         if (isOnCompleteProfile || isOnAuthPage) {
-          router.replace(`/dashboard}`);
+          router.replace(`/dashboard/admin`);
           return;
         }
 

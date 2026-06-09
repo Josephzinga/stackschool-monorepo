@@ -32,7 +32,7 @@ export default function ClassAction({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => meta?.openEdit(row.original)}>
+          <DropdownMenuItem onClick={() => meta?.openEdit?.(row.original)}>
             Modifier
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => meta?.openAdd?.(row.original)}>
@@ -40,7 +40,7 @@ export default function ClassAction({
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
-            onClick={() => meta?.openDelete(row.original)}
+            onClick={() => meta?.openDelete?.(row.original)}
           >
             Supprimer
           </DropdownMenuItem>

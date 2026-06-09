@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import * as React from 'react';
 import { useState } from 'react';
-import { RelationType } from '@stackschool/shared';
+import { RelationTypeEnum } from '@stackschool/shared';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Popover,
@@ -26,7 +26,7 @@ export type ParentColumn = {
     id: string;
     firstname: string;
     lastname: string;
-    relationType: RelationType;
+    relationType: RelationTypeEnum;
     classe: {
       name: string;
       level: string;

@@ -5,34 +5,39 @@ import {
   Group,
   Lesson,
   PrismaClient,
-  TeacherAssignment,
+  Student,
   Subject,
   Teacher,
-  Student,
+  TeacherAssignment,
+  User,
 } from '@stackschool/db';
 
 export const createLoaders = (prisma: PrismaClient) => {
   return {
-    userLoader: new DataLoader(async (schoolUserIds: readonly string[]) => {
-      const schoolUsers = await prisma.schoolUser.findMany({
-        where: { id: { in: [...schoolUserIds] } },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              phoneNumber: true,
-              username: true,
-              isActive: true,
-              emailVerified: true,
-              profile: true,
+    userLoader: new DataLoader<string, User | undefined>(
+      async (schoolUserIds) => {
+        const schoolUsers = await prisma.schoolUser.findMany({
+          where: { id: { in: [...schoolUserIds] } },
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                phoneNumber: true,
+                username: true,
+                isActive: true,
+                emailVerified: true,
+                hasMembership: true,
+                profileCompleted: true,
+                profile: true,
+              },
             },
           },
-        },
-      });
-      const userMap = new Map(schoolUsers.map((su) => [su.id, su.user]));
-      return schoolUserIds.map((id) => userMap.get(id) || null);
-    }),
+        });
+        const userMap = new Map(schoolUsers.map((su) => [su.id, su.user]));
+        return schoolUserIds.map((id) => userMap.get(id));
+      },
+    ),
     classSubjectLoader: new DataLoader<string, ClassSubjects | undefined>(
       async (ids) => {
         const classSubjects = await prisma.classSubjects.findMany({

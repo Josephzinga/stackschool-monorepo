@@ -1,7 +1,7 @@
-import { RelationType } from '@stackschool/shared/src';
+import { RelationTypeEnum } from '@stackschool/shared/src';
 
 export const relationItems: Array<{
-  value: RelationType;
+  value: RelationTypeEnum;
   label: string;
 }> = [
   { value: 'FATHER', label: 'Père' },

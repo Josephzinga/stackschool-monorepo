@@ -4,7 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@react-navigation/native';
 import { useColorScheme } from 'nativewind';
 import { PortalHost } from '@rn-primitives/portal';
-import { authService } from '@stackschool/shared';
+import { authServices } from '@stackschool/shared';
 import Toast from 'react-native-toast-message';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -27,8 +27,8 @@ export default function RootLayout() {
   }, [loaded, error]);
 
   useEffect(() => {
-    authService.setBaseUrl(`http://localhost:${API_PORT}`);
-    console.log(authService.getApiBaseUrl());
+    authServices.setBaseUrl(`http://localhost:${API_PORT}`);
+    console.log(authServices.getApiBaseUrl());
   }, [IP_ADDRESS, API_PORT]);
 
   if (!loaded && !error) {

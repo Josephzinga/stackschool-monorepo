@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import {
   parentFormSchema,
-  RelationType,
+  RelationTypeEnum,
   studentFormSchema,
 } from './complete-profile.schema';
 import { profileSchema, registerFormSchema } from './auth.schema';
 
-export enum StudentStatus {
+export enum StudentStatusEnum {
   ACTIVE = 'ACTIVE',
   SUSPENDED = 'SUSPENDED',
   EXPELLED = 'EXPELLED',
@@ -17,7 +17,7 @@ export enum StudentStatus {
   DECEASED = 'DECEASED',
 }
 
-export enum TransportMode {
+export enum TransportModeEnum {
   BUS = 'BUS',
   WALK = 'WALK',
   PARENT = 'PARENT',
@@ -40,13 +40,13 @@ export const createStudentSchema = z.object({
   phoneNumber: registerFormSchema.shape.phoneNumber.optional(),
   isActive: z.boolean().optional(),
   // info metier dispo
-  status: z.enum(StudentStatus).optional(),
+  status: z.enum(StudentStatusEnum).optional(),
   birthCertificateNumber: z.string().optional(),
   previousSchool: z.string().optional(),
   previousClass: z.string().optional(),
   studentNumber: z.number().optional(),
   enrollmentDate: z.coerce.date().optional(),
-  transportMode: z.enum(TransportMode).optional(),
+  transportMode: z.enum(TransportModeEnum).optional(),
   documents: z
     .array(
       z.object({
@@ -71,7 +71,7 @@ export const createStudentSchema = z.object({
         phoneNumber: profileSchema.shape.phoneNumber.nonoptional(),
         email: registerFormSchema.shape.email.optional(),
         gender: profileSchema.shape.gender.optional(),
-        relationType: z.enum(RelationType),
+        relationType: z.enum(RelationTypeEnum),
         profession: parentFormSchema.shape.profession.nonoptional(),
       })
       .optional(),

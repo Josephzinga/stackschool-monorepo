@@ -2,7 +2,6 @@ input GetLessonsInput {
   groupId: ID
   teacherId: ID
   classId: ID
-  searchTerm: String
   department: String
   mode: ResourceMode!
   hasLessonOnly: Boolean = true
@@ -37,6 +36,8 @@ input GetSchoolTeachersInput {
   subjectId: ID
   isActive: Boolean
   isSupervisor: Boolean
+
+  day: Day
 }
 
 input GetSchoolClassesInput {

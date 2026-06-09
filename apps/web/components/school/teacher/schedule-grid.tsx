@@ -27,20 +27,19 @@ const TeacherScheduleGrid = ({ id }: { id: string }) => {
     lessonDialogOpen,
     alertOpen,
     setResourceMode,
+    setIsClassOnly,
   } = useLessonStore();
 
   useEffect(() => {
+    setIsClassOnly(true);
     resetAll();
     setResourceMode('TEACHER');
-    setCurrentView('timeGridWeek');
+    setResource({ id, title: 'joseph' });
     setSelectedFilter({ type: 'TEACHER', id });
+    setCurrentView('timeGridWeek');
   }, []);
   const { events, resources } = useLessonCalendar();
-  useEffect(() => {
-    if (resources && resources.length > 0)
-      setResource({ id: resources?.[0]?.id, title: resources?.[0]?.title });
-  }, [resources, lessonDialogOpen]);
-  console.log('Rendre');
+
   return (
     <div className="p-4 flex flex-col gap-4">
       {isLoading ? (

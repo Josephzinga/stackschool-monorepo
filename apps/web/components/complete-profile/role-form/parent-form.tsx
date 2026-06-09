@@ -14,10 +14,10 @@ import { Button } from '@/components/ui/button';
 import { Check, User, UserPlus, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
-  ParentFormData,
+  ParentFormDataType,
   parentFormSchema,
   parseAxiosError,
-  RelationType,
+  RelationTypeEnum,
 } from '@stackschool/shared';
 import { toast } from 'sonner';
 import { SubmitButton } from '@/components/submit-button';
@@ -53,14 +53,14 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
   const [childToConfigure, setChildToConfigure] = useState<Student | null>(
     null,
   );
-  const [tempRelation, setTempRelation] = useState<RelationType>('FATHER');
+  const [tempRelation, setTempRelation] = useState<RelationTypeEnum>('FATHER');
   const {
     handleSubmit,
     register,
     control,
 
     formState: { isSubmitting, errors },
-  } = useForm<ParentFormData>({
+  } = useForm<ParentFormDataType>({
     resolver: zodResolver(parentFormSchema),
     defaultValues: {
       children: parentData?.children || [],
@@ -123,12 +123,12 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
     toast.success(`${childToConfigure?.user?.profile?.firstname} ajouté !`);
   };
 
-  const relationSelected = (childRelation: RelationType) => {
+  const relationSelected = (childRelation: RelationTypeEnum) => {
     const relation = relationItems.filter((r) => r.value === childRelation);
     return relation.length > 0 ? relation[0].label : '';
   };
 
-  const onSubmit = async (data: ParentFormData) => {
+  const onSubmit = async (data: ParentFormDataType) => {
     try {
       setRoleData({ role: 'PARENT', parent: data });
       setCurrentStep(4);

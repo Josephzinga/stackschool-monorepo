@@ -1,4 +1,4 @@
-import { ProfileData, RoleData, SchoolData } from '@stackschool/shared';
+import { ProfileData, RoleDataType, SchoolDataType } from '@stackschool/shared';
 import { School, User } from '../generated/graphql';
 
 export interface UserStore {
@@ -11,9 +11,9 @@ export interface UserStore {
 }
 
 export interface CompleteProfileStep {
-  school: SchoolData | null;
+  school: SchoolDataType | null;
   profile: ProfileData | null;
-  role: RoleData | null;
+  role: RoleDataType | null;
   lastSavedAt: string | null;
   error?: string | null;
   isSubmitting: boolean;
@@ -22,9 +22,9 @@ export interface CompleteProfileStep {
   reset: () => void;
   setError: (err: string | null) => void;
 
-  setSchoolData: (school: SchoolData) => void;
+  setSchoolData: (school: SchoolDataType) => void;
   setProfileData: (profileData: ProfileData) => void;
-  setRoleData: (roleData: RoleData) => void;
+  setRoleData: (roleData: RoleDataType) => void;
   saveToRedis: () => Promise<void | { success: boolean; error?: string }>;
   loadFromRedis: () => Promise<
     boolean | undefined | { success: boolean; error?: string }

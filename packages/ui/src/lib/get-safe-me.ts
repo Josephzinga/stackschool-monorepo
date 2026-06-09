@@ -1,8 +1,8 @@
-import { authService, parseAxiosError, UserInMe } from '@stackschool/shared';
+import { authServices, parseAxiosError, UserInMe } from '@stackschool/shared';
 
 export async function getSafeMe(): Promise<UserInMe | null> {
   try {
-    const me = await authService.getMe();
+    const me = await authServices.getMe();
     if (me.ok) {
       return me.user ?? null;
     }
@@ -11,9 +11,9 @@ export async function getSafeMe(): Promise<UserInMe | null> {
 
     if (status === 401) {
       try {
-        const refresh = await authService.refresh();
+        const refresh = await authServices.refresh();
         if (refresh.ok) {
-          const me2 = await authService.getMe();
+          const me2 = await authServices.getMe();
           return me2.user ?? null;
         }
       } catch (refreshErr) {

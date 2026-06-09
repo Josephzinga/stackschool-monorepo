@@ -67,7 +67,28 @@ type Query {
   getSchoolClasses(input: GetSchoolClassesInput!): ClassList!
 
   getSchoolSubjects(input: GetSubjectInput!): SubjectList
+  getTeachersForAttendance(filter: GetTeacherForAttendanceInput!): [TeacherTodaySubject]
 
   getSchoolRooms(filter: GetSchoolRoomInput!): RoomList!
   getSchoolParents(filter: GetSchoolParentsInput!): ParentList
+}
+
+
+input GetTeacherForAttendanceInput {
+  search: String
+  day: Day
+  page: Int! = 0
+  limit: Int! = 10
+
+  attendanceDate: Date
+}
+
+type TeacherTodaySubject {
+  teachers: Teacher
+  classes: ClassLessons
+}
+
+type ClassLessons {
+  classSubject: ClassSubject
+  lesson: Lesson
 }

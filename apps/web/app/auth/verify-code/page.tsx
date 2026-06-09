@@ -18,7 +18,7 @@ import {
 
 import { Controller, useForm, zodResolver } from '@stackschool/ui';
 import {
-  authService,
+  authServices,
   parseAxiosError,
   VerifyCodeFormType,
   VerifyCodeSchema,
@@ -57,7 +57,7 @@ export default function VerifyCode() {
 
   const handleCode = async ({ code }: VerifyCodeFormType) => {
     try {
-      const res = await authService.verifyCode(code, null);
+      const res = await authServices.verifyCode(code, null);
       toast.success(res.message);
       if (res.ok) {
         router.push(`/auth/reset-password`);
@@ -72,7 +72,7 @@ export default function VerifyCode() {
 
   const handleResendCode = async () => {
     try {
-      const res = await authService.resendCode();
+      const res = await authServices.resendCode();
       if (res.ok) {
         toast.success(res.message || 'Nouveau code envoyé');
         setCountdown(60); // 60 secondes d'attente

@@ -1,0 +1,1 @@
+{"version":3,"file":"teacher-dialog.d.ts","sourceRoot":"","sources":["teacher-dialog.tsx"],"names":[],"mappings":"AAUA,OAAO,EAAE,mBAAmB,EAAE,MAAM,qBAAqB,CAAC;AAE1D,wBAAgB,aAAa,CAAC,EAC5B,IAAI,EACJ,OAAO,EACP,aAAa,GACd,EAAE;IACD,IAAI,EAAE,OAAO,CAAC;IACd,OAAO,EAAE,CAAC,KAAK,EAAE,OAAO,KAAK,IAAI,CAAC;IAClC,aAAa,CAAC,EAAE,mBAAmB,CAAC;CACrC,+BAyBA"}

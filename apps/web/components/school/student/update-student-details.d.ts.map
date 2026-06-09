@@ -1,0 +1,1 @@
+{"version":3,"file":"update-student-details.d.ts","sourceRoot":"","sources":["update-student-details.tsx"],"names":[],"mappings":"AAUA,OAAO,EAAE,sBAAsB,EAAE,MAAM,iBAAiB,CAAC;AAEzD,wBAAgB,oBAAoB,CAAC,EACnC,IAAI,EACJ,YAAY,EACZ,WAAW,GACZ,EAAE;IACD,IAAI,EAAE,OAAO,CAAC;IACd,YAAY,EAAE,CAAC,IAAI,EAAE,OAAO,KAAK,IAAI,CAAC;IACtC,WAAW,EAAE,sBAAsB,CAAC,SAAS,CAAC,CAAC;CAChD,+BAuBA"}

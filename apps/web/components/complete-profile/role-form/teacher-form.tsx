@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
   ClassWithSubjects,
-  TeacherFormData,
+  TeacherFormDataType,
   teacherSchema,
 } from '@stackschool/shared';
 import {
@@ -55,7 +55,7 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<TeacherFormData>({
+  } = useForm<TeacherFormDataType>({
     resolver: zodResolver(teacherSchema),
     defaultValues: {
       assignments: teacherData?.assignments || [],
@@ -123,7 +123,7 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
     );
   }, [classesData, fields]);
 
-  const onSubmit = async (data: TeacherFormData) => {
+  const onSubmit = async (data: TeacherFormDataType) => {
     try {
       setRoleData({ role: 'TEACHER', teacher: data });
       setCurrentStep(4);

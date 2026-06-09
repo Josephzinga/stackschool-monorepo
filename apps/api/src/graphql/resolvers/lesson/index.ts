@@ -1,6 +1,6 @@
 import { GetLessonsInput } from '../../types.generated';
 import { prisma, Prisma } from '@stackschool/db';
-import { LessonStatus } from '@stackschool/shared';
+import { LessonStatusEnum } from '@stackschool/shared';
 import { lessonMutationResolver } from './lesson-mutation.resolver';
 import { lessonQueryResolver } from './lesson-query.resolver';
 import { lessonsResolver } from './lessons.resolver';
@@ -99,7 +99,7 @@ export const fetchLessons = async (
   mode: string,
   teacherIds: string[],
   groupIds: string[],
-  status?: LessonStatus,
+  status?: LessonStatusEnum,
 ) => {
   const lessonWhere: Prisma.LessonWhereInput = {
     schoolId,

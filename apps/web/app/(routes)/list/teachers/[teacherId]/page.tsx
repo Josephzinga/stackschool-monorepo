@@ -46,13 +46,6 @@ import {
 } from '@/components/app-tabs';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 
-const shortHands = [
-  { value: 'classes', label: 'Classes', href: '/list/classes' },
-  { value: 'lessons', label: 'Leçons', href: '/list/lessons' },
-  { value: 'subject', label: 'Matières', href: '/list/subject' },
-  { value: 'students', label: 'Élèves', href: '/list/students' },
-];
-
 export default function TeacherDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -73,7 +66,6 @@ export default function TeacherDetailsPage() {
 
     const promise = mutateAsync({
       teacherIds: [teacherId],
-      schoolId: currentSchool.id,
     });
 
     toast.promise(promise, {
@@ -88,10 +80,6 @@ export default function TeacherDetailsPage() {
     } catch (e) {
       console.error(e);
     }
-  };
-
-  const handleShortcut = (href: string) => {
-    router.push(`${href}?teacherId=${teacherId}`);
   };
 
   if (isLoading) {
@@ -197,7 +185,9 @@ export default function TeacherDetailsPage() {
             <AppTabsList className="rounded-lg mb-2">
               <AppTabsTrigger value="overview">Aperçu</AppTabsTrigger>
               <AppTabsTrigger value="classes">
-                Classes ({teacher.classSubjects?.length || 0})
+                <div onClick={() => router.push('#classes')}>
+                  Classes ({teacher?.classesCount || 0})
+                </div>
               </AppTabsTrigger>
               <AppTabsTrigger value="schedule">Emploi du temps</AppTabsTrigger>
             </AppTabsList>
@@ -234,7 +224,7 @@ export default function TeacherDetailsPage() {
                             Département
                           </span>
                           <span className="font-medium">
-                            {teacher.departement || '-'}
+                            {teacher.department || '-'}
                           </span>
                         </div>
                       </div>
@@ -267,17 +257,8 @@ export default function TeacherDetailsPage() {
               </Card>
             </AppTabsContent>
 
-            <AppTabsContent value="classes">
-              <Card>
-                <CardHeader className="flex w-full justify-end">
-                  <Button variant="outline" size="icon">
-                    <MoreHorizontal className="h-10 w-10" />
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <ClassesSection classSubject={teacher?.classSubjects} />
-                </CardContent>
-              </Card>
+            <AppTabsContent id="classes" value="classes">
+              <ClassesSection teacherId={teacher?.id} />
             </AppTabsContent>
 
             <AppTabsContent value="schedule">

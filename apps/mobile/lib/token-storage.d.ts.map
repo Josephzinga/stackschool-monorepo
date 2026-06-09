@@ -1,0 +1,1 @@
+{"version":3,"file":"token-storage.d.ts","sourceRoot":"","sources":["token-storage.ts"],"names":[],"mappings":"AAMA,wBAAsB,WAAW,CAAC,OAAO,EAAE;IACzC,WAAW,EAAE,MAAM,CAAC;IACpB,YAAY,EAAE,MAAM,CAAC;IACrB,OAAO,EAAE,MAAM,CAAC;CACjB,iBAIA;AAED,wBAAsB,cAAc,2BAEnC;AAED,wBAAsB,eAAe,2BAEpC;AAED,wBAAsB,YAAY,kBAIjC;AAED,wBAAsB,oBAAoB,qBAIzC"}

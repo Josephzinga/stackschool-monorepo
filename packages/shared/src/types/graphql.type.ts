@@ -1,4 +1,4 @@
-import { Class, Subject, UserInMe } from '@stackschool/shared/src';
+import { Class, Subject, UserInMe } from '../../src';
 
 export interface Context {
   user?: UserInMe;

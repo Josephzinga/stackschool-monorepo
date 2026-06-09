@@ -116,6 +116,12 @@ export type ClassCount = {
   teachers?: Maybe<Scalars['Int']['output']>;
 };
 
+export type ClassLessons = {
+  __typename?: 'ClassLessons';
+  classSubject?: Maybe<ClassSubject>;
+  lesson?: Maybe<Lesson>;
+};
+
 export type ClassList = {
   __typename?: 'ClassList';
   data?: Maybe<Array<Class>>;
@@ -323,7 +329,6 @@ export type GetLessonsInput = {
   limit?: Scalars['Int']['input'];
   mode: ResourceMode;
   page?: Scalars['Int']['input'];
-  searchTerm?: InputMaybe<Scalars['String']['input']>;
   section?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<LessonStatus>;
   teacherId?: InputMaybe<Scalars['ID']['input']>;
@@ -366,6 +371,7 @@ export type GetSchoolStudentsInput = {
 
 export type GetSchoolTeachersInput = {
   classId?: InputMaybe<Scalars['ID']['input']>;
+  day?: InputMaybe<Day>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isSupervisor?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
@@ -381,6 +387,14 @@ export type GetSubjectInput = {
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   sort?: InputMaybe<SubjectSortInput>;
   teacherId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type GetTeacherForAttendanceInput = {
+  attendanceDate?: InputMaybe<Scalars['Date']['input']>;
+  day?: InputMaybe<Day>;
+  limit?: Scalars['Int']['input'];
+  page?: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Group = {
@@ -741,6 +755,7 @@ export type Query = {
   getSchoolStudents: StudentList;
   getSchoolSubjects?: Maybe<SubjectList>;
   getSchoolTeachers: TeacherList;
+  getTeachersForAttendance?: Maybe<Array<Maybe<TeacherTodaySubject>>>;
   me?: Maybe<User>;
   school: School;
   searchSchool?: Maybe<Array<School>>;
@@ -801,6 +816,11 @@ export type QueryGetSchoolSubjectsArgs = {
 
 export type QueryGetSchoolTeachersArgs = {
   input: GetSchoolTeachersInput;
+};
+
+
+export type QueryGetTeachersForAttendanceArgs = {
+  filter: GetTeacherForAttendanceInput;
 };
 
 
@@ -967,6 +987,7 @@ export type Staff = {
 export type Student = {
   __typename?: 'Student';
   allergies?: Maybe<Scalars['String']['output']>;
+  attendances?: Maybe<Array<AttendanceRecord>>;
   birthCertificateNumber?: Maybe<Scalars['String']['output']>;
   birthDate?: Maybe<Scalars['DateTime']['output']>;
   birthPlace?: Maybe<Scalars['DateTime']['output']>;
@@ -990,6 +1011,11 @@ export type Student = {
   studentNumber?: Maybe<Scalars['Int']['output']>;
   transportMode?: Maybe<TransportMode>;
   user?: Maybe<User>;
+};
+
+
+export type StudentAttendancesArgs = {
+  date?: InputMaybe<Scalars['Date']['input']>;
 };
 
 export type StudentDisciplinaryAction = {
@@ -1082,7 +1108,9 @@ export type SubjectSortInput = {
 export type Teacher = {
   __typename?: 'Teacher';
   assignments?: Maybe<Array<Maybe<TeacherAssignments>>>;
+  attendances?: Maybe<Array<AttendanceRecord>>;
   bio?: Maybe<Scalars['String']['output']>;
+  classesCount?: Maybe<Scalars['Int']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   department?: Maybe<Scalars['String']['output']>;
   diploma?: Maybe<Scalars['String']['output']>;
@@ -1097,6 +1125,11 @@ export type Teacher = {
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   user?: Maybe<User>;
   weeklyHours?: Maybe<Scalars['Float']['output']>;
+};
+
+
+export type TeacherAttendancesArgs = {
+  date?: InputMaybe<Scalars['Date']['input']>;
 };
 
 export type TeacherAssignments = {
@@ -1114,6 +1147,12 @@ export type TeacherList = {
   __typename?: 'TeacherList';
   data: Array<Teacher>;
   meta: PaginationMeta;
+};
+
+export type TeacherTodaySubject = {
+  __typename?: 'TeacherTodaySubject';
+  classes?: Maybe<ClassLessons>;
+  teachers?: Maybe<Teacher>;
 };
 
 export type TeachingTeamMember = {
@@ -1439,6 +1478,14 @@ export type GetStudentDetailsQueryVariables = Exact<{
 
 export type GetStudentDetailsQuery = { __typename?: 'Query', student?: { __typename?: 'Student', id: string, matricule: string, enrollmentYear: string, birthDate?: Date | null, birthPlace?: Date | null, nationality?: string | null, status?: StudentStatus | null, previousClass?: string | null, previousSchool?: string | null, bloodGroup?: string | null, allergies?: string | null, medicalCondition?: string | null, studentNumber?: number | null, birthCertificateNumber?: string | null, enrollmentDate?: Date | null, transportMode?: TransportMode | null, parentStudent?: Array<{ __typename?: 'ParentStudent', relationType?: RelationType | null, parent?: { __typename?: 'Parent', id: string, profession?: string | null, user?: { __typename?: 'User', phoneNumber?: string | null, isActive?: boolean | null, id: string, email?: string | null, profile?: { __typename?: 'Profile', address?: string | null, firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null> | null, schoolClass?: { __typename?: 'Class', id: string, name: string, section?: string | null, level: string } | null, user?: { __typename?: 'User', id: string, phoneNumber?: string | null, email?: string | null, username?: string | null, isActive?: boolean | null, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, photo?: string | null, gender?: string | null, address?: string | null } | null } | null } | null };
 
+export type GetStudentForAttendanceQueryVariables = Exact<{
+  input: GetSchoolStudentsInput;
+  date?: InputMaybe<Scalars['Date']['input']>;
+}>;
+
+
+export type GetStudentForAttendanceQuery = { __typename?: 'Query', getSchoolStudents: { __typename?: 'StudentList', data?: Array<{ __typename?: 'Student', id: string, user?: { __typename?: 'User', email?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null, schoolClass?: { __typename?: 'Class', id: string, name: string } | null, attendances?: Array<{ __typename?: 'AttendanceRecord', status?: AttendanceStatus | null }> | null }> | null } };
+
 export type UpdateStudentMutationVariables = Exact<{
   studentId: Scalars['ID']['input'];
   data: CreateStudentInput;
@@ -1518,6 +1565,14 @@ export type GetTeacherOptionsQueryVariables = Exact<{
 
 export type GetTeacherOptionsQuery = { __typename?: 'Query', getSchoolTeachers: { __typename?: 'TeacherList', data: Array<{ __typename?: 'Teacher', id: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null }> } };
 
+export type GetTeacherForAttendanceQueryVariables = Exact<{
+  input: GetSchoolTeachersInput;
+  date?: InputMaybe<Scalars['Date']['input']>;
+}>;
+
+
+export type GetTeacherForAttendanceQuery = { __typename?: 'Query', getSchoolTeachers: { __typename?: 'TeacherList', data: Array<{ __typename?: 'Teacher', id: string, user?: { __typename?: 'User', profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null, attendances?: Array<{ __typename?: 'AttendanceRecord', status?: AttendanceStatus | null }> | null, assignments?: Array<{ __typename?: 'TeacherAssignments', classSubjects?: { __typename?: 'ClassSubject', subject: { __typename?: 'Subject', id: string, name: string }, group: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', id: string, name: string }> } } | null } | null> | null }> } };
+
 export type GetTeacherScheduleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -1530,7 +1585,7 @@ export type GetTeacherDetailsQueryVariables = Exact<{
 }>;
 
 
-export type GetTeacherDetailsQuery = { __typename?: 'Query', teacher?: { __typename?: 'Teacher', id: string, specialization?: string | null, diploma?: string | null, experience?: string | null, bio?: string | null, hireDate?: Date | null, salary?: number | null, department?: string | null, weeklyHours?: number | null, isActive?: boolean | null, createdAt?: Date | null, user?: { __typename?: 'User', id: string, email?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null, gender?: string | null, address?: string | null } | null } | null, assignments?: Array<{ __typename?: 'TeacherAssignments', classSubjects?: { __typename?: 'ClassSubject', id: string, group: { __typename?: 'Group', id: string, type?: GroupType | null, name: string, classes: Array<{ __typename?: 'Class', id: string, name: string, level: string }> }, subject: { __typename?: 'Subject', id: string, name: string, code?: string | null } } | null } | null> | null } | null };
+export type GetTeacherDetailsQuery = { __typename?: 'Query', teacher?: { __typename?: 'Teacher', id: string, specialization?: string | null, diploma?: string | null, experience?: string | null, bio?: string | null, hireDate?: Date | null, salary?: number | null, department?: string | null, weeklyHours?: number | null, isActive?: boolean | null, createdAt?: Date | null, classesCount?: number | null, user?: { __typename?: 'User', id: string, email?: string | null, phoneNumber?: string | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null, photo?: string | null, gender?: string | null, address?: string | null } | null } | null } | null };
 
 export type DeleteTeachersMutationVariables = Exact<{
   teacherIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -1539,6 +1594,13 @@ export type DeleteTeachersMutationVariables = Exact<{
 
 
 export type DeleteTeachersMutation = { __typename?: 'Mutation', deleteTeachers?: { __typename?: 'ApiResponse', ok?: boolean | null, message?: string | null } | null };
+
+export type GetTeacherAssignmentQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetTeacherAssignmentQuery = { __typename?: 'Query', getAssignments?: Array<{ __typename?: 'TeacherAssignments', classSubjects?: { __typename?: 'ClassSubject', id: string, group: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', id: string, name: string }> }, subject: { __typename?: 'Subject', id: string, name: string, code?: string | null } } | null }> | null };
 
 export type CreateTeacherMutationVariables = Exact<{
   input: CreateTeacherInput;
@@ -3610,6 +3672,73 @@ useInfiniteGetStudentDetailsQuery.getKey = (variables: GetStudentDetailsQueryVar
 
 useGetStudentDetailsQuery.fetcher = (variables: GetStudentDetailsQueryVariables, options?: RequestInit['headers']) => fetcher<GetStudentDetailsQuery, GetStudentDetailsQueryVariables>(GetStudentDetailsDocument, variables, options);
 
+export const GetStudentForAttendanceDocument = `
+    query GetStudentForAttendance($input: GetSchoolStudentsInput!, $date: Date) {
+  getSchoolStudents(input: $input) {
+    data {
+      id
+      user {
+        email
+        profile {
+          firstname
+          lastname
+          photo
+        }
+      }
+      schoolClass {
+        id
+        name
+      }
+      attendances(date: $date) {
+        status
+      }
+    }
+  }
+}
+    `;
+
+export const useGetStudentForAttendanceQuery = <
+      TData = GetStudentForAttendanceQuery,
+      TError = unknown
+    >(
+      variables: GetStudentForAttendanceQueryVariables,
+      options?: Omit<UseQueryOptions<GetStudentForAttendanceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetStudentForAttendanceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetStudentForAttendanceQuery, TError, TData>(
+      {
+    queryKey: ['GetStudentForAttendance', variables],
+    queryFn: fetcher<GetStudentForAttendanceQuery, GetStudentForAttendanceQueryVariables>(GetStudentForAttendanceDocument, variables),
+    ...options
+  }
+    )};
+
+useGetStudentForAttendanceQuery.getKey = (variables: GetStudentForAttendanceQueryVariables) => ['GetStudentForAttendance', variables];
+
+export const useInfiniteGetStudentForAttendanceQuery = <
+      TData = InfiniteData<GetStudentForAttendanceQuery>,
+      TError = unknown
+    >(
+      variables: GetStudentForAttendanceQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetStudentForAttendanceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetStudentForAttendanceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetStudentForAttendanceQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetStudentForAttendance.infinite', variables],
+      queryFn: (metaData) => fetcher<GetStudentForAttendanceQuery, GetStudentForAttendanceQueryVariables>(GetStudentForAttendanceDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetStudentForAttendanceQuery.getKey = (variables: GetStudentForAttendanceQueryVariables) => ['GetStudentForAttendance.infinite', variables];
+
+
+useGetStudentForAttendanceQuery.fetcher = (variables: GetStudentForAttendanceQueryVariables, options?: RequestInit['headers']) => fetcher<GetStudentForAttendanceQuery, GetStudentForAttendanceQueryVariables>(GetStudentForAttendanceDocument, variables, options);
+
 export const UpdateStudentDocument = `
     mutation UpdateStudent($studentId: ID!, $data: CreateStudentInput!, $schoolId: ID!) {
   updateStudent(studentId: $studentId, data: $data, schoolId: $schoolId) {
@@ -4084,6 +4213,81 @@ useInfiniteGetTeacherOptionsQuery.getKey = (variables: GetTeacherOptionsQueryVar
 
 useGetTeacherOptionsQuery.fetcher = (variables: GetTeacherOptionsQueryVariables, options?: RequestInit['headers']) => fetcher<GetTeacherOptionsQuery, GetTeacherOptionsQueryVariables>(GetTeacherOptionsDocument, variables, options);
 
+export const GetTeacherForAttendanceDocument = `
+    query GetTeacherForAttendance($input: GetSchoolTeachersInput!, $date: Date) {
+  getSchoolTeachers(input: $input) {
+    data {
+      id
+      user {
+        profile {
+          firstname
+          lastname
+        }
+      }
+      attendances(date: $date) {
+        status
+      }
+      assignments {
+        classSubjects {
+          subject {
+            id
+            name
+          }
+          group {
+            classes {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+export const useGetTeacherForAttendanceQuery = <
+      TData = GetTeacherForAttendanceQuery,
+      TError = unknown
+    >(
+      variables: GetTeacherForAttendanceQueryVariables,
+      options?: Omit<UseQueryOptions<GetTeacherForAttendanceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetTeacherForAttendanceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetTeacherForAttendanceQuery, TError, TData>(
+      {
+    queryKey: ['GetTeacherForAttendance', variables],
+    queryFn: fetcher<GetTeacherForAttendanceQuery, GetTeacherForAttendanceQueryVariables>(GetTeacherForAttendanceDocument, variables),
+    ...options
+  }
+    )};
+
+useGetTeacherForAttendanceQuery.getKey = (variables: GetTeacherForAttendanceQueryVariables) => ['GetTeacherForAttendance', variables];
+
+export const useInfiniteGetTeacherForAttendanceQuery = <
+      TData = InfiniteData<GetTeacherForAttendanceQuery>,
+      TError = unknown
+    >(
+      variables: GetTeacherForAttendanceQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetTeacherForAttendanceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetTeacherForAttendanceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetTeacherForAttendanceQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetTeacherForAttendance.infinite', variables],
+      queryFn: (metaData) => fetcher<GetTeacherForAttendanceQuery, GetTeacherForAttendanceQueryVariables>(GetTeacherForAttendanceDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetTeacherForAttendanceQuery.getKey = (variables: GetTeacherForAttendanceQueryVariables) => ['GetTeacherForAttendance.infinite', variables];
+
+
+useGetTeacherForAttendanceQuery.fetcher = (variables: GetTeacherForAttendanceQueryVariables, options?: RequestInit['headers']) => fetcher<GetTeacherForAttendanceQuery, GetTeacherForAttendanceQueryVariables>(GetTeacherForAttendanceDocument, variables, options);
+
 export const GetTeacherScheduleDocument = `
     query GetTeacherSchedule($id: ID!) {
   teacher(id: $id) {
@@ -4171,6 +4375,7 @@ export const GetTeacherDetailsDocument = `
     weeklyHours
     isActive
     createdAt
+    classesCount
     user {
       id
       email
@@ -4181,26 +4386,6 @@ export const GetTeacherDetailsDocument = `
         photo
         gender
         address
-      }
-    }
-    assignments {
-      classSubjects {
-        id
-        group {
-          id
-          type
-          name
-          classes {
-            id
-            name
-            level
-          }
-        }
-        subject {
-          id
-          name
-          code
-        }
       }
     }
   }
@@ -4273,6 +4458,69 @@ export const useDeleteTeachersMutation = <
 
 
 useDeleteTeachersMutation.fetcher = (variables: DeleteTeachersMutationVariables, options?: RequestInit['headers']) => fetcher<DeleteTeachersMutation, DeleteTeachersMutationVariables>(DeleteTeachersDocument, variables, options);
+
+export const GetTeacherAssignmentDocument = `
+    query GetTeacherAssignment($id: ID!) {
+  getAssignments(filter: {teacherId: $id}) {
+    classSubjects {
+      id
+      group {
+        classes {
+          id
+          name
+        }
+      }
+      subject {
+        id
+        name
+        code
+      }
+    }
+  }
+}
+    `;
+
+export const useGetTeacherAssignmentQuery = <
+      TData = GetTeacherAssignmentQuery,
+      TError = unknown
+    >(
+      variables: GetTeacherAssignmentQueryVariables,
+      options?: Omit<UseQueryOptions<GetTeacherAssignmentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetTeacherAssignmentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetTeacherAssignmentQuery, TError, TData>(
+      {
+    queryKey: ['GetTeacherAssignment', variables],
+    queryFn: fetcher<GetTeacherAssignmentQuery, GetTeacherAssignmentQueryVariables>(GetTeacherAssignmentDocument, variables),
+    ...options
+  }
+    )};
+
+useGetTeacherAssignmentQuery.getKey = (variables: GetTeacherAssignmentQueryVariables) => ['GetTeacherAssignment', variables];
+
+export const useInfiniteGetTeacherAssignmentQuery = <
+      TData = InfiniteData<GetTeacherAssignmentQuery>,
+      TError = unknown
+    >(
+      variables: GetTeacherAssignmentQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetTeacherAssignmentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetTeacherAssignmentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetTeacherAssignmentQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetTeacherAssignment.infinite', variables],
+      queryFn: (metaData) => fetcher<GetTeacherAssignmentQuery, GetTeacherAssignmentQueryVariables>(GetTeacherAssignmentDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetTeacherAssignmentQuery.getKey = (variables: GetTeacherAssignmentQueryVariables) => ['GetTeacherAssignment.infinite', variables];
+
+
+useGetTeacherAssignmentQuery.fetcher = (variables: GetTeacherAssignmentQueryVariables, options?: RequestInit['headers']) => fetcher<GetTeacherAssignmentQuery, GetTeacherAssignmentQueryVariables>(GetTeacherAssignmentDocument, variables, options);
 
 export const CreateTeacherDocument = `
     mutation CreateTeacher($input: CreateTeacherInput!) {

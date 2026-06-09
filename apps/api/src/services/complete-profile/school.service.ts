@@ -1,5 +1,5 @@
 import { GlobalRole, Prisma, SchoolRole } from '@stackschool/db';
-import { SchoolData } from '@stackschool/shared';
+import { SchoolDataType } from '@stackschool/shared';
 import { createServiceError } from '../../utils/api-errors';
 
 type PrismaTx = Prisma.TransactionClient;
@@ -15,7 +15,7 @@ type PrismaTx = Prisma.TransactionClient;
 export async function handleSchoolCreation(
   tx: PrismaTx,
   userId: string,
-  schoolData: SchoolData,
+  schoolData: SchoolDataType,
   role: SchoolRole,
 ): Promise<string> {
   // Cas 1 : Création d'une nouvelle école

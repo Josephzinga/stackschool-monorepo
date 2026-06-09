@@ -1,9 +1,4 @@
-import {ConfigContext, ExpoConfig} from 'expo/config';
-/*import * as dotenv from "dotenv"
-import path from "path"
-
-dotenv.config({path: path.resolve(__dirname, ".env")})
-*/
+import 'expo/config/index.js';
 const FACEBOOK_APP_ID = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
 const FACEBOOK_CLIENT_TOKEN = process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN;
 

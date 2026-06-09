@@ -1,16 +1,21 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
-import {Text} from '@/components/ui/text';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 import * as React from 'react';
-import {Pressable, type TextInput, View} from 'react-native';
-import {Controller, useForm, zodResolver} from '@stackschool/ui';
+import { Pressable, type TextInput, View } from 'react-native';
+import { Controller, useForm, zodResolver } from '@stackschool/ui';
 import Toast from 'react-native-toast-message';
-import {authService, parseAxiosError, registerFormSchema, RegisterFormType,} from '@stackschool/shared';
-import {useRouter} from 'expo-router';
-import {FieldError} from './field';
-import {Lock, Mail, Phone, User} from 'lucide-react-native';
-import {CustomButton} from '@/components/CustomButton';
+import {
+  authServices,
+  parseAxiosError,
+  registerFormSchema,
+  RegisterFormType,
+} from '@stackschool/shared';
+import { useRouter } from 'expo-router';
+import { FieldError } from './field';
+import { Lock, Mail, Phone, User } from 'lucide-react-native';
+import { CustomButton } from '@/components/CustomButton';
 import Logo from '@/components/Logo';
 
 export function SignUpForm() {
@@ -37,7 +42,7 @@ export function SignUpForm() {
   }
   async function onSubmit({ username, phoneNumber, email, password, confirm }: RegisterFormType) {
     try {
-      const res = await authService.register({
+      const res = await authServices.register({
         username,
         phoneNumber,
         email,

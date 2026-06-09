@@ -1,7 +1,7 @@
 import { lessonMutationResolver } from '../lesson-mutation.resolver';
 import { prisma } from '@stackschool/db';
 import { checkRole } from '../../../../lib/verify-role';
-import { LessonStatus, REFERENCE_DATE } from '@stackschool/shared';
+import { LessonStatusEnum, REFERENCE_DATE } from '@stackschool/shared';
 import { parse } from 'date-fns';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
@@ -73,7 +73,7 @@ describe('Lesson Mutations', () => {
         day: 'MONDAY',
         schoolId: mockSchoolId,
         classSubject: { teacherId: mockTeacherId },
-        status: LessonStatus.PLANNED,
+        status: LessonStatusEnum.PLANNED,
         subtitle: null,
         roomId: null,
         createdAt: parse('MONDAY 08:00', 'EEEE HH:mm', REFERENCE_DATE),
@@ -214,7 +214,7 @@ describe('Lesson Mutations', () => {
     beforeEach(() => {
       mockPrisma.lesson.findUnique.mockResolvedValue({
         id: mockLessonId,
-        status: LessonStatus.PLANNED,
+        status: LessonStatusEnum.PLANNED,
         classSubject: { teacherId: mockTeacherId },
         title: null,
         subtitle: null,
@@ -227,7 +227,7 @@ describe('Lesson Mutations', () => {
       });
       mockPrisma.lesson.update.mockResolvedValue({
         id: mockLessonId,
-        status: LessonStatus.PLANNED,
+        status: LessonStatusEnum.PLANNED,
         title: null,
         subtitle: null,
         startTime: parse('MONDAY 08:00 ', 'EEEE HH:mm', REFERENCE_DATE),

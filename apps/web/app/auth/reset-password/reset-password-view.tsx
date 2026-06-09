@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  authService,
+  authServices,
   parseAxiosError,
   ResetPasswordType,
 } from '@stackschool/shared';
@@ -24,7 +24,7 @@ export const onSubmit = async (
   }
 
   try {
-    const res = await authService.resetPassword(
+    const res = await authServices.resetPassword(
       token,
       data.password,
       data.confirm,

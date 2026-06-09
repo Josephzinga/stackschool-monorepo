@@ -238,7 +238,9 @@ model Lesson {
   roomId              String?
   teacherAssignmentId String
   createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  updatedAt           DateTime?         @updatedAt
+  deletedAt           DateTime?
+  courseSessions      CourseSession[]
   teacherAssignment   TeacherAssignment @relation(fields: [teacherAssignmentId], references: [id], onDelete: Cascade)
   school              School            @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   room                Room?             @relation(fields: [roomId], references: [id], onDelete: NoAction)
@@ -246,6 +248,21 @@ model Lesson {
   @@unique([schoolId, teacherAssignmentId, roomId])
   @@unique([schoolId, day, endTime, startTime, teacherAssignmentId])
   @@index([schoolId])
+}
+
+model CourseSession {
+  id       String @id @default(cuid())
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+
+  chapter String // Ex: "Algèbre"
+  title   String // Ex: "Les équations du second degré"
+
+  date      DateTime  @default(now())
+  startTime DateTime  @default(now())
+  endTime   DateTime?
+
+  status SessionStatus @default(STARTED) // STARTED, FINISHED
 }
 
 /// *
@@ -387,7 +404,6 @@ model Attendance {
   session    AttendanceSession? @relation(fields: [sessionId], references: [id])
 
   // Contraintes : une seule entrée par jour pour une même personne
-
   @@unique([schoolUserId, date])
   @@index([schoolId, date])
   @@index([schoolUserId, date])
@@ -718,4 +734,9 @@ enum LessonStatus {
 enum GroupType {
   SOLO
   MULTIPLE
+}
+
+enum SessionStatus {
+  FINISHED
+  STARTED
 }

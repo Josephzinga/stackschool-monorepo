@@ -13,7 +13,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import {
-  authService,
+  authServices,
   forgotPasswordSchema,
   FormDataType,
   parseAxiosError,
@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const res = await authService.forgotPassword(identifier);
+      const res = await authServices.forgotPassword(identifier);
       if (res.ok) {
         toast.success(res.message);
         if (res.method === 'whatsapp') {

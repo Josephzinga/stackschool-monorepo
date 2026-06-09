@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  authService,
+  authServices,
   LoginFormType,
   parseAxiosError,
 } from '@stackschool/shared';
@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   const handleLogin = async ({ identifier, password }: LoginFormType) => {
     try {
-      const res = await authService.login({
+      const res = await authServices.login({
         identifier,
         password,
       });

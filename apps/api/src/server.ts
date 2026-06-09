@@ -2,13 +2,10 @@ import { config } from 'dotenv';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Strategy as FacebookStrategy } from 'passport-facebook';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import pg from 'pg';
 import helmet from 'helmet';
-import handleOauthStrategy from './controllers/passport-social.controller';
 import setupLocalStrategy from './lib/setup-local-strategy';
 import { getUserFromRedis } from './lib/handle-redis-user';
 import path from 'path';
@@ -20,49 +17,46 @@ import { isAuthenticated } from './middlewares/auth';
 import routes from './routes';
 import { express as useragent } from 'express-useragent';
 import { createServer } from 'node:http';
-import { Server } from 'socket.io';
+import { initSocket } from './lib/socket';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
+import handleOauthStrategy from './controllers/passport-social.controller';
+import forgotPasswordController from './controllers/auth/forgot-password.controller';
 
 config();
 
 const PORT = Number(process.env.PORT) || 4000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
-const MOBILE_ORIGIN = process.env.MOBILE_DEEPLINK_URL;
 const NODE_ENV = process.env.NODE_ENV || 'development';
-
-const pgSession = connectPgSimple(session);
-const pgPool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 const app = express();
 const httpServer = createServer(app);
-export const io = new Server(httpServer);
 
+// 1. Middlewares de base (Sécurité en premier)
 app.use(helmet());
-const allowedOrigins = FRONTEND_ORIGIN;
-
-const corsOptions = {
-  origin: (origin: any, callback: any) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-};
 app.use(
   cors({
-    origin: [FRONTEND_ORIGIN, '*'],
+    origin: [FRONTEND_ORIGIN],
     credentials: true,
     methods: ['POST', 'GET', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-school-id'],
   }),
 );
+
+// 2. Initialisation Socket.io
+export const io = initSocket(httpServer, FRONTEND_ORIGIN);
+
+// 3. Middlewares de parsing
 app.use(useragent());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// 4. Session & Auth
+const pgSession = connectPgSimple(session);
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 const SESSION_TTL = 1000 * 60 * 30; // 30 min
 
@@ -73,10 +67,9 @@ app.use(
       tableName: 'Session',
     }),
     name: 'sid',
-    secret: JWT_SECRET || 'mdmfsdfmdfmsdf',
+    secret: JWT_SECRET || 'default_secret_key',
     resave: false,
     saveUninitialized: false,
-
     cookie: {
       secure: NODE_ENV === 'production',
       httpOnly: true,
@@ -105,6 +98,7 @@ passport.deserializeUser(async (id: string, done) => {
 
 setupLocalStrategy();
 
+// OAuth Strategies
 passport.use(
   new GoogleStrategy(
     {
@@ -131,15 +125,18 @@ passport.use(
   ),
 );
 
+// 5. Routes
 app.use('/api', routes);
+app.use('/api/auth', forgotPasswordController);
 app.all('/graphql', isAuthenticated, graphqlMiddleware);
+
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, './index.html'));
 });
 
 app.use(express.static(path.resolve(process.cwd(), 'public')));
 
-// Gestionnaire d'erreur centralisée
+// 6. Error Handling
 app.use(errorHandler);
 
 httpServer.listen(PORT, () => {

@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import {
-  authService,
+  authServices,
   parseAxiosError,
   registerFormSchema,
   RegisterFormType,
@@ -50,7 +50,7 @@ export default function RegisterPage() {
 
   async function handleRegister(data: RegisterFormType) {
     try {
-      const res = await authService.register(data);
+      const res = await authServices.register(data);
       if (res.ok) {
         toast.success(res.message);
         router.push(`/auth/finish?from=${res.user.provider}`);

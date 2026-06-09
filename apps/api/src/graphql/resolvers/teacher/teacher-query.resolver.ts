@@ -1,11 +1,11 @@
-import { prisma, Prisma } from '@stackschool/db';
+import { Prisma } from '@stackschool/db';
 import { Resolvers } from '../../types.generated';
 import { createServiceError } from '../../../utils/api-errors';
 import { checkRole, checkSchoolId, checkUser } from '../../../lib/verify-role';
 
 export const teacherQueryResolver: Resolvers = {
   Query: {
-    getSchoolTeachers: async (_, { input }, { user, schoolId }) => {
+    getSchoolTeachers: async (_, { input }, { user, schoolId, prisma }) => {
       try {
         checkUser(user);
         checkSchoolId(schoolId);
@@ -22,6 +22,7 @@ export const teacherQueryResolver: Resolvers = {
           subjectId,
           isActive,
           isSupervisor,
+          day,
         } = input;
 
         const skip = page * limit;
@@ -124,6 +125,18 @@ export const teacherQueryResolver: Resolvers = {
             ],
           };
 
+          if (day) {
+            whereClause.assignments = {
+              some: {
+                lessons: {
+                  some: {
+                    day,
+                  },
+                },
+              },
+            };
+          }
+
           // Si on a déjà un OR (à cause de classId), on doit utiliser AND pour combiner
           if (whereClause.OR) {
             whereClause.AND = [
@@ -177,13 +190,9 @@ export const teacherQueryResolver: Resolvers = {
       }
     },
 
-    teacher: async (_, { id }, { user, schoolId }) => {
-      if (!user) throw createServiceError('Non authentifié', 401);
-      if (!schoolId)
-        throw createServiceError(
-          "Identifiant de l'établissement est manquant",
-          400,
-        );
+    teacher: async (_, { id }, { user, schoolId, prisma }) => {
+      checkUser(user);
+      checkSchoolId(schoolId);
 
       const checkedRole = await checkRole({
         context: { schoolId, userId: user.id },
@@ -202,6 +211,110 @@ export const teacherQueryResolver: Resolvers = {
       if (!teacher) throw createServiceError('Enseignant introuvable', 404);
 
       return teacher;
+    },
+
+    getTeachersForAttendance: async (
+      _,
+      { filter: { attendanceDate, page = 0, limit = 10, search, day } },
+      { user, prisma, schoolId, membership },
+    ) => {
+      checkUser(user);
+      checkSchoolId(schoolId);
+      const skip = page * limit;
+
+      let whereClause: Prisma.TeacherWhereInput = {
+        assignments: {
+          some: {
+            classSubject: {
+              assignments: {
+                lessons: {
+                  some: {
+                    ...(day && {
+                      day,
+                    }),
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      if (search) {
+        whereClause.schoolUser = {
+          user: {
+            profile: {
+              OR: [
+                { firstname: { contains: search.trim(), mode: 'insensitive' } },
+                { lastname: { contains: search.trim(), mode: 'insensitive' } },
+              ],
+            },
+          },
+        };
+      }
+
+      const [teachers, total] = await Promise.all([
+        await prisma.teacher.findMany({
+          where: whereClause,
+          take: limit,
+          skip,
+          select: {
+            schoolUserId: true,
+            id: true,
+            assignments: {
+              include: {
+                classSubject: true,
+              },
+            },
+          },
+        }),
+        await prisma.teacher.count({
+          where: whereClause,
+        }),
+      ]);
+
+      let lessonWhereClause: Prisma.LessonWhereInput = {
+        schoolId,
+        ...(day && {
+          day,
+        }),
+      };
+
+      const lessons = await prisma.lesson.findMany({
+        where: lessonWhereClause,
+        include: {
+          teacherAssignment: {
+            include: {
+              teacher: true,
+              classSubject: {
+                include: {
+                  subject: true,
+                  group: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      console.log(
+        'Lessons',
+        lessons.map((l) => l),
+      );
+
+      return {
+        data: lessons.map((l) => ({
+          id: l.teacherAssignment.teacherId,
+          schoolUserId: l.teacherAssignment.teacher.schoolUserId,
+          assignments: lessons.map((l) => l.teacherAssignment.classSubject),
+        })),
+        meta: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
     },
   },
 };

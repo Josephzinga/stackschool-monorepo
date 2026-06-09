@@ -92,7 +92,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="w-full h-full font-poppins z-10 flex flex-col gap-4">
+    <div className="w-full h-full font-poppins flex flex-col gap-4">
       <div className="rounded-md border relative min-h-75 overflow-x-auto">
         {isLoading && (
           <div className="absolute inset-0 bg-white/50 dark:bg-slate-800/70 z-50 flex flex-col backdrop-blur-sm">

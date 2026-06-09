@@ -8,6 +8,12 @@ import {
   VisibilityState,
 } from '@tanstack/react-table';
 import { PaginationMeta, StudentSortInput } from '@stackschool/ui';
+import {
+  parseAsInteger,
+  parseAsString,
+  useQueryState,
+  useQueryStates,
+} from 'nuqs';
 
 export interface StudentFilterState {
   classId?: string;
@@ -23,7 +29,8 @@ interface TableContextType {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   filters: StudentFilterState;
-  setFilters: React.Dispatch<React.SetStateAction<StudentFilterState>>;
+  setFilters: (updates: Partial<StudentFilterState>) => void;
+  clearFilters: () => void;
 
   rowSelection: RowSelectionState;
   setRowSelection: OnChangeFn<RowSelectionState>;
@@ -37,13 +44,23 @@ interface TableContextType {
 const TableContext = createContext<TableContextType | undefined>(undefined);
 
 export function TableProvider({ children }: { children: ReactNode }) {
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState<StudentFilterState>({});
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [pagination, setPagination] = useQueryStates(
+    {
+      pageIndex: parseAsInteger.withDefault(0),
+      pageSize: parseAsInteger.withDefault(10),
+    },
+    {
+      history: 'push',
+    },
+  );
+  const [searchTerm, setSearchTerm] = useQueryState(
+    'student_search',
+    parseAsString.withDefault(''),
+  );
+
+  const [classId, setClassId] = useQueryState('classId', { defaultValue: '' });
+  const [level, setLevel] = useQueryState('level', { defaultValue: '' });
+  const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     info: true,
     select: true,
@@ -52,12 +69,27 @@ export function TableProvider({ children }: { children: ReactNode }) {
     speciality: true,
   });
 
+  const filters = {
+    classId,
+    level,
+  };
+  const setFilters = async (updates: Partial<StudentFilterState>) => {
+    if ('classId' in updates) await setClassId(updates.classId ?? null);
+    if ('level' in updates) await setLevel(updates.level ?? null);
+  };
+
+  const clearFilters = async () => {
+    await setClassId('');
+    await setLevel('');
+  };
+
   const value = {
     pagination,
     setPagination,
     searchTerm,
     setSearchTerm,
     filters,
+    clearFilters,
     setFilters,
     rowSelection,
     setRowSelection,
@@ -69,7 +101,6 @@ export function TableProvider({ children }: { children: ReactNode }) {
     <TableContext.Provider value={value}>{children}</TableContext.Provider>
   );
 }
-
 export const useTable = () => {
   const context = useContext(TableContext);
   if (context === undefined) {

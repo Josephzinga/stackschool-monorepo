@@ -2,11 +2,11 @@ import { NextFunction, type Request, Response, Router } from 'express';
 import { isAuthenticated } from '../../middlewares/auth';
 import { redisClient } from '../../lib/redis';
 import {
-  ProfileFormData,
+  ProfileFormDataType,
   profileSchema,
-  RoleData,
+  RoleDataType,
   roleDataSchema,
-  SchoolData,
+  SchoolDataType,
   schoolDataSchema,
 } from '@stackschool/shared';
 import { safeValidateSchema } from '../../utils/validate-schema.util';
@@ -20,9 +20,9 @@ router.post(
     try {
       const userId = req.user!.id;
       const { step, school, profile, role } = req.body as {
-        profile: ProfileFormData;
-        role: RoleData;
-        school: SchoolData;
+        profile: ProfileFormDataType;
+        role: RoleDataType;
+        school: SchoolDataType;
         step: number;
       };
 

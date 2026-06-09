@@ -22,7 +22,7 @@ import {
   User,
   Users,
 } from 'lucide-react';
-import { ParentFormData, StudentFormData } from '@stackschool/shared';
+import { ParentFormDataType, StudentFormDataType } from '@stackschool/shared';
 import { useRouter } from 'next/navigation';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -87,7 +87,7 @@ function TeacherReview({ data }: { data: any }) {
   );
 }
 
-function ParentReview({ data }: { data: ParentFormData }) {
+function ParentReview({ data }: { data: ParentFormDataType }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4 text-sm">
@@ -157,7 +157,7 @@ function ParentReview({ data }: { data: ParentFormData }) {
   );
 }
 
-function StudentReview({ data }: { data: StudentFormData }) {
+function StudentReview({ data }: { data: StudentFormDataType }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4 text-sm">

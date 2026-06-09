@@ -1,21 +1,21 @@
-import api from "@/services/api";
-import { saveProgressToRedis } from "@/services/complete-profile";
+import api from '@/services/api';
+import { saveProgressToRedis } from '@/services/complete-profile';
 
-import { RoleData, SchoolData, ProfileData } from "@stackschool/shared";
-import { toast } from "sonner";
+import { RoleDataType, SchoolDataType, ProfileData } from '@stackschool/shared';
+import { toast } from 'sonner';
 
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface CompleteProfileStep {
-  school: SchoolData | null;
+  school: SchoolDataType | null;
   profile: ProfileData | null;
-  role: RoleData | null;
+  role: RoleDataType | null;
   lastSavedAt: string | null;
 
-  setSchoolData: (school: SchoolData) => void;
+  setSchoolData: (school: SchoolDataType) => void;
   setProfileData: (profileData: ProfileData) => void;
-  setRole: (role: RoleData) => void;
+  setRole: (role: RoleDataType) => void;
   reset: () => void;
   saveToRedis: () => Promise<void>;
   loadFromRedis: () => Promise<boolean | undefined>;
@@ -54,7 +54,7 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
         set({ currentStep: step });
       },
 
-      setRole: async (role: RoleData) => {
+      setRole: async (role: RoleDataType) => {
         set({ role });
         await get().saveToRedis();
       },
@@ -84,14 +84,14 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
           }
         } catch (error) {
           toast.warning(
-            "Échec sauvegarde Redis, continuation avec localStorage"
+            'Échec sauvegarde Redis, continuation avec localStorage',
           );
         }
       },
 
       loadFromRedis: async () => {
         try {
-          const res = await api.get("/complete-profile/load-progress");
+          const res = await api.get('/complete-profile/load-progress');
           if (res.data?.ok) {
             const { data } = res;
             if (data && data.currentStep) {
@@ -106,7 +106,7 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
             return true;
           }
         } catch (error) {
-          console.warn("Échec chargement Redis, utilisation localStorage");
+          console.warn('Échec chargement Redis, utilisation localStorage');
         }
         return false;
       },
@@ -115,7 +115,7 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
         get().reset();
 
         try {
-          await api.post("/complete-profile/clear-progress");
+          await api.post('/complete-profile/clear-progress');
         } catch (error) {}
       },
 
@@ -123,12 +123,12 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
         const { school, role, profile, clearAllData } = get();
 
         if (!school || !role || !profile)
-          return { success: false, error: "Données manquantes" };
+          return { success: false, error: 'Données manquantes' };
 
         set({ isSubmitting: true });
 
         try {
-          const res = await api.post("/complete-profile", {
+          const res = await api.post('/complete-profile', {
             school,
             role,
             profile,
@@ -141,17 +141,17 @@ export const UseCompleteProfileStore = create<CompleteProfileStep>()(
             return { success: true, error: data?.message };
           }
         } catch (error) {
-          console.error("Erreur soumission profil:", error);
-          return { success: false, error: "Erreur réseau" };
+          console.error('Erreur soumission profil:', error);
+          return { success: false, error: 'Erreur réseau' };
         } finally {
           set({ isSubmitting: false });
         }
       },
     }),
     {
-      name: "complete-profile-storage",
+      name: 'complete-profile-storage',
       storage: createJSONStorage(() => localStorage),
       version: 1,
-    }
-  )
+    },
+  ),
 );

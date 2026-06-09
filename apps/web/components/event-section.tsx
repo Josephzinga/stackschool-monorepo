@@ -5,8 +5,11 @@ import { Card } from '@/components/ui/card';
 import { IconWrapper } from '@/components/animate-ui/icons/icon';
 import { MoreHorizontal } from 'lucide-react';
 import { LectureCard } from '@/components/lecture-card';
+import { useSocket } from '@/lib/socket-context';
 
 export default function EventSection() {
+  const io = useSocket();
+  io?.emit('join_room', { message: 'bonjour' });
   return (
     <Card className="h-screen! lg:flex md:max-w-120 px-2 w-full xl:w-[30%]  mt-4 border">
       <div className="flex justify-center w-full items-center h-100 text-center text-lg">
@@ -22,18 +25,22 @@ export default function EventSection() {
         <LectureCard
           classe="11ème"
           title="Ensemble N des entiers naturel"
-          chapter={1}
+          chapter={'1'}
           time="8:30 - 9:10"
+          teacher={{
+            name: 'joseph zinga',
+          }}
           subject="Mathématique"
-        />
-        <LectureCard
-          subject="Histoire"
-          classe="10ème B"
-          time="8:00 - 9:30"
-          title="Histoire de la guerre mondial"
-          chapter={4}
+          status={'SCHEDULED'}
         />
       </div>
     </Card>
   );
 }
+/* <LectureCard
+          subject="Histoire"
+          classe="10ème B"
+          time="8:00 - 9:30"
+          title="Histoire de la guerre mondial"
+          chapter={4}
+        /> */

@@ -12,6 +12,7 @@ type Student {
   birthCertificateNumber: String
   medicalCondition: String
   allergies: String
+  attendances(date: Date): [AttendanceRecord!]
 
   transportMode: TransportMode
   previousSchool: String
@@ -155,9 +156,9 @@ type Teacher {
   supervisedClasses: [Class]
   createdAt: DateTime
   updatedAt: DateTime
-
+  attendances(date: Date): [AttendanceRecord!]
   weeklyHours: Float
-
+  classesCount: Int
   user: User
 }
 

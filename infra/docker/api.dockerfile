@@ -1,0 +1,20 @@
+FROM node:lts-slim
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+COPY package.json pnpm-workspace.yaml tsconfig.base.json ./
+RUN apt-get update -y && apt-get install -y openssl
+COPY packages/db ./packages/db
+COPY packages/shared ./packages/shared
+COPY apps/backend ./apps/backend
+COPY apps/api ./apps/api
+
+RUN pnpm install --no-frozen-lockfile
+
+EXPOSE 4000 51212 3001
+
+# Solution simple et fiable
+WORKDIR /app/apps/api
+CMD ["pnpm", "run", "dev"]

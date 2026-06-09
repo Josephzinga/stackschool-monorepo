@@ -1,6 +1,6 @@
 import { createServiceError } from '../../../utils/api-errors';
 import { safeValidateSchema } from '../../../utils/validate-schema.util';
-import { createStudentSchema, RelationType } from '@stackschool/shared';
+import { createStudentSchema, RelationTypeEnum } from '@stackschool/shared';
 import { checkSchoolId, checkUser, isAdmin } from '../../../lib/verify-role';
 import { Resolvers } from '../../types.generated';
 
@@ -242,7 +242,7 @@ export const studentMutationResolver: Resolvers = {
                   studentId,
                   parentId: parentIdToLink,
                   relationType: (parentData.newParent?.relationType ||
-                    'OTHER') as RelationType,
+                    'OTHER') as RelationTypeEnum,
                 },
                 update: {}, // On ne change rien si le lien existe déjà
               });

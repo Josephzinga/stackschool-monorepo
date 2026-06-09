@@ -1,8 +1,8 @@
 import {
   Context,
   ProfileData,
-  RoleData,
-  SchoolData,
+  RoleDataType,
+  SchoolDataType,
 } from '@stackschool/shared';
 import { prisma } from '@stackschool/db';
 import { redisClient } from '../../lib/redis';
@@ -38,8 +38,8 @@ export const confirmCompleteProfileResolver: Resolvers = {
         }
 
         const { school, role, profile } = JSON.parse(cachedData) as {
-          school: SchoolData;
-          role: RoleData;
+          school: SchoolDataType;
+          role: RoleDataType;
           profile: ProfileData;
         };
 

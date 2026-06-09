@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export enum LessonStatus {
+export enum LessonStatusEnum {
   Cancelled = 'CANCELLED',
   Completed = 'COMPLETED',
   Ongoing = 'ONGOING',
@@ -51,7 +51,7 @@ export const createLessonSchema = z
       'FRIDAY',
       'SATURDAY',
     ]),
-    status: z.enum(LessonStatus).optional(),
+    status: z.enum(LessonStatusEnum).optional(),
     subjectId: z
       .string('Veuillez sélectionner une matière.')
       .min(1, 'Veuillez sélectionner une matière.'),

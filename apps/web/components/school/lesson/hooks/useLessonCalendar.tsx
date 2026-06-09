@@ -5,6 +5,7 @@ import { Day, ResourceMode, useGetSchoolLessonsQuery } from '@stackschool/ui';
 import { format } from 'date-fns';
 import { dayMapping } from '@stackschool/shared';
 import { EventInput } from '@fullcalendar/core';
+import { lessonStatusConfig } from '@/constant';
 
 export const useLessonCalendar = () => {
   const {
@@ -69,6 +70,7 @@ export const useLessonCalendar = () => {
         startTime: format(new Date(e.startTime), 'HH:mm'),
         endTime: format(new Date(e.endTime), 'HH:mm'),
         daysOfWeek: [dayMapping[e.day as Day]],
+        backgroundColor: lessonStatusConfig[e.status ?? 'PLANNED'].color,
         extendedProps: {
           subject: e.subject,
           status: e.status,

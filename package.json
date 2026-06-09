@@ -7,7 +7,7 @@
     "apps/*"
   ],
   "resolutions": {
-    "react": "^19.1.0"
+    "react": "^19.2.3"
   },
   "engines": {
     "node": ">=16"
@@ -62,5 +62,7 @@
       "sharp",
       "unrs-resolver"
     ]
-  }
+  },
+
+  "packageManager": "pnpm"
 }

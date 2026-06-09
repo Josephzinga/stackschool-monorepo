@@ -1,5 +1,5 @@
 import { Prisma } from '@stackschool/db';
-import { RoleData } from '@stackschool/shared';
+import { RoleDataType } from '@stackschool/shared';
 
 type PrismaTx = Prisma.TransactionClient;
 
@@ -15,7 +15,7 @@ export async function handleRoleCreation(
   tx: PrismaTx,
   userId: string,
   schoolId: string,
-  roleData: RoleData,
+  roleData: RoleDataType,
 ) {
   const role = roleData.role;
 

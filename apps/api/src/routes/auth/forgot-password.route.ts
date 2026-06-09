@@ -1,4 +1,4 @@
-import { NextFunction, type Request, Response, Router } from 'express';
+import { NextFunction, type Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { prisma } from '@stackschool/db';
 import { sendResetPasswordEmail } from '../../services/mail.service';
@@ -15,231 +15,228 @@ import {
   TEMP_TOKEN_EXP,
 } from '../../constant/config';
 import { consumeIdentifier, consumeIp } from '../../utils/limiter';
-import { forgotPasswordSchema } from '@stackschool/shared';
-import { safeValidateSchema } from '../../utils/validate-schema.util';
 import { createServiceError } from '../../utils/api-errors';
 import { sendApiResponse } from '../../middlewares/errorHandler';
 
-const router = Router();
-
-router.post(
-  '/forgot-password',
-  async (req: Request, res: Response, next: NextFunction) => {
+export const forgotPasswordRoute = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
     try {
-      try {
-        await consumeIp(req);
-        await consumeIdentifier(req);
-      } catch (RateLimiterQueueError) {
-        return next(
-          createServiceError(
-            'Trop de tentatives. Veuillez réessayer plus tard',
-            429,
-          ),
-        );
-      }
-
-      const errors = safeValidateSchema(forgotPasswordSchema, req.body);
-      if (errors) {
-        return next(errors);
-      }
-      const { identifier } = req.body as { identifier: string };
-
-      const user = (await Promise.race([
-        prisma.user.findFirst({
-          where: {
-            OR: [
-              { username: { equals: identifier, mode: 'insensitive' } },
-              { phoneNumber: { equals: identifier, mode: 'insensitive' } },
-              { email: { equals: identifier, mode: 'insensitive' } },
-            ],
-          },
-          select: {
-            id: true,
-            email: true,
-            phoneNumber: true,
-            username: true,
-          },
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 2000),
+      await consumeIp(req);
+      await consumeIdentifier(req);
+    } catch (RateLimiterQueueError) {
+      return next(
+        createServiceError(
+          'Trop de tentatives. Veuillez réessayer plus tard',
+          429,
         ),
-      ])) as any;
-      // pas d'user on renvoie un message avec un délai pour masquer le temps de requête des utilisateurs non trouvé
-      if (!user) {
-        await new Promise((resolve) =>
-          setTimeout(resolve, 500 + Math.random() * 500),
-        );
-        return sendApiResponse(res, 200, {
-          ok: false,
-          message:
-            'Si un compte correspond à cet identifiant, un message a été envoyé.',
-        });
-      }
-
-      const now = new Date();
-      const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000);
-      // vérifie si le user a un message envoyer par email ou whatsapp
-      const [existingToken, existingCode] = await Promise.all([
-        prisma.verificationToken.findFirst({
-          where: {
-            userId: user.id,
-            type: 'password_reset',
-            used: false,
-            expiresAt: { gt: now },
-          },
-          orderBy: { createdAt: 'desc' },
-        }),
-        prisma.verificationCode.findFirst({
-          where: {
-            userId: user.id,
-            type: 'password-reset',
-            used: false,
-            expiresAt: { gt: now },
-          },
-        }),
-      ]);
-
-      const minDelay = 1000 * 60 * 2; // 2 min
-      const lastCreated = Math.max(
-        existingCode ? new Date(existingCode.createdAt).getTime() : 0,
-        existingToken ? new Date(existingToken.createdAt).getTime() : 0,
       );
+    }
 
-      if (Date.now() - lastCreated < minDelay) {
-        sendApiResponse(res, 200, {
-          ok: false,
-          message: ' Veuillez patienter avant de redemander un code.',
-        });
-        return;
-      }
+    console.log('Forgot password route', req.body?.identifier);
+    //  const errors = safeValidateSchema(forgotPasswordSchema, req.body);
+    //     if (errors) return next(errors);
+    //
 
-      await Promise.all([
-        prisma.verificationToken.updateMany({
-          where: {
-            userId: user.id,
-            type: 'password_reset',
-            used: false,
-          },
-          data: { used: true },
-        }),
-        prisma.verificationCode.updateMany({
-          where: {
-            userId: user.id,
-            type: 'password_reset',
-            used: false,
-          },
-          data: { used: true },
-        }),
-      ]);
+    const { identifier } = req.body as { identifier: string };
+    console.log('identifier', identifier);
+    const user = (await Promise.race([
+      prisma.user.findFirst({
+        where: {
+          OR: [
+            { username: { equals: identifier, mode: 'insensitive' } },
+            { phoneNumber: { equals: identifier, mode: 'insensitive' } },
+            { email: { equals: identifier, mode: 'insensitive' } },
+          ],
+        },
+        select: {
+          id: true,
+          email: true,
+          phoneNumber: true,
+          username: true,
+        },
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout')), 2000),
+      ),
+    ])) as any;
+    console.log('user', user);
+    // pas d'user on renvoie un message avec un délai pour masquer le temps de requête des utilisateurs non trouvé
+    if (!user) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 500 + Math.random() * 500),
+      );
+      return sendApiResponse(res, 200, {
+        ok: false,
+        message:
+          'Si un compte correspond à cet identifiant, un message a été envoyé.',
+      });
+    }
 
-      let sent = false;
-      // 5️⃣ Si l'utilisateur a un email : envoi d'un lien sécurisé
-      if (
-        user.email.toLowerCase() === identifier.toLowerCase() ||
-        user.username.toLowerCase() === identifier.toLowerCase()
-      ) {
-        const rawToken = generateToken(32);
-        const tokenHash = hashToken(rawToken);
+    const now = new Date();
+    const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000);
+    // vérifie si le user a un message envoyer par email ou whatsapp
+    const [existingToken, existingCode] = await Promise.all([
+      prisma.verificationToken.findFirst({
+        where: {
+          userId: user.id,
+          type: 'password_reset',
+          used: false,
+          expiresAt: { gt: now },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.verificationCode.findFirst({
+        where: {
+          userId: user.id,
+          type: 'password-reset',
+          used: false,
+          expiresAt: { gt: now },
+        },
+      }),
+    ]);
 
-        await prisma.verificationToken.create({
-          data: {
-            userId: user.id,
-            tokenHash,
-            method: 'email',
-            type: 'password_reset',
-            used: false,
-            expiresAt,
-          },
-        });
+    const minDelay = 1000 * 60 * 2; // 2 min
+    const lastCreated = Math.max(
+      existingCode ? new Date(existingCode.createdAt).getTime() : 0,
+      existingToken ? new Date(existingToken.createdAt).getTime() : 0,
+    );
 
-        const resetLink = `${process.env.FRONTEND_URL}/auth/reset-password?method=email&token=${rawToken}`;
+    if (Date.now() - lastCreated < minDelay) {
+      sendApiResponse(res, 200, {
+        ok: false,
+        message: ' Veuillez patienter avant de redemander un code.',
+      });
+      return;
+    }
 
-        try {
-          await sendResetPasswordEmail(user.email, 'password_reset', resetLink);
-          sent = true;
-        } catch (err) {
-          createServiceError('Erreur envoi email:', 400, err);
-        }
+    await Promise.all([
+      prisma.verificationToken.updateMany({
+        where: {
+          userId: user.id,
+          type: 'password_reset',
+          used: false,
+        },
+        data: { used: true },
+      }),
+      prisma.verificationCode.updateMany({
+        where: {
+          userId: user.id,
+          type: 'password_reset',
+          used: false,
+        },
+        data: { used: true },
+      }),
+    ]);
 
-        return res.status(200).json({
-          ok: true,
-          message:
-            'Un lien de réinitialisation du mot de passe a été envoyé à votre email.',
+    let sent = false;
+    // 5️⃣ Si l'utilisateur a un email : envoi d'un lien sécurisé
+    if (
+      user.email.toLowerCase() === identifier.toLowerCase() ||
+      user.username.toLowerCase() === identifier.toLowerCase()
+    ) {
+      const rawToken = generateToken(32);
+      const tokenHash = hashToken(rawToken);
+
+      await prisma.verificationToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
           method: 'email',
-        });
-      }
-      // si le lien n'est pas envoyer par email et que le user a un numéro de téléphone
-      if (!sent && user.phoneNumber) {
-        const rawCode = generate6Code();
-        const codeHash = hashCode(rawCode);
+          type: 'password_reset',
+          used: false,
+          expiresAt,
+        },
+      });
 
-        await prisma.verificationCode.create({
-          data: {
-            userId: user.id,
-            codeHash,
-            method: 'whatsapp',
-            type: 'password_reset',
-            used: false,
-            attempts: 0,
-            expiresAt,
-          },
-        });
+      const resetLink = `${process.env.FRONTEND_URL}/auth/reset-password?method=email&token=${rawToken}`;
 
-        try {
-          await sendWhatsAppMessage(user.phoneNumber, rawCode);
-          sent = true;
-        } catch (err) {
-          return createServiceError(
-            "Erreur d'envoie du message whatsapp",
-            500,
-            err,
-          );
-        }
-
-        // Crée un petit JWT temporaire pour réessayer sans redemander l'identifiant
-        const tempToken = jwt.sign(
-          {
-            userId: user.id,
-            type: 'resend_code',
-            jti: generateToken(16),
-          },
-          JWT_SECRET,
-
-          { expiresIn: TEMP_TOKEN_EXP },
-        );
-
-        res.cookie('tempToken', tempToken, {
-          httpOnly: true,
-          sameSite: 'lax',
-          maxAge: 1000 * 60 * CODE_EXPIRES_MINUTES,
-          secure: process.env.NODE_ENV === 'production',
-        });
-        return res.status(200).json({
-          ok: true,
-          message: 'Un code de réinitialisation a été envoyé par WhatsApp.',
-          method: 'whatsapp',
-        });
-      }
-
-      if (!sent) {
-        // Logger l'incident pour le support
-        console.warn(`Aucun moyen de contact pour l'utilisateur ${user.id}`);
+      try {
+        await sendResetPasswordEmail(user.email, 'password_reset', resetLink);
+        sent = true;
+      } catch (err) {
+        createServiceError('Erreur envoi email:', 400, err);
       }
 
       return res.status(200).json({
         ok: true,
-        message: 'Aucun moyen de contact veilliez contacter le support',
+        message:
+          'Un lien de réinitialisation du mot de passe a été envoyé à votre email.',
+        method: 'email',
       });
-    } catch (err) {
-      return next(
-        createServiceError(
-          'Si un compte correspond à cet identifiant, un message vous a été envoyé.',
+    }
+    // si le lien n'est pas envoyer par email et que le user a un numéro de téléphone
+    if (!sent && user.phoneNumber) {
+      const rawCode = generate6Code();
+      const codeHash = hashCode(rawCode);
+
+      await prisma.verificationCode.create({
+        data: {
+          userId: user.id,
+          codeHash,
+          method: 'whatsapp',
+          type: 'password_reset',
+          used: false,
+          attempts: 0,
+          expiresAt,
+        },
+      });
+
+      try {
+        await sendWhatsAppMessage(user.phoneNumber, rawCode);
+        sent = true;
+      } catch (err) {
+        return createServiceError(
+          "Erreur d'envoie du message whatsapp",
           500,
           err,
-        ),
-      );
-    }
-  },
-);
+        );
+      }
 
-export default router;
+      // Crée un petit JWT temporaire pour réessayer sans redemander l'identifiant
+      const tempToken = jwt.sign(
+        {
+          userId: user.id,
+          type: 'resend_code',
+          jti: generateToken(16),
+        },
+        JWT_SECRET,
+
+        { expiresIn: TEMP_TOKEN_EXP },
+      );
+
+      res.cookie('tempToken', tempToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 1000 * 60 * CODE_EXPIRES_MINUTES,
+        secure: process.env.NODE_ENV === 'production',
+      });
+      return res.status(200).json({
+        ok: true,
+        message: 'Un code de réinitialisation a été envoyé par WhatsApp.',
+        method: 'whatsapp',
+      });
+    }
+
+    if (!sent) {
+      // Logger l'incident pour le support
+      console.warn(`Aucun moyen de contact pour l'utilisateur ${user.id}`);
+    }
+
+    return res.status(200).json({
+      ok: true,
+      message: 'Aucun moyen de contact veilliez contacter le support',
+    });
+  } catch (err) {
+    return next(
+      createServiceError(
+        'Si un compte correspond à cet identifiant, un message vous a été envoyé.',
+        500,
+        err,
+      ),
+    );
+  }
+};

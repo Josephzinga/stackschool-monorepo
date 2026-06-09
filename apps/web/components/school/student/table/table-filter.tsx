@@ -16,7 +16,7 @@ import {
 } from '@/components/school/student/table/table-provider';
 
 export default function StudentFilter() {
-  const { filters, setFilters } = useTable();
+  const { filters, setFilters, clearFilters } = useTable();
   const { currentSchool } = useUserStore();
 
   const { data } = useGetClassesOptionsQuery(
@@ -32,7 +32,7 @@ export default function StudentFilter() {
 
   const classes = data?.getSchoolClasses.data;
 
-  const hasActiveFilters = Object.keys(filters).some((v) => v !== undefined);
+  const hasActiveFilters = Object.keys(filters).some((v) => !v);
 
   const uniqueLevel = [...new Set(classes?.map((item) => item?.level))];
   const uniqueSection = [...new Set(classes?.map((item) => item?.section))];
@@ -41,7 +41,7 @@ export default function StudentFilter() {
     key: keyof StudentFilterState,
     val: string | boolean | undefined,
   ) => {
-    setFilters((prev) => ({ ...prev, [key]: val === 'ALL' ? undefined : val }));
+    setFilters({ [key]: val });
   };
   return (
     <div className="flex flex-wrap items-end gap-4 p-4 bg-accent  rounded-lg border shadow-lg">
@@ -58,11 +58,14 @@ export default function StudentFilter() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Toutes les niveaux</SelectItem>
-            {uniqueLevel?.map((level) => (
-              <SelectItem key={level} value={level!}>
-                {level}
-              </SelectItem>
-            ))}
+            {uniqueLevel?.map((level) => {
+              if (!level) return;
+              return (
+                <SelectItem key={level} value={level}>
+                  {level}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -79,11 +82,15 @@ export default function StudentFilter() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Toutes les sections</SelectItem>
-            {uniqueSection?.map((section, i) => (
-              <SelectItem value={section!} key={section}>
-                {section}
-              </SelectItem>
-            ))}
+            {uniqueSection.length !== 0 &&
+              uniqueSection.map((section, i) => {
+                if (!section) return;
+                return (
+                  <SelectItem value={section} key={section}>
+                    {section}
+                  </SelectItem>
+                );
+              })}
           </SelectContent>
         </Select>
       </div>
@@ -137,7 +144,7 @@ export default function StudentFilter() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setFilters({})}
+          onClick={() => clearFilters()}
           className="h-8 px-2 text-destructive hover:text-destructive/80 bg-destructive/10 hover:bg-destructive/20 cursor-pointer"
         >
           <X className="h-4 w-4 mr-1 text-destructive" />

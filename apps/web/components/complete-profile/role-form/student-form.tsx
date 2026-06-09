@@ -27,7 +27,7 @@ import { useState } from 'react';
 import {
   generateStudentMatricule,
   parseAxiosError,
-  StudentFormData,
+  StudentFormDataType,
   studentFormSchema,
 } from '@stackschool/shared';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
@@ -48,7 +48,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<StudentFormData>({
+  } = useForm<StudentFormDataType>({
     resolver: zodResolver(studentFormSchema),
     mode: 'onBlur',
     defaultValues: {
@@ -91,7 +91,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
     toast.error(message || 'Echec de chargement de classes');
   }
 
-  const onSubmit = async (data: StudentFormData) => {
+  const onSubmit = async (data: StudentFormDataType) => {
     setRoleData({ role: 'STUDENT', student: data });
     setCurrentStep(4);
   };

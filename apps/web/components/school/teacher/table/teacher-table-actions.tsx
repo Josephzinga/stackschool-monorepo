@@ -29,7 +29,9 @@ export function TeacherTableActions({ row }: { row: Row<TeacherColumns> }) {
 
   const { mutateAsync, isPending } = useDeleteTeachersMutation({
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['GetSchoolTeachers'] });
+      await queryClient.invalidateQueries({
+        queryKey: ['GetSchoolTeachers'],
+      });
     },
   });
 

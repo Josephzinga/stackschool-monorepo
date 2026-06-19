@@ -94,12 +94,12 @@ export const studentColumns: ColumnDef<AttendanceColumns>[] = [
   {
     id: 'status',
     header: 'Statut de Présence',
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const studentId = row.original.id;
       return (
         <RadioGroup
           defaultValue={AttendanceStatus.Present}
-          onValueChange={(val) => console.log(val)}
+          onValueChange={(val) => console.log('radioGroup value', val)}
           className="flex gap-2"
         >
           <div className="flex items-center space-x-2">

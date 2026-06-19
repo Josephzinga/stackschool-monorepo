@@ -8,14 +8,14 @@ import { useAttendanceEvent } from '@/components/school/attendance/hooks/useAtte
 import { AttendanceStatus } from '@stackschool/ui';
 import { z } from 'zod';
 
-export const attendanceSchema = z.array(
+export const markStudentAttendanceSchema = z.array(
   z.object({
     id: z.string(),
     status: z.enum(AttendanceStatus),
-    userType: z.enum(['TEACHER', 'STUDENT', 'STAFF']),
+    classId: z.string().optional().nullable()
   }),
 );
-export type AttendanceFormType = z.infer<typeof attendanceSchema>;
+export type markStudentAttendanceFormType = z.infer<typeof markStudentAttendanceSchema>;
 export function AttendanceDashboard() {
   const { handleStatusChange, openQrDialog } = useAttendanceEvent();
   const {
@@ -40,7 +40,7 @@ export function AttendanceDashboard() {
               onClick={() =>
                 openQrDialog(
                   row.original.id,
-                  `${row.original.profile.firstName} ${row.original.profile.lastName}`,
+                  `${row.original?.profile?.firstName} ${row.original?.profile?.lastName}`,
                   row.original.userType,
                 )
               }

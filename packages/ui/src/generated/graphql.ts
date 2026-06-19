@@ -485,9 +485,10 @@ export type MarkEmployeeAttendanceInput = {
 };
 
 export type MarkStudentAttendanceInput = {
-  date?: InputMaybe<Scalars['Date']['input']>;
+  Date?: InputMaybe<Scalars['Date']['input']>;
+  classId?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
   status: AttendanceStatus;
-  studentId: Scalars['String']['input'];
 };
 
 export type MonthlyRevenue = {
@@ -523,7 +524,6 @@ export type Mutation = {
   deleteTeacherAssignment?: Maybe<ApiResponse>;
   deleteTeachers?: Maybe<ApiResponse>;
   generateAttendanceSession: AttendanceSessionPayload;
-  markEmployeeAttendance: AttendanceRecord;
   markStudentAttendance: AttendanceRecord;
   registerPresence: AttendanceRecord;
   syncTeacherAssignment?: Maybe<ApiResponse>;
@@ -633,13 +633,8 @@ export type MutationGenerateAttendanceSessionArgs = {
 };
 
 
-export type MutationMarkEmployeeAttendanceArgs = {
-  input: MarkEmployeeAttendanceInput;
-};
-
-
 export type MutationMarkStudentAttendanceArgs = {
-  input: MarkStudentAttendanceInput;
+  input?: InputMaybe<Array<MarkStudentAttendanceInput>>;
 };
 
 
@@ -1234,7 +1229,7 @@ export type GetSchoolSettingsQueryVariables = Exact<{
 export type GetSchoolSettingsQuery = { __typename?: 'Query', school: { __typename?: 'School', settings?: { __typename?: 'SchoolSettings', id?: string | null, startHour?: number | null, endHour?: number | null, daysOfWeek?: Array<Day | null> | null, lessonDuration?: number | null } | null } };
 
 export type MarkStudentAttendanceMutationVariables = Exact<{
-  input: MarkStudentAttendanceInput;
+  input?: InputMaybe<Array<MarkStudentAttendanceInput> | MarkStudentAttendanceInput>;
 }>;
 
 
@@ -2011,7 +2006,7 @@ useInfiniteGetSchoolSettingsQuery.getKey = (variables: GetSchoolSettingsQueryVar
 useGetSchoolSettingsQuery.fetcher = (variables: GetSchoolSettingsQueryVariables, options?: RequestInit['headers']) => fetcher<GetSchoolSettingsQuery, GetSchoolSettingsQueryVariables>(GetSchoolSettingsDocument, variables, options);
 
 export const MarkStudentAttendanceDocument = `
-    mutation MarkStudentAttendance($input: MarkStudentAttendanceInput!) {
+    mutation MarkStudentAttendance($input: [MarkStudentAttendanceInput!]) {
   markStudentAttendance(input: $input) {
     id
     date
@@ -2053,7 +2048,7 @@ export const useMarkStudentAttendanceMutation = <
     )};
 
 
-useMarkStudentAttendanceMutation.fetcher = (variables: MarkStudentAttendanceMutationVariables, options?: RequestInit['headers']) => fetcher<MarkStudentAttendanceMutation, MarkStudentAttendanceMutationVariables>(MarkStudentAttendanceDocument, variables, options);
+useMarkStudentAttendanceMutation.fetcher = (variables?: MarkStudentAttendanceMutationVariables, options?: RequestInit['headers']) => fetcher<MarkStudentAttendanceMutation, MarkStudentAttendanceMutationVariables>(MarkStudentAttendanceDocument, variables, options);
 
 export const GetSchoolClassesDocument = `
     query GetSchoolClasses($input: GetSchoolClassesInput!) {

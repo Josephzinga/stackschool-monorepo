@@ -1,4 +1,4 @@
-mutation MarkStudentAttendance($input: MarkStudentAttendanceInput!) {
+mutation MarkStudentAttendance($input: [MarkStudentAttendanceInput!]) {
   markStudentAttendance(input: $input) {
     id
     date

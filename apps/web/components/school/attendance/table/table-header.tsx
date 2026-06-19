@@ -44,8 +44,10 @@ export function TableHeader() {
   };
   const handleBadgeScan = () => {};
   return (
-    <header className="flex flex-col gap-6 w-full">
+    <header className="flex flex-col gap-4 w-full">
       <div className="flex flex-col gap-4">
+        {/* Header with title and date picker */}
+
         <div className="flex gap-4 items-center">
           <h1 className="text-3xl font-bold tracking-tight">
             Gestion des présences
@@ -71,9 +73,10 @@ export function TableHeader() {
             </PopoverContent>
           </Popover>
         </div>
+        {/* Tabs button switch */}
         <ModeButtonGroup activeMode={mode} onModeChange={handleSwitchMode} />
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-accent rounded-md p-2">
         {mode === 'STUDENT' ? (
           <ClassCombobox
             classes={classes}
@@ -94,7 +97,12 @@ export function TableHeader() {
           </div>
         )}
         <div>
-          <Button className="px-4 cursor-pointer" variant="ghost">
+          <Button
+            className="px-4 cursor-pointer hover:bg-accent-foreground/70 font-poppins font-medium hover:text-background transition-colors duration-300"
+            variant="outline"
+            onClick={() => openScanner()}
+          >
+            Générer un QR Code
             <LucideQrCode />
           </Button>
         </div>

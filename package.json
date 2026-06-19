@@ -34,8 +34,8 @@
     "@tanstack/react-query-devtools": "^5.91.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "eslint": "^9",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
@@ -52,7 +52,9 @@
   "pnpm": {
     "overrides": {
       "react": "$react",
-      "react-dom": "$react-dom"
+      "react-dom": "$react-dom",
+      "@types/react": "$@types/react",
+      "@types/react-dom": "$@types/react-dom"
     },
     "onlyBuiltDependencies": [
       "@prisma/engines",

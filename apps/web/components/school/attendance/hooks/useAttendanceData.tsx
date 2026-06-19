@@ -187,16 +187,16 @@ export function useAttendanceData() {
 
     baseColumns.push({
       accessorKey: 'status',
-      header: 'Statut',
+      header: 'Statut de présence',
       cell: ({ row, table }) => (
         <StatusBadgeGroup
           value={row.original?.status}
           onChange={(status) =>
-            table.options.meta?.onChange?.(row.original, status)
+            table.options.meta?.onAttendanceStatusChange?.(row.original, status)
           }
         />
       ),
-      size: 400,
+      size: 800,
     });
 
     // Colonne QR pour Teacher et Staff

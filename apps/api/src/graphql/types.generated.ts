@@ -476,9 +476,10 @@ export type MarkEmployeeAttendanceInput = {
 };
 
 export type MarkStudentAttendanceInput = {
-  date?: InputMaybe<Scalars['Date']['input']>;
+  Date?: InputMaybe<Scalars['Date']['input']>;
+  classId?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
   status: AttendanceStatus;
-  studentId: Scalars['String']['input'];
 };
 
 export type MonthlyRevenue = {
@@ -514,7 +515,6 @@ export type Mutation = {
   deleteTeacherAssignment?: Maybe<ApiResponse>;
   deleteTeachers?: Maybe<ApiResponse>;
   generateAttendanceSession: AttendanceSessionPayload;
-  markEmployeeAttendance: AttendanceRecord;
   markStudentAttendance: AttendanceRecord;
   registerPresence: AttendanceRecord;
   syncTeacherAssignment?: Maybe<ApiResponse>;
@@ -624,13 +624,8 @@ export type MutationGenerateAttendanceSessionArgs = {
 };
 
 
-export type MutationMarkEmployeeAttendanceArgs = {
-  input: MarkEmployeeAttendanceInput;
-};
-
-
 export type MutationMarkStudentAttendanceArgs = {
-  input: MarkStudentAttendanceInput;
+  input?: InputMaybe<Array<MarkStudentAttendanceInput>>;
 };
 
 
@@ -1690,8 +1685,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   deleteTeacherAssignment?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationDeleteTeacherAssignmentArgs, 'id'>>;
   deleteTeachers?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationDeleteTeachersArgs, 'soft' | 'teacherIds'>>;
   generateAttendanceSession?: Resolver<ResolversTypes['AttendanceSessionPayload'], ParentType, ContextType, RequireFields<MutationGenerateAttendanceSessionArgs, 'input'>>;
-  markEmployeeAttendance?: Resolver<ResolversTypes['AttendanceRecord'], ParentType, ContextType, RequireFields<MutationMarkEmployeeAttendanceArgs, 'input'>>;
-  markStudentAttendance?: Resolver<ResolversTypes['AttendanceRecord'], ParentType, ContextType, RequireFields<MutationMarkStudentAttendanceArgs, 'input'>>;
+  markStudentAttendance?: Resolver<ResolversTypes['AttendanceRecord'], ParentType, ContextType, Partial<MutationMarkStudentAttendanceArgs>>;
   registerPresence?: Resolver<ResolversTypes['AttendanceRecord'], ParentType, ContextType, RequireFields<MutationRegisterPresenceArgs, 'sessionId'>>;
   syncTeacherAssignment?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationSyncTeacherAssignmentArgs, 'input'>>;
   updateClass?: Resolver<Maybe<ResolversTypes['ApiResponse']>, ParentType, ContextType, RequireFields<MutationUpdateClassArgs, 'classId' | 'data' | 'schoolId'>>;

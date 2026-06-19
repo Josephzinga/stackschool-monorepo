@@ -19,12 +19,24 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { AttendanceMode } from '@/types/attendance';
 import { AttendanceStatus } from '@stackschool/ui';
+import { z } from 'zod';
 
 interface AttendanceTableProps<T> {
   columns: ColumnDef<T>[];
   data: T[];
   isLoading?: boolean;
 }
+
+export const attendanceFormSchema = z.object({
+  classId: z.string(),
+  data: z.array(
+    z.object({
+      id: z.string(),
+      userType: z.enum(['STUDENT', 'TEACHER', 'STAFF']),
+      status: z.enum(AttendanceStatus),
+    }),
+  ),
+});
 
 export function AttendanceTable<T>({
   columns,
@@ -47,7 +59,7 @@ export function AttendanceTable<T>({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     meta: {
-      onChange: (data, status) => {
+      onAttendanceStatusChange: (data, status) => {
         queryClient.getQueryData(['']);
         setCurrentStatus((prev) => [
           ...prev,
@@ -73,13 +85,13 @@ export function AttendanceTable<T>({
   }
 
   return (
-    <FormProvider {...methods}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-4">
         <div className="rounded-md border">
           <AppDataTable table={table} columns={columns} />
         </div>
         <DataTablePagination table={table} />
       </div>
-    </FormProvider>
+    </form>
   );
 }

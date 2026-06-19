@@ -12,6 +12,12 @@ enum LessonStatus {
   CANCELLED
   POSTPONED
 }
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
 enum AssessmentType {
   EXAM
   ASSIGNMENT

@@ -1,5 +1,5 @@
 import { prisma } from './prisma';
-import { SchoolRole } from '@stackschool/db';
+import { SchoolRole, SchoolUser } from '@stackschool/db';
 import { redisClient } from './redis';
 import { createServiceError } from '../utils/api-errors';
 import { UserInMe } from '@stackschool/shared';
@@ -12,14 +12,21 @@ type SchoolUserContext = {
 type CheckRoleArgs =
   | { schoolUserId: string; context?: never; roles: SchoolRole[] }
   | { schoolUserId?: never; context: SchoolUserContext; roles: SchoolRole[] };
+type Teacher = {
+  id: string | null;
+};
+interface MemberShip extends SchoolUser {
+  teacher: Teacher | null;
+}
 
 /**
  * Vérifie si un utilisateur possède l'un des rôles requis dans une école.
  * Utilise Redis pour mettre en cache l'objet SchoolUser complet.
  */
+
 export const checkRole = async (
   args: CheckRoleArgs,
-): Promise<{ success: boolean; message?: string; member?: any }> => {
+): Promise<{ success: boolean; message?: string; member?: MemberShip }> => {
   try {
     const { schoolUserId, context, roles } = args;
 
@@ -30,7 +37,7 @@ export const checkRole = async (
     const cacheKey = context
       ? `membership:${context.schoolId}:${context.userId}`
       : null;
-    let membership: any = null;
+    let membership: MemberShip | null = null;
 
     // 1. Essayer de récupérer depuis Redis
     if (cacheKey) {

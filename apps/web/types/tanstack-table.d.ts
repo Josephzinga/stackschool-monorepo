@@ -7,7 +7,8 @@ declare module '@tanstack/react-table' {
     openEdit?: (data: TData) => void;
     openDelete?: (data: TData) => void;
     openAdd?: (data: TData) => void;
-    onChange?: (data: TData, status?: AttendanceStatus) => void;
+    onChange?: (data: TData) => void;
+    onAttendanceStatusChange?: (data: TData, status?: AttendanceStatus) => void;
   }
 }
 export interface DataTableProps<TData, TValue> {

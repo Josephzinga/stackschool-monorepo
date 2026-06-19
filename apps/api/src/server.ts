@@ -131,7 +131,7 @@ app.use('/api/auth', forgotPasswordController);
 app.all('/graphql', isAuthenticated, graphqlMiddleware);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, './index.html'));
+  res.sendFile(path.resolve(process.cwd(), 'public/index.html'));
 });
 
 app.use(express.static(path.resolve(process.cwd(), 'public')));

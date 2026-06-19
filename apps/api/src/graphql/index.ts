@@ -23,7 +23,8 @@ import { classSubjectResolvers } from './resolvers/classSubject';
 import { classResolvers } from './resolvers/class';
 import { teacherResolvers } from './resolvers/teacher';
 import { studentResolvers } from './resolvers/student';
-import { attendanceResolver } from './resolvers/attendance.resolver';
+import { attendanceResolver } from './resolvers/attendance/attendance.resolver';
+import { attendanceResolvers } from './resolvers/attendance';
 
 const dirPath = path.resolve(
   __dirname,
@@ -54,7 +55,7 @@ const resolvers = merge(
   parentQueryResolver,
   parentResolver,
   parentMutationResolver,
-  attendanceResolver,
+  attendanceResolvers,
 );
 
 const schema = makeExecutableSchema({

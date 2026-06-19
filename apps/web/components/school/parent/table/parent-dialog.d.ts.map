@@ -1,1 +1,0 @@
-{"version":3,"file":"parent-dialog.d.ts","sourceRoot":"","sources":["parent-dialog.tsx"],"names":[],"mappings":"AASA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAC;AAE/B,UAAU,iBAAiB;IACzB,IAAI,EAAE,OAAO,CAAC;IACd,OAAO,EAAE,CAAC,IAAI,EAAE,OAAO,KAAK,IAAI,CAAC;IACjC,aAAa,CAAC,EAAE,GAAG,CAAC;CACrB;AAED,wBAAgB,YAAY,CAAC,EAAE,IAAI,EAAE,OAAO,EAAE,aAAa,EAAE,EAAE,iBAAiB,qBAoB/E"}

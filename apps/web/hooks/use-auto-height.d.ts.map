@@ -1,1 +1,0 @@
-{"version":3,"file":"use-auto-height.d.ts","sourceRoot":"","sources":["use-auto-height.tsx"],"names":[],"mappings":"AAEA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAC;AAE/B,KAAK,iBAAiB,GAAG;IACvB,gBAAgB,CAAC,EAAE,OAAO,CAAC;IAC3B,cAAc,CAAC,EAAE,OAAO,CAAC;CAC1B,CAAC;AAEF,wBAAgB,aAAa,CAAC,CAAC,SAAS,WAAW,GAAG,cAAc,EAClE,IAAI,GAAE,KAAK,CAAC,cAAmB,EAC/B,OAAO,GAAE,iBAGR;;;EAuFF"}

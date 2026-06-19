@@ -1,4 +1,3 @@
-// hooks/useAttendanceData.ts
 import * as React from 'react';
 import { useMemo } from 'react';
 import { useAttendanceStore } from '@/store/attendance';
@@ -84,12 +83,6 @@ export function useAttendanceData() {
     },
   );
 
-  const {} = useTeacherForAttendancesQuery({
-    filter: {
-      day: day as Day,
-      search: searchTerm,
-    },
-  });
   const rows: AttendanceRow[] = useMemo(() => {
     switch (mode) {
       case 'STUDENT':

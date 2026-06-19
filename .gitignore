@@ -6,6 +6,13 @@ node_modules
 coverage
 jest-exercices
 joseph
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+!/types/**/*
+
+
 
 
 

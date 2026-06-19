@@ -21,7 +21,6 @@ export const initSocket = (httpServer: HttpServer, frontendOrigin: string) => {
       console.log(
         `L'utilisateur ${socket.id} a rejoint la chambre : ${roomName}`,
       );
-      console.log('Data', data);
     });
 
     socket.on('disconnect', () => {

@@ -30,7 +30,7 @@ import { Button } from '@/components/ui/button';
 import { Controller, useForm, zodResolver } from '@stackschool/ui';
 import { toast } from 'sonner';
 import { Container } from '@/components/Container';
-import { ButtonSocial } from '@/components/button-social';
+import { ButtonSocial } from '@/components/auth/button-social';
 import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
 import { useState } from 'react';

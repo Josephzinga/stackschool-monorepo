@@ -80,7 +80,7 @@ export const lessonMutationResolver: Resolvers = {
 
       const currentCS = await prisma.classSubjects.findUnique({
         where: {
-          groupId_subjectId: { groupId: groupId, subjectId },
+          groupId_subjectId: { groupId: groupId!, subjectId },
         },
         include: {
           assignments: true,

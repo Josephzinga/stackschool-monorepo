@@ -78,6 +78,8 @@ model School {
   settings           SchoolSettings?
 }
 
+// Paramétre de l'ecole
+
 model SchoolSettings {
   id String @id @default(cuid())
 
@@ -91,23 +93,50 @@ model SchoolSettings {
   school         School @relation(fields: [schoolId], references: [id])
 }
 
+// table de permission 
+model Permission {
+  id          String           @id @default(cuid())
+  code        PermissionCode   @unique // L'identifiant strict, ex: "MARK_STUDENT_ATTENDANCE"
+  name        String // Nom lisible, ex: "Faire l'appel des élèves"
+  module      PermissionModule // Pour grouper dans l'UI, ex: "ATTENDANCE", "FINANCE", "GRADES"
+  description String? // Explication détaillée pour l'admin
+
+  // Relation inverse : Une permission appartient à plusieurs utilisateurs
+  schoolUsers SchoolUserPermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SchoolUserPermission {
+  id           String @id @default(cuid())
+  schoolUserId String
+  permissionId String
+
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolUserId, permissionId])
+}
+
 /// *
 /// * pivot User <-> School
 model SchoolUser {
-  id                 String              @id @default(cuid())
+  id                 String                 @id @default(cuid())
   schoolId           String
   userId             String
   role               SchoolRole
-  isOwner            Boolean             @default(false)
-  createdAt          DateTime            @default(now())
+  isOwner            Boolean                @default(false)
+  createdAt          DateTime               @default(now())
   Parent             Parent?
-  school             School              @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school             School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   Staff              Staff?
   student            Student?
   teacher            Teacher?
   attendance         Attendance[]
   attendanceSessions AttendanceSession[]
+  permissions        SchoolUserPermission[]
 
   @@unique([schoolId, userId])
   @@index([schoolId])
@@ -148,6 +177,7 @@ model ClassSubjects {
   group       Group              @relation(fields: [groupId], references: [id], onDelete: Cascade)
   subject     Subject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   assignments TeacherAssignment?
+  attendances Attendance[]
 
   @@unique([groupId, subjectId])
   @@index([groupId])
@@ -230,10 +260,10 @@ model Lesson {
   id                  String            @id @default(cuid())
   title               String?
   subtitle            String?
-  startTime           DateTime
+  startTime           DateTime          @db.Time()
   status              LessonStatus      @default(PLANNED)
   day                 Day
-  endTime             DateTime
+  endTime             DateTime          @db.Time()
   schoolId            String
   roomId              String?
   teacherAssignmentId String
@@ -259,8 +289,8 @@ model CourseSession {
   title   String // Ex: "Les équations du second degré"
 
   date      DateTime  @default(now())
-  startTime DateTime  @default(now())
-  endTime   DateTime?
+  startTime DateTime  @default(now()) @db.Time()
+  endTime   DateTime? @db.Time()
 
   status SessionStatus @default(STARTED) // STARTED, FINISHED
 }
@@ -275,11 +305,11 @@ model Student {
   enrollmentDate DateTime?
   studentNumber  Int       @default(autoincrement())
 
-  bloodGroup       String?
-  allergies        String?
-  medicalCondition String?
-
-  birthDate              DateTime
+  bloodGroup             String?
+  allergies              String?
+  medicalCondition       String?
+  schoolUserId           String                      @unique
+  birthDate              DateTime                    @db.Date()
   createdAt              DateTime                    @default(now())
   updatedAt              DateTime                    @updatedAt
   deletedAt              DateTime?
@@ -292,7 +322,6 @@ model Student {
   schoolId               String
   classId                String
   transportMode          TransportMode               @default(WALK)
-  schoolUserId           String                      @unique
   status                 StudentStatus               @default(ACTIVE)
   results                AssessmentResult[]
   parentStudent          ParentStudent[]
@@ -313,8 +342,8 @@ model StudentDisciplinaryAction {
   studentId String
   type      DisciplinaryType
   reason    String
-  startDate DateTime
-  endDate   DateTime?
+  startDate DateTime         @db.Date()
+  endDate   DateTime?        @db.Date()
   createdAt DateTime         @default(now())
   student   Student          @relation(fields: [studentId], references: [id])
 }
@@ -391,21 +420,24 @@ model Attendance {
   schoolId String
 
   // Pour un employé (teacher, student ou staff)
-  schoolUserId String?
-  date         DateTime // la date (sans heure)
-  status       AttendanceStatus
-  checkInTime  DateTime? // heure de pointage (optionnel)
-  recordedBy   String? // schoolUserId de l'agent qui a fait le pointage manuel
-  sessionId    String? // si le pointage vient d'une session QR
-  createdAt    DateTime         @default(now())
+  schoolUserId   String?
+  date           DateTime         @db.Date() // la date (sans heure)
+  status         AttendanceStatus
+  checkInTime    DateTime?        @db.Time() // heure de pointage (optionnel)
+  recordedBy     String? // schoolUserId de l'agent qui a fait le pointage manuel
+  sessionId      String? // si le pointage vient d'une session QR
+  type           AtteandanceType  @default(DAILY)
+  classSubjectId String?
+  createdAt      DateTime         @default(now())
 
-  school     School             @relation(fields: [schoolId], references: [id])
-  schoolUser SchoolUser?        @relation(fields: [schoolUserId], references: [id])
-  session    AttendanceSession? @relation(fields: [sessionId], references: [id])
+  classSuject ClassSubjects?     @relation(fields: [classSubjectId], references: [id])
+  school      School             @relation(fields: [schoolId], references: [id])
+  schoolUser  SchoolUser?        @relation(fields: [schoolUserId], references: [id])
+  session     AttendanceSession? @relation(fields: [sessionId], references: [id])
 
   // Contraintes : une seule entrée par jour pour une même personne
-  @@unique([schoolUserId, date])
-  @@index([schoolId, date])
+  @@unique([schoolUserId, date, type, classSubjectId])
+  @@index([schoolId])
   @@index([schoolUserId, date])
 }
 
@@ -421,8 +453,8 @@ model Assessment {
   classSubjectId String
   schoolId       String
   startDate      DateTime?
-  endDate        DateTime?
-  dueDate        DateTime?
+  endDate        DateTime?          @db.Date()
+  dueDate        DateTime?          @db.Date()
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   classSubject   ClassSubjects      @relation(fields: [classSubjectId], references: [id])
@@ -739,4 +771,41 @@ enum GroupType {
 enum SessionStatus {
   FINISHED
   STARTED
+}
+
+enum PermissionModule {
+  ATTENDANCE // Gestion des présences
+  ACADEMICS // Notes, bulletins, classes, matières
+  USERS // Gestion des profs, élèves, parents, staff
+  FINANCE // Frais de scolarité, paiements, salaires
+  SETTINGS // Configuration de l'école
+}
+
+enum PermissionCode {
+  // --- MODULE: ATTENDANCE ---
+  MARK_STUDENT_ATTENDANCE
+  MARK_TEACHER_ATTENDANCE
+  MARK_STAFF_ATTENDANCE
+  VIEW_ATTENDANCE_REPORTS
+
+  // --- MODULE: ACADEMICS ---
+  MANAGE_CLASSES
+  MANAGE_SUBJECTS
+  INPUT_GRADES
+  PUBLISH_BULLETINS
+
+  // --- MODULE: USERS ---
+  CREATE_USER
+  UPDATE_USER
+  DELETE_USER
+  MANAGE_USER_PERMISSIONS // Permet à un admin secondaire de modifier les accès
+
+  // --- MODULE: FINANCE ---
+  MANAGE_PAYMENTS
+  VIEW_FINANCIAL_REPORTS
+}
+
+enum AtteandanceType {
+  DAILY
+  SUBJECT
 }

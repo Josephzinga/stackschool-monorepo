@@ -25,8 +25,6 @@ query SearchSchool($input: SchoolSearchInput!) {
   }
 }
 
-
-
 mutation ConfirmCompleteProfile {
   confirmCompleteProfile {
     ok
@@ -36,92 +34,6 @@ mutation ConfirmCompleteProfile {
       email
       profileCompleted
       hasMembership
-    }
-  }
-}
-query GetMe {
-  me {
-    id
-    username
-    phoneNumber
-    email
-    profileCompleted
-    hasMembership
-
-    profile {
-      id
-      address
-      firstname
-      lastname
-      gender
-      photo
-    }
-    memberships {
-      id
-      role
-      school {
-        id
-        name
-        logo
-        slug
-        address
-      }
-    }
-  }
-}
-
-query GetDashboardContext($input: SchoolId!) {
-  me {
-    schoolContext(schoolId: $input) {
-      id
-      role
-      teacher {
-        id
-        department
-        specialization
-        supervisedClasses {
-          id
-          section
-          section
-        }
-      }
-      staff {
-        id
-        position
-        departement
-        schoolUserId
-      }
-      parent {
-        id
-        isDelegate
-        parentStudent{
-         student {
-           id
-           user {
-             id
-             profile {
-               lastname
-               firstname
-               photo
-             }
-           }
-           matricule
-         }
-        }
-      }
-      student {
-        id
-        user {
-          id
-          profile {
-            id
-            firstname
-            lastname
-            photo
-          }
-        }
-        matricule
-      }
     }
   }
 }

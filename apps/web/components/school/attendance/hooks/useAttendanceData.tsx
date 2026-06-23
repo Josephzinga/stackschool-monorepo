@@ -1,23 +1,32 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { useAttendanceStore } from '@/store/attendance';
-import { AttendanceMode, AttendanceRow, Staff } from '@/types/attendance';
+import {
+  AttendanceMode,
+  AttendanceProfile,
+  AttendanceRow,
+  Staff,
+} from '@/types/attendance';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { QrCode } from 'lucide-react';
+import { format } from 'date-fns';
 import {
-  Day,
+  type Day,
+  type PaginationMeta,
   useGetClassesOptionsQuery,
   useGetStudentForAttendanceQuery,
   useGetTeacherForAttendanceQuery,
+  useGetSubjectsOptionsQuery,
 } from '@stackschool/ui';
 import { Checkbox } from '@/components/ui/checkbox';
 import { dayMapping } from '@stackschool/shared';
 import { useDebounce } from '@/hooks/useDebounce';
-import { StatusBadgeGroup } from '@/components/school/attendance/status-radio-group';
 import { useAttendanceEvent } from '@/components/school/attendance/hooks/useAttendanceEvent';
+import { ProfileCell } from '@/components/table/profile-cell';
+import { AttendanceCell } from '../table/attendance-cell';
+import { useDashboard } from '@/components/providers/dashboard-provider';
 
 const mockStaff: Staff[] = [
   {
@@ -46,7 +55,10 @@ const mockStaff: Staff[] = [
 
 export function useAttendanceData() {
   const { date, tenantId } = useAttendanceStore();
-  const { selectedClass, mode, search } = useAttendanceEvent();
+  const { selectedClass, mode, search, handleSwitchMode, pagination } =
+    useAttendanceEvent();
+  const { me } = useDashboard();
+  const [meta, setMeta] = React.useState<Omit<PaginationMeta, 'page'>>();
 
   const searchTerm = useDebounce(search, 400);
 
@@ -54,20 +66,38 @@ export function useAttendanceData() {
     (day) => dayMapping[day as Day] === date.getDay(),
   );
 
+  const teacherId =
+    me?.schoolContext?.role === 'TEACHER' ? me.schoolContext.teacher?.id : '';
+
   const classesQuery = useGetClassesOptionsQuery({
     input: {
       limit: 100,
+      teacherId,
     },
   });
   const studentQuery = useGetStudentForAttendanceQuery(
     {
       input: {
         classId: selectedClass,
+        limit: pagination.pageSize,
+        page: pagination.pageIndex,
+        teacherId,
       },
       date,
     },
     {
       enabled: mode === 'STUDENT',
+    },
+  );
+
+  const { data: subjectsData } = useGetSubjectsOptionsQuery(
+    {
+      input: {
+        teacherId,
+      },
+    },
+    {
+      enabled: !!teacherId,
     },
   );
 
@@ -83,24 +113,33 @@ export function useAttendanceData() {
     },
   );
 
-  const rows: AttendanceRow[] = useMemo(() => {
+  const rows: AttendanceRow[] | [] = useMemo(() => {
     switch (mode) {
       case 'STUDENT':
         const students = studentQuery.data?.getSchoolStudents.data || [];
+        if (studentQuery.data?.getSchoolStudents?.meta)
+          setMeta(studentQuery.data?.getSchoolStudents?.meta);
+
         return students.map((s) => ({
           id: s.id,
           profile: s.user?.profile!,
-          status: s.attendances?.[0]?.status,
+          status: s.attendances?.[0]?.status ?? null,
+          time: {
+            checkInTime: s.attendances?.[0]?.checkInTime,
+            date: s.attendances?.[0]?.date,
+          },
           class: s.schoolClass,
           userType: 'STUDENT' as AttendanceMode,
         }));
 
       case 'TEACHER':
         const teachers = teacherQuery.data?.getSchoolTeachers.data || [];
+        if (teacherQuery.data?.getSchoolTeachers?.meta)
+          setMeta(teacherQuery.data?.getSchoolTeachers?.meta);
         return teachers.map((t) => ({
           id: t.id,
-          profile: t.user?.profile,
-          status: 'PRESENT',
+          profile: t.user?.profile!,
+          status: t.attendances?.[0].status ?? null,
           userType: 'TEACHER' as AttendanceMode,
         }));
 
@@ -108,8 +147,8 @@ export function useAttendanceData() {
         const staff = mockStaff || [];
         return staff.map((s) => ({
           id: s.id,
-          profile: s.profile,
-          status: 'ABSENT',
+          profile: s.profile!,
+          status: s.status,
           role: s.role,
           userType: 'STAFF' as AttendanceMode,
         }));
@@ -119,7 +158,7 @@ export function useAttendanceData() {
     }
   }, [studentQuery.data, teacherQuery.data, mode]);
 
-  const columns: ColumnDef<AttendanceRow>[] = useMemo(() => {
+  const getColumns = React.useCallback((): ColumnDef<AttendanceRow>[] => {
     const baseColumns: ColumnDef<AttendanceRow>[] = [
       {
         id: 'select',
@@ -154,7 +193,7 @@ export function useAttendanceData() {
             : mode === 'TEACHER'
               ? 'Enseignant'
               : 'Personnel',
-        cell: ({ row }) => <ProfileCell profile={row.original.profile} />,
+        cell: ({ row }) => <ProfileCell profile={row.original.profile!} />,
       },
     ];
 
@@ -188,15 +227,25 @@ export function useAttendanceData() {
     baseColumns.push({
       accessorKey: 'status',
       header: 'Statut de présence',
-      cell: ({ row, table }) => (
-        <StatusBadgeGroup
-          value={row.original?.status}
-          onChange={(status) =>
-            table.options.meta?.onAttendanceStatusChange?.(row.original, status)
-          }
-        />
-      ),
+      cell: ({ row, table }) => <AttendanceCell row={row} table={table} />,
       size: 800,
+    });
+
+    baseColumns.push({
+      accessorKey: 'time',
+      header: 'Date/heure',
+      cell: ({ row }) => {
+        const checkInTime = row.original?.time?.checkInTime;
+        return (
+          <div>
+            {checkInTime ? (
+              <span>heure: {format(checkInTime, 'HH:mm')}</span>
+            ) : (
+              ''
+            )}
+          </div>
+        );
+      },
     });
 
     // Colonne QR pour Teacher et Staff
@@ -221,11 +270,13 @@ export function useAttendanceData() {
     }
 
     return baseColumns;
-  }, [mode]);
+  }, [mode, handleSwitchMode]);
 
   return {
     rows,
-    columns,
+    getColumns,
+    subjectsData: subjectsData?.getSchoolSubjects?.data,
+    meta,
     classes: classesQuery.data?.getSchoolClasses.data || [],
     isLoading:
       teacherQuery.isPending ||
@@ -234,36 +285,4 @@ export function useAttendanceData() {
     isError:
       teacherQuery.isError || classesQuery.isError || studentQuery.isError,
   };
-}
-
-function ProfileCell({
-  profile,
-}: {
-  profile: {
-    firstname: string;
-    lastname: string;
-    email?: string;
-    photo?: string;
-  };
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <Avatar className="h-9 w-9">
-        <AvatarImage
-          src={profile?.photo ?? undefined}
-          alt={`${profile?.firstname} ${profile?.lastname}`}
-        />
-        <AvatarFallback className="bg-primary/10 text-primary">
-          {profile?.firstname[0]}
-          {profile?.lastname[0]}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex flex-col">
-        <span className="font-medium text-sm">
-          {profile?.firstname} {profile?.lastname}
-        </span>
-        <span className="text-muted-foreground text-xs">{profile?.email}</span>
-      </div>
-    </div>
-  );
 }

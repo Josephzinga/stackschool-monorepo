@@ -43,28 +43,7 @@ query GetStudentDetails($id: ID!) {
     ...StudentDetails
   }
 }
-query GetStudentForAttendance($input: GetSchoolStudentsInput!, $date: Date) {
-  getSchoolStudents(input: $input) {
-    data {
-      id
-      user {
-        email
-        profile {
-          firstname
-          lastname
-          photo
-        }
-      }
-      schoolClass {
-        id
-        name
-      }
-      attendances(date: $date) {
-        status
-      }
-    }
-  }
-}
+
 mutation UpdateStudent(
   $studentId: ID!
   $data: CreateStudentInput!
@@ -104,21 +83,21 @@ fragment StudentDetails on Student {
   birthCertificateNumber
   enrollmentDate
   transportMode
- parentStudent {
-   relationType
-   parent {
-     id
-     profession
-     user {
-       phoneNumber
-       isActive
-       ...UserProfile
-       profile {
-         address
-       }
-     }
-   }
- }
+  parentStudent {
+    relationType
+    parent {
+      id
+      profession
+      user {
+        phoneNumber
+        isActive
+        ...UserProfile
+        profile {
+          address
+        }
+      }
+    }
+  }
   schoolClass {
     id
     name

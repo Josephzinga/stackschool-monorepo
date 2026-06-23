@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { UserStore } from '../types';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export const useUserStore = create<UserStore>()(
   persist(
@@ -9,7 +9,14 @@ export const useUserStore = create<UserStore>()(
       loading: true,
       isAuthenticated: false,
       currentSchool: null,
+      currentMemberShip: null,
 
+
+      setCurrentMemberShip: (memberShip)=> {
+        set({
+          currentMemberShip: memberShip
+        })
+      } ,
       setUser: (user) => {
         set({
           user,
@@ -24,7 +31,8 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: 'user-storage', // Nom de la clé dans localStorage
-      partialize: (state) => ({ currentSchool: state.currentSchool }), // On ne persiste que l'école choisie
+      partialize: (state) => ({ currentSchool: state.currentSchool, currentMemberShip: state.currentMemberShip }), // On ne persiste que l'école choisie
+      storage: createJSONStorage(() => sessionStorage)
     },
   ),
 );

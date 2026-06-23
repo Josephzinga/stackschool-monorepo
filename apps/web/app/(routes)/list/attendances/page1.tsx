@@ -1,33 +1,18 @@
 'use client';
 import React, { useMemo } from 'react';
-import { AttendanceTable } from '@/components/school/attendance/manual-attendace-table';
+import { AttendanceTable } from '@/components/school/attendance/table/manual-attendace-table';
 import { Button } from '@/components/ui/button';
 import { useAttendanceData } from '@/components/school/attendance/hooks/useAttendanceData';
 import { QrCode } from 'lucide-react';
 import { useAttendanceEvent } from '@/components/school/attendance/hooks/useAttendanceEvent';
-import { AttendanceStatus } from '@stackschool/ui';
-import { z } from 'zod';
 
-export const markStudentAttendanceSchema = z.array(
-  z.object({
-    id: z.string(),
-    status: z.enum(AttendanceStatus),
-    classId: z.string().optional().nullable()
-  }),
-);
-export type markStudentAttendanceFormType = z.infer<typeof markStudentAttendanceSchema>;
 export function AttendanceDashboard() {
   const { handleStatusChange, openQrDialog } = useAttendanceEvent();
-  const {
-    rows: data,
-    columns: baseColumns,
-    classes,
-    isLoading,
-  } = useAttendanceData();
+  const { rows: data, getColumns, classes, isLoading } = useAttendanceData();
 
   // Construction finale des colonnes avec les handlers d'événements
-  const dynamicColumns = useMemo<typeof baseColumns>(() => {
-    return baseColumns.map((col) => {
+  const dynamicColumns = useMemo<ReturnType<typeof getColumns>>(() => {
+    return getColumns().map((col) => {
       // Injecter le handler QR pour Teacher et Staff
       if (col.id === 'qr') {
         return {
@@ -53,7 +38,13 @@ export function AttendanceDashboard() {
 
       return col;
     });
-  }, [baseColumns, handleStatusChange, openQrDialog]);
+  }, [getColumns, handleStatusChange, openQrDialog]);
 
-  return <AttendanceTable columns={dynamicColumns} data={data} />;
+  return (
+    <AttendanceTable
+      columns={dynamicColumns}
+      data={data}
+      isLoading={isLoading}
+    />
+  );
 }

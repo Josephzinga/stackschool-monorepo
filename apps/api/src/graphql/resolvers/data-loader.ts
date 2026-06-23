@@ -10,11 +10,12 @@ import {
   Teacher,
   TeacherAssignment,
   User,
+  Profile,
 } from '@stackschool/db';
 
 export const createLoaders = (prisma: PrismaClient) => {
   return {
-    userLoader: new DataLoader<string, User | undefined>(
+    userLoader: new DataLoader<string, Omit<User, 'password'> | undefined>(
       async (schoolUserIds) => {
         const schoolUsers = await prisma.schoolUser.findMany({
           where: { id: { in: [...schoolUserIds] } },
@@ -29,13 +30,27 @@ export const createLoaders = (prisma: PrismaClient) => {
                 emailVerified: true,
                 hasMembership: true,
                 profileCompleted: true,
-                profile: true,
+                profileId: true,
               },
             },
           },
         });
         const userMap = new Map(schoolUsers.map((su) => [su.id, su.user]));
         return schoolUserIds.map((id) => userMap.get(id));
+      },
+    ),
+    profileLoader: new DataLoader<string, Profile | undefined>(
+      async (userIds) => {
+        const profile = await prisma.profile.findMany({
+          where: {
+            userId: {
+              in: [...userIds],
+            },
+          },
+        });
+
+        const map = new Map(profile.map((p) => [p.userId, p]));
+        return userIds.map((id) => map.get(id));
       },
     ),
     classSubjectLoader: new DataLoader<string, ClassSubjects | undefined>(
@@ -330,6 +345,8 @@ export const createLoaders = (prisma: PrismaClient) => {
         assignments.filter((ass) => ass.teacherId === id),
       );
     }),
+
+    permis,
   };
 };
 export type DataLoaders = ReturnType<typeof createLoaders>;

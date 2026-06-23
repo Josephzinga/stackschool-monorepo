@@ -5,7 +5,7 @@ import {
   LoginFormType,
   parseAxiosError,
 } from '@stackschool/shared';
-import { LoginForm } from '@/components/login-form';
+import { LoginForm } from '@/components/auth/login-form';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Container } from '@/components/Container';

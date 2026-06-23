@@ -1,8 +1,11 @@
-input MarkStudentAttendanceInput {
+input MarkAttendanceInput {
   id: String!
   classId: String
   status: AttendanceStatus!
-  Date: Date
+  date: Date!
+  userType: SchoolRole!
+  isSubjectMode: Boolean! = false
+  subjectId: String
 }
 
 input MarkEmployeeAttendanceInput {
@@ -39,5 +42,6 @@ type AttendanceRecord {
   date: DateTime
   checkInTime: DateTime
   recordedBy: User
+  type: AttendanceType
 }
 union Person = Student | Teacher | Staff

@@ -38,7 +38,9 @@ export const subjectResolver: Resolvers = {
           ...whereClause,
           classSubjects: {
             some: {
-              teacherId,
+              assignments: {
+                teacherId,
+              },
             },
           },
         };
@@ -115,19 +117,19 @@ export const subjectResolver: Resolvers = {
         const group = await prisma.group.findFirst({
           where: {
             classes: {
-              some:{
-                id: data.classId
-              }
-            }
-          }
-        })
+              some: {
+                id: data.classId,
+              },
+            },
+          },
+        });
         if (data?.classSubject) {
           for (const cls of data?.classSubject) {
             await tx.classSubjects.create({
               data: {
                 schoolId,
                 subjectId: subject?.id,
-               groupId: '',
+                groupId: '',
                 coefficient: cls?.coefficient,
                 weeklyHours: cls?.weeklyHours,
               },
@@ -192,7 +194,7 @@ export const subjectResolver: Resolvers = {
     },
     mainTeacher: async (parent, _args, { loaders }) => {
       if (!parent.mainTeacherId) return null;
-      return await loaders.teacherLoader.load(parent.mainTeacherId);
+      return (await loaders.teacherLoader.load(parent.mainTeacherId)) || null;
     },
   },
 };

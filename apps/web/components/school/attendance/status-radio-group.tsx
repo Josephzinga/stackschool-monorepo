@@ -2,26 +2,24 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Check, Clock, LucideProps, X } from 'lucide-react';
-import { AttendanceStatus } from '@stackschool/ui';
+import { Check, Clock, LucideProps, X, type LucideIcon } from 'lucide-react';
+import { AttendanceStatusEnum } from '@stackschool/shared';
 
 interface StatusBadgeGroupProps {
-  value: AttendanceStatus;
-  onChange: (status: AttendanceStatus) => void;
+  value: AttendanceStatusEnum | null;
+  onChange: (status: AttendanceStatusEnum) => void;
   size?: 'sm' | 'md';
 }
 interface Style {
   label: string;
-  icon: React.ForwardRefExoticComponent<
-    Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>
-  >;
+  icon: LucideIcon;
   activeClass: string;
   inactiveClass: string;
   darkActiveClass: string;
   darkInactiveClass: string;
 }
-const statusConfig: Record<AttendanceStatus, any> = {
-  [AttendanceStatus.Present]: {
+const statusConfig: Record<AttendanceStatusEnum, Style> = {
+  [AttendanceStatusEnum.PRESENT]: {
     label: 'Présent',
     icon: Check,
     // Light mode
@@ -35,7 +33,7 @@ const statusConfig: Record<AttendanceStatus, any> = {
     darkInactiveClass:
       'dark:text-green-400 dark:border-green-700 dark:hover:bg-green-950/50 dark:hover:border-green-600',
   },
-  [AttendanceStatus.Absent]: {
+  [AttendanceStatusEnum.ABSENT]: {
     label: 'Absent',
     icon: X,
     activeClass:
@@ -47,7 +45,7 @@ const statusConfig: Record<AttendanceStatus, any> = {
     darkInactiveClass:
       'dark:text-red-400 dark:border-red-700 dark:hover:bg-red-950/50 dark:hover:border-red-600',
   },
-  [AttendanceStatus.Late]: {
+  [AttendanceStatusEnum.LATE]: {
     label: 'Retard',
     icon: Clock,
     activeClass:
@@ -58,6 +56,14 @@ const statusConfig: Record<AttendanceStatus, any> = {
       'dark:bg-amber-600 dark:text-white dark:border-amber-500 dark:shadow-amber-900/30',
     darkInactiveClass:
       'dark:text-amber-400 dark:border-amber-700 dark:hover:bg-amber-950/50 dark:hover:border-amber-600',
+  },
+  [AttendanceStatusEnum.EXCUSED]: {
+    label: 'Malade',
+    icon: Clock,
+    activeClass: '',
+    inactiveClass: '',
+    darkActiveClass: '',
+    darkInactiveClass: '',
   },
 };
 
@@ -82,7 +88,7 @@ export function StatusBadgeGroup({
       role="group"
       aria-label="Statut de présence"
     >
-      {(Object.keys(statusConfig) as AttendanceStatus[]).map((status) => {
+      {(Object.keys(statusConfig) as AttendanceStatusEnum[]).map((status) => {
         const config = statusConfig[status];
         const Icon = config.icon;
         const isActive = value === status;

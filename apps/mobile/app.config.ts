@@ -1,4 +1,3 @@
-import 'expo/config/index.js';
 const FACEBOOK_APP_ID = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
 const FACEBOOK_CLIENT_TOKEN = process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN;
 
@@ -6,7 +5,7 @@ if (!FACEBOOK_APP_ID || !FACEBOOK_CLIENT_TOKEN) {
   console.log("❌ Erreur : Les variables d'environnement Facebook sont manquantes !");
 }
 
-export default ({ config }: ConfigContext): ExpoConfig => ({
+export default ({ config }: any) => ({
   ...config,
   name: 'StackSchool',
   slug: 'stackschool',
@@ -40,7 +39,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#ffff',
     },
     softwareKeyboardLayoutMode: 'pan',
-    edgeToEdgeEnabled: true,
     runtimeVersion: {
       policy: 'appVersion',
     },

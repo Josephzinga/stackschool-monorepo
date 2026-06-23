@@ -70,9 +70,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {}, []);
 
-  return (
-    <TableContext.Provider value={value}>{children}</TableContext.Provider>
-  );
+  return <TableContext value={value}>{children}</TableContext>;
 }
 
 export const useClassTable = () => {

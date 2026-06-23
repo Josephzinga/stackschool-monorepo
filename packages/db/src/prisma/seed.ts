@@ -15,7 +15,7 @@ import {
 } from 'date-fns';
 
 // ID de l'école cible
-const TARGET_SCHOOL_ID = '';
+const TARGET_SCHOOL_ID = 'cmpskwfd80000q6s80sh8uznl';
 
 const START_HOUR = 8;
 const END_HOUR = 17;

@@ -1,15 +1,8 @@
 import { create } from 'zustand';
 import { AttendanceMode } from '@/types/attendance';
+import { format } from 'date-fns';
 
 interface AttendanceState {
-  // Mode actif
-  mode: AttendanceMode;
-  setMode: (mode: AttendanceMode) => void;
-
-  // Filtre classe (uniquement pour les élèves)
-  selectedClass: string | null;
-  setSelectedClass: (classId: string | null) => void;
-
   // Dialog scanner
   isScannerOpen: boolean;
   setScannerOpen: (open: boolean) => void;
@@ -25,24 +18,15 @@ interface AttendanceState {
 
   // Tenant
   tenantId: string;
-
-  // Reset filtres quand on change de mode
-  resetFilters: () => void;
+  isAutoSave: boolean;
+  setIsAutoSave: (value: boolean) => void;
 }
+const now = format(new Date(), 'yyyy-MM-dd');
 
 export const useAttendanceStore = create<AttendanceState>((set) => ({
-  mode: 'STUDENT',
-  setMode: (mode) =>
-    set((state) => {
-      // Reset la classe si on quitte le mode STUDENT
-      if (mode !== 'STUDENT') {
-        return { mode, selectedClass: null };
-      }
-      return { mode };
-    }),
+  isAutoSave: true,
 
-  selectedClass: null,
-  setSelectedClass: (classId) => set({ selectedClass: classId }),
+  setIsAutoSave: (value) => set({ isAutoSave: value }),
 
   isScannerOpen: false,
   setScannerOpen: (open) => set({ isScannerOpen: open }),
@@ -50,10 +34,8 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
   qrDialogUser: null,
   setQrDialogUser: (user) => set({ qrDialogUser: user }),
 
-  date: new Date(),
+  date: new Date(now),
   setDate: (date) => set({ date }),
 
   tenantId: 'tenant-1', // Récupérer depuis le contexte auth
-
-  resetFilters: () => set({ selectedClass: null }),
 }));

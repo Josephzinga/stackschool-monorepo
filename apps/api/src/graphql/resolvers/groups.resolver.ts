@@ -35,10 +35,10 @@ export const groupResolver: Resolvers = {
   },
   Group: {
     classSubjects: async (parent, _args, { loaders }) => {
-      return await loaders.classSubjectByGroupLoader.load(parent.id);
+      return (await loaders.classSubjectByGroupLoader.load(parent.id)) || [];
     },
     classes: async (parent, _args, { loaders }) => {
-      return await loaders.classByGroupLoader.load(parent.id);
+      return (await loaders.classByGroupLoader.load(parent.id)) || [];
     },
   },
 };

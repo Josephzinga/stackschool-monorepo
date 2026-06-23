@@ -18,3 +18,5 @@ export * from './validation/room.schema';
 export * from './constants';
 export * from './lib/check-lesson-conflict';
 export * from './validation/parent.schema';
+export * from './validation/attendance.schema';
+export * from './utils/permissions';

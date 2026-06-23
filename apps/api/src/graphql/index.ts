@@ -7,7 +7,7 @@ import merge from 'lodash.merge';
 import { confirmCompleteProfileResolver } from './resolvers/confirm-complete-profile.resolver';
 import { meResolver } from './resolvers/me.resolver';
 import { schoolResolver } from './resolvers/school.resolver';
-import { ServiceError } from '@stackschool/shared';
+import { hasPermission, ServiceError } from '@stackschool/shared';
 import { prisma, SchoolUser } from '@stackschool/db';
 import { ZodError } from 'zod';
 import { createLoaders } from './resolvers/data-loader';
@@ -23,15 +23,18 @@ import { classSubjectResolvers } from './resolvers/classSubject';
 import { classResolvers } from './resolvers/class';
 import { teacherResolvers } from './resolvers/teacher';
 import { studentResolvers } from './resolvers/student';
-import { attendanceResolver } from './resolvers/attendance/attendance.resolver';
+import { attendanceResolver } from './resolvers/attendance/query/attendance.resolver';
 import { attendanceResolvers } from './resolvers/attendance';
+import { checkRole } from '../lib/verify-role';
 
 const dirPath = path.resolve(
   __dirname,
   '../../../../packages/shared/src/graphql',
 );
 const dirSchema = fs.readdirSync(dirPath, 'utf-8');
-const files = dirSchema.filter((f) => f.includes('.graphql'));
+const files = dirSchema.filter(
+  (f) => f.includes('.graphql') || f.includes('.gql'),
+);
 
 let typeDefs = '';
 for (const file of files) {
@@ -74,6 +77,8 @@ const graphqlMiddleware = createHandler({
       membership,
       loaders: createLoaders(prisma),
       prisma,
+      hasPermission,
+      checkRole,
     };
   },
   formatError: (err) => {

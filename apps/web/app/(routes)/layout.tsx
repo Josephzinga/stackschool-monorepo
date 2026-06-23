@@ -23,9 +23,8 @@ export default function DashboardLayout({
               } as React.CSSProperties
             }
           >
-            <div>
-              <AppSidebar variant="inset" />
-            </div>
+            <AppSidebar className="z-30" variant="inset" />
+
             <SidebarInset>
               <SiteHeader />
 

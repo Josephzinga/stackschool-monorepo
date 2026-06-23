@@ -23,36 +23,6 @@ query GetTeacherOptions($input: GetSchoolTeachersInput!) {
     }
   }
 }
-query GetTeacherForAttendance($input: GetSchoolTeachersInput! , $date: Date) {
-  getSchoolTeachers(input: $input) {
-    data {
-      id
-      user {
-        profile {
-          firstname
-          lastname
-        }
-      }
-      attendances(date: $date) {
-        status
-      }
-      assignments {
-        classSubjects {
-          subject {
-            id
-            name
-          }
-          group {
-            classes {
-              id
-              name
-            }
-          }
-        }
-      }
-    }
-  }
-}
 
 query GetTeacherSchedule($id: ID!) {
   teacher(id: $id) {
@@ -109,7 +79,6 @@ query GetTeacherDetails($id: ID!) {
         address
       }
     }
-
   }
 }
 
@@ -121,9 +90,9 @@ mutation DeleteTeachers($teacherIds: [ID!]!, $soft: Boolean) {
 }
 
 query GetTeacherAssignment($id: ID!) {
-  getAssignments(filter: {teacherId: $id}) {
+  getAssignments(filter: { teacherId: $id }) {
     classSubjects {
-       id
+      id
       group {
         classes {
           id
@@ -152,8 +121,8 @@ mutation CreateTeacherAssignment($input: CreateTeacherAssignmentInput!) {
   }
 }
 
-mutation SyncTeacherAssignment($input: CreateTeacherAssignmentInput!){
-  syncTeacherAssignment(input: $input ) {
+mutation SyncTeacherAssignment($input: CreateTeacherAssignmentInput!) {
+  syncTeacherAssignment(input: $input) {
     ok
     message
     details

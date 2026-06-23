@@ -12,7 +12,7 @@ export default function ProtectedRoute({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { setUser, currentSchool, user, setCurrentSchool } = useUserStore();
+  const { setUser, currentSchool, currentMemberShip, setCurrentSchool, setCurrentMemberShip } = useUserStore();
 
   const { data, isLoading, error } = useGetMeQuery({}, { retry: false });
   let currentUser = '';
@@ -52,12 +52,11 @@ export default function ProtectedRoute({
         router.replace('/auth/complete-profile');
         return;
       }
-      console.log('data', data.me.memberships);
       // Cas B : Profil complet
       if (isProfileComplete) {
         // Redirection depuis les pages d'auth
         if (isOnCompleteProfile || isOnAuthPage) {
-          router.replace(`/dashboard/admin`);
+          router.replace(`/dashboard/${currentMemberShip?.role?.toLocaleLowerCase()}`);
           return;
         }
 
@@ -67,6 +66,7 @@ export default function ProtectedRoute({
         if (!currentSchool && !isOnSelectSchool) {
           if (memberships.length === 1) {
             setCurrentSchool(memberships[0]?.school);
+            setCurrentMemberShip(memberships[0]!)
           } else if (memberships.length > 1) {
             // Plusieurs écoles : Redirection vers la sélection
 
@@ -89,6 +89,8 @@ export default function ProtectedRoute({
     setUser,
     currentSchool,
     setCurrentSchool,
+    currentMemberShip,
+    setCurrentMemberShip
   ]);
 
   if (isLoading) {

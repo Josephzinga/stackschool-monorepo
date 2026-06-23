@@ -15,21 +15,23 @@ const DashboardContext = createContext<GetDashboardContextQuery | undefined>(
 );
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
-  const { currentSchool } = useUserStore();
+  const { currentSchool, currentMemberShip } = useUserStore();
   const router = useRouter();
   const pathname = usePathname();
 
   const schoolId = currentSchool?.id;
-  const { data, isLoading, error } = useGetDashboardContextQuery(
-    { input: schoolId },
+  const { data, isLoading, error, isError } = useGetDashboardContextQuery(
+    { input: schoolId || '' },
     {
       enabled: !!schoolId,
       staleTime: 1000 * 60 * 5,
     },
   );
 
+  
+
   const contextData = data?.me?.schoolContext;
-  const role = contextData?.role;
+  const role = currentMemberShip?.role || contextData?.role
 
   // Logique de redirection basée sur le rôle
   useEffect(() => {
@@ -70,7 +72,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  if (error || !contextData) {
+  if (isError) {
     const { message } = parseAxiosError(error);
     console.log('Error', message);
     return <div>Erreur de chargement du contexte école.</div>;
@@ -82,11 +84,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     },
   };
 
-  return (
-    <DashboardContext.Provider value={value}>
-      {children}
-    </DashboardContext.Provider>
-  );
+  return <DashboardContext value={value}>{children}</DashboardContext>;
 }
 
 export const useDashboard = () => {

@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { isAuthenticated } from '../../middlewares/auth';
-import { prisma } from '@stackschool/db';
+import { Prisma, prisma } from '@stackschool/db';
 
 const router = Router();
 
@@ -13,11 +13,15 @@ router.get('/me', isAuthenticated, async (req: Request, res: Response) => {
       provider = p.provider;
     }
   }
-  const roleData = prisma.schoolUser.findUnique({
+ 
+  const memberShips = await prisma.schoolUser.findMany({
     where: {
-      schoolId_userId: { schoolId: '', userId: user?.id as string },
+      userId: user.id
     },
-  });
+    include: {
+      school: true
+    }
+  })
   return res.json({
     ok: true,
     user: {
@@ -29,6 +33,7 @@ router.get('/me', isAuthenticated, async (req: Request, res: Response) => {
       provider,
       profile: user.profile ?? null,
       hasMembership: user.hasMembership,
+      memberships: memberShips,
     },
   });
 });

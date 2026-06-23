@@ -37,7 +37,7 @@ type Mutation {
 
   createParent(input: CreateParentInput!): Parent!
 
-  markStudentAttendance(input: [MarkStudentAttendanceInput!]): AttendanceRecord!
+  markAttendance(input: [MarkAttendanceInput!]): AttendanceRecord!
 
   generateAttendanceSession(
     input: GenerateSessionInput!

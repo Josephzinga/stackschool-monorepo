@@ -8,7 +8,6 @@
       "developmentClient": true,
       "distribution": "internal",
       "environment": "development",
-      
       "env": {
         "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "558639383173-q2fcjdl2dqh9f0cjutj1p7s0vm513hr5.apps.googleusercontent.com"
       }
@@ -23,9 +22,16 @@
       "distribution": "internal",
       "environment": "production",
       "autoIncrement": true
+    },
+    "development-simulator": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "environment": "development"
     }
   },
-
   "submit": {
     "production": {}
   }

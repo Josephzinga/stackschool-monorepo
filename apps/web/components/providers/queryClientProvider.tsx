@@ -1,13 +1,10 @@
 'use client';
 
-import {
-  QueryClient,
-  PersistQueryClientProvider,
-  QueryClientProvider,
-} from '@stackschool/ui';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createIDBPersister } from '@/lib/idb-keyval-setup';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 
 export default function QueryProvider({
   children,
@@ -21,10 +18,13 @@ export default function QueryProvider({
           queries: {
             staleTime: 1000 * 60 * 5, // 5 minute
             gcTime: 1000 * 60 * 60 * 24, // 24 heure de cache
+            networkMode: 'offlineFirst',
           },
         },
       }),
   );
+
+  const persister = createIDBPersister();
 
   return (
     <QueryClientProvider client={queryClient}>

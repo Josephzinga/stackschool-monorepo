@@ -1,9 +1,13 @@
-import { studentMutationResolver } from './student-mutation.resolver';
-import { studentQueryResolver } from './student-query.resolver';
-import { studentResolver } from './student.resolver';
+import { studentQueryResolver } from './query/student-query.resolver';
+import { studentResolver } from './query/student.resolver';
+import { createStudentMutationResolver } from './mutation/create-student.resolver';
+import { deleteStudentMutationResolver } from './mutation/student-mutation.resolver';
+import { updateStudentMutationResolver } from './mutation/update-student.resolver';
 
 export const studentResolvers = {
-  ...studentMutationResolver,
+  ...deleteStudentMutationResolver,
   ...studentResolver,
   ...studentQueryResolver,
+  ...createStudentMutationResolver,
+  ...updateStudentMutationResolver,
 };

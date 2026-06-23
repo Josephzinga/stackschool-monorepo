@@ -7,7 +7,7 @@ import { ThemeTogglerButton } from '@/components/animate-ui/components/buttons/t
 
 export function SiteHeader() {
   return (
-    <header className="flex z-20 h-16 sticky top-0 backdrop-blur-2xl border-b right-0 w-full bg-sidebar/50 shadow-sm shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+    <section className="flex z-20 h-16 sticky w-full top-0 backdrop-blur-2xl border-b right-0 bg-sidebar/50 shadow-sm shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center h-full gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
         <Separator
@@ -33,6 +33,6 @@ export function SiteHeader() {
           </Button>
         </div>
       </div>
-    </header>
+    </section>
   );
 }

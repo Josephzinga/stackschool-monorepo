@@ -10,12 +10,14 @@ import {
   subDays,
   subMonths,
 } from 'date-fns';
-import { isAdmin } from '../../lib/verify-role';
+import { isAdmin, checkUser } from '../../lib/verify-role';
 
 export const schoolResolver: Resolvers = {
   Query: {
-    school: async (_: any, { schoolId }, context) => {
-      const userId = context?.user.id;
+    school: async (_: any, { schoolId }, { prisma, user }) => {
+      checkUser(user);
+
+      const userId = user.id;
 
       if (!userId) {
         throw createServiceError('Non authentifié', 401);
@@ -212,5 +214,41 @@ export const schoolResolver: Resolvers = {
       });
       return settings;
     },
+  },
+  SchoolMembership: {
+    teacher: async (parent, _args, { prisma, user }) => {
+      return prisma.teacher.findFirst({
+        where: {
+          schoolUserId: parent.id,
+        },
+      });
+    },
+
+    staff: async (parent, _args, { prisma }) => {
+      return prisma.staff.findFirst({
+        where: {
+          schoolUserId: parent.id,
+        },
+      });
+    },
+
+    parent: async (p, _args, { prisma }) => {
+      return prisma.parent.findFirst({
+        where: {
+          schoolUserId: p.id,
+        },
+      });
+    },
+    schoolUserPermissions: async (parent, _args, { prisma }) => {
+      return prisma.schoolUserPermission.findMany({
+        where: {
+          schoolUserId: parent.id,
+        },
+      });
+    },
+  },
+
+  SchoolUserPermission: {
+    permission: async (parent, _args, { prisma, loaders }) => {},
   },
 };

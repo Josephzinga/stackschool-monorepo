@@ -77,7 +77,7 @@ export const SearchSchoolFrom = () => {
           }}
         />
 
-        {!!data?.searchSchool!.length ? (
+        {!!data?.searchSchool?.length ? (
           <div className=" w-full mt-1 border rounded-lg bg-slate-50 dark:bg-slate-900 shadow-lg max-h-60 overflow-y-auto overflow-x-hidden">
             {data.searchSchool.map((item) => (
               <div

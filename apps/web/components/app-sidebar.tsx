@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     {currentSchool?.name}
                   </span>
                   <span className="text-xs text-muted-foreground capitalize">
-                    {role.toLowerCase()}
+                    {role?.toLowerCase()}
                   </span>
                 </div>
               </a>

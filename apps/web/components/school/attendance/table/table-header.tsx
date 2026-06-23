@@ -1,8 +1,7 @@
 'use client';
 
-import { ClassCombobox } from '@/components/school/attendance/class-combobox';
+import { AppCombobox } from '@/components/school/attendance/app-combobox';
 import { ScannerDialog } from '@/components/school/attendance/QR-scan';
-import React from 'react';
 import { CalendarIcon, LucideQrCode } from 'lucide-react';
 import {
   Popover,
@@ -17,8 +16,12 @@ import { useAttendanceData } from '@/components/school/attendance/hooks/useAtten
 import { useAttendanceStore } from '@/store/attendance';
 import { QRCodeDialog } from '@/components/school/attendance/employee-QR-generator';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { format } from 'date-fns';
+import { useDashboard } from '@/components/providers/dashboard-provider';
 
-export function TableHeader() {
+export function AttendanceTableHeader() {
   const {
     mode,
     handleSwitchMode,
@@ -32,10 +35,13 @@ export function TableHeader() {
     selectedClass,
     search,
     setSearch,
+    selectedSubject,
+    handleSelectSubject,
   } = useAttendanceEvent();
 
-  const { classes } = useAttendanceData();
-  const { date, setDate } = useAttendanceStore();
+  const { classes, subjectsData } = useAttendanceData();
+  const { date, setDate, isAutoSave, setIsAutoSave } = useAttendanceStore();
+  const { me } = useDashboard();
   const options = {
     weekday: 'long',
     year: 'numeric',
@@ -43,6 +49,7 @@ export function TableHeader() {
     day: 'numeric',
   };
   const handleBadgeScan = () => {};
+
   return (
     <header className="flex flex-col gap-4 w-full">
       <div className="flex flex-col gap-4">
@@ -67,22 +74,56 @@ export function TableHeader() {
                 weekStartsOn={1}
                 startMonth={new Date(1990, 0)}
                 onSelect={(date) => {
-                  if (date) setDate(date);
+                  if (date) setDate(new Date(format(date, 'yyyy-MM-dd')));
                 }}
               />
             </PopoverContent>
           </Popover>
         </div>
         {/* Tabs button switch */}
-        <ModeButtonGroup activeMode={mode} onModeChange={handleSwitchMode} />
+        <div className="flex justify-between items-center">
+          <ModeButtonGroup activeMode={mode} onModeChange={handleSwitchMode} />
+
+          <div className="flex w-full justify-end-safe items-center gap-2 group">
+            <Label
+              htmlFor="switch"
+              className="group-hover:text-secondary/70 text-secondary text-[1rem] cursor-grab font-meduim font-sans"
+            >
+              {!isAutoSave
+                ? 'Enregistrement automatique'
+                : 'Enregistrement manuel'}
+            </Label>
+            <Switch
+              id="switch"
+              size="md"
+              checked={isAutoSave}
+              onCheckedChange={setIsAutoSave}
+            />
+          </div>
+        </div>
       </div>
-      <div className="flex items-center justify-between bg-accent rounded-md p-2">
+
+      {/* Class combobox or search input and QR code button */}
+      <div className="flex flex-col md:flex-row items-center justify-between bg-accent rounded-md p-2">
         {mode === 'STUDENT' ? (
-          <ClassCombobox
-            classes={classes}
-            selectedClass={selectedClass}
-            onSelect={handleSelectClass}
-          />
+          <div className="flex flex-col w-full md:flex-row gap-2">
+            <AppCombobox
+              data={classes || []}
+              selectedData={selectedClass}
+              onSelect={handleSelectClass}
+              label="Rechercher une classe..."
+              defaultValue="Tous les classes"
+            />
+            {me?.schoolContext?.role === 'TEACHER' && (
+              <AppCombobox
+                data={subjectsData || []}
+                label="Rechercher une matière..."
+                defaultValue="Tous les matières"
+                selectedData={selectedSubject}
+                onSelect={handleSelectSubject}
+              />
+            )}
+          </div>
         ) : (
           <div>
             <Input
@@ -96,14 +137,24 @@ export function TableHeader() {
             />
           </div>
         )}
-        <div>
+
+        <div className="flex gap-2">
           <Button
-            className="px-4 cursor-pointer hover:bg-accent-foreground/70 font-poppins font-medium hover:text-background transition-colors duration-300"
-            variant="outline"
+            className="px-4 cursor-pointer hover:bg-accent-foreground/50 font-poppins font-semibold 
+            hover:text-background text-xs  transition-colors duration-300"
+            variant="secondary"
             onClick={() => openScanner()}
           >
-            Générer un QR Code
+            Générer QR Code
             <LucideQrCode />
+          </Button>
+          <Button
+            type="submit"
+            form="attendance-form"
+            disabled={isAutoSave}
+            className="hover:scale-102 active:scale-98 duration-100 transition-all"
+          >
+            Enregistrer
           </Button>
         </div>
       </div>

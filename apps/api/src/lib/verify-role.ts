@@ -1,5 +1,11 @@
 import { prisma } from './prisma';
-import { SchoolRole, SchoolUser } from '@stackschool/db';
+import {
+  SchoolRole,
+  SchoolUser,
+  SchoolUserPermission,
+  PermissionCode,
+  PermissionModule,
+} from '@stackschool/db';
 import { redisClient } from './redis';
 import { createServiceError } from '../utils/api-errors';
 import { UserInMe } from '@stackschool/shared';
@@ -12,11 +18,21 @@ type SchoolUserContext = {
 type CheckRoleArgs =
   | { schoolUserId: string; context?: never; roles: SchoolRole[] }
   | { schoolUserId?: never; context: SchoolUserContext; roles: SchoolRole[] };
+
 type Teacher = {
   id: string | null;
 };
+
 interface MemberShip extends SchoolUser {
   teacher: Teacher | null;
+  permissions: (SchoolUserPermission & {
+    permission: {
+      id: string;
+      code: PermissionCode;
+      module: PermissionModule;
+      description: string | null;
+    };
+  })[];
 }
 
 /**
@@ -61,6 +77,19 @@ export const checkRole = async (
         include: {
           teacher: {
             select: { id: true }, // Inclure l'ID du prof si c'est un enseignant
+          },
+
+          permissions: {
+            include: {
+              permission: {
+                select: {
+                  id: true,
+                  code: true,
+                  module: true,
+                  description: true,
+                },
+              },
+            },
           },
         },
       });
@@ -140,3 +169,5 @@ export function checkSchoolId(
     throw createServiceError("Identifiant de l'établissement manquant", 400);
   }
 }
+
+export type CheckRole = typeof checkRole;

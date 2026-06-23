@@ -9,10 +9,31 @@ type Profile {
 
 scalar SchoolId
 
+type Permission {
+  id: ID
+  code: PermissionCode
+  module: PermissionModule
+  name: String
+  description: String
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  user: User
+}
+
+type SchoolUserPermission {
+  id: ID
+  permissionId: ID
+  schoolUserId: ID
+  schoolUser: SchoolMembership
+  permission: Permission
+}
+
 type SchoolMembership {
   id: ID!
-  role: String!
-  school: School!
+  role: SchoolRole!
+  school: School
+  schoolUserPermissions: [SchoolUserPermission]
 
   # Données spécifiques au rôle
   teacher: Teacher
@@ -20,8 +41,6 @@ type SchoolMembership {
   parent: Parent
   staff: Staff
 }
-
-
 
 type User {
   id: ID!
@@ -38,4 +57,3 @@ type User {
   # Contexte spécifique à une école
   schoolContext(schoolId: SchoolId): SchoolMembership
 }
-

@@ -13,7 +13,7 @@ import Confetti from 'react-confetti';
 export default function SuccessStep() {
   const router = useRouter();
 
-  const { school, clearAllData, profile } = useCompleteProfileStore();
+  const { school, clearAllData, profile, role } = useCompleteProfileStore();
   const { width, height } = useWindowSize();
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -63,8 +63,9 @@ export default function SuccessStep() {
 
   const handleGoToDashboard = async () => {
     await clearAllData();
-    router.push('/dashboard');
+    router.push(`/dashboard/${role?.role.toLowerCase()}`);
   };
+
   const firstName = profile?.firstname || 'Utilisateur';
   const schoolName = school?.schoolSelected?.name || 'votre établissement';
 

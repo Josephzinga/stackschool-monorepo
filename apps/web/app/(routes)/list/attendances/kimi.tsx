@@ -4,7 +4,7 @@
 import { useAttendanceStore } from '@/store/attendance';
 import { useAttendanceEvent } from '@/components/school/attendance/hooks/useAttendanceEvent';
 import { useAttendanceData } from '@/components/school/attendance/hooks/useAttendanceData';
-import { AttendanceTable } from '@/components/school/attendance/manual-attendace-table';
+import { AttendanceTable } from '@/components/school/attendance/table/manual-attendace-table';
 import { QRCodeDialog } from '@/components/school/attendance/employee-QR-generator';
 import { AttendanceRow } from '@/types/attendance';
 import { Calendar, QrCode } from 'lucide-react';

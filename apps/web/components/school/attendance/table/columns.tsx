@@ -8,7 +8,7 @@ import * as React from 'react';
 import { AttendanceStatus } from '@stackschool/ui';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mode } from '@/app/(routes)/list/attendances/page';
+import {AttendanceMode} from "@/types/attendance"
 
 export type AttendanceColumns = {
   id: string;
@@ -26,7 +26,7 @@ export type AttendanceColumns = {
     id: string;
     name: string;
   }[];
-  mode: Mode;
+  mode:AttendanceMode;
 };
 
 export const studentColumns: ColumnDef<AttendanceColumns>[] = [

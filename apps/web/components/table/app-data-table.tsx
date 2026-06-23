@@ -25,7 +25,7 @@ export default function AppDataTable<TData>({
   isLoading,
 }: AppDataTableProps<TData>) {
   return (
-    <Table>
+    <Table className="px-2">
       <TableHeader>
         {table?.getHeaderGroups()?.map((headerGroup) => (
           <TableRow

@@ -122,7 +122,7 @@ export const teacherSchema = z.object({
         subjectNames: z.array(z.string()).optional(),
       }),
     )
-    .min(1, 'Veuillez sélectionner au moins une classe'),
+    .optional(),
 });
 
 export const StaffFormSchema = z.object({

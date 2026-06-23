@@ -51,27 +51,12 @@ export const meResolver: Resolvers = {
     },
   },
   User: {
-    schoolContext: async (parent: any, args, context: Context) => {
+    schoolContext: async (parent: any, args, { prisma }) => {
       const { schoolId } = args;
       const userId = parent.id;
       const membership = await prisma.schoolUser.findUnique({
         where: {
           schoolId_userId: { schoolId, userId },
-        },
-        include: {
-          school: true,
-          teacher: { include: { supervisedClasses: true } },
-          student: { include: { schoolClass: true } },
-          Parent: {
-            include: {
-              students: {
-                include: {
-                  student: { include: { profile: true, schoolClass: true } },
-                },
-              },
-            },
-          },
-          Staff: true,
         },
       });
 
@@ -81,20 +66,11 @@ export const meResolver: Resolvers = {
 
       return {
         id: membership.id,
-        role: membership.role as any,
-        school: membership.school,
-        teacher: membership.teacher as any,
-        student: membership.student as any,
-        parent: membership.Parent as any,
-        staff: membership.Staff as any,
+        role: membership.role,
       };
     },
-    profile: async (parent) => {
-      return prisma.profile.findUnique({
-        where: {
-          userId: parent.id,
-        },
-      });
+    profile: async (parent, _args, { loaders }) => {
+      return (await loaders.profileLoader.load(parent.id)) || null;
     },
   },
 };

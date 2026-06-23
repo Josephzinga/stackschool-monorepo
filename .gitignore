@@ -2,7 +2,6 @@
 node_modules
 .idea
 .vscode
-.devcontainer
 coverage
 jest-exercices
 joseph
@@ -11,6 +10,8 @@ joseph
 *.d.ts
 *.d.ts.map
 !/types/**/*
+stackschool-monorepo.key
+
 
 
 

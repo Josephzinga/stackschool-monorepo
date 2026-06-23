@@ -1,4 +1,5 @@
 {
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "jsx": "react",
     "strict": true,
@@ -7,14 +8,16 @@
     "skipLibCheck": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "rootDir": "src",
-    "moduleResolution": "nodenext",
+    "module": "es2015",
+    "rootDir": ".",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
+    "outDir": "build",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["src/*"],
+      "@composants/*": ["src/components/*"]
     }
   }
 }

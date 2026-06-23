@@ -1,0 +1,18 @@
+-- AlterTable
+ALTER TABLE "Assessment" ALTER COLUMN "endDate" SET DATA TYPE DATE,
+ALTER COLUMN "dueDate" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "CourseSession" ALTER COLUMN "startTime" SET DATA TYPE TIME,
+ALTER COLUMN "endTime" SET DATA TYPE TIME;
+
+-- AlterTable
+ALTER TABLE "Lesson" ALTER COLUMN "startTime" SET DATA TYPE TIME,
+ALTER COLUMN "endTime" SET DATA TYPE TIME;
+
+-- AlterTable
+ALTER TABLE "Student" ALTER COLUMN "birthDate" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "StudentDisciplinaryAction" ALTER COLUMN "startDate" SET DATA TYPE DATE,
+ALTER COLUMN "endDate" SET DATA TYPE DATE;

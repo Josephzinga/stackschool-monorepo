@@ -36,7 +36,7 @@ import { SearchResultsList } from '@/components/search-results-list';
 
 export function TeacherForm({ onBack }: { onBack: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearch = useDebounce(400, searchQuery);
+  const debouncedSearch = useDebounce(searchQuery, 400);
   const { school, setRoleData, setCurrentStep, role } =
     useCompleteProfileStore();
   const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;

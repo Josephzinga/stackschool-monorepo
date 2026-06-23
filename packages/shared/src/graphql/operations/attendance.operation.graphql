@@ -1,8 +1,9 @@
-mutation MarkStudentAttendance($input: [MarkStudentAttendanceInput!]) {
-  markStudentAttendance(input: $input) {
+mutation MarkAttendance($input: [MarkAttendanceInput!]) {
+  markAttendance(input: $input) {
     id
     date
     checkInTime
+    status
     recordedBy {
       id
       profile {
@@ -19,6 +20,72 @@ mutation MarkStudentAttendance($input: [MarkStudentAttendanceInput!]) {
         profile {
           firstname
           lastname
+        }
+      }
+    }
+  }
+}
+
+query GetStudentForAttendance($input: GetSchoolStudentsInput!, $date: Date) {
+  getSchoolStudents(input: $input) {
+    meta {
+      limit
+      total
+      totalPages
+    }
+    data {
+      id
+      user {
+        email
+        profile {
+          firstname
+          lastname
+          photo
+        }
+      }
+      schoolClass {
+        id
+        name
+      }
+      attendances(date: $date) {
+        id
+        status
+        checkInTime
+        date
+      }
+    }
+  }
+}
+query GetTeacherForAttendance($input: GetSchoolTeachersInput!, $date: Date) {
+  getSchoolTeachers(input: $input) {
+    meta {
+      total
+      totalPages
+      limit
+    }
+    data {
+      id
+      user {
+        profile {
+          firstname
+          lastname
+        }
+      }
+      attendances(date: $date) {
+        status
+      }
+      assignments {
+        classSubjects {
+          subject {
+            id
+            name
+          }
+          group {
+            classes {
+              id
+              name
+            }
+          }
         }
       }
     }

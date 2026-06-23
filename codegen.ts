@@ -12,6 +12,12 @@ const config: CodegenConfig = {
       config: {
         contextType: '../types/context#Context',
         useIndexSignature: true,
+        useTypeImports: true,
+        mappers: {
+          AttendanceStatus:
+            '@stackschool/shared/src/validation/attendance.schema#AttendanceStatusEnum',
+          SchoolRole: '@stackschool/db/src/prisma/client/generated#SchoolRole',
+        },
         enumValues: {
           StudentStatus:
             '@stackschool/db/src/prisma/client/generated#StudentStatus',
@@ -26,6 +32,8 @@ const config: CodegenConfig = {
           RelationType:
             '@stackschool/db/src/prisma/client/generated#RelationType',
           GroupType: '@stackschool/db/src/prisma/client/generated#GroupType',
+          AttendanceStatus:
+            '@stackschool/shared/src/validation/attendance.schema#AttendanceStatusEnum',
         },
       },
     },
@@ -37,6 +45,17 @@ const config: CodegenConfig = {
         'typescript-react-query',
       ],
       config: {
+        // AJOUTS ICI POUR CORRIGER LE CRASH MOBILE :
+        //   enumsAsTypes: true,  Transforme les enums GraphQL en types (ex: 'PRESENT' | 'ABSENT')
+        // useTypeImports: true,  Force l'utilisation de "import type" côté client
+        mappers: {
+          AttendanceStatus:
+            '@stackschool/shared/src/validation/attendance.schema#AttendanceStatusEnum',
+        },
+        enumValues: {
+          AttendanceStatus:
+            '@stackschool/shared/src/validation/attendance.schema#AttendanceStatusEnum',
+        },
         scalars: {
           SchoolId: 'string',
           DateTime: 'Date',

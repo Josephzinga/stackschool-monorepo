@@ -10,6 +10,16 @@
       "name": "stackschool",
       "database": "postgres_db",
       "username": "joseph"
+    },
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "stackscool",
+      "database": "stackschool",
+      "username": "joseph"
     }
   ]
 }

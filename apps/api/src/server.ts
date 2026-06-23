@@ -22,6 +22,8 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import handleOauthStrategy from './controllers/passport-social.controller';
 import forgotPasswordController from './controllers/auth/forgot-password.controller';
+import lusca from 'lusca';
+import { createRateLimiter } from './utils/limiter';
 
 config();
 
@@ -58,6 +60,21 @@ const pgPool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+const globalRateLimiter = createRateLimiter({
+  points: 100,
+  duration: 15 * 60,
+  keyPrefix: 'global',
+});
+
+// Limite globale sur toutes les routes : 100 requêtes par IP toutes les 15 minutes.
+app.use(globalRateLimiter.middleware);
+
+const graphqlRateLimiter = createRateLimiter({
+  points: 30,
+  duration: 60,
+  keyPrefix: 'graphql',
+});
+
 const SESSION_TTL = 1000 * 60 * 30; // 30 min
 
 app.use(
@@ -78,7 +95,7 @@ app.use(
     },
   }),
 );
-
+app.use(lusca.csrf());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -128,7 +145,7 @@ passport.use(
 // 5. Routes
 app.use('/api', routes);
 app.use('/api/auth', forgotPasswordController);
-app.all('/graphql', isAuthenticated, graphqlMiddleware);
+app.all('/graphql', isAuthenticated, graphqlRateLimiter.middleware, graphqlMiddleware);
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(process.cwd(), 'public/index.html'));

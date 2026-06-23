@@ -1,3 +1,4 @@
+import type { Request } from 'express';
 import { createHandler } from 'graphql-http/lib/use/express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import path from 'node:path';
@@ -75,6 +76,7 @@ const graphqlMiddleware = createHandler({
       user,
       schoolId,
       membership,
+      req: req.raw as Request,
       loaders: createLoaders(prisma),
       prisma,
       hasPermission,

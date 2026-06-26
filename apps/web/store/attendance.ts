@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { AttendanceMode } from '@/types/attendance';
 import { format } from 'date-fns';
+import { RowSelectionState, OnChangeFn } from '@tanstack/react-table';
 
-interface AttendanceState {
+interface AttendanceStore {
   // Dialog scanner
   isScannerOpen: boolean;
   setScannerOpen: (open: boolean) => void;
@@ -20,21 +21,30 @@ interface AttendanceState {
   tenantId: string;
   isAutoSave: boolean;
   setIsAutoSave: (value: boolean) => void;
+  rowSelection: RowSelectionState;
+  setRowSelection: OnChangeFn<RowSelectionState>;
 }
 const now = format(new Date(), 'yyyy-MM-dd');
 
-export const useAttendanceStore = create<AttendanceState>((set) => ({
+export const useAttendanceStore = create<AttendanceStore>((set, get) => ({
   isAutoSave: true,
+  date: new Date(now),
+  isScannerOpen: false,
+  qrDialogUser: null,
+  rowSelection: {},
 
+  setRowSelection: (rowSelection) => {
+    if (typeof rowSelection === 'function') {
+      const row = rowSelection(get().rowSelection);
+      set({ rowSelection: row });
+    }
+  },
   setIsAutoSave: (value) => set({ isAutoSave: value }),
 
-  isScannerOpen: false,
   setScannerOpen: (open) => set({ isScannerOpen: open }),
 
-  qrDialogUser: null,
   setQrDialogUser: (user) => set({ qrDialogUser: user }),
 
-  date: new Date(now),
   setDate: (date) => set({ date }),
 
   tenantId: 'tenant-1', // Récupérer depuis le contexte auth

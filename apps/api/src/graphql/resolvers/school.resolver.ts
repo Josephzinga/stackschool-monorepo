@@ -198,18 +198,10 @@ export const schoolResolver: Resolvers = {
         enrollmentPerMonth: [],
       };
     },
-    settings: async (parent, _, { user }) => {
-      if (!parent.id) return null;
-      const checked = await isAdmin({
-        context: { schoolId: parent.id, userId: user.id },
-      });
-      if (!checked.success) {
-        throw createServiceError(checked.message || 'Accès non autoriser', 403);
-      }
-
+    settings: async (parent, _, { prisma }) => {
       const settings = await prisma.schoolSettings.findUnique({
         where: {
-          schoolId: parent.id,
+          schoolId: parent.id!,
         },
       });
       return settings;
@@ -239,16 +231,8 @@ export const schoolResolver: Resolvers = {
         },
       });
     },
-    schoolUserPermissions: async (parent, _args, { prisma }) => {
-      return prisma.schoolUserPermission.findMany({
-        where: {
-          schoolUserId: parent.id,
-        },
-      });
+    permissions: async (parent, _args, { loaders }) => {
+      return (await loaders.permissionsLoader.load(parent.id)) || [];
     },
-  },
-
-  SchoolUserPermission: {
-    permission: async (parent, _args, { prisma, loaders }) => {},
   },
 };

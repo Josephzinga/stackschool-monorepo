@@ -40,7 +40,14 @@ export function AttendanceTableHeader() {
   } = useAttendanceEvent();
 
   const { classes, subjectsData } = useAttendanceData();
-  const { date, setDate, isAutoSave, setIsAutoSave } = useAttendanceStore();
+  const {
+    date,
+    setDate,
+    isAutoSave,
+    setIsAutoSave,
+    rowSelection,
+    setRowSelection,
+  } = useAttendanceStore();
   const { me } = useDashboard();
   const options = {
     weekday: 'long',
@@ -49,6 +56,10 @@ export function AttendanceTableHeader() {
     day: 'numeric',
   };
   const handleBadgeScan = () => {};
+  console.log('row selection', rowSelection);
+
+  const selectedCount = Object.values(rowSelection).length;
+  console.log('selectedCount', selectedCount);
 
   return (
     <header className="flex flex-col gap-4 w-full">

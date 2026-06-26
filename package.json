@@ -45,8 +45,8 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "ts-node-dev": "^2.0.0"
   },
   "pnpm": {
@@ -66,5 +66,5 @@
       "unrs-resolver"
     ]
   },
-  "packageManager": "pnpm"
+  "packageManager": "pnpm@10.33.1"
 }

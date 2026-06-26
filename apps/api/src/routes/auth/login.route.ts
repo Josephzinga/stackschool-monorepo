@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import passport from 'passport';
-import { Profile, User } from '@stackschool/db';
+import { Profile, User, prisma } from '@stackschool/db';
 import { createServiceError } from '../../utils/api-errors';
-import { prisma } from '../../lib/prisma';
 import { generateToken } from '../../lib/outils';
 import { UserInMe } from '@stackschool/shared';
 

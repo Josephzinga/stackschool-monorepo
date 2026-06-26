@@ -95,7 +95,33 @@ app.use(
     },
   }),
 );
-app.use(lusca.csrf());
+// Apply strict security headers globally
+app.use(lusca.xframe('SAMEORIGIN'));
+app.use(lusca.p3p('ABCDEF'));
+app.use(lusca.xssProtection(true));
+app.use(lusca.nosniff());
+app.use(lusca.referrerPolicy('same-origin'));
+
+// CSRF: apply only to non-API routes (SPA/pages). We skip `/api` and `/graphql` because
+// those endpoints are consumed by the frontend via XHR/fetch and use other protections
+// (CORS, sameSite cookies, auth tokens). For protected non-API POSTs/forms, enable CSRF.
+const csrfMiddleware = lusca.csrf();
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api') || req.path === '/graphql') return next();
+  csrfMiddleware(req as any, res as any, (err?: unknown) => {
+    if (err) return next(err);
+    try {
+      if (typeof (req as any).csrfToken === 'function') {
+        // Expose token for SPA clients in a cookie named `XSRF-TOKEN`
+        res.cookie('XSRF-TOKEN', (req as any).csrfToken());
+      }
+    } catch (e) {
+      // ignore token generation errors here
+    }
+    return next();
+  });
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -145,7 +171,12 @@ passport.use(
 // 5. Routes
 app.use('/api', routes);
 app.use('/api/auth', forgotPasswordController);
-app.all('/graphql', isAuthenticated, graphqlRateLimiter.middleware, graphqlMiddleware);
+app.all(
+  '/graphql',
+  isAuthenticated,
+  graphqlRateLimiter.middleware,
+  graphqlMiddleware,
+);
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(process.cwd(), 'public/index.html'));

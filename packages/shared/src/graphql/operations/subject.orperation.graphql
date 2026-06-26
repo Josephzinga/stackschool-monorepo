@@ -44,6 +44,27 @@ query GetSubjectsOptions($input: GetSubjectInput!) {
   }
 }
 
+query GetClassesAndSubjectsOptions($classId: ID, $teacherId: ID, $groupId: ID) {
+  getClassSubjects(
+    classId: $classId
+    teacherId: $teacherId
+    groupId: $groupId
+  ) {
+    id
+    subject {
+      id
+      name
+      code
+    }
+    group {
+      classes {
+        id
+        name
+      }
+    }
+  }
+}
+
 query GetClassSubjectOptions($classId: ID, $teacherId: ID, $groupId: ID) {
   getClassSubjects(
     classId: $classId

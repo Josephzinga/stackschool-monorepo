@@ -57,7 +57,7 @@ export default function DataTableHeader() {
 
   const hasActiveFilters = Object.keys(filters).some((v) => v !== undefined);
   const selectedCount = Object.values(rowSelection).length;
-  const queryClient = useQueryClient();
+
   const isPending = false;
   const toggleColumns = (columnId: string, isVisible: boolean) => {
     setColumnVisibility((prev) => ({

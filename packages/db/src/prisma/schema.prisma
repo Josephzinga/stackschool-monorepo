@@ -102,7 +102,7 @@ model Permission {
   description String? // Explication détaillée pour l'admin
 
   // Relation inverse : Une permission appartient à plusieurs utilisateurs
-  schoolUsers SchoolUserPermission[]
+  schoolUserPermissions SchoolUserPermission[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

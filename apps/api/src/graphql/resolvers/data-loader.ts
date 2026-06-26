@@ -11,11 +11,28 @@ import {
   TeacherAssignment,
   User,
   Profile,
+  Permission,
 } from '@stackschool/db';
+
+interface UserLoader extends Pick<
+  User,
+  | 'id'
+  | 'email'
+  | 'username'
+  | 'phoneNumber'
+  | 'isActive'
+  | 'emailVerified'
+  | 'hasMembership'
+  | 'profileCompleted'
+> {
+  profile: {
+    id: string;
+  } | null;
+}
 
 export const createLoaders = (prisma: PrismaClient) => {
   return {
-    userLoader: new DataLoader<string, Omit<User, 'password'> | undefined>(
+    userLoader: new DataLoader<string, UserLoader | undefined>(
       async (schoolUserIds) => {
         const schoolUsers = await prisma.schoolUser.findMany({
           where: { id: { in: [...schoolUserIds] } },
@@ -30,7 +47,11 @@ export const createLoaders = (prisma: PrismaClient) => {
                 emailVerified: true,
                 hasMembership: true,
                 profileCompleted: true,
-                profileId: true,
+                profile: {
+                  select: {
+                    id: true,
+                  },
+                },
               },
             },
           },
@@ -346,7 +367,39 @@ export const createLoaders = (prisma: PrismaClient) => {
       );
     }),
 
-    permis,
+    permissionsLoader: new DataLoader<string, Permission[] | undefined>(
+      async (schoolUserIds) => {
+        const permissions = await prisma.permission.findMany({
+          where: {
+            schoolUserPermissions: {
+              some: {
+                schoolUserId: {
+                  in: [...schoolUserIds],
+                },
+              },
+            },
+          },
+          include: {
+            schoolUserPermissions: {
+              select: {
+                schoolUserId: true,
+              },
+            },
+          },
+        });
+
+        const permissionMap = new Map<string, Permission[]>();
+        for (const permission of permissions) {
+          for (const schoolUser of permission.schoolUserPermissions) {
+            const list = permissionMap.get(schoolUser.schoolUserId) ?? [];
+            list.push(permission);
+            permissionMap.set(schoolUser.schoolUserId, list);
+          }
+        }
+
+        return schoolUserIds.map((id) => permissionMap.get(id));
+      },
+    ),
   };
 };
 export type DataLoaders = ReturnType<typeof createLoaders>;

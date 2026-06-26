@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
-import { useAttendanceStore } from '@/store/attendance';
+import { useAttendanceDate } from '@/components/school/attendance/hooks/useAttendanceDate';
 import type { AttendanceMode } from '@/types/attendance';
 import { useQueryClient } from '@tanstack/react-query';
+import { Table, Row } from '@tanstack/react-table';
 import {
   type AttendanceStatus,
   type GetStudentForAttendanceQuery,
@@ -20,7 +21,9 @@ import {
   hasPermission,
   type MarkAttendanceFormType,
 } from '@stackschool/shared';
+import { CheckedState } from '@radix-ui/react-checkbox';
 import { toast } from 'sonner';
+import { AttendanceRow } from '@/types/attendance';
 import { useDashboard } from '@/components/providers/dashboard-provider';
 
 export function useAttendanceEvent() {
@@ -33,6 +36,7 @@ export function useAttendanceEvent() {
     'subjectId',
     parseAsString.withDefault(''),
   );
+
   const [search, setSearch] = useQueryState(
     'search_staff_teacher',
     parseAsString.withDefault(''),
@@ -51,7 +55,16 @@ export function useAttendanceEvent() {
     parseAsString.withDefault(''),
   );
 
-  const store = useAttendanceStore();
+  const {
+    date,
+    isScannerOpen,
+    openScanner,
+    closeScanner,
+    qrDialogUser,
+    setQrDialogUser,
+    closeQrDialog,
+    tenantId,
+  } = useAttendanceDate();
   const queryClient = useQueryClient();
   let queryKey: any[] | undefined;
   const teacherId = me?.schoolContext?.teacher?.id;
@@ -66,7 +79,7 @@ export function useAttendanceEvent() {
             page: pagination.pageIndex,
             ...(teacherId && { teacherId }),
           },
-          date: store.date,
+          date,
         },
       ];
   }
@@ -155,25 +168,33 @@ export function useAttendanceEvent() {
   // Switch de mode
   const handleSwitchMode = useCallback(
     async (mode: AttendanceMode) => {
+      if (me?.schoolContext?.role === 'TEACHER') {
+        if (
+          mode === 'TEACHER' &&
+          !hasPermission(
+            me.schoolContext.permissions?.map((perm) => perm?.code!)!,
+            ['MARK_TEACHER_ATTENDANCE'],
+          )
+        ) {
+          toast.warning(`Permissions non accorder. `);
+          return;
+        }
+      }
+      setMode(mode);
+
       if (mode !== 'STUDENT') {
         handleSelectClass(null);
         handleSelectSubject(null);
       }
-      if (
-        me?.schoolContext?.role === 'TEACHER' &&
-        hasPermission[me.schoolContext.teacher]
-      ) {
-      }
-      setMode(mode);
     },
-    [store],
+    [handleSelectClass, handleSelectSubject, me],
   );
 
   const handleSelectClass = useCallback(
     (classId: string | null) => {
       setSelectedClass(classId);
     },
-    [selectedClass],
+    [setSelectedClass],
   );
 
   const handleSelectSubject = (subjectId: string | null) => {
@@ -181,25 +202,19 @@ export function useAttendanceEvent() {
   };
 
   // Dialog scanner
-  const openScanner = useCallback(() => {
-    store.setScannerOpen(true);
-  }, [store]);
-
-  const closeScanner = useCallback(() => {
-    store.setScannerOpen(false);
-  }, [store]);
+  // Dialog scanner
+  const handleOpenScanner = openScanner;
+  const handleCloseScanner = closeScanner;
 
   // Dialog QR
   const openQrDialog = useCallback(
     (id: string, name: string, type: AttendanceMode) => {
-      store.setQrDialogUser({ id, name, type });
+      setQrDialogUser({ id, name, type });
     },
-    [store],
+    [setQrDialogUser],
   );
 
-  const closeQrDialog = useCallback(() => {
-    store.setQrDialogUser(null);
-  }, [store]);
+  const handleCloseQrDialog = closeQrDialog;
 
   const handleStatusChange = useCallback(
     (userId: string, userType: AttendanceMode, status: AttendanceStatus) => {
@@ -209,6 +224,13 @@ export function useAttendanceEvent() {
   );
 
   const handleMarkAttendance = async (data: MarkAttendanceFormType) => {
+    if (me?.schoolContext?.role === 'TEACHER') {
+      if (!selectedClass || !selectedSubject) {
+        toast.info('Veuillez selectionner une classe et la matière enseigné');
+        return;
+      }
+    }
+
     const promise = markAttendanceMutate({
       input: data.attendances.map((att) => ({
         ...att,
@@ -226,6 +248,31 @@ export function useAttendanceEvent() {
       error: (err) => err?.message || 'Erreur lors du sauvegarde',
     });
   };
+
+  const handleCheckedTable = useCallback(
+    (
+      value: CheckedState,
+      type: 'All' | 'Row',
+      table?: Table<AttendanceRow>,
+      row?: Row<AttendanceRow>,
+    ) => {
+      if (me?.schoolContext?.role !== 'TEACHER') {
+        toggle();
+      } else if (!selectedClass || !selectedSubject) {
+        toast.warning(
+          'Veuillez selectionner une classe et la matiére enseigner',
+        );
+      } else {
+        toggle();
+      }
+      function toggle() {
+        type === 'All'
+          ? table?.toggleAllPageRowsSelected(!!value)
+          : row?.toggleSelected(!!value);
+      }
+    },
+    [selectedClass, selectedSubject],
+  );
 
   // Scan badge
   /*  const scanBadgeMutation = useMutation({
@@ -251,9 +298,9 @@ export function useAttendanceEvent() {
   return {
     mode,
     selectedClass,
-    isScannerOpen: store.isScannerOpen,
-    qrDialogUser: store.qrDialogUser,
-    date: store.date,
+    isScannerOpen,
+    qrDialogUser,
+    date,
     search,
     pagination,
     selectedSubject,
@@ -262,15 +309,16 @@ export function useAttendanceEvent() {
     handleSwitchMode,
     handleSelectClass,
     handleSelectSubject,
-    openScanner,
-    closeScanner,
+    openScanner: handleOpenScanner,
+    closeScanner: handleCloseScanner,
     openQrDialog,
-    closeQrDialog,
+    closeQrDialog: handleCloseQrDialog,
     handleStatusChange,
     handleBadgeScan,
     setPagination,
     setSearch,
     handleMarkAttendance,
+    handleCheckedTable,
 
     // Loading states
     isMarking: false,

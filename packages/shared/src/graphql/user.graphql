@@ -21,19 +21,11 @@ type Permission {
   user: User
 }
 
-type SchoolUserPermission {
-  id: ID
-  permissionId: ID
-  schoolUserId: ID
-  schoolUser: SchoolMembership
-  permission: Permission
-}
-
 type SchoolMembership {
   id: ID!
   role: SchoolRole!
   school: School
-  schoolUserPermissions: [SchoolUserPermission]
+  permissions: [Permission]
 
   # Données spécifiques au rôle
   teacher: Teacher

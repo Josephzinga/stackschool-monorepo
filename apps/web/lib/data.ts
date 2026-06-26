@@ -1,5 +1,6 @@
 import {
   BookA,
+  Briefcase,
   CalendarDays,
   CircleUserRound,
   GraduationCap,
@@ -26,6 +27,7 @@ const ROLES = {
   TEACHER: 'TEACHER',
   STUDENT: 'STUDENT',
   PARENT: 'PARENT',
+  STAFF: 'STAFF',
 };
 
 export const menuItems = {
@@ -34,31 +36,43 @@ export const menuItems = {
       icon: LayoutDashboard,
       label: 'Dashboard',
       href: '/dashboard',
-      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT, ROLES.PARENT],
+      visible: [
+        ROLES.ADMIN,
+        ROLES.TEACHER,
+        ROLES.STUDENT,
+        ROLES.PARENT,
+        ROLES.STAFF,
+      ],
     },
     {
       icon: GraduationCap,
       label: 'Professeurs',
       href: '/list/teachers',
-      visible: [ROLES.ADMIN, ROLES.TEACHER],
+      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STAFF],
     },
     {
       icon: UserSquare2,
       label: 'Élèves',
       href: '/list/students',
-      visible: [ROLES.ADMIN, ROLES.TEACHER],
+      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STAFF],
     },
     {
       icon: Users2Icon,
       label: 'Parents',
       href: '/list/parents',
-      visible: [ROLES.ADMIN, ROLES.TEACHER],
+      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STAFF],
+    },
+    {
+      icon: Briefcase,
+      label: 'Personnels',
+      href: '/list/staff',
+      visible: [ROLES.ADMIN, ROLES.STAFF],
     },
     {
       icon: BookA,
       label: 'Classes',
       href: '/list/classes',
-      visible: [ROLES.ADMIN, ROLES.TEACHER],
+      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STAFF],
     },
     {
       icon: NotebookPen,
@@ -76,13 +90,19 @@ export const menuItems = {
       icon: HotelIcon,
       label: 'Salles',
       href: '/list/rooms',
-      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT],
+      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT, ROLES.STAFF],
     },
     {
       icon: Newspaper,
       label: 'Examens',
       href: '/list/exams',
-      visible: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT, ROLES.PARENT],
+      visible: [
+        ROLES.ADMIN,
+        ROLES.TEACHER,
+        ROLES.STUDENT,
+        ROLES.PARENT,
+        ROLES.STAFF,
+      ],
     },
     {
       icon: ScrollText,

@@ -944,9 +944,9 @@ export type SchoolMembership = {
   __typename?: 'SchoolMembership';
   id: Scalars['ID']['output'];
   parent?: Maybe<Parent>;
+  permissions?: Maybe<Array<Maybe<Permission>>>;
   role: SchoolRole;
   school?: Maybe<School>;
-  schoolUserPermissions?: Maybe<Array<Maybe<SchoolUserPermission>>>;
   staff?: Maybe<Staff>;
   student?: Maybe<Student>;
   teacher?: Maybe<Teacher>;
@@ -985,15 +985,6 @@ export type SchoolStats = {
   totalClasses: Scalars['Int']['output'];
   totalStudents: Scalars['Int']['output'];
   totalTeachers: Scalars['Int']['output'];
-};
-
-export type SchoolUserPermission = {
-  __typename?: 'SchoolUserPermission';
-  id?: Maybe<Scalars['ID']['output']>;
-  permission?: Maybe<Permission>;
-  permissionId?: Maybe<Scalars['ID']['output']>;
-  schoolUser?: Maybe<SchoolMembership>;
-  schoolUserId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type SearchClassesAndSubjects = {
@@ -1423,7 +1414,7 @@ export type GetDashboardContextQueryVariables = Exact<{
 }>;
 
 
-export type GetDashboardContextQuery = { __typename?: 'Query', me?: { __typename?: 'User', schoolContext?: { __typename?: 'SchoolMembership', id: string, role: SchoolRole, schoolUserPermissions?: Array<{ __typename?: 'SchoolUserPermission', id?: string | null, permission?: { __typename?: 'Permission', id?: string | null, code?: PermissionCode | null, name?: string | null, description?: string | null, module?: PermissionModule | null } | null } | null> | null, teacher?: { __typename?: 'Teacher', id: string, department?: string | null, specialization?: string | null, supervisedClasses?: Array<{ __typename?: 'Class', id: string, section?: string | null } | null> | null } | null, staff?: { __typename?: 'Staff', id: string, position: string, departement?: string | null, schoolUserId: string } | null, parent?: { __typename?: 'Parent', id: string, isDelegate?: boolean | null, parentStudent?: Array<{ __typename?: 'ParentStudent', student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null } | null> | null } | null, student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null } | null };
+export type GetDashboardContextQuery = { __typename?: 'Query', me?: { __typename?: 'User', schoolContext?: { __typename?: 'SchoolMembership', id: string, role: SchoolRole, permissions?: Array<{ __typename?: 'Permission', id?: string | null, code?: PermissionCode | null, name?: string | null, description?: string | null, module?: PermissionModule | null } | null> | null, teacher?: { __typename?: 'Teacher', id: string, department?: string | null, specialization?: string | null, supervisedClasses?: Array<{ __typename?: 'Class', id: string, section?: string | null } | null> | null } | null, staff?: { __typename?: 'Staff', id: string, position: string, departement?: string | null, schoolUserId: string } | null, parent?: { __typename?: 'Parent', id: string, isDelegate?: boolean | null, parentStudent?: Array<{ __typename?: 'ParentStudent', student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null } | null> | null } | null, student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null } | null };
 
 export type GetSchoolSettingsQueryVariables = Exact<{
   schoolId: Scalars['ID']['input'];
@@ -1576,6 +1567,15 @@ export type GetSubjectsOptionsQueryVariables = Exact<{
 
 
 export type GetSubjectsOptionsQuery = { __typename?: 'Query', getSchoolSubjects?: { __typename?: 'SubjectList', data: Array<{ __typename?: 'Subject', id: string, name: string, code?: string | null }> } | null };
+
+export type GetClassesAndSubjectsOptionsQueryVariables = Exact<{
+  classId?: InputMaybe<Scalars['ID']['input']>;
+  teacherId?: InputMaybe<Scalars['ID']['input']>;
+  groupId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type GetClassesAndSubjectsOptionsQuery = { __typename?: 'Query', getClassSubjects?: Array<{ __typename?: 'ClassSubject', id: string, subject: { __typename?: 'Subject', id: string, name: string, code?: string | null }, group: { __typename?: 'Group', classes: Array<{ __typename?: 'Class', id: string, name: string }> } }> | null };
 
 export type GetClassSubjectOptionsQueryVariables = Exact<{
   classId?: InputMaybe<Scalars['ID']['input']>;
@@ -2967,15 +2967,12 @@ export const GetDashboardContextDocument = `
     schoolContext(schoolId: $input) {
       id
       role
-      schoolUserPermissions {
+      permissions {
         id
-        permission {
-          id
-          code
-          name
-          description
-          module
-        }
+        code
+        name
+        description
+        module
       }
       teacher {
         id
@@ -4016,6 +4013,67 @@ useInfiniteGetSubjectsOptionsQuery.getKey = (variables: GetSubjectsOptionsQueryV
 
 
 useGetSubjectsOptionsQuery.fetcher = (variables: GetSubjectsOptionsQueryVariables, options?: RequestInit['headers']) => fetcher<GetSubjectsOptionsQuery, GetSubjectsOptionsQueryVariables>(GetSubjectsOptionsDocument, variables, options);
+
+export const GetClassesAndSubjectsOptionsDocument = `
+    query GetClassesAndSubjectsOptions($classId: ID, $teacherId: ID, $groupId: ID) {
+  getClassSubjects(classId: $classId, teacherId: $teacherId, groupId: $groupId) {
+    id
+    subject {
+      id
+      name
+      code
+    }
+    group {
+      classes {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+export const useGetClassesAndSubjectsOptionsQuery = <
+      TData = GetClassesAndSubjectsOptionsQuery,
+      TError = unknown
+    >(
+      variables?: GetClassesAndSubjectsOptionsQueryVariables,
+      options?: Omit<UseQueryOptions<GetClassesAndSubjectsOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetClassesAndSubjectsOptionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetClassesAndSubjectsOptionsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetClassesAndSubjectsOptions'] : ['GetClassesAndSubjectsOptions', variables],
+    queryFn: fetcher<GetClassesAndSubjectsOptionsQuery, GetClassesAndSubjectsOptionsQueryVariables>(GetClassesAndSubjectsOptionsDocument, variables),
+    ...options
+  }
+    )};
+
+useGetClassesAndSubjectsOptionsQuery.getKey = (variables?: GetClassesAndSubjectsOptionsQueryVariables) => variables === undefined ? ['GetClassesAndSubjectsOptions'] : ['GetClassesAndSubjectsOptions', variables];
+
+export const useInfiniteGetClassesAndSubjectsOptionsQuery = <
+      TData = InfiniteData<GetClassesAndSubjectsOptionsQuery>,
+      TError = unknown
+    >(
+      variables: GetClassesAndSubjectsOptionsQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetClassesAndSubjectsOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetClassesAndSubjectsOptionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetClassesAndSubjectsOptionsQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetClassesAndSubjectsOptions.infinite'] : ['GetClassesAndSubjectsOptions.infinite', variables],
+      queryFn: (metaData) => fetcher<GetClassesAndSubjectsOptionsQuery, GetClassesAndSubjectsOptionsQueryVariables>(GetClassesAndSubjectsOptionsDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetClassesAndSubjectsOptionsQuery.getKey = (variables?: GetClassesAndSubjectsOptionsQueryVariables) => variables === undefined ? ['GetClassesAndSubjectsOptions.infinite'] : ['GetClassesAndSubjectsOptions.infinite', variables];
+
+
+useGetClassesAndSubjectsOptionsQuery.fetcher = (variables?: GetClassesAndSubjectsOptionsQueryVariables, options?: RequestInit['headers']) => fetcher<GetClassesAndSubjectsOptionsQuery, GetClassesAndSubjectsOptionsQueryVariables>(GetClassesAndSubjectsOptionsDocument, variables, options);
 
 export const GetClassSubjectOptionsDocument = `
     query GetClassSubjectOptions($classId: ID, $teacherId: ID, $groupId: ID) {

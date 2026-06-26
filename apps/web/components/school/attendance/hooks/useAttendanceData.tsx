@@ -1,16 +1,12 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { useAttendanceStore } from '@/store/attendance';
-import {
-  AttendanceMode,
-  AttendanceProfile,
-  AttendanceRow,
-  Staff,
-} from '@/types/attendance';
+import { AttendanceMode, AttendanceRow, Staff } from '@/types/attendance';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QrCode } from 'lucide-react';
+
 import { format } from 'date-fns';
 import {
   type Day,
@@ -54,9 +50,16 @@ const mockStaff: Staff[] = [
 ];
 
 export function useAttendanceData() {
-  const { date, tenantId } = useAttendanceStore();
-  const { selectedClass, mode, search, handleSwitchMode, pagination } =
-    useAttendanceEvent();
+  const { date } = useAttendanceStore();
+  const {
+    selectedClass,
+    mode,
+    search,
+    handleSwitchMode,
+    pagination,
+    selectedSubject,
+    handleCheckedTable,
+  } = useAttendanceEvent();
   const { me } = useDashboard();
   const [meta, setMeta] = React.useState<Omit<PaginationMeta, 'page'>>();
 
@@ -75,6 +78,17 @@ export function useAttendanceData() {
       teacherId,
     },
   });
+
+  const { data: subjectsData } = useGetSubjectsOptionsQuery(
+    {
+      input: {
+        teacherId,
+      },
+    },
+    {
+      enabled: me?.schoolContext?.role === 'TEACHER',
+    },
+  );
   const studentQuery = useGetStudentForAttendanceQuery(
     {
       input: {
@@ -87,17 +101,6 @@ export function useAttendanceData() {
     },
     {
       enabled: mode === 'STUDENT',
-    },
-  );
-
-  const { data: subjectsData } = useGetSubjectsOptionsQuery(
-    {
-      input: {
-        teacherId,
-      },
-    },
-    {
-      enabled: !!teacherId,
     },
   );
 
@@ -169,16 +172,16 @@ export function useAttendanceData() {
               (table.getIsSomePageRowsSelected() && 'indeterminate')
             }
             className="cursor-pointer"
-            onCheckedChange={(value) =>
-              table.toggleAllPageRowsSelected(!!value)
-            }
+            onCheckedChange={(value) => handleCheckedTable(value, 'All', table)}
           />
         ),
         cell: ({ row }) => (
           <Checkbox
             className="cursor-pointer"
             checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            onCheckedChange={(value) =>
+              handleCheckedTable(value, 'Row', undefined, row)
+            }
           />
         ),
         enableSorting: false,
@@ -270,7 +273,7 @@ export function useAttendanceData() {
     }
 
     return baseColumns;
-  }, [mode, handleSwitchMode]);
+  }, [mode, handleSwitchMode, meta, selectedClass, selectedSubject]);
 
   return {
     rows,

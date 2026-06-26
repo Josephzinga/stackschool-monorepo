@@ -17,6 +17,10 @@ const config: CodegenConfig = {
           AttendanceStatus:
             '@stackschool/shared/src/validation/attendance.schema#AttendanceStatusEnum',
           SchoolRole: '@stackschool/db/src/prisma/client/generated#SchoolRole',
+          PermissionCode:
+            '@stackschool/db/src/prisma/client/generated#PermissionCode',
+          PermissionModule:
+            '@stackschool/db/src/prisma/client/generated#PermissionModule',
         },
         enumValues: {
           StudentStatus:

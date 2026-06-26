@@ -19,15 +19,19 @@ import {
   markAttendanceSchema,
 } from '@stackschool/shared';
 import { toast } from 'sonner';
+import { useDashboard } from '@/components/providers/dashboard-provider';
 
 export function AttendanceTable() {
-  const { date, isAutoSave } = useAttendanceStore();
+  const { me } = useDashboard();
+  const { date, isAutoSave, rowSelection, setRowSelection } =
+    useAttendanceStore();
   const {
     mode,
     handleMarkAttendance,
     setPagination,
     pagination,
     selectedClass,
+    selectedSubject,
   } = useAttendanceEvent();
   const { rows: data, getColumns, meta, isLoading } = useAttendanceData();
 
@@ -38,11 +42,11 @@ export function AttendanceTable() {
     setValue,
     trigger,
     reset,
+    watch,
     formState: { dirtyFields, errors, isValid },
   } = useForm<MarkAttendanceFormType>({
     resolver: zodResolver(markAttendanceSchema),
   });
-
   useEffect(() => {
     reset({
       attendances: data.map((row) => ({
@@ -51,9 +55,11 @@ export function AttendanceTable() {
         classId: row.class?.id,
         userType: row.userType,
         date,
+        isSubjectMode: me?.schoolContext?.role === 'TEACHER',
+        subjectId: selectedSubject,
       })),
     });
-  }, [selectedClass, mode, data]);
+  }, [selectedClass, mode, data, selectedSubject]);
 
   const table = useReactTable({
     data,
@@ -62,6 +68,7 @@ export function AttendanceTable() {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
+    onRowSelectionChange: setRowSelection,
     manualPagination: true,
     rowCount: meta?.total,
     getRowId: (row: any) => row.id,
@@ -69,13 +76,17 @@ export function AttendanceTable() {
       trigger,
       control,
       setValue,
+      canMark:
+        me?.schoolContext?.role === 'TEACHER'
+          ? !!selectedClass && !!selectedSubject
+          : true,
       onCellChange: async (rowIndex, data) => {
         setValue(`attendances.${rowIndex}.id`, data.id);
         setValue(`attendances.${rowIndex}.userType`, data.userType);
         setValue(`attendances.${rowIndex}.date`, date);
 
         if (isAutoSave) {
-          handleMarkAttendance({
+          onSubmit({
             attendances: [getValues(`attendances.${rowIndex}`)],
           });
         }
@@ -83,6 +94,7 @@ export function AttendanceTable() {
     },
     state: {
       pagination,
+      rowSelection,
     },
   });
 
@@ -101,7 +113,6 @@ export function AttendanceTable() {
       attendances: changedAttendances,
     });
   }
-
   return (
     <form
       id="attendance-form"

@@ -9,7 +9,7 @@ import type { GroupType } from '@stackschool/db/src/prisma/client/generated';
 import type { AttendanceStatusEnum as AttendanceStatus } from '@stackschool/shared/src/validation/attendance.schema';
 import type { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import type { AttendanceStatusEnum } from '@stackschool/shared/src/validation/attendance.schema';
-import type { SchoolRole } from '@stackschool/db/src/prisma/client/generated';
+import type { SchoolRole, PermissionCode, PermissionModule } from '@stackschool/db/src/prisma/client/generated';
 import type { Context } from '../types/context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -928,9 +928,9 @@ export type SchoolMembership = {
   __typename?: 'SchoolMembership';
   id: Scalars['ID']['output'];
   parent?: Maybe<Parent>;
+  permissions?: Maybe<Array<Maybe<Permission>>>;
   role: SchoolRole;
   school?: Maybe<School>;
-  schoolUserPermissions?: Maybe<Array<Maybe<SchoolUserPermission>>>;
   staff?: Maybe<Staff>;
   student?: Maybe<Student>;
   teacher?: Maybe<Teacher>;
@@ -969,15 +969,6 @@ export type SchoolStats = {
   totalClasses: Scalars['Int']['output'];
   totalStudents: Scalars['Int']['output'];
   totalTeachers: Scalars['Int']['output'];
-};
-
-export type SchoolUserPermission = {
-  __typename?: 'SchoolUserPermission';
-  id?: Maybe<Scalars['ID']['output']>;
-  permission?: Maybe<Permission>;
-  permissionId?: Maybe<Scalars['ID']['output']>;
-  schoolUser?: Maybe<SchoolMembership>;
-  schoolUserId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type SearchClassesAndSubjects = {
@@ -1379,9 +1370,9 @@ export type ResolversTypes = ResolversObject<{
   ParentList: ResolverTypeWrapper<Omit<ParentList, 'data'> & { data?: Maybe<Array<ResolversTypes['Parent']>> }>;
   ParentStudent: ResolverTypeWrapper<Omit<ParentStudent, 'parent' | 'student'> & { parent?: Maybe<ResolversTypes['Parent']>, student?: Maybe<ResolversTypes['Student']> }>;
   ParentStudentInput: ParentStudentInput;
-  Permission: ResolverTypeWrapper<Omit<Permission, 'user'> & { user?: Maybe<ResolversTypes['User']> }>;
-  PermissionCode: PermissionCode;
-  PermissionModule: PermissionModule;
+  Permission: ResolverTypeWrapper<Omit<Permission, 'code' | 'module' | 'user'> & { code?: Maybe<ResolversTypes['PermissionCode']>, module?: Maybe<ResolversTypes['PermissionModule']>, user?: Maybe<ResolversTypes['User']> }>;
+  PermissionCode: ResolverTypeWrapper<PermissionCode>;
+  PermissionModule: ResolverTypeWrapper<PermissionModule>;
   Person: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['Person']>;
   Profile: ResolverTypeWrapper<Profile>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -1392,12 +1383,11 @@ export type ResolversTypes = ResolversObject<{
   RoomList: ResolverTypeWrapper<Omit<RoomList, 'data'> & { data: Array<Maybe<ResolversTypes['Room']>> }>;
   School: ResolverTypeWrapper<Omit<School, 'lessons' | 'teachers'> & { lessons?: Maybe<Array<Maybe<ResolversTypes['Lesson']>>>, teachers?: Maybe<Array<Maybe<ResolversTypes['Teacher']>>> }>;
   SchoolId: ResolverTypeWrapper<Scalars['SchoolId']['output']>;
-  SchoolMembership: ResolverTypeWrapper<Omit<SchoolMembership, 'parent' | 'role' | 'school' | 'schoolUserPermissions' | 'student' | 'teacher'> & { parent?: Maybe<ResolversTypes['Parent']>, role: ResolversTypes['SchoolRole'], school?: Maybe<ResolversTypes['School']>, schoolUserPermissions?: Maybe<Array<Maybe<ResolversTypes['SchoolUserPermission']>>>, student?: Maybe<ResolversTypes['Student']>, teacher?: Maybe<ResolversTypes['Teacher']> }>;
+  SchoolMembership: ResolverTypeWrapper<Omit<SchoolMembership, 'parent' | 'permissions' | 'role' | 'school' | 'student' | 'teacher'> & { parent?: Maybe<ResolversTypes['Parent']>, permissions?: Maybe<Array<Maybe<ResolversTypes['Permission']>>>, role: ResolversTypes['SchoolRole'], school?: Maybe<ResolversTypes['School']>, student?: Maybe<ResolversTypes['Student']>, teacher?: Maybe<ResolversTypes['Teacher']> }>;
   SchoolRole: ResolverTypeWrapper<SchoolRole>;
   SchoolSearchInput: SchoolSearchInput;
   SchoolSettings: ResolverTypeWrapper<SchoolSettings>;
   SchoolStats: ResolverTypeWrapper<SchoolStats>;
-  SchoolUserPermission: ResolverTypeWrapper<Omit<SchoolUserPermission, 'permission' | 'schoolUser'> & { permission?: Maybe<ResolversTypes['Permission']>, schoolUser?: Maybe<ResolversTypes['SchoolMembership']> }>;
   SearchClassesAndSubjects: ResolverTypeWrapper<Omit<SearchClassesAndSubjects, 'searchClasses' | 'searchSubjects'> & { searchClasses?: Maybe<Array<Maybe<ResolversTypes['Class']>>>, searchSubjects?: Maybe<Array<Maybe<ResolversTypes['Subject']>>> }>;
   SortOrder: SortOrder;
   Staff: ResolverTypeWrapper<Staff>;
@@ -1499,11 +1489,10 @@ export type ResolversParentTypes = ResolversObject<{
   RoomList: Omit<RoomList, 'data'> & { data: Array<Maybe<ResolversParentTypes['Room']>> };
   School: Omit<School, 'lessons' | 'teachers'> & { lessons?: Maybe<Array<Maybe<ResolversParentTypes['Lesson']>>>, teachers?: Maybe<Array<Maybe<ResolversParentTypes['Teacher']>>> };
   SchoolId: Scalars['SchoolId']['output'];
-  SchoolMembership: Omit<SchoolMembership, 'parent' | 'school' | 'schoolUserPermissions' | 'student' | 'teacher'> & { parent?: Maybe<ResolversParentTypes['Parent']>, school?: Maybe<ResolversParentTypes['School']>, schoolUserPermissions?: Maybe<Array<Maybe<ResolversParentTypes['SchoolUserPermission']>>>, student?: Maybe<ResolversParentTypes['Student']>, teacher?: Maybe<ResolversParentTypes['Teacher']> };
+  SchoolMembership: Omit<SchoolMembership, 'parent' | 'permissions' | 'school' | 'student' | 'teacher'> & { parent?: Maybe<ResolversParentTypes['Parent']>, permissions?: Maybe<Array<Maybe<ResolversParentTypes['Permission']>>>, school?: Maybe<ResolversParentTypes['School']>, student?: Maybe<ResolversParentTypes['Student']>, teacher?: Maybe<ResolversParentTypes['Teacher']> };
   SchoolSearchInput: SchoolSearchInput;
   SchoolSettings: SchoolSettings;
   SchoolStats: SchoolStats;
-  SchoolUserPermission: Omit<SchoolUserPermission, 'permission' | 'schoolUser'> & { permission?: Maybe<ResolversParentTypes['Permission']>, schoolUser?: Maybe<ResolversParentTypes['SchoolMembership']> };
   SearchClassesAndSubjects: Omit<SearchClassesAndSubjects, 'searchClasses' | 'searchSubjects'> & { searchClasses?: Maybe<Array<Maybe<ResolversParentTypes['Class']>>>, searchSubjects?: Maybe<Array<Maybe<ResolversParentTypes['Subject']>>> };
   Staff: Staff;
   String: Scalars['String']['output'];
@@ -1800,6 +1789,10 @@ export type PermissionResolvers<ContextType = Context, ParentType extends Resolv
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
 }>;
 
+export type PermissionCodeResolvers = EnumResolverSignature<{ CREATE_USER?: any, DELETE_USER?: any, INPUT_GRADES?: any, MANAGE_PAYMENTS?: any, MANAGE_SUBJECTS?: any, MANAGE_USER_PERMISSIONS?: any, MARK_STAFF_ATTENDANCE?: any, MARK_STUDENT_ATTENDANCE?: any, MARK_TEACHER_ATTENDANCE?: any, PUBLISH_BULLETINS?: any, UPDATE_USER?: any, VIEW_ATTENDANCE_REPORTS?: any, VIEW_FINANCIAL_REPORTS?: any }, ResolversTypes['PermissionCode']>;
+
+export type PermissionModuleResolvers = EnumResolverSignature<{ ACADEMICS?: any, ATTENDANCE?: any, FINANCE?: any, SETTINGS?: any, USERS?: any }, ResolversTypes['PermissionModule']>;
+
 export type PersonResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = ResolversObject<{
   __resolveType: TypeResolveFn<'Staff' | 'Student' | 'Teacher', ParentType, ContextType>;
 }>;
@@ -1871,9 +1864,9 @@ export interface SchoolIdScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 export type SchoolMembershipResolvers<ContextType = Context, ParentType extends ResolversParentTypes['SchoolMembership'] = ResolversParentTypes['SchoolMembership']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   parent?: Resolver<Maybe<ResolversTypes['Parent']>, ParentType, ContextType>;
+  permissions?: Resolver<Maybe<Array<Maybe<ResolversTypes['Permission']>>>, ParentType, ContextType>;
   role?: Resolver<ResolversTypes['SchoolRole'], ParentType, ContextType>;
   school?: Resolver<Maybe<ResolversTypes['School']>, ParentType, ContextType>;
-  schoolUserPermissions?: Resolver<Maybe<Array<Maybe<ResolversTypes['SchoolUserPermission']>>>, ParentType, ContextType>;
   staff?: Resolver<Maybe<ResolversTypes['Staff']>, ParentType, ContextType>;
   student?: Resolver<Maybe<ResolversTypes['Student']>, ParentType, ContextType>;
   teacher?: Resolver<Maybe<ResolversTypes['Teacher']>, ParentType, ContextType>;
@@ -1900,14 +1893,6 @@ export type SchoolStatsResolvers<ContextType = Context, ParentType extends Resol
   totalClasses?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   totalStudents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   totalTeachers?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-}>;
-
-export type SchoolUserPermissionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['SchoolUserPermission'] = ResolversParentTypes['SchoolUserPermission']> = ResolversObject<{
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  permission?: Resolver<Maybe<ResolversTypes['Permission']>, ParentType, ContextType>;
-  permissionId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  schoolUser?: Resolver<Maybe<ResolversTypes['SchoolMembership']>, ParentType, ContextType>;
-  schoolUserId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
 }>;
 
 export type SearchClassesAndSubjectsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['SearchClassesAndSubjects'] = ResolversParentTypes['SearchClassesAndSubjects']> = ResolversObject<{
@@ -2099,6 +2084,8 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   ParentList?: ParentListResolvers<ContextType>;
   ParentStudent?: ParentStudentResolvers<ContextType>;
   Permission?: PermissionResolvers<ContextType>;
+  PermissionCode?: PermissionCodeResolvers;
+  PermissionModule?: PermissionModuleResolvers;
   Person?: PersonResolvers<ContextType>;
   Profile?: ProfileResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
@@ -2111,7 +2098,6 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   SchoolRole?: SchoolRoleResolvers;
   SchoolSettings?: SchoolSettingsResolvers<ContextType>;
   SchoolStats?: SchoolStatsResolvers<ContextType>;
-  SchoolUserPermission?: SchoolUserPermissionResolvers<ContextType>;
   SearchClassesAndSubjects?: SearchClassesAndSubjectsResolvers<ContextType>;
   Staff?: StaffResolvers<ContextType>;
   Student?: StudentResolvers<ContextType>;

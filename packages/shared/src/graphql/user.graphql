@@ -24,6 +24,7 @@ type Permission {
 type SchoolMembership {
   id: ID!
   role: SchoolRole!
+  schoolId: ID
   school: School
   permissions: [Permission]
 

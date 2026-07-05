@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { AttendanceMode } from '@/types/attendance';
 import { format } from 'date-fns';
 import { RowSelectionState, OnChangeFn } from '@tanstack/react-table';
+import { AttendanceStatusEnum } from '@stackschool/shared';
 
 interface AttendanceStore {
   // Dialog scanner
@@ -23,6 +24,12 @@ interface AttendanceStore {
   setIsAutoSave: (value: boolean) => void;
   rowSelection: RowSelectionState;
   setRowSelection: OnChangeFn<RowSelectionState>;
+
+  // Bulk mark callback
+  bulkMarkCallback: ((status: AttendanceStatusEnum) => void) | null;
+  setBulkMarkCallback: (
+    cb: ((status: AttendanceStatusEnum) => void) | null,
+  ) => void;
 }
 const now = format(new Date(), 'yyyy-MM-dd');
 
@@ -32,6 +39,7 @@ export const useAttendanceStore = create<AttendanceStore>((set, get) => ({
   isScannerOpen: false,
   qrDialogUser: null,
   rowSelection: {},
+  bulkMarkCallback: null,
 
   setRowSelection: (rowSelection) => {
     if (typeof rowSelection === 'function') {
@@ -46,6 +54,8 @@ export const useAttendanceStore = create<AttendanceStore>((set, get) => ({
   setQrDialogUser: (user) => set({ qrDialogUser: user }),
 
   setDate: (date) => set({ date }),
+
+  setBulkMarkCallback: (cb) => set({ bulkMarkCallback: cb }),
 
   tenantId: 'tenant-1', // Récupérer depuis le contexte auth
 }));

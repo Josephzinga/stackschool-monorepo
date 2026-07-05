@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "./client/generated"
+  provider     = "prisma-client-js"
 }
 
 datasource db {
@@ -23,7 +22,7 @@ model User {
   emailVerifiedAt   DateTime?
   emailVerified     Boolean?            @default(false)
   isActive          Boolean             @default(true)
-  Account           Account[]
+  accounts          Account[]
   payments          Payment[]
   profile           Profile?
   memberships       SchoolUser[]
@@ -125,13 +124,14 @@ model SchoolUser {
   id                 String                 @id @default(cuid())
   schoolId           String
   userId             String
+  isActive           Boolean                @default(true)
   role               SchoolRole
   isOwner            Boolean                @default(false)
   createdAt          DateTime               @default(now())
   Parent             Parent?
   school             School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Staff              Staff?
+  staff              Staff?
   student            Student?
   teacher            Teacher?
   attendance         Attendance[]
@@ -502,17 +502,6 @@ model Subscription {
   @@index([schoolId])
 }
 
-model Session {
-  userId       String?
-  createdAt    DateTime @default(now())
-  expires      DateTime @map("expire")
-  sessionToken String   @unique @map("sess")
-  id           String   @id @default(cuid()) @map("sid")
-  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
 model Teacher {
   id                String              @id @default(cuid())
   schoolUserId      String              @unique
@@ -538,15 +527,20 @@ model Teacher {
 }
 
 model Staff {
-  id           String     @id @default(cuid())
-  schoolUserId String     @unique
-  position     String
-  hireDate     DateTime?
-  salary       Float?
-  departement  String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  schoolUser   SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  id            String        @id @default(cuid())
+  schoolUserId  String        @unique
+  hireDate      DateTime?
+  position      StaffPosition @default(OTHER)
+  positionOther String?
+  salary        Float?
+  departement   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+
+  @@index([schoolUserId])
+  @@index([position])
 }
 
 /// *
@@ -561,21 +555,28 @@ model Plan {
   subscription Subscription[]
 }
 
+model Session {
+  id           String   @id @default(cuid()) @map("sid")
+  userId       String?
+  createdAt    DateTime @default(now())
+  expires      DateTime @map("expire")
+  sessionToken String   @map("sess") @db.Text
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 /// *
 /// * *  required models **
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String?
-  provider          String?
+  provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -808,4 +809,16 @@ enum PermissionCode {
 enum AtteandanceType {
   DAILY
   SUBJECT
+}
+
+enum StaffPosition {
+  SECRETARY
+  GUARDIAN
+  SUPERVISOR
+  ACCOUNTANT
+  LIBRARIAN
+  NURSE
+  CLEANER
+  MAINTENANCE
+  OTHER
 }

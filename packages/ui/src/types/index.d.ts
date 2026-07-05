@@ -1,12 +1,16 @@
 import { ProfileData, RoleDataType, SchoolDataType } from '@stackschool/shared';
-import { School, User } from '../generated/graphql';
+import { School, SchoolMembership, User } from '../generated/graphql';
+type CurrentSchool = Omit<School, 'students' | 'teachers'>;
+type CurrentMemberShip = Omit<SchoolMembership, 'school'>;
 export interface UserStore {
     user: User | null;
     loading: boolean;
     isAuthenticated: boolean;
     setUser: (user: User | null) => void;
-    currentSchool: School | null;
-    setCurrentSchool: (school?: Omit<School, 'students' | 'teachers'>) => void;
+    currentSchool: CurrentSchool | null;
+    currentMemberShip: CurrentMemberShip | null;
+    setCurrentSchool: (school?: CurrentSchool) => void;
+    setCurrentMemberShip: (memberShip: CurrentMemberShip) => void;
 }
 export interface CompleteProfileStep {
     school: SchoolDataType | null;
@@ -36,4 +40,5 @@ export interface CompleteProfileStep {
         error?: string | any;
     }>;
 }
+export {};
 //# sourceMappingURL=index.d.ts.map

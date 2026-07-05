@@ -2,7 +2,7 @@ import '@tanstack/react-table';
 import type { ColumnDef, RowData } from '@tanstack/react-table';
 import { AttendanceStatus, PaginationMeta } from '@stackschool/ui';
 import { Control, UseFormSetValue, UseFormTrigger } from 'react-hook-form';
-import { MarkStudentAttendanceFormType } from '@/components/school/attendance/table/manual-attendace-table';
+import { MarkStudentAttendanceFormType } from '@/components/school/attendance/table/manual-attendance-table';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {

@@ -6,6 +6,7 @@ coverage
 jest-exercices
 joseph
 *.js
+n
 *.js.map
 *.d.ts
 *.d.ts.map
@@ -17,3 +18,9 @@ stackschool-monorepo.key
 
 
 
+
+
+
+.nx/cache
+.nx/workspace-data
+.nx/migrate-runs

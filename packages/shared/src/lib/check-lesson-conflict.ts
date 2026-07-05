@@ -1,5 +1,5 @@
 import { getDay } from 'date-fns';
-import { REFERENCE_DATE } from '../constants';
+import { REFERENCE_DATE } from '../constants/index.js';
 
 export interface Event {
   daysOfWeek: number[];

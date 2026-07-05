@@ -1,11 +1,13 @@
 {
   "name": "@stackschool/shared",
   "version": "1.0.0",
-  "description": "",
-  "private": true,
-  "main": "src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup src/index.ts --format esm && tsc --emitDeclarationOnly --declaration --outDir dist",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "build:bun": "bun build --target=node --outfile=dist/index.js ./src/index.ts"
   },
   "keywords": [],
   "author": "",

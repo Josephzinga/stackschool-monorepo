@@ -3,8 +3,8 @@ import {
   parentFormSchema,
   RelationTypeEnum,
   studentFormSchema,
-} from './complete-profile.schema';
-import { profileSchema, registerFormSchema } from './auth.schema';
+} from './complete-profile.schema.js';
+import { profileSchema, registerFormSchema } from './auth.schema.js';
 
 export enum StudentStatusEnum {
   ACTIVE = 'ACTIVE',

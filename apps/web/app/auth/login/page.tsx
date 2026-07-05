@@ -25,7 +25,6 @@ export default function LoginPage() {
       toast.success(res.message || 'Connexion réussie');
     } catch (err: any) {
       const { message, data, status } = parseAxiosError(err);
-      console.log('message', message);
       if (data?.isSocialOnly) {
         return toast.warning(data.message);
       }

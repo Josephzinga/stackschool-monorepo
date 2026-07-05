@@ -11,7 +11,9 @@ COPY packages/ui ./packages/ui
 COPY packages/db ./packages/db
 COPY apps/web ./apps/web
 
-RUN pnpm --filter @stackschool/web install --no-frozen-lockfile
+# À la place de RUN pnpm --filter @stackschool/web install --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
+
 
 EXPOSE 3000
 

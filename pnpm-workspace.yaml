@@ -1,10 +1,36 @@
 packages:
-  - packages/*
-  - apps/*
+  - 'packages/*'
+  - 'apps/api'
+  - 'apps/api-nest'
+  - 'apps/web'
 
-onlyBuiltDependencies:
-  - esbuild
-  - msgpackr-extract
-  - prisma
-  - sharp
-  - unrs-resolver
+allowBuilds:
+  '@apollo/protobufjs': true
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  bcrypt: true
+  esbuild: true
+  '@prisma/client': true
+  msgpackr-extract: true
+  nx: true
+  prisma: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+  '@swc/core': true
+  ngrok: false
+
+catalog:
+  react: '^19.2.3'
+  react-dom: '^19.2.3'
+  '@types/react': '^19.2.3'
+  '@types/react-dom': '^19.2.3'
+
+overrides:
+  react: 'catalog:'
+  react-dom: 'catalog:'
+  '@types/react': 'catalog:'
+  '@types/react-dom': 'catalog:'
+  lightningcss: 1.30.1
+
+nodeLinker: hoisted

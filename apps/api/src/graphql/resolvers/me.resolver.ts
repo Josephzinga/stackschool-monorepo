@@ -13,37 +13,16 @@ export const meResolver: Resolvers = {
       try {
         const user = await prisma.user.findUnique({
           where: { id: context.user.id },
-          include: {
-            profile: true,
-            memberships: {
-              include: {
-                school: {
-                  select: {
-                    id: true,
-                    name: true,
-                    logo: true,
-                    slug: true,
-                    address: true,
-                  },
-                },
-                student: { select: { id: true } },
-                teacher: { select: { id: true } },
-                Parent: { select: { id: true } },
-                Staff: { select: { id: true } },
-              },
-            },
-          },
         });
 
         if (!user) {
           throw createServiceError('Utilisateur introuvable', 404);
         }
 
-        return user as any;
+        return user;
       } catch (error) {
-        console.error('Erreur getMe:', error);
         throw createServiceError(
-          'Erreur lors de la récupération du profil',
+          "Erreur lors de la récupération de l'utilisateur.",
           500,
           error,
         );
@@ -69,8 +48,20 @@ export const meResolver: Resolvers = {
         role: membership.role,
       };
     },
-    profile: async (parent, _args, { loaders }) => {
-      return (await loaders.profileLoader.load(parent.id)) || null;
+    profile: async (parent, _args, { prisma }) => {
+      return prisma.profile.findUnique({
+        where: {
+          userId: parent.id,
+        },
+      });
+    },
+
+    memberships: async (parent, _args, { prisma, loaders }) => {
+      return prisma.schoolUser.findMany({
+        where: {
+          userId: parent.id,
+        },
+      });
     },
   },
 };

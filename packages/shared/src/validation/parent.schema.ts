@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { createTeacherSchema } from './create-list-teacher.schema';
-import { RelationTypeEnum } from './complete-profile.schema';
+import { createTeacherSchema } from './create-list-teacher.schema.js';
+import { RelationTypeEnum } from './complete-profile.schema.js';
 
 export const createParentSchema = z.object({
   firstname: createTeacherSchema.shape.firstname,

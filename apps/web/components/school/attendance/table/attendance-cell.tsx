@@ -1,8 +1,11 @@
+'use client';
+
 import { AttendanceRow } from '@/types/attendance';
 import { Row, Table } from '@tanstack/react-table';
 import { Controller } from 'react-hook-form';
 import { StatusBadgeGroup } from '@/components/school/attendance/status-radio-group';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function AttendanceCell({
   row,
@@ -13,6 +16,8 @@ export function AttendanceCell({
 }) {
   const index = row.index;
   const { control, trigger, onCellChange, canMark } = table.options.meta!;
+  const isMobile = useIsMobile();
+
   return (
     <Controller
       control={control}
@@ -20,6 +25,7 @@ export function AttendanceCell({
       render={({ field }) => (
         <StatusBadgeGroup
           value={field.value}
+          size={isMobile ? 'sm' : 'md'}
           onChange={async (newValue) => {
             if (!canMark) {
               return toast.warning(

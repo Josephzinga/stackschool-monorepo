@@ -1,7 +1,7 @@
-import { Day } from '@stackschool/db';
+import { Day, StaffPosition } from '@stackschool/db';
 
 export const REFERENCE_DATE = new Date(2024, 0, 1);
-export const dayConstant = [
+export const dayConstants = [
   { value: 'MONDAY', label: 'Lundi' },
   { value: 'TUESDAY', label: 'Mardi' },
   { value: 'WEDNESDAY', label: 'Mercredi' },
@@ -50,3 +50,15 @@ export const lessonStatusConfig = {
     icon: 'clock',
   },
 } as const;
+
+export const StaffPositionLabels: Record<StaffPosition, string> = {
+  SECRETARY: 'Secrétaire',
+  GUARDIAN: 'Gardien',
+  SUPERVISOR: 'Surveillant',
+  ACCOUNTANT: 'Comptable',
+  LIBRARIAN: 'Bibliothécaire',
+  NURSE: 'Infirmier(ère)',
+  CLEANER: 'Agent d\'entretien',
+  MAINTENANCE: 'Maintenance',
+  OTHER: 'Autre',
+} as const

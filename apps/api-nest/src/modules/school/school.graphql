@@ -1,0 +1,16 @@
+type School {
+  id: ID
+  name: String!
+  slug: String
+  address: String!
+  code: String
+  logo: String
+  stats: SchoolStats
+  settings: SchoolSettings
+  teachers: [Teacher]
+  lessons: [Lesson]
+}
+
+input SchoolSearchInput {
+  searchTerm: String
+}

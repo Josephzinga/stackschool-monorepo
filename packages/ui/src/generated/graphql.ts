@@ -947,6 +947,7 @@ export type SchoolMembership = {
   permissions?: Maybe<Array<Maybe<Permission>>>;
   role: SchoolRole;
   school?: Maybe<School>;
+  schoolId?: Maybe<Scalars['ID']['output']>;
   staff?: Maybe<Staff>;
   student?: Maybe<Student>;
   teacher?: Maybe<Teacher>;

@@ -1,7 +1,7 @@
-import { Class, Subject, UserInMe } from '../../src';
+import { Class, Subject } from '../../src/index.js';
 
 export interface Context {
-  user?: UserInMe;
+  user?: any;
 }
 
 export interface ClassWithSubjects extends Pick<

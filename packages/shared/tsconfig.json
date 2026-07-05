@@ -2,12 +2,19 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "strict": true,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "declaration": true, // Génère les fichiers .d.ts pour les types
-    "declarationMap": true, // Génère les fichiers .d.ts.map
-    "composite": true // Nécessaire pour les projets référencés
+    "declaration": true,
+    "declarationMap": true,
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["index.ts", "src/**/*"],
-  "references": []
+  "include": ["./src/index.ts", "src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

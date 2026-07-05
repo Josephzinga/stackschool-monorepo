@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { profileSchema } from '../../src';
+import { profileSchema } from '../../src/index.js';
 
 z.config(z.locales.fr());
 
@@ -84,7 +84,7 @@ export const parentFormSchema = z.object({
   children: z
     .array(
       z.object({
-        id: z.cuid(),
+        id: z.cuid2(),
         firstname: z.string(),
         lastname: z.string(),
         photo: z.string().optional(),
@@ -154,6 +154,30 @@ export const roleDataSchema = z.discriminatedUnion('role', [
     admin: StaffFormSchema, // Ou un schéma spécifique admin
   }),
 ]);
+
+export const completeProfileDataSchema = z
+  .object({
+    role: roleDataSchema.nullable(),
+    profile: profileSchema.nullable(),
+    school: schoolDataSchema.nullable(),
+    currentStep: z.coerce.number<number>(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.currentStep === 1 && !data.school) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['school'],
+        message: "Vous devriez remplir les information de l'ecole",
+      });
+    }
+    if (data.currentStep === 2 && !data.profile) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['profile'],
+        message: 'Remplisez le donné du profile',
+      });
+    }
+  });
 
 // Types inférés
 export type StaffFormDataType = z.infer<typeof StaffFormSchema>;

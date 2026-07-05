@@ -46,7 +46,7 @@ export function AppCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full md:w-60  justify-between"
+          className="w-full sm:w-56 lg:w-64 flex justify-between"
         >
           {selectedData
             ? data?.find((c) => c.id === selectedData)?.name
@@ -54,10 +54,10 @@ export function AppCombobox({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full! md:w-60 p-0">
-        <Command>
-          <CommandInput placeholder={label} />
-          <CommandList>
+      <PopoverContent className="w-80">
+        <Command className="w-full bg-transparent">
+          <CommandInput placeholder={label} className="text-sm" />
+          <CommandList className="w-full">
             <CommandEmpty>Aucune valeur trouvée.</CommandEmpty>
             <CommandGroup>
               <CommandItem
@@ -82,7 +82,7 @@ export function AppCombobox({
                     onSelect(item.id);
                     setOpen(false);
                   }}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-sm font-sans font-medium"
                 >
                   <Check
                     className={cn(

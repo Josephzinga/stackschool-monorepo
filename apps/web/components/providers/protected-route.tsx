@@ -12,7 +12,13 @@ export default function ProtectedRoute({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { setUser, currentSchool, currentMemberShip, setCurrentSchool, setCurrentMemberShip } = useUserStore();
+  const {
+    setUser,
+    currentSchool,
+    currentMemberShip,
+    setCurrentSchool,
+    setCurrentMemberShip,
+  } = useUserStore();
 
   const { data, isLoading, error } = useGetMeQuery({}, { retry: false });
   let currentUser = '';
@@ -28,11 +34,11 @@ export default function ProtectedRoute({
     if (data?.me?.memberships && currentSchool) {
       for (const member of data?.me?.memberships) {
         if (member?.school?.id === currentSchool?.id) {
-          setCurrentSchool(member?.school);
+          setCurrentSchool(member?.school ?? undefined);
 
-          api.defaults.headers.common['x-school-id'] = member?.school.id;
+          api.defaults.headers.common['x-school-id'] = member?.school?.id;
         } else {
-          setCurrentSchool(data?.me?.memberships[0]?.school);
+          setCurrentSchool(data?.me?.memberships[0]?.school ?? undefined);
         }
       }
     }
@@ -56,7 +62,9 @@ export default function ProtectedRoute({
       if (isProfileComplete) {
         // Redirection depuis les pages d'auth
         if (isOnCompleteProfile || isOnAuthPage) {
-          router.replace(`/dashboard/${currentMemberShip?.role?.toLocaleLowerCase()}`);
+          router.replace(
+            `/dashboard/${currentMemberShip?.role?.toLocaleLowerCase()}`,
+          );
           return;
         }
 
@@ -65,8 +73,8 @@ export default function ProtectedRoute({
 
         if (!currentSchool && !isOnSelectSchool) {
           if (memberships.length === 1) {
-            setCurrentSchool(memberships[0]?.school);
-            setCurrentMemberShip(memberships[0]!)
+            setCurrentSchool(memberships[0]?.school ?? undefined);
+            setCurrentMemberShip(memberships[0]!);
           } else if (memberships.length > 1) {
             // Plusieurs écoles : Redirection vers la sélection
 
@@ -90,7 +98,7 @@ export default function ProtectedRoute({
     currentSchool,
     setCurrentSchool,
     currentMemberShip,
-    setCurrentMemberShip
+    setCurrentMemberShip,
   ]);
 
   if (isLoading) {

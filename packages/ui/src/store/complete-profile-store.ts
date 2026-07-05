@@ -1,9 +1,9 @@
-import { parseAxiosError, RedisService } from '@stackschool/shared';
+import { parseAxiosError, RedisService, api } from '@stackschool/shared';
 import { create } from 'zustand';
 import { CompleteProfileStep } from '../types';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-const redisService = new RedisService();
+const redisService = new RedisService(api);
 
 export const useCompleteProfileStore = create<CompleteProfileStep>()(
   persist(

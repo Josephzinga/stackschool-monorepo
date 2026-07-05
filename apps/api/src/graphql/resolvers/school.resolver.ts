@@ -234,5 +234,14 @@ export const schoolResolver: Resolvers = {
     permissions: async (parent, _args, { loaders }) => {
       return (await loaders.permissionsLoader.load(parent.id)) || [];
     },
+
+    school: async (parent, _args, { prisma, schoolId }) => {
+      if (!parent.schoolId && !schoolId) return null;
+      return prisma.school.findUnique({
+        where: {
+          id: (parent.schoolId || schoolId) ?? undefined,
+        },
+      });
+    },
   },
 };

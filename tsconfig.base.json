@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "@stackschool/db/*": ["packages/db/*"],
-      "@stackschool/shared/*": ["packages/shared/*"],
-      "@stackschool/ui/*": ["packages/ui/*"],
-      "@stackschool/api/*": ["apps/api/*"],
-      "@stackschool/web/*": ["apps/web/*"],
-      "@stackschool/mobile/*": ["apps/mobile/*"],
-      "@stackschool/backend/*": ["apps/backend/*/**"]
+      "*": ["./"],
+      "@stackschool/db/*": ["./packages/db/*"],
+      "@stackschool/shared/*": ["./packages/shared/*"],
+      "@stackschool/ui/*": ["./packages/ui/*"],
+      "@stackschool/api/*": ["./apps/api/*"],
+      "@stackschool/web/*": ["./apps/web/*"],
+      "@stackschool/mobile/*": ["./apps/mobile/*"],
+      "@stackschool/api-nest/*": ["./apps/api-nest/*"]
     },
 
     "composite": true,

@@ -1,9 +1,9 @@
-import { api, getApiBaseUrl, setApiBaseUrl } from '../../lib/api';
+import { api, getApiBaseUrl, setApiBaseUrl } from '../../lib/api.js';
 import type {
   LoginFormType,
   ProfileType,
   RegisterFormType,
-} from '../../../src';
+} from '../../../src/index.js';
 
 export const authServices = {
   setBaseUrl: (url: string) => {

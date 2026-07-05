@@ -5,7 +5,7 @@ import {
   StaffFormDataType,
   StudentFormDataType,
   TeacherFormDataType,
-} from '../validation/complete-profile.schema';
+} from '../validation/complete-profile.schema.js';
 
 type CreateSchoolPayload = {
   type: 'create';
@@ -25,16 +25,10 @@ type InviteSchoolPayload = {
   schoolId: string;
 };
 export type SchoolData =
-  | CreateSchoolPayload
-  | JoinSchoolPayload
-  | InviteSchoolPayload;
+  CreateSchoolPayload | JoinSchoolPayload | InviteSchoolPayload;
 
 export type RoleData =
-  | StudentData
-  | ParentData
-  | TeacherData
-  | StaffData
-  | AdminData;
+  StudentData | ParentData | TeacherData | StaffData | AdminData;
 
 type StudentData = {
   role: 'STUDENT';
@@ -71,11 +65,11 @@ export interface ProfileData {
   phoneNumber?: string | undefined;
 }
 
-export type UserInMe = User & {
-  profile: Profile;
-  Account: Account[];
-};
-type Moi = UserInMe['id'];
+export interface UserInMe extends User {
+  password: string | null;
+  profile?: Profile | null;
+  accounts?: Account[];
+}
 export interface SchoolClass {
   id: string;
   name: string;

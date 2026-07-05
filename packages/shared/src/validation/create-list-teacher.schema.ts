@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { profileSchema } from './auth.schema';
+import { profileSchema } from './auth.schema.js';
 
 export const createTeacherSchema = z.object({
   firstname: z.string().min(2, 'Le prénom est requis'),

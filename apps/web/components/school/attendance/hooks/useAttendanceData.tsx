@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
-import { useAttendanceStore } from '@/store/attendance';
+import { useAttendanceUiState } from '@/components/school/attendance/hooks/useAttendanceUiState';
 import { AttendanceMode, AttendanceRow, Staff } from '@/types/attendance';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,7 @@ import { useAttendanceEvent } from '@/components/school/attendance/hooks/useAtte
 import { ProfileCell } from '@/components/table/profile-cell';
 import { AttendanceCell } from '../table/attendance-cell';
 import { useDashboard } from '@/components/providers/dashboard-provider';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const mockStaff: Staff[] = [
   {
@@ -50,7 +51,7 @@ const mockStaff: Staff[] = [
 ];
 
 export function useAttendanceData() {
-  const { date } = useAttendanceStore();
+  const { date } = useAttendanceUiState();
   const {
     selectedClass,
     mode,
@@ -62,7 +63,6 @@ export function useAttendanceData() {
   } = useAttendanceEvent();
   const { me } = useDashboard();
   const [meta, setMeta] = React.useState<Omit<PaginationMeta, 'page'>>();
-
   const searchTerm = useDebounce(search, 400);
 
   const day = Object.keys(dayMapping).find(

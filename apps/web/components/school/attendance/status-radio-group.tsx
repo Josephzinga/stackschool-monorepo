@@ -18,7 +18,7 @@ interface Style {
   darkActiveClass: string;
   darkInactiveClass: string;
 }
-const statusConfig: Record<AttendanceStatusEnum, Style> = {
+const statusConfig: Record<string, Style> = {
   [AttendanceStatusEnum.PRESENT]: {
     label: 'Présent',
     icon: Check,
@@ -57,14 +57,6 @@ const statusConfig: Record<AttendanceStatusEnum, Style> = {
     darkInactiveClass:
       'dark:text-amber-400 dark:border-amber-700 dark:hover:bg-amber-950/50 dark:hover:border-amber-600',
   },
-  [AttendanceStatusEnum.EXCUSED]: {
-    label: 'Malade',
-    icon: Clock,
-    activeClass: '',
-    inactiveClass: '',
-    darkActiveClass: '',
-    darkInactiveClass: '',
-  },
 };
 
 export function StatusBadgeGroup({
@@ -73,7 +65,7 @@ export function StatusBadgeGroup({
   size = 'md',
 }: StatusBadgeGroupProps) {
   const sizeClasses = {
-    sm: 'px-2 py-1 text-[10px] gap-1',
+    sm: 'px-2 py-1 text-1 gap-1',
     md: 'px-4 py-1.5 text-xs gap-1.5',
   };
 

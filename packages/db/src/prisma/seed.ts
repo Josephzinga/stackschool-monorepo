@@ -1,10 +1,11 @@
-import { prisma } from '.';
+import { prisma } from './index.js';
 import {
+  AttendanceStatus,
   Day,
   Gender,
   PaymentStatus,
   PaymentType,
-} from '../prisma/client/generated';
+} from '@prisma/client';
 import {
   addMinutes,
   getHours,
@@ -15,7 +16,7 @@ import {
 } from 'date-fns';
 
 // ID de l'école cible
-const TARGET_SCHOOL_ID = 'cmpskwfd80000q6s80sh8uznl';
+const TARGET_SCHOOL_ID = 'cmr6ptszc000096j7m7xz9zbd';
 
 const START_HOUR = 8;
 const END_HOUR = 17;
@@ -348,7 +349,7 @@ async function main() {
       await prisma.attendance.create({
         data: {
           date: lesson.startTime, // La présence est liée à l'heure du cours
-          status,
+          status: status as AttendanceStatus,
           studentId: student.id,
           schoolId,
         },
@@ -359,7 +360,6 @@ async function main() {
 
   console.log('🚀 Seeding terminé avec succès.');
 }
-
 main()
   .catch((e) => {
     console.error(e);

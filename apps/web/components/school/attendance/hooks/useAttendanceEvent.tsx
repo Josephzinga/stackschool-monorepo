@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useAttendanceDate } from '@/components/school/attendance/hooks/useAttendanceDate';
+import { useAttendanceUiState } from '@/components/school/attendance/hooks/useAttendanceUiState';
 import type { AttendanceMode } from '@/types/attendance';
 import { useQueryClient } from '@tanstack/react-query';
 import { Table, Row } from '@tanstack/react-table';
@@ -57,6 +57,7 @@ export function useAttendanceEvent() {
 
   const {
     date,
+    isAutoSave,
     isScannerOpen,
     openScanner,
     closeScanner,
@@ -64,7 +65,7 @@ export function useAttendanceEvent() {
     setQrDialogUser,
     closeQrDialog,
     tenantId,
-  } = useAttendanceDate();
+  } = useAttendanceUiState();
   const queryClient = useQueryClient();
   let queryKey: any[] | undefined;
   const teacherId = me?.schoolContext?.teacher?.id;
@@ -85,7 +86,7 @@ export function useAttendanceEvent() {
   }
   const { mutateAsync: markAttendanceMutate } = useMarkAttendanceMutation({
     onSuccess: async (data, variables) => {
-      if (store.isAutoSave) {
+      if (isAutoSave) {
         switch (mode) {
           case 'STUDENT':
             await queryClient.setQueryData(
@@ -165,6 +166,17 @@ export function useAttendanceEvent() {
     },
   });
 
+  const handleSelectClass = useCallback(
+    (classId: string | null) => {
+      setSelectedClass(classId);
+    },
+    [setSelectedClass],
+  );
+
+  const handleSelectSubject = (subjectId: string | null) => {
+    setSelectedSubject(subjectId);
+  };
+
   // Switch de mode
   const handleSwitchMode = useCallback(
     async (mode: AttendanceMode) => {
@@ -179,8 +191,9 @@ export function useAttendanceEvent() {
           toast.warning(`Permissions non accorder. `);
           return;
         }
+      } else {
+        setMode(mode);
       }
-      setMode(mode);
 
       if (mode !== 'STUDENT') {
         handleSelectClass(null);
@@ -189,17 +202,6 @@ export function useAttendanceEvent() {
     },
     [handleSelectClass, handleSelectSubject, me],
   );
-
-  const handleSelectClass = useCallback(
-    (classId: string | null) => {
-      setSelectedClass(classId);
-    },
-    [setSelectedClass],
-  );
-
-  const handleSelectSubject = (subjectId: string | null) => {
-    setSelectedSubject(subjectId);
-  };
 
   // Dialog scanner
   // Dialog scanner
@@ -278,14 +280,14 @@ export function useAttendanceEvent() {
   /*  const scanBadgeMutation = useMutation({
     mutationFn: async (badgeId: string) => {
       return request(ENDPOINT, SCAN_BADGE, {
-        tenantId: store.tenantId,
+        tenantId,
         badgeId,
-        date: store.date,
+        date,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['attendance', 'STUDENT', store.date],
+        queryKey: ['attendance', 'STUDENT', date],
       });
       closeScanner();
     },

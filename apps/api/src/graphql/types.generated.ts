@@ -931,6 +931,7 @@ export type SchoolMembership = {
   permissions?: Maybe<Array<Maybe<Permission>>>;
   role: SchoolRole;
   school?: Maybe<School>;
+  schoolId?: Maybe<Scalars['ID']['output']>;
   staff?: Maybe<Staff>;
   student?: Maybe<Student>;
   teacher?: Maybe<Teacher>;
@@ -1867,6 +1868,7 @@ export type SchoolMembershipResolvers<ContextType = Context, ParentType extends 
   permissions?: Resolver<Maybe<Array<Maybe<ResolversTypes['Permission']>>>, ParentType, ContextType>;
   role?: Resolver<ResolversTypes['SchoolRole'], ParentType, ContextType>;
   school?: Resolver<Maybe<ResolversTypes['School']>, ParentType, ContextType>;
+  schoolId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   staff?: Resolver<Maybe<ResolversTypes['Staff']>, ParentType, ContextType>;
   student?: Resolver<Maybe<ResolversTypes['Student']>, ParentType, ContextType>;
   teacher?: Resolver<Maybe<ResolversTypes['Teacher']>, ParentType, ContextType>;

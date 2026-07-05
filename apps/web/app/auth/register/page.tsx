@@ -37,7 +37,6 @@ import { useState } from 'react';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [isValid, setIsValid] = useState<Boolean | undefined>();
   const {
     handleSubmit,
     register,
@@ -91,7 +90,7 @@ export default function RegisterPage() {
                   type="text"
                   required
                   icon={User}
-                  autoComplete="name"
+                  autoComplete="username"
                   placeholder="John Doe"
                   aria-invalid={!!errors.username}
                   aria-describedby="username-error"

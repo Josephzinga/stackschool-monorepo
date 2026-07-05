@@ -1,10 +1,12 @@
 import './styles/globals.css';
 import './styles/search-input.css';
+import NextTopLoader from 'nextjs-toploader';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { inter, jost, poppins, sans } from '@/lib/fonts';
 import QueryProvider from '@/components/providers/queryClientProvider';
 import { NuqsAdapter } from 'nuqs/adapters/next';
+import CsrfProvider from '@/components/providers/csrf-provider';
 
 /**
  * RootLayout est le composant racine de l'application.
@@ -25,8 +27,10 @@ export default async function RootLayout({
       <body>
         <QueryProvider>
           <ThemeProvider attribute="class" enableSystem={false}>
-            <NuqsAdapter>{children}</NuqsAdapter>
-
+            <NuqsAdapter>
+              <CsrfProvider>{children}</CsrfProvider>
+            </NuqsAdapter>
+            <NextTopLoader />
             <Toaster
               position="top-center"
               className="bg-sky-500! text-lg"

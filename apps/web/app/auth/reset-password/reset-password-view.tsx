@@ -4,53 +4,147 @@ import {
   authServices,
   parseAxiosError,
   ResetPasswordType,
+  resetPasswordSchema,
 } from '@stackschool/shared';
 import { toast } from 'sonner';
 import { router } from 'next/client';
 import { use } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/Container';
 import { AlertCircle } from 'lucide-react';
 
-export const onSubmit = async (
-  data: ResetPasswordType,
-  onSuccess: (success: boolean) => void,
-  token?: string,
-) => {
-  if (!token) {
-    toast.error('Token de réinitialisation manquant');
-    return;
-  }
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CheckCircle2, Lock } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { SubmitButton } from '@/components/submit-button';
 
-  try {
-    const res = await authServices.resetPassword(
-      token,
-      data.password,
-      data.confirm,
-    );
+export const ResetPasswordForm = ({
+  onSubmit,
+}: {
+  onSubmit: (data: ResetPasswordType) => void;
+}) => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<Omit<ResetPasswordType, 'token'>>({
+    resolver: zodResolver(resetPasswordSchema),
+    mode: 'onChange',
+  });
 
-    if (res.ok) {
-      onSuccess(true);
-      toast.success(
-        res.data?.message || 'Mot de passe réinitialisé avec succès',
-      );
-      // Redirection après 3 secondes
-      setTimeout(() => {
-        router.push('/auth/login');
-      }, 3000);
-    }
-  } catch (error: any) {
-    const { message } = parseAxiosError(error);
-    toast.error(message || 'Erreur lors de la réinitialisation');
+  const passwordValue = watch('password');
 
-    // Si le token est invalide, rediriger vers forgot-password
-    if (error.response?.status === 400) {
-      setTimeout(() => {
-        router.push('/auth/forgot-password');
-      }, 2000);
-    }
-  }
+  // Vérification de la force du mot de passe
+  const getPasswordStrength = (password: string) => {
+    if (!password) return 0;
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+    return strength;
+  };
+
+  const passwordStrength = getPasswordStrength(passwordValue);
+
+  return (
+    <Container>
+      <Card className="max-w-md mx-auto w-100! font-poppins">
+        <CardHeader>
+          <CardTitle className="text-center">Nouveau mot de passe</CardTitle>
+          <CardDescription className="text-center">
+            Choisissez un nouveau mot de passe sécurisé
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Champ mot de passe */}
+            <Field>
+              <FieldLabel>Nouveau mot de passe</FieldLabel>
+              <Input
+                icon={Lock}
+                isPassword
+                {...register('password')}
+                placeholder="********"
+                aria-invalid={!!errors.password}
+              />
+
+              <FieldError>{errors.password?.message}</FieldError>
+              {/* Indicateur de force du mot de passe */}
+              {passwordValue && (
+                <div className="mt-2 space-y-2">
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <div
+                        key={level}
+                        className={`h-1 flex-1 rounded ${
+                          level <= passwordStrength
+                            ? level <= 2
+                              ? 'bg-red-500'
+                              : level <= 3
+                                ? 'bg-yellow-500'
+                                : 'bg-green-500'
+                            : 'bg-gray-200'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {passwordStrength <= 2 && 'Faible'}
+                    {passwordStrength === 3 && 'Moyen'}
+                    {passwordStrength >= 4 && 'Fort'}
+                  </div>
+                </div>
+              )}
+            </Field>
+
+            <Field>
+              <FieldLabel>Confirmer le mot de passe</FieldLabel>
+              <Input
+                isPassword
+                {...register('confirm')}
+                aria-invalid={!!errors.confirm}
+              />
+
+              <FieldError>{errors.confirm?.message}</FieldError>
+            </Field>
+            <SubmitButton
+              className="w-full font-poppins"
+              isSubmitting={isSubmitting}
+            >
+              {isSubmitting
+                ? 'Réinitialisation en cours...'
+                : 'Réinitialiser le mot de passe'}
+            </SubmitButton>
+          </form>
+
+          <div className="mt-6 text-center">
+            <Link
+              href="/auth/login"
+              className="text-primary hover:underline text-sm"
+            >
+              ← Retour à la connexion
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </Container>
+  );
 };
 
 export const HandleFallBack = ({

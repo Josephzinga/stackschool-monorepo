@@ -1,5 +1,4 @@
-import { prisma } from './index';
-
+import { prisma } from './index.ts';
 async function main() {
   /*await prisma.permission.createMany({
     data: [
@@ -21,29 +20,10 @@ async function main() {
     ],
     skipDuplicates: true,
   }); */
-  const admin = 'msmdmsmoeoemfdmfdds';
-  const teachers = await prisma.teacher.findMany({
-    where: {
-      schoolUser: {
-        schoolId: 'cmpskwfd80000q6s80sh8uznl',
-      },
-      include: {
-        schoolUser: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  console.log('Teachers', teachers);
+  const userId = 'cmr3wpp440000xuj70vtlo1mm';
+  const schoolId = 'cmr6ptszc000096j7m7xz9zbd';
+  const schools = await prisma.session.deleteMany();
 }
-
 main()
   .catch((e) => {
     console.error(e);

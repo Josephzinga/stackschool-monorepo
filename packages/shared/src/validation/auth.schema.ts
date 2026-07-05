@@ -90,7 +90,7 @@ export const registerFormSchema = z
       .optional()
       .or(z.literal('')),
 
-    confirm: z.string(),
+    confirm: z.string('La confirmation du mot de passe est requis.'),
   })
   .superRefine((data, ctx) => {
     // Vérifie la correspondance des mots de passe
@@ -166,7 +166,7 @@ export const resetPasswordSchema = z
         /[^a-zA-Z0-9]/,
         'Le mot de passe doit contenir au moins un caractère spécial.',
       ),
-    confirm: z.string(),
+    confirm: registerFormSchema.shape.confirm,
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirm) {

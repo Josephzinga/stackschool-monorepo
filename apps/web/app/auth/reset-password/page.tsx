@@ -1,59 +1,59 @@
 'use client';
 
 import { Container } from '@/components/Container';
+import { Card, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { resetPasswordSchema, ResetPasswordType } from '@stackschool/shared';
-import { zodResolver } from '@hookform/resolvers/zod';
+  ResetPasswordType,
+  authServices,
+  parseAxiosError,
+} from '@stackschool/shared';
 import { CheckCircle2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Suspense, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { SubmitButton } from '@/components/submit-button';
-import { HandleFallBack } from '@/app/auth/reset-password/reset-password-view';
-import { onSubmit } from './reset-password-view';
+import { useState } from 'react';
+import { ResetPasswordForm } from './reset-password-view';
+import { useQueryStates, useQueryState, parseAsString } from 'nuqs';
 
-export default function ResetPasswordPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ token?: string; method?: string }>;
-}) {
+export default function ResetPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [token, setToken] = useQueryState('token');
   const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<Omit<ResetPasswordType, 'token'>>({
-    resolver: zodResolver(resetPasswordSchema),
-    mode: 'onChange',
-  });
+  const onSubmit = async (data: ResetPasswordType) => {
+    if (!token) {
+      toast.error('Token de réinitialisation manquant');
+      return;
+    }
 
-  const passwordValue = watch('password');
+    try {
+      const res = await authServices.resetPassword(
+        token,
+        data.password,
+        data.confirm,
+      );
 
-  // Vérification de la force du mot de passe
-  const getPasswordStrength = (password: string) => {
-    if (!password) return 0;
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
-    return strength;
+      if (res.ok) {
+        toast.success(
+          res.data?.message || 'Mot de passe réinitialisé avec succès',
+        );
+        // Redirection après 3 secondes
+        setTimeout(() => {
+          router.push('/auth/login');
+        }, 3000);
+      }
+    } catch (error: any) {
+      const { message } = parseAxiosError(error);
+      toast.error(message || 'Erreur lors de la réinitialisation');
+
+      // Si le token est invalide, rediriger vers forgot-password
+      if (error.response?.status === 400) {
+        setTimeout(() => {
+          router.push('/auth/forgot-password');
+        }, 2000);
+      }
+    }
   };
-
-  const passwordStrength = getPasswordStrength(passwordValue);
 
   if (isSuccess) {
     return (
@@ -71,98 +71,6 @@ export default function ResetPasswordPage({
       </Container>
     );
   }
-  if (!isSuccess) {
-    return (
-      <Suspense fallback={''}>
-        <HandleFallBack searchParams={searchParams} />
-      </Suspense>
-    );
-  }
-  return (
-    <Container>
-      <Card className="max-w-md mx-auto w-100! font-poppins">
-        <CardHeader>
-          <CardTitle className="text-center">Nouveau mot de passe</CardTitle>
-          <CardDescription className="text-center">
-            Choisissez un nouveau mot de passe sécurisé
-          </CardDescription>
-        </CardHeader>
 
-        <CardContent>
-          <form
-            onSubmit={handleSubmit((data) => onSubmit?.(data, setIsSuccess))}
-            className="space-y-4"
-          >
-            {/* Champ mot de passe */}
-            <Field>
-              <FieldLabel>Nouveau mot de passe</FieldLabel>
-              <Input
-                icon={Lock}
-                isPassword
-                {...register('password')}
-                placeholder="********"
-                aria-invalid={!!errors.password}
-              />
-
-              <FieldError>{errors.password?.message}</FieldError>
-              {/* Indicateur de force du mot de passe */}
-              {passwordValue && (
-                <div className="mt-2 space-y-2">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((level) => (
-                      <div
-                        key={level}
-                        className={`h-1 flex-1 rounded ${
-                          level <= passwordStrength
-                            ? level <= 2
-                              ? 'bg-red-500'
-                              : level <= 3
-                                ? 'bg-yellow-500'
-                                : 'bg-green-500'
-                            : 'bg-gray-200'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    {passwordStrength <= 2 && 'Faible'}
-                    {passwordStrength === 3 && 'Moyen'}
-                    {passwordStrength >= 4 && 'Fort'}
-                  </div>
-                </div>
-              )}
-            </Field>
-
-            <Field>
-              <FieldLabel>Confirmer le mot de passe</FieldLabel>
-              <Input
-                isPassword
-                {...register('confirm')}
-                aria-invalid={!!errors.confirm}
-              />
-
-              <FieldError>{errors.confirm?.message}</FieldError>
-            </Field>
-            <SubmitButton
-              className="w-full font-poppins"
-              isSubmitting={isSubmitting}
-            >
-              {isSubmitting
-                ? 'Réinitialisation en cours...'
-                : 'Réinitialiser le mot de passe'}
-            </SubmitButton>
-          </form>
-
-          <div className="mt-6 text-center">
-            <Link
-              href="/auth/login"
-              className="text-primary hover:underline text-sm"
-            >
-              ← Retour à la connexion
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </Container>
-  );
+  return <ResetPasswordForm onSubmit={onSubmit} />;
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiErrorPayload } from '../types/api-response.type';
+import { ApiErrorPayload } from '../types/api-response.type.js';
 
 const URL = process.env.NEXT_PUBLIC_API_URL! || 'http://api/4000';
 

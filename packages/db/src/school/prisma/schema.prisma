@@ -1,0 +1,211 @@
+
+model School {
+  id                 String              @id @default(cuid())
+  name               String
+  slug               String?             @unique
+  address            String
+  code               String?             @unique
+  planId             String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  deletedAt          DateTime?
+  inviationCode      String?
+  logo               String?
+  motto              String?
+  assessments        Assessment[]
+  orangeMerchantId   String?
+  paymentApiKey      String?
+  walletBalance      Float               @default(0)
+  attendances        Attendance[]
+  attendanceSessions AttendanceSession[]
+  classes            Class[]
+  lessons            Lesson[]
+  room               Room[]
+  payment            Payment[]
+  memberships        SchoolUser[]
+  students           Student[]
+  Subject            Subject[]
+  subscriptions      Subscription[]
+  settings           SchoolSettings?
+}
+
+// Paramétre de l'ecole
+
+model SchoolSettings {
+  id String @id @default(cuid())
+
+  schoolId       String @unique
+  lessonDuration DateTime  @db.Time()  // durée d'une lesson (5O min)
+  startHour      DateTime  @db.Time() // début de cours (8 heure)
+  endHour        DateTime  @db.Time() // fin de cours (18 heure)
+  daysOfWeek     Day[]
+  breakStartHour Int    @db.Time() // 12 heure (heure de pause)
+  breakDuration  Int    @db.Time() // 60 duration de la pause (60 min)
+  school         School @relation(fields: [schoolId], references: [id])
+}
+
+// table de permission 
+model Permission {
+  id          String           @id @default(cuid())
+  code        PermissionCode   @unique // L'identifiant strict, ex: "MARK_STUDENT_ATTENDANCE"
+  name        String // Nom lisible, ex: "Faire l'appel des élèves"
+  module      PermissionModule // Pour grouper dans l'UI, ex: "ATTENDANCE", "FINANCE", "GRADES"
+  description String? // Explication détaillée pour l'admin
+
+  // Relation inverse : Une permission appartient à plusieurs utilisateurs
+  schoolUserPermissions SchoolUserPermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SchoolUserPermission {
+  id           String @id @default(cuid())
+  schoolUserId String
+  permissionId String
+
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolUserId, permissionId])
+}
+
+/// *
+/// * pivot User <-> School
+model SchoolUser {
+  id                 String                 @id @default(cuid())
+  schoolId           String
+  userId             String
+  isActive           Boolean                @default(true)
+  role               SchoolRole
+  isOwner            Boolean                @default(false)
+  createdAt          DateTime               @default(now())
+  Parent             Parent?
+  school             School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  staff              Staff?
+  student            Student?
+  teacher            Teacher?
+  attendance         Attendance[]
+  attendanceSessions AttendanceSession[]
+  permissions        SchoolUserPermission[]
+
+  @@unique([schoolId, userId])
+  @@index([schoolId])
+  @@index([userId])
+  @@index([role])
+}
+
+/// *
+/// * Etudiant
+model Student {
+  id             String    @id @default(cuid())
+  profileId      String    @unique
+  matricule      String
+  enrollmentYear String
+  enrollmentDate DateTime?
+  studentNumber  Int       @default(autoincrement())
+  bloodGroup             String?
+  allergies              String?
+  medicalCondition       String?
+  schoolUserId           String                      @unique
+  birthDate              DateTime                    @db.Date()
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+  deletedAt              DateTime?
+  birthPlace             String?
+  nationality            String?
+  previousClass          String?
+  previousLevel          String?
+  birthCertificateNumber String?
+  previousSchool         String?
+  schoolId               String
+  classId                String
+  transportMode          TransportMode               @default(WALK)
+  status                 StudentStatus               @default(ACTIVE)
+  results                AssessmentResult[]
+  parentStudent          ParentStudent[]
+  payments               Payment[]
+  schoolClass            Class                       @relation(fields: [classId], references: [id])
+  profile                Profile                     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  school                 School                      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser             SchoolUser                  @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  disciplinaryActions    StudentDisciplinaryAction[]
+
+  @@unique([matricule, schoolId])
+  @@index([schoolUserId])
+  @@index([schoolId])
+}
+
+model Class {
+  id            String    @id @default(cuid())
+  name          String
+  level         String
+  section       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  schoolId      String
+  teacherId     String?
+  defaultRoomId String?
+  supervisorId  String?
+  groupId       String
+  group         Group     @relation(fields: [groupId], references: [id])
+  school        School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  supervisor    Teacher?  @relation("ClassSupervisor", fields: [supervisorId], references: [id])
+  students      Student[]
+  defaultRoom   Room?     @relation("DefaultRoom", fields: [defaultRoomId], references: [id], onDelete: SetNull)
+
+  @@unique([name, schoolId])
+  @@unique([defaultRoomId])
+  @@index([schoolId])
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum SchoolRole {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+  STAFF
+}
+
+enum PermissionModule {
+  ATTENDANCE // Gestion des présences
+  ACADEMICS // Notes, bulletins, classes, matières
+  USERS // Gestion des profs, élèves, parents, staff
+  FINANCE // Frais de scolarité, paiements, salaires
+  SETTINGS // Configuration de l'école
+}
+
+enum PermissionCode {
+  // --- MODULE: ATTENDANCE ---
+  MARK_STUDENT_ATTENDANCE
+  MARK_TEACHER_ATTENDANCE
+  MARK_STAFF_ATTENDANCE
+  VIEW_ATTENDANCE_REPORTS
+
+  // --- MODULE: ACADEMICS ---
+  MANAGE_CLASSES
+  MANAGE_SUBJECTS
+  INPUT_GRADES
+  PUBLISH_BULLETINS
+
+  // --- MODULE: USERS ---
+  CREATE_USER
+  UPDATE_USER
+  DELETE_USER
+  MANAGE_USER_PERMISSIONS // Permet à un admin secondaire de modifier les accès
+
+  // --- MODULE: FINANCE ---
+  MANAGE_PAYMENTS
+  VIEW_FINANCIAL_REPORTS
+}

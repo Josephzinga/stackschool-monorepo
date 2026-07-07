@@ -5,7 +5,7 @@ import {
   Gender,
   PaymentStatus,
   PaymentType,
-} from '@prisma/client';
+} from './generated/client/index.ts';
 import {
   addMinutes,
   getHours,

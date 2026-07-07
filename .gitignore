@@ -12,6 +12,7 @@ n
 *.d.ts.map
 !/types/**/*
 stackschool-monorepo.key
+infra/api-nest
 
 
 

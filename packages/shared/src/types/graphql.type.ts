@@ -1,4 +1,4 @@
-import { Class, Subject } from '../../src/index.js';
+import { Class, Subject } from '../../src/index.ts';
 
 export interface Context {
   user?: any;

@@ -1,0 +1,35 @@
+POST  http://localhost:4000/graphql HTTP/1.1
+X-Request-Type: GraphQL
+User-Agent: rest-client
+Accept-Language: en-GB,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+Content-Type: application/json; charset=utf-8
+Access-Control-Allow-Credentials: true
+Set-Cookie: refresh_token=e5adb3d869c0a3f7baa6e03bf43882e5; Max-Age=2159999; Path=/; Expires=Thu, 30 Jul 2026 21:55:55 GMT; HttpOnly; SameSite=Lax,sid=s%3AxbN6lZyn77ZKupyE-mdi47yleQatZ6XY.9O0W9zc%2F1zVnbpt%2FWmXLcz8DKa2339Q5HOpPG4MT8YE; Path=/; Expires=Sun, 05 Jul 2026 22:55:55 GMT; HttpOnly; SameSite=Lax
+
+ query GetMe {
+    me {
+        id
+        username
+        email
+        profileCompleted
+        hasMembership
+        profile {
+            lastname
+            photo 
+            gender
+        }
+        accounts {
+            id
+            provider
+            userId
+        }
+    }
+}
+
+
+
+
+  

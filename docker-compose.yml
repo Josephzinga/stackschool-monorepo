@@ -10,12 +10,103 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - stackschool-net
+
+  auth_db:
+    image: postgres:17
+    container_name: stackschool-auth
+    environment:
+      POSTGRES_USER: ${POSTGRES_AUTH_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_AUTH_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_AUTH_DB}
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    ports:
+      - '5434:5432'
+    networks:
+      - stackschool-net
+
+  core_db:
+    image: postgres:17
+    container_name: stackschool-core
+    environment:
+      POSTGRES_USER: ${POSTGRES_CORE_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_CORE_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_CORE_DB}
+    volumes:
+      - core_data:/var/lib/postgresql/data
+    ports:
+      - '5435:5432'
+    networks:
+      - stackschool-net
+
+  operations_db:
+    image: postgres:17
+    container_name: stackschool-operations
+    environment:
+      POSTGRES_USER: ${POSTGRES_OPERATIONS_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_OPERATIONS_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_OPERATIONS_DB}
+    volumes:
+      - operations_data:/var/lib/postgresql/data
+    ports:
+      - '5436:5432'
+    networks:
+      - stackschool-net
+
+  academic_db:
+    image: postgres:17
+    container_name: stackschool-academic
+    environment:
+      POSTGRES_USER: ${POSTGRES_ACADEMIC_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_ACADEMIC_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_ACADEMIC_DB}
+    volumes:
+      - academic_data:/var/lib/postgresql/data
+    ports:
+      - '5437:5432'
+    networks:
+      - stackschool-net
 
   redis:
     image: redis:7
     container_name: stackschool-redis
+    volumes:
+      - redis_data:/data
     ports:
       - '6379:6379'
+    networks:
+      - stackschool-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: stackschool-rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'check_port_connectivity']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5672:5672' # AMQP
+      - '15672:15672' # UI management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - stackschool-net
 
 volumes:
   db_data:
+  auth_data:
+  core_data:
+  operations_data:
+  academic_data:
+  redis_data:
+  rabbitmq_data:
+
+networks:
+  stackschool-net:
+    driver: bridge

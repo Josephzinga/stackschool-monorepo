@@ -35,6 +35,12 @@ type SchoolMembership {
   staff: Staff
 }
 
+type Account {
+  id: ID!
+  provider: String
+  userId: ID
+}
+
 type User {
   id: ID!
   email: String
@@ -44,9 +50,8 @@ type User {
   hasMembership: Boolean
   profile: Profile
   isActive: Boolean
-  # Liste de toutes les écoles
   memberships: [SchoolMembership]
+  accounts: [Account]
 
-  # Contexte spécifique à une école
   schoolContext(schoolId: SchoolId): SchoolMembership
 }

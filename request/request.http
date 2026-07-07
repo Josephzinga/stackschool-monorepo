@@ -1,0 +1,18 @@
+POST  http://localhost:4000/api/auth/login HTTP/1.1
+User-Agent: rest-client
+Accept-Language: en-GB,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+Content-Type: application/json; charset=utf-8
+Access-Control-Allow-Credentials: true
+
+{
+  "identifier": "futizingajoseph@gmail.com",
+  "password": "JJJJ.8888"
+}
+
+
+
+
+  

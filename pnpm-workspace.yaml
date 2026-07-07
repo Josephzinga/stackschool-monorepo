@@ -1,8 +1,12 @@
 packages:
   - 'packages/*'
   - 'apps/api'
-  - 'apps/api-nest'
+  - 'apps/gateway'
   - 'apps/web'
+  - 'apps/service-auth'
+  - 'apps/service-core'
+  - 'apps/service-operations'
+  - 'apps/service-academic'
 
 allowBuilds:
   '@apollo/protobufjs': true
@@ -25,6 +29,9 @@ catalog:
   react-dom: '^19.2.3'
   '@types/react': '^19.2.3'
   '@types/react-dom': '^19.2.3'
+  '@prisma/client': '7.8.0'
+  'prisma': '7.8.0'
+  '@prisma/adapter-pg': '7.8.0'
 
 overrides:
   react: 'catalog:'
@@ -32,5 +39,8 @@ overrides:
   '@types/react': 'catalog:'
   '@types/react-dom': 'catalog:'
   lightningcss: 1.30.1
+  '@prisma/client': 'catalog:'
+  prisma: 'catalog:'
+  '@prisma/adapter-pg': 'catalog:'
 
 nodeLinker: hoisted

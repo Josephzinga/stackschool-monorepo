@@ -7,17 +7,15 @@
   "scripts": {
     "migrate": "prisma migrate dev",
     "seed": "ts-node-dev src/prisma/seed.ts",
-    "build": "tsup src/index.ts --format esm  && tsc --emitDeclarationOnly --declaration --outDir dist",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "build:bun": "bun build --target=node --outfile=dist/index.ts ./src/index.ts"
+    "build": "tsup src/index.ts --format esm  && tsc --emitDeclarationOnly --declaration --outDir dist"
   },
   "devDependencies": {
-    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/adapter-pg": "catalog:",
     "@prisma/extension-accelerate": "^2.0.2",
-    "prisma": "^7.6.0",
+    "prisma": "catalog:",
     "tsup": "^8.5.1"
   },
   "dependencies": {
-    "@prisma/client": "^7.6.0"
+    "@prisma/client": "catalog:"
   }
 }

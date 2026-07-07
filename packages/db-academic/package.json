@@ -1,0 +1,21 @@
+{
+  "name": "@stackschool/db-academic",
+  "version": "1.0.0",
+  "main": "./dist/index.ts",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "migrate": "prisma migrate dev",
+    "seed": "ts-node-dev src/prisma/seed.ts",
+    "build": "tsup src/index.ts --format esm  && tsc --emitDeclarationOnly --declaration --outDir dist"
+  },
+  "devDependencies": {
+    "@prisma/adapter-pg": "catalog:",
+    "@prisma/extension-accelerate": "^2.0.2",
+    "prisma": "catalog:",
+    "tsup": "^8.5.1"
+  },
+  "dependencies": {
+    "@prisma/client": "catalog:"
+  }
+}

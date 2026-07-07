@@ -1,5 +1,6 @@
 export { RedisService } from './services/redis/redisService.ts';
-
+export * from './messaging/auth.schema.ts';
+export * from './messaging/patterns.ts';
 export { authServices } from './services/auth/authServices.ts';
 export * from './lib/api.js';
 export { z, ZodError } from 'zod';
@@ -20,3 +21,5 @@ export * from './lib/check-lesson-conflict.ts';
 export * from './validation/parent.schema.ts';
 export * from './validation/attendance.schema.ts';
 export * from './utils/permissions.ts';
+
+export * from './errors/rcp.error.ts';

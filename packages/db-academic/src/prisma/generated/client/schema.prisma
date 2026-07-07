@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Subject {
+  id            String          @id @default(cuid())
+  name          String
+  code          String?
+  category      SubjectCategory @default(GENERAL)
+  mainTeacherId String?
+  schoolId      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  classSubjects ClassSubjects[]
+
+  @@unique([name, schoolId])
+  @@unique([code, schoolId])
+  @@index([schoolId])
+}
+
+/// *
+/// * Pivot explicit pour Class <-> Subject
+model ClassSubjects {
+  id          String             @id @default(cuid())
+  groupId     String
+  schoolId    String
+  weeklyHours Int?
+  coefficient Int                @default(1)
+  subjectId   String
+  assessments Assessment[]
+  group       Group              @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  subject     Subject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  assignments TeacherAssignment?
+
+  @@unique([groupId, subjectId])
+  @@index([groupId])
+  @@index([subjectId])
+}
+
+model TeacherAssignment {
+  id             String @id @default(cuid())
+  teacherId      String
+  classSubjectId String
+  schoolId       String
+
+  classSubject ClassSubjects @relation(fields: [classSubjectId], references: [id], onDelete: Cascade)
+
+  lessons Lesson[]
+
+  @@unique([schoolId, classSubjectId, teacherId])
+  @@unique([classSubjectId])
+  @@unique([schoolId, classSubjectId])
+  @@index([schoolId])
+}
+
+model Class {
+  id            String   @id @default(cuid())
+  name          String
+  level         String
+  section       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  schoolId      String
+  teacherId     String?
+  defaultRoomId String?
+  supervisorId  String?
+  groupId       String
+  group         Group    @relation(fields: [groupId], references: [id])
+  defaultRoom   Room?    @relation("DefaultRoom", fields: [defaultRoomId], references: [id], onDelete: SetNull)
+
+  @@unique([name, schoolId])
+  @@unique([defaultRoomId])
+  @@index([schoolId])
+}
+
+model Group {
+  id            String          @id @default(cuid())
+  name          String
+  type          GroupType       @default(SOLO)
+  classes       Class[]
+  classSubjects ClassSubjects[]
+  schoolId      String
+
+  @@unique([name, schoolId])
+  @@index([schoolId])
+}
+
+// * Salle
+model Room {
+  id              String   @id @default(cuid())
+  name            String
+  code            String?
+  type            String?  @default("CLASSIC")
+  capacity        Int?
+  defaultForClass Class?   @relation("DefaultRoom")
+  lessons         Lesson[]
+  schoolId        String
+
+  @@unique([name, schoolId])
+  @@unique([code, schoolId])
+  @@index([schoolId])
+}
+
+model Lesson {
+  id                  String            @id @default(cuid())
+  title               String?
+  subtitle            String?
+  startTime           DateTime          @db.Time()
+  status              LessonStatus      @default(PLANNED)
+  day                 Day
+  date                DateTime          @db.Date()
+  endTime             DateTime          @db.Time()
+  schoolId            String
+  roomId              String?
+  teacherAssignmentId String
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime?         @updatedAt
+  deletedAt           DateTime?
+  courseSessions      CourseSession[]
+  room                Room?             @relation(fields: [roomId], references: [id], onDelete: NoAction)
+  assignments         TeacherAssignment @relation(fields: [teacherAssignmentId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, teacherAssignmentId, roomId])
+  @@unique([schoolId, day, endTime, startTime, teacherAssignmentId])
+  @@index([schoolId])
+}
+
+model CourseSession {
+  id       String @id @default(cuid())
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+
+  chapter String // Ex: "Algèbre"
+  title   String // Ex: "Les équations du second degré"
+
+  date      DateTime  @default(now())
+  startTime DateTime  @default(now()) @db.Time()
+  endTime   DateTime? @db.Time()
+
+  status SessionStatus @default(STARTED) // STARTED, FINISHED
+}
+
+model Assessment {
+  id             String             @id @default(cuid())
+  title          String
+  type           AssessmentType
+  description    String?
+  status         AssessmentStatus   @default(DRAFT)
+  weight         Float?
+  maxScore       Float
+  teacherId      String
+  classSubjectId String
+  schoolId       String
+  startDate      DateTime?
+  endDate        DateTime?          @db.Date()
+  dueDate        DateTime?          @db.Date()
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  classSubject   ClassSubjects      @relation(fields: [classSubjectId], references: [id])
+  results        AssessmentResult[]
+
+  @@unique([title, classSubjectId, startDate])
+  @@index([teacherId])
+}
+
+model AssessmentResult {
+  id           String     @id @default(cuid())
+  assessmentId String
+  studentId    String
+  score        Float?
+  grade        String?
+  feedback     String?
+  status       String?
+  submittedAt  DateTime?
+  gradedAt     DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, studentId])
+  @@index([studentId])
+  @@index([assessmentId])
+}
+
+enum AssessmentType {
+  EXAM
+  ASSIGNMENT
+  QUIZ
+  TEST
+  PRACTICAL
+  ORAL
+}
+
+enum AssessmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum SubjectCategory {
+  SCIENTIFIC
+  LITERARY
+  GENERAL
+  SPORT
+}
+
+enum LessonStatus {
+  PLANNED // Prévue mais pas encore commencée
+  ONGOING // En cours (optionnel mais utile)
+  COMPLETED // Terminée (cours effectivement donné)
+  CANCELLED // Annulée (ne comptera pas)
+  POSTPONED // Reportée à une autre date
+}
+
+enum GroupType {
+  SOLO
+  MULTIPLE
+}
+
+enum SessionStatus {
+  FINISHED
+  STARTED
+}

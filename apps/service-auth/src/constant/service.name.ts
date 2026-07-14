@@ -1,0 +1,1 @@
+export const OPERATIONS_SERVICE = 'OPERATIONS_SERVICE' as const;

@@ -9,7 +9,7 @@ type Query {
   ): [ClassSubject!]
   getAssignments(filter: GetAssignmentInput!): [TeacherAssignments!]
   me: User
-  school(schoolId: ID!): School!
+
   verifyInvitationCode(code: InvitationCodeInput!): User
   getLessons(filter: GetLessonsInput!): LessonsList
 

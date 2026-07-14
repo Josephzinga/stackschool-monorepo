@@ -1,0 +1,15 @@
+type Class {
+  id: ID!
+  name: String!
+  level: String!
+  section: String
+  students: [Student!]
+  defaultRoom: Room
+  groupId: ID!
+  group: Group
+  teachingTeamMembers: [TeachingTeamMember!]
+  supervisor: Teacher
+  _count: ClassCount
+  totalCoefficient: Int
+  totalWeeklyHours: Float
+}

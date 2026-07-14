@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Prisma } from '@stackschool/db-auth';
 import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '../../prisma/db/generated/client';
+import { UserWithRelationsContract } from '@stackschool/messaging';
 
 @Injectable()
 export class UserService {
@@ -23,12 +24,94 @@ export class UserService {
     try {
       const users = await this.prisma.user.findMany();
       return users;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        error,
-        'Erreur lors de requête de users',
-      );
+    } catch (error) {}
+  }
+
+  async validateField({
+    phoneNumber,
+    email,
+    selfCheck = false,
+    user,
+  }: {
+    phoneNumber: string | null;
+    email: string | null;
+    selfCheck: boolean;
+    user: UserWithRelationsContract;
+  }) {
+    // check email uniqueness
+    if (selfCheck ? email && user?.email !== email : email) {
+      const existingUser = await this.findUnique({
+        where: { email: email ?? undefined },
+      });
+
+      if (existingUser) {
+        return {
+          ok: true,
+          valid: false,
+          field: 'email',
+          message: 'Cette valeur est déjà utilisée.',
+        };
+      }
     }
+
+    if (
+      selfCheck
+        ? phoneNumber &&
+          user?.phoneNumber?.replace(/\s+/g, '') !==
+            phoneNumber?.replace(/\s+/g, '')
+        : phoneNumber
+    ) {
+      const existingUser = await this.prisma.user.findUnique({
+        where: {
+          phoneNumber: phoneNumber?.replace(/\s+/g, ''),
+        },
+      });
+
+      if (existingUser) {
+        return {
+          ok: true,
+          valid: false,
+          field: 'phone',
+          message: 'Cette valeur est déjà utilisée.',
+        };
+      }
+    }
+
+    // everything ok
+    return {
+      ok: true,
+      valid: true,
+    };
+  }
+
+  async findByIdentifier(identifier: string) {
+    return await this.findOne({
+      where: {
+        isActive: true,
+        OR: [
+          { username: { equals: identifier.trim(), mode: 'insensitive' } },
+          { phoneNumber: { equals: identifier.trim(), mode: 'insensitive' } },
+          { email: { equals: identifier.trim(), mode: 'insensitive' } },
+        ],
+      },
+    });
+  }
+
+  async findByIdentifierWithRelations(identifier: string) {
+    return await this.findOne({
+      where: {
+        isActive: true,
+        OR: [
+          { username: { equals: identifier.trim(), mode: 'insensitive' } },
+          { phoneNumber: { equals: identifier.trim(), mode: 'insensitive' } },
+          { email: { equals: identifier.trim(), mode: 'insensitive' } },
+        ],
+      },
+      include: {
+        profile: true,
+        accounts: true,
+      },
+    });
   }
 
   async findOne<T extends Prisma.UserFindFirstArgs>(

@@ -1,4 +1,3 @@
-import { AttendanceStatus, SchoolRole } from '@stackschool/db';
 import { z } from 'zod';
 
 export enum AttendanceStatusEnum {

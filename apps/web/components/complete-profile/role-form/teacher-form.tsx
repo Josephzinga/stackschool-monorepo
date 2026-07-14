@@ -3,11 +3,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useMemo, useState } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
-import {
-  ClassWithSubjects,
-  TeacherFormDataType,
-  teacherSchema,
-} from '@stackschool/shared';
+import { TeacherFormDataType, teacherSchema } from '@stackschool/contracts';
 import {
   useCompleteProfileStore,
   useFieldArray,
@@ -42,9 +38,7 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
   const schoolId = school?.type === 'join' ? school.schoolSelected.id : null;
 
   // État pour la modale
-  const [selectedClass, setSelectedClass] = useState<ClassWithSubjects | null>(
-    null,
-  );
+  const [selectedClass, setSelectedClass] = useState<any | null>(null);
   const [tempIsMain, setTempIsMain] = useState(false);
   const [tempSubjects, setTempSubjects] = useState<string[]>([]);
 
@@ -80,7 +74,7 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
     name: 'assignments',
   });
 
-  const openConfiguration = (cls: ClassWithSubjects) => {
+  const openConfiguration = (cls: any) => {
     setSelectedClass(cls);
     setTempIsMain(false);
     setTempSubjects([]);

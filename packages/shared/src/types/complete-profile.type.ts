@@ -1,4 +1,3 @@
-import type { Account, Gender, Profile, School, User } from '@stackschool/db';
 import {
   CreateSchoolType,
   ParentFormDataType,
@@ -11,10 +10,13 @@ type CreateSchoolPayload = {
   type: 'create';
   newSchool: CreateSchoolType;
 };
-export type SchoolSelected = Pick<
-  School,
-  'name' | 'id' | 'code' | 'address' | 'logo'
->;
+export type SchoolSelected = {
+  id: string;
+  name: string;
+  code: string;
+  address: string;
+  logo: string;
+};
 type JoinSchoolPayload = {
   type: 'join';
   schoolSelected: SchoolSelected;
@@ -25,10 +27,16 @@ type InviteSchoolPayload = {
   schoolId: string;
 };
 export type SchoolData =
-  CreateSchoolPayload | JoinSchoolPayload | InviteSchoolPayload;
+  | CreateSchoolPayload
+  | JoinSchoolPayload
+  | InviteSchoolPayload;
 
 export type RoleData =
-  StudentData | ParentData | TeacherData | StaffData | AdminData;
+  | StudentData
+  | ParentData
+  | TeacherData
+  | StaffData
+  | AdminData;
 
 type StudentData = {
   role: 'STUDENT';
@@ -58,18 +66,13 @@ type AdminData = {
 export interface ProfileData {
   firstname: string;
   lastname: string;
-  gender: Gender;
+  gender: 'MALE' | 'FEMALE';
   address: string | undefined;
   photo?: string | undefined;
   email?: string | undefined;
   phoneNumber?: string | undefined;
 }
 
-export interface UserInMe extends User {
-  password: string | null;
-  profile?: Profile | null;
-  accounts?: Account[];
-}
 export interface SchoolClass {
   id: string;
   name: string;

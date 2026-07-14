@@ -1,0 +1,396 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "./generated"
+  engineType          = "client"
+  runtime             = "nodejs"
+  moduleFormat        = "cjs"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model School {
+  id               String          @id @default(uuid())
+  name             String
+  slug             String?         @unique
+  address          String
+  code             String?         @unique
+  planId           String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?
+  invitationCode   String?
+  logo             String?
+  motto            String?
+  orangeMerchantId String?
+  paymentApiKey    String?
+  walletBalance    Float           @default(0)
+  memberships      SchoolUser[]
+  students         Student[]
+  subscriptions    Subscription[]
+  profiles         SchoolProfile[]
+  settings         SchoolSettings?
+}
+
+/// *
+/// * pivot User <-> School
+model SchoolUser {
+  id          String                 @id @default(uuid())
+  schoolId    String
+  userId      String
+  isActive    Boolean                @default(true)
+  role        SchoolRole
+  isOwner     Boolean                @default(false)
+  createdAt   DateTime               @default(now())
+  Parent      Parent?
+  school      School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  staff       Staff?
+  student     Student?
+  teacher     Teacher?
+  permissions SchoolUserPermission[]
+  schoolProfile  SchoolProfile?
+
+  @@unique([schoolId, userId])
+  @@index([schoolId])
+  @@index([userId])
+  @@index([role])
+}
+
+model SchoolProfile {
+  id         String @id  @default(cuid())
+  firstName   String
+  lastName String
+  address  String
+  avatarUrl  String?
+  bio  String?
+  schoolUserId  String    @unique
+  schoolId  String
+
+  
+  schoolUser  SchoolUser  @relation(fields: [schoolUserId], references: [id])
+  school   School @relation(fields: [schoolId] , references: [id])
+
+}
+
+// Paramétre de l'ecole
+model SchoolSettings {
+  id String @id @default(cuid())
+
+  schoolId       String @unique
+  lessonDuration Int    @default(50) // durée d'une lesson (5O min)
+  startHour      Int    @default(8) // début de cours (8 heure)
+  endHour        Int    @default(18) // fin de cours (18 heure)
+  daysOfWeek     Day[]
+  breakStartHour Int    @default(12) // 12 heure (heure de pause)
+  breakDuration  Int    @default(60) // 60 duration de la pause (60 min)
+  school         School @relation(fields: [schoolId], references: [id])
+}
+
+// table de permission 
+model Permission {
+  id          String           @id @default(cuid())
+  code        PermissionCode   @unique // L'identifiant strict, ex: "MARK_STUDENT_ATTENDANCE"
+  name        String // Nom lisible, ex: "Faire l'appel des élèves"
+  module      PermissionModule // Pour grouper dans l'UI, ex: "ATTENDANCE", "FINANCE", "GRADES"
+  description String? // Explication détaillée pour l'admin
+
+  // Relation inverse : Une permission appartient à plusieurs utilisateurs
+  schoolUserPermissions SchoolUserPermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SchoolUserPermission {
+  id           String @id @default(cuid())
+  schoolUserId String
+  permissionId String
+
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolUserId, permissionId])
+}
+
+
+
+model StudentDisciplinaryAction {
+  id        String           @id @default(cuid())
+  studentId String
+  type      DisciplinaryType
+  reason    String
+  startDate DateTime         @db.Date()
+  endDate   DateTime?        @db.Date()
+  createdAt DateTime         @default(now())
+  student   Student          @relation(fields: [studentId], references: [id])
+}
+
+/// * Parent
+model Parent {
+  id                String             @id @default(cuid())
+  schoolUserId      String             @unique
+  profession        String?
+  isDelegate        Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  contactPreference ContactPreference? @default(WHATSAPP)
+  schoolUser        SchoolUser         @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  students          ParentStudent[]
+}
+
+/// *
+/// * Etudiant
+model Student {
+  id                     String                      @id @default(cuid())
+  profileId              String                      @unique
+  matricule              String
+  enrollmentYear         String
+  enrollmentDate         DateTime?
+  studentNumber          Int                         @default(autoincrement())
+  bloodGroup             String?
+  allergies              String?
+  medicalCondition       String?
+  schoolUserId           String                      @unique
+  birthDate              DateTime                    @db.Date()
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+  deletedAt              DateTime?
+  birthPlace             String?
+  nationality            String?
+  previousClass          String?
+  previousLevel          String?
+  birthCertificateNumber String?
+  previousSchool         String?
+  schoolId               String
+  classId                String
+  transportMode          TransportMode               @default(WALK)
+  status                 StudentStatus               @default(ACTIVE)
+  parentStudent          ParentStudent[]
+  school                 School                      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser             SchoolUser                  @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  disciplinaryActions    StudentDisciplinaryAction[]
+
+  @@unique([matricule, schoolId])
+  @@index([schoolUserId])
+  @@index([schoolId])
+}
+
+/// *
+/// * Parent - Student pivot
+model ParentStudent {
+  id           String       @id @default(cuid())
+  studentId    String
+  createdAt    DateTime     @default(now())
+  parentId     String
+  relationType RelationType
+  parent       Parent       @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, studentId])
+}
+
+model Teacher {
+  id             String     @id @default(cuid())
+  schoolUserId   String     @unique
+  diploma        String?
+  experience     String?
+  hireDate       DateTime?
+  isActive       Boolean
+  salary         Float?
+  department     String?
+  specialization String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+  bio            String?
+  cvUrl          String?
+  schoolUser     SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+
+  @@map("Teachers")
+}
+
+model Staff {
+  id            String        @id @default(cuid())
+  schoolUserId  String        @unique
+  hireDate      DateTime?
+  position      StaffPosition @default(OTHER)
+  positionOther String?
+  salary        Float?
+  department    String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+
+  @@index([schoolUserId])
+  @@index([position])
+}
+
+model Invite {
+  id          String     @id @default(cuid())
+  email       String?
+  schoolId    String
+  studentId   String?
+  token       String?    @unique
+  relation    String?
+  createdAt   DateTime   @default(now())
+  expiresAt   DateTime
+  used        Boolean    @default(false)
+  role        SchoolRole
+  message     String
+  phoneNumber String?
+  code        String?    @unique
+
+  @@index([schoolId])
+  @@index([studentId])
+}
+
+model Subscription {
+  id          String    @id @default(cuid())
+  schoolId    String
+  planId      String
+  stripeSubId String?
+  status      String
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  createdAt   DateTime  @default(now())
+  plan        Plan      @relation(fields: [planId], references: [id])
+  school      School    @relation(fields: [schoolId], references: [id])
+
+  @@index([schoolId])
+}
+
+/// *
+/// * Billing
+model Plan {
+  id           String         @id @default(cuid())
+  name         String
+  stripeId     String?
+  priceCents   Int
+  features     String?
+  createdAt    DateTime       @default(now())
+  subscription Subscription[]
+}
+
+enum DisciplinaryType {
+  SUSPENSION
+  EXPULSION
+  WARNING
+}
+
+enum SchoolRole {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+  STAFF
+}
+
+enum GlobalRole {
+  SUPER_ADMIN
+  USER
+}
+
+enum RelationType {
+  FATHER
+  MOTHER
+  GUARDIAN
+  UNCLE
+  OTHER
+  GRAND_MOTHER
+  GRAND_FATHER
+  AUNT
+}
+
+enum ContactPreference {
+  WHATSAPP
+  EMAIL
+  PHONE
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum StudentStatus {
+  ACTIVE
+  SUSPENDED
+  EXPELLED
+  TRANSFERRED
+  DROPPED_OUT
+  GRADUATED
+  INACTIVE
+  DECEASED
+}
+
+enum TransportMode {
+  BUS
+  WALK
+  CAR
+  MOTO
+  TAXI
+  PARENT
+  OTHER
+}
+
+enum GroupType {
+  SOLO
+  MULTIPLE
+}
+
+enum SessionStatus {
+  FINISHED
+  STARTED
+}
+
+enum PermissionModule {
+  ATTENDANCE // Gestion des présences
+  ACADEMICS // Notes, bulletins, classes, matières
+  USERS // Gestion des profs, élèves, parents, staff
+  FINANCE // Frais de scolarité, paiements, salaires
+  SETTINGS // Configuration de l'école
+}
+
+enum PermissionCode {
+  // --- MODULE: ATTENDANCE ---
+  MARK_STUDENT_ATTENDANCE
+  MARK_TEACHER_ATTENDANCE
+  MARK_STAFF_ATTENDANCE
+  VIEW_ATTENDANCE_REPORTS
+
+  // --- MODULE: ACADEMICS ---
+  MANAGE_CLASSES
+  MANAGE_SUBJECTS
+  INPUT_GRADES
+  PUBLISH_BULLETINS
+
+  // --- MODULE: USERS ---
+  CREATE_USER
+  UPDATE_USER
+  DELETE_USER
+  MANAGE_USER_PERMISSIONS // Permet à un admin secondaire de modifier les accès
+
+  // --- MODULE: FINANCE ---
+  MANAGE_PAYMENTS
+  VIEW_FINANCIAL_REPORTS
+}
+
+enum StaffPosition {
+  SECRETARY
+  GUARDIAN
+  SUPERVISOR
+  ACCOUNTANT
+  LIBRARIAN
+  NURSE
+  CLEANER
+  MAINTENANCE
+  OTHER
+}

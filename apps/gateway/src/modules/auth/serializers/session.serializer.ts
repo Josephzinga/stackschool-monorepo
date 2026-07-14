@@ -1,39 +1,39 @@
 import { PassportSerializer } from '@nestjs/passport';
 import { Inject, Injectable } from '@nestjs/common';
-import type { Request } from 'express';
 import { DoneCallback } from 'passport';
+
 import { UserService } from '../../user/user.service';
-import { ClientProxy, ClientRMQ } from '@nestjs/microservices';
-import { catchError, firstValueFrom, throwError } from 'rxjs';
-import { AUTH_PATTERNS } from '@stackschool/shared';
-import { mapAuthError } from '../errors/auth.error-maper';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { UserWithRelationsContract } from '@stackschool/messaging';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
   constructor(
-    @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
+    private readonly userService: UserService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {
     super();
   }
 
-  serializeUser(user: any, done: DoneCallback) {
+  serializeUser(user: Record<string, any>, done: DoneCallback) {
     done(null, user.id);
   }
 
   async deserializeUser(payload: string, done: DoneCallback) {
     try {
-      const user = await firstValueFrom<Record<string, any>>(
-        this.authClient
-          .send(AUTH_PATTERNS.FIND_FULL_USER, payload)
-          .pipe(catchError((err) => throwError(() => mapAuthError(err)))),
-      );
-      if (!user) {
-        return done(null, false);
+      const userKey = `user-${payload}`;
+      const userStr = await this.cacheManager.get<string>(userKey);
+
+      const cachedUser = userStr
+        ? (JSON.parse(userStr) as UserWithRelationsContract)
+        : null;
+
+      if (!cachedUser) {
+        const user = await this.userService.findFullUser(payload);
+        await this.cacheManager.set(userKey, JSON.stringify(user));
+        return done(null, user);
       }
-      return done(null, {
-        ...user,
-        password: null,
-      });
+      return done(null, cachedUser);
     } catch (error) {
       return done(error);
     }

@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MembershipService } from './membership.service';
 import { MembershipResolver } from './membership.resolver';
-import { PrismaModule } from '../../prisma/prisma.module';
+import { SchoolModule } from '../school/school.module';
+import { SchoolService } from '../school/school.service';
 
 @Module({
-  imports: [PrismaModule],
-  providers: [MembershipResolver, MembershipService],
+  imports: [SchoolModule],
+  providers: [MembershipResolver, MembershipService, SchoolService],
 })
 export class MembershipModule {}

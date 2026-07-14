@@ -1,6 +1,5 @@
 packages:
   - 'packages/*'
-  - 'apps/api'
   - 'apps/gateway'
   - 'apps/web'
   - 'apps/service-auth'
@@ -43,4 +42,22 @@ overrides:
   prisma: 'catalog:'
   '@prisma/adapter-pg': 'catalog:'
 
-nodeLinker: hoisted
+publicHoistPattern:
+  - '*eslint*'
+  - '*babel*'
+  - '@swc/cli'
+  - '@swc/core'
+  - 'tsup'
+  - '*microservices*'
+  - '*tanstack*'
+  - '*zod*'
+  - '*dotenv*'
+  - '*typescript*'
+  - '*node*'
+  - '*nestjs*'
+  - '*react*'
+  - '*axios*'
+  - '*react-hook-form*'
+  - '*jest*'
+  - '*date-fns*'
+  - '*type*'

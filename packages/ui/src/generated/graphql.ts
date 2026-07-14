@@ -1,6 +1,6 @@
 import { AttendanceStatusEnum as AttendanceStatus } from '@stackschool/shared/src/validation/attendance.schema';
 import { useMutation, useQuery, useInfiniteQuery, UseMutationOptions, UseQueryOptions, UseInfiniteQueryOptions, InfiniteData } from '@tanstack/react-query';
-import { fetcher } from '../lib/graphql-fetcher';
+import { fetcher } from '../../../contracts/src/lib/graphql-fetcher';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -18,6 +18,13 @@ export type Scalars = {
   Date: { input: Date; output: Date; }
   DateTime: { input: Date; output: Date; }
   SchoolId: { input: string; output: string; }
+};
+
+export type Account = {
+  __typename?: 'Account';
+  id: Scalars['ID']['output'];
+  provider?: Maybe<Scalars['String']['output']>;
+  userId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type ApiResponse = {
@@ -57,7 +64,7 @@ export type AttendanceRecord = {
   checkInTime?: Maybe<Scalars['DateTime']['output']>;
   date?: Maybe<Scalars['DateTime']['output']>;
   id?: Maybe<Scalars['String']['output']>;
-  person?: Maybe<Person>;
+  member?: Maybe<Member>;
   recordedBy?: Maybe<User>;
   status?: Maybe<AttendanceStatus>;
   type?: Maybe<AttendanceType>;
@@ -496,6 +503,8 @@ export type MarkEmployeeAttendanceInput = {
   status: AttendanceStatus;
 };
 
+export type Member = Parent | Staff | Student | Teacher;
+
 export type MonthlyRevenue = {
   __typename?: 'MonthlyRevenue';
   currentMonth: Scalars['Float']['output'];
@@ -767,8 +776,6 @@ export enum PermissionModule {
   Users = 'USERS'
 }
 
-export type Person = Staff | Student | Teacher;
-
 export type Profile = {
   __typename?: 'Profile';
   address?: Maybe<Scalars['String']['output']>;
@@ -1014,7 +1021,7 @@ export enum SortOrder {
 
 export type Staff = {
   __typename?: 'Staff';
-  departement?: Maybe<Scalars['String']['output']>;
+  department?: Maybe<Scalars['String']['output']>;
   hireDate?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
   position: Scalars['String']['output'];
@@ -1233,6 +1240,7 @@ export type UpdateStudentParentData = {
 
 export type User = {
   __typename?: 'User';
+  accounts?: Maybe<Array<Maybe<Account>>>;
   email?: Maybe<Scalars['String']['output']>;
   hasMembership?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
@@ -1262,7 +1270,8 @@ export type MarkAttendanceMutationVariables = Exact<{
 }>;
 
 
-export type MarkAttendanceMutation = { __typename?: 'Mutation', markAttendance: { __typename?: 'AttendanceRecord', id?: string | null, date?: Date | null, checkInTime?: Date | null, status?: AttendanceStatus | null, recordedBy?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null, person?:
+export type MarkAttendanceMutation = { __typename?: 'Mutation', markAttendance: { __typename?: 'AttendanceRecord', id?: string | null, date?: Date | null, checkInTime?: Date | null, status?: AttendanceStatus | null, recordedBy?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null } | null, member?:
+      | { __typename?: 'Parent' }
       | { __typename?: 'Staff' }
       | { __typename?: 'Student', id: string, schoolClass?: { __typename?: 'Class', name: string } | null, profile?: { __typename?: 'Profile', firstname?: string | null, lastname?: string | null } | null }
       | { __typename?: 'Teacher' }
@@ -1415,7 +1424,7 @@ export type GetDashboardContextQueryVariables = Exact<{
 }>;
 
 
-export type GetDashboardContextQuery = { __typename?: 'Query', me?: { __typename?: 'User', schoolContext?: { __typename?: 'SchoolMembership', id: string, role: SchoolRole, permissions?: Array<{ __typename?: 'Permission', id?: string | null, code?: PermissionCode | null, name?: string | null, description?: string | null, module?: PermissionModule | null } | null> | null, teacher?: { __typename?: 'Teacher', id: string, department?: string | null, specialization?: string | null, supervisedClasses?: Array<{ __typename?: 'Class', id: string, section?: string | null } | null> | null } | null, staff?: { __typename?: 'Staff', id: string, position: string, departement?: string | null, schoolUserId: string } | null, parent?: { __typename?: 'Parent', id: string, isDelegate?: boolean | null, parentStudent?: Array<{ __typename?: 'ParentStudent', student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null } | null> | null } | null, student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null } | null };
+export type GetDashboardContextQuery = { __typename?: 'Query', me?: { __typename?: 'User', schoolContext?: { __typename?: 'SchoolMembership', id: string, role: SchoolRole, permissions?: Array<{ __typename?: 'Permission', id?: string | null, code?: PermissionCode | null, name?: string | null, description?: string | null, module?: PermissionModule | null } | null> | null, teacher?: { __typename?: 'Teacher', id: string, department?: string | null, specialization?: string | null, supervisedClasses?: Array<{ __typename?: 'Class', id: string, section?: string | null } | null> | null } | null, staff?: { __typename?: 'Staff', id: string, position: string, department?: string | null, schoolUserId: string } | null, parent?: { __typename?: 'Parent', id: string, isDelegate?: boolean | null, parentStudent?: Array<{ __typename?: 'ParentStudent', student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', lastname?: string | null, firstname?: string | null, photo?: string | null } | null } | null } | null } | null> | null } | null, student?: { __typename?: 'Student', id: string, matricule: string, user?: { __typename?: 'User', id: string, profile?: { __typename?: 'Profile', id: string, firstname?: string | null, lastname?: string | null, photo?: string | null } | null } | null } | null } | null } | null };
 
 export type GetSchoolSettingsQueryVariables = Exact<{
   schoolId: Scalars['ID']['input'];
@@ -1927,7 +1936,7 @@ export const MarkAttendanceDocument = `
         lastname
       }
     }
-    person {
+    member {
       ... on Student {
         id
         schoolClass {
@@ -2988,7 +2997,7 @@ export const GetDashboardContextDocument = `
       staff {
         id
         position
-        departement
+        department
         schoolUserId
       }
       parent {

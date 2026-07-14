@@ -1,4 +1,4 @@
-import api, { parseAxiosError } from '@stackschool/shared/src/lib/api';
+import { parseAxiosError, api } from '@stackschool/contracts';
 
 // lib/check-profile-field.ts
 export async function checkField(

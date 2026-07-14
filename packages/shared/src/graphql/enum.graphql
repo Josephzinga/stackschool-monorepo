@@ -19,32 +19,7 @@ enum AttendanceStatus {
   EXCUSED
 }
 
-enum PermissionCode {
-  MARK_STUDENT_ATTENDANCE
-  MARK_TEACHER_ATTENDANCE
-  MARK_STAFF_ATTENDANCE
-  VIEW_ATTENDANCE_REPORTS
 
-  MANAGE_SUBJECTS
-  INPUT_GRADES
-  PUBLISH_BULLETINS
-
-  CREATE_USER
-  UPDATE_USER
-  DELETE_USER
-  MANAGE_USER_PERMISSIONS
-
-  MANAGE_PAYMENTS
-  VIEW_FINANCIAL_REPORTS
-}
-
-enum PermissionModule {
-  ATTENDANCE
-  ACADEMICS
-  USERS
-  FINANCE
-  SETTINGS
-}
 
 enum AttendanceType {
   SUBJECT
@@ -70,15 +45,6 @@ enum SubjectCategory {
   LITERARY
   GENERAL
   SPORT
-}
-enum TransportMode {
-  BUS
-  WALK
-  CAR
-  MOTO
-  TAXI
-  PARENT
-  OTHER
 }
 
 enum RelationType {
@@ -123,17 +89,6 @@ enum DisciplinaryType {
   SUSPENSION
   EXPULSION
   WARNING
-}
-
-enum StudentStatus {
-  ACTIVE
-  SUSPENDED
-  EXPELLED
-  TRANSFERRED
-  DROPPED_OUT
-  GRADUATED
-  INACTIVE
-  DECEASED
 }
 
 enum Day {

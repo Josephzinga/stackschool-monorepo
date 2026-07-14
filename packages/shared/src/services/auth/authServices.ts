@@ -1,9 +1,4 @@
-import { api, getApiBaseUrl, setApiBaseUrl } from '../../lib/api.js';
-import type {
-  LoginFormType,
-  ProfileType,
-  RegisterFormType,
-} from '../../../src/index.js';
+import { api, getApiBaseUrl, setApiBaseUrl } from '../../lib/api';
 
 export const authServices = {
   setBaseUrl: (url: string) => {
@@ -15,12 +10,12 @@ export const authServices = {
   },
 
   // auth routes
-  login: async (data: LoginFormType) => {
+  login: async (data: any) => {
     const res = await api.post('/api/auth/login', data);
     return res.data;
   },
 
-  register: async (data: RegisterFormType) => {
+  register: async (data: any) => {
     const res = await api.post('/api/auth/register', data);
     return res.data;
   },
@@ -65,7 +60,7 @@ export const authServices = {
   },
 
   // profile
-  updateProfile: async (data: ProfileType) => {
+  updateProfile: async (data: any) => {
     const res = await api.put('/api/profile', data);
     return res.data;
   },

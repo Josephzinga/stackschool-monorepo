@@ -1,9 +1,9 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, ResolveField, Args } from '@nestjs/graphql';
 import { SchoolService } from './school.service';
 import { CreateSchoolInput } from './dto/create-school.input';
-import { SchoolSearchInput } from '../../graphql/graphql';
+import { SchoolSearchInput, IQuery, School } from '../../graphql/graphql';
 import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
-import { UseGuards } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { ZodValidationPipe } from '../../utils/zod-validation-pipe';
 import { searchSchoolSchema } from './dto/search.input';
 
@@ -17,6 +17,20 @@ export class SchoolResolver {
     filter: SchoolSearchInput,
   ) {
     const search = filter.searchTerm?.trim();
-    return await this.schoolService.search(search!);
+    if (!search || search.length < 2)
+      throw new BadRequestException(
+        'Le terme de recherche dois contenir au moins deux càractère.',
+      );
+    return await this.schoolService.search(search);
+  }
+
+  @Query('school')
+  async school(@Args() schoolId: string): Promise<School> {
+    return this.schoolService.findById(schoolId);
+  }
+
+  @ResolveField('stats')
+  async stats() {
+    return this.schoolService.getStats();
   }
 }

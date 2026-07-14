@@ -1,21 +1,13 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { AUTH_PATTERNS, loginFormSchema, UserInMe } from '@stackschool/shared';
-import { ClientProxy } from '@nestjs/microservices';
-import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
-import { mapAuthError } from '../errors/auth.error-maper';
+import { loginFormSchema } from '@stackschool/contracts';
+import { safeValidateSchema } from '@stackschool/messaging';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-  constructor(
-    @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
-  ) {
+  constructor(private readonly authService: AuthService) {
     super({
       usernameField: 'identifier',
       passwordField: 'password',
@@ -24,23 +16,14 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   }
 
   async validate(identifier: string, password: string) {
-    const safeData = loginFormSchema.safeParse({ identifier, password });
-    console.log('Data', safeData.data);
-    if (!safeData.success) {
-      throw new BadRequestException(
-        safeData.error.issues.map((issue) => issue.message).join(', '),
-      );
-    }
+    const dto = { identifier, password };
+    const { success, errors, data } = safeValidateSchema(loginFormSchema, dto);
 
-    const result = await firstValueFrom<UserInMe>(
-      this.authClient
-        .send(AUTH_PATTERNS.VALIDATE_CREDENTIALS, { identifier, password })
-        .pipe(
-          timeout(3000),
-          catchError((err: any) => throwError(() => mapAuthError(err))),
-        ),
-    );
-    console.log('Result', result);
-    return result;
+    if (!success || !data)
+      throw new BadRequestException(
+        errors?.[0]?.message ?? 'Erreur de validation',
+      );
+
+    return this.authService.validateLocalUser(identifier, password);
   }
 }

@@ -1,32 +1,4 @@
-type Student {
-  id: ID!
-  matricule: String!
-  birthDate: DateTime
-  birthPlace: DateTime
-  schoolUserId: ID
-  enrollmentDate: DateTime
-  previousClass: String
-  studentNumber: Int
-
-  bloodGroup: String
-  birthCertificateNumber: String
-  medicalCondition: String
-  allergies: String
-  attendances(date: Date): [AttendanceRecord!]
-
-  transportMode: TransportMode
-  previousSchool: String
-  enrollmentYear: String!
-  status: StudentStatus
-  disciplinaryActions: StudentDisciplinaryAction
-  nationality: String
-  schoolClass: Class
-  classId: ID
-  profileId: ID
-  profile: Profile
-  parentStudent: [ParentStudent]
-  user: User
-}
+union Member = Student | Teacher | Staff | Parent
 
 type StudentDisciplinaryAction {
   id: String
@@ -35,28 +7,6 @@ type StudentDisciplinaryAction {
   reason: String
   startDate: DateTime
   endDate: DateTime
-}
-
-type School {
-  id: ID
-  name: String!
-  slug: String
-  address: String!
-  code: String
-  logo: String
-  stats: SchoolStats
-  settings: SchoolSettings
-  teachers: [Teacher]
-  lessons: [Lesson]
-}
-
-type SchoolSettings {
-  id: ID
-  schoolId: ID
-  lessonDuration: Int
-  startHour: Int
-  endHour: Int
-  daysOfWeek: [Day]
 }
 
 type Subject {
@@ -91,22 +41,7 @@ type ClassSubject {
   group: Group!
   assessments: [Assessment!]
 }
-type Parent {
-  id: ID!
-  profession: String
-  isDelegate: Boolean
-  parentStudent: [ParentStudent]
-  schoolUserId: ID
-  user: User
-}
 
-type ParentStudent {
-  relationType: RelationType
-  student: Student
-  studentId: ID
-  parentId: ID
-  parent: Parent
-}
 type Assessment {
   id: ID!
   type: AssessmentType
@@ -132,44 +67,6 @@ type ClassTeacher {
   groups: [Group!]
   classes: [Class]
 }
-type TeacherAssignments {
-  id: ID!
-  teacher: Teacher
-  teacherId: ID!
-  classSubjectId: ID!
-  classSubjects: ClassSubject
-  lessons: [Lesson!]
-  schoolId: ID
-}
-type Teacher {
-  id: ID!
-  schoolUserId: ID
-  diploma: String
-  experience: String
-  hireDate: DateTime
-  isActive: Boolean
-  bio: String
-  salary: Float
-  department: String
-  specialization: String
-  assignments: [TeacherAssignments]
-  supervisedClasses: [Class]
-  createdAt: DateTime
-  updatedAt: DateTime
-  attendances(date: Date): [AttendanceRecord!]
-  weeklyHours: Float
-  classesCount: Int
-  user: User
-}
-
-type Staff {
-  id: ID!
-  schoolUserId: String!
-  position: String!
-  hireDate: DateTime
-  salary: Float
-  departement: String
-}
 
 type TeachingTeamMember {
   teacher: Teacher!
@@ -178,21 +75,6 @@ type TeachingTeamMember {
 type SubjectAssignments {
   id: ID!
   subject: Subject!
-}
-type Class {
-  id: ID!
-  name: String!
-  level: String!
-  section: String
-  students: [Student!]
-  defaultRoom: Room
-  groupId: ID!
-  group: Group
-  teachingTeamMembers: [TeachingTeamMember!]
-  supervisor: Teacher
-  _count: ClassCount
-  totalCoefficient: Int
-  totalWeeklyHours: Float
 }
 
 enum GroupType {
@@ -213,11 +95,6 @@ type ClassCount {
   subjects: Int
 }
 
-type GenderStats {
-  male: Int!
-  female: Int!
-}
-
 type MonthlyStats {
   month: String!
   count: Int!
@@ -236,58 +113,11 @@ type DailyAttendance {
   late: Int!
 }
 
-type MonthlyRevenue {
-  currentMonth: Float!
-  previousMonth: Float
-}
-
-type AttendanceStats {
-  rate: Float!
-  presentCount: Int!
-  absentCount: Int!
-  lateCount: Int!
-  totalExpected: Int!
-  history: [DailyAttendance!]
-}
-
-type SchoolStats {
-  # KPI Cards
-  totalStudents: Int!
-  totalTeachers: Int!
-  totalClasses: Int!
-
-  # Finance & Présence
-  monthlyRevenue: MonthlyRevenue
-  pendingPaymentsCount: Int
-
-  # Remplacé par un objet complexe
-  attendance: AttendanceStats
-
-  # Charts Data
-  studentGender: GenderStats
-  enrollmentPerMonth: [MonthlyStats!]
-  classesOccupancy: [ClassStats!]
-}
-
-input StudentSortInput {
-  field: StudentSortField
-  order: SortOrder
-}
 input SubjectSortInput {
   field: SubjectSortField
   order: SortOrder
 }
-input GetSchoolStudentsInput {
-  page: Int! = 0
-  limit: Int! = 10
 
-  teacherId: String
-  sort: StudentSortInput
-  classId: ID
-  searchTerm: String
-  level: String
-  section: String
-}
 input CreateSubjectInput {
   name: String!
   code: String!

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useGetMeQuery, useUserStore } from '@stackschool/ui';
 import { Spinner } from '@/components/ui/spinner';
-import { api } from '@stackschool/shared';
+import { api } from '@stackschool/contracts';
 
 export default function ProtectedRoute({
   children,

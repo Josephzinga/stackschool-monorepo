@@ -4,7 +4,7 @@ import {
   authServices,
   LoginFormType,
   parseAxiosError,
-} from '@stackschool/shared';
+} from '@stackschool/contracts';
 import { LoginForm } from '@/components/auth/login-form';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';

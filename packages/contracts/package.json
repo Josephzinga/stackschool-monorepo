@@ -1,0 +1,21 @@
+{
+  "name": "@stackschool/contracts",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm && tsc --emitDeclarationOnly --declaration --outDir dist",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "build:bun": "bun build --target=node --outfile=dist/index.js ./src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
+    "zod": "^4.2.1"
+  }
+}

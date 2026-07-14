@@ -72,7 +72,7 @@ query GetDashboardContext($input: SchoolId!) {
       staff {
         id
         position
-        departement
+        department
         schoolUserId
       }
       parent {

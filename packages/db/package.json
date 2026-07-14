@@ -12,8 +12,7 @@
   "devDependencies": {
     "@prisma/adapter-pg": "catalog:",
     "@prisma/extension-accelerate": "^2.0.2",
-    "prisma": "catalog:",
-    "tsup": "^8.5.1"
+    "prisma": "catalog:"
   },
   "dependencies": {
     "@prisma/client": "catalog:"

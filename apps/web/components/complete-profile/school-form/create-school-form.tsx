@@ -1,6 +1,6 @@
 // components/complete-profile/school-step/create-school-form.tsx
 import { useCompleteProfileStore, useForm, zodResolver } from '@stackschool/ui';
-import { createSchoolSchema, CreateSchoolType } from '@stackschool/shared';
+import { createSchoolSchema, CreateSchoolType } from '@stackschool/contracts';
 import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';

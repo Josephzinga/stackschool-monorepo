@@ -23,7 +23,7 @@ import { useForm, zodResolver } from '@stackschool/ui';
 import Link from 'next/link';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
-import { loginFormSchema, LoginFormType } from '@stackschool/shared';
+import { loginFormSchema, LoginFormType } from '@stackschool/contracts';
 import { ButtonSocial } from './button-social';
 
 export function LoginForm({

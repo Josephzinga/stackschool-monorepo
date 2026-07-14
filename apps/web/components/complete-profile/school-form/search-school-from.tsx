@@ -1,7 +1,7 @@
 import { Field, FieldLabel } from '@/components/ui/field';
 import { ItemTitle } from '@/components/ui/item';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { SchoolSelected } from '@stackschool/shared';
+import { SchoolSelected } from '@stackschool/contracts';
 import { toast } from 'sonner';
 import {
   SearchSchoolQuery,

@@ -1,31 +1,28 @@
 import { Request } from 'express';
-import { PrismaService } from '../prisma/prisma.service';
-import { UserInMe } from '@stackschool/shared';
-import { SchoolUser } from '@stackschool/db';
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, HttpStatus } from '@nestjs/common';
 import { DataLoaders } from '../modules/dataloader/dataloader.service';
+import type { SchoolUserContract } from '@stackschool/contracts';
 
 export interface GraphQLContext {
   req: Request;
-  user: UserInMe;
+  user: NonNullable<Request['user']>;
   schoolId?: string;
-  schoolUser?: SchoolUser;
+  schoolUser?: SchoolUserContract;
   teacherId?: string;
   studentId?: string;
   staffId?: string;
   loaders?: DataLoaders;
 }
 
-export function createContext(
-  req: Request,
-  prisma: PrismaService,
-): Promise<GraphQLContext> {
+export function createContext(req: Request): Promise<GraphQLContext> {
   const user = req.user;
 
   if (!user)
-    throw new UnauthorizedException(
-      'Vous devez être connecté pour accéder à cette ressource.',
-    );
+    throw new UnauthorizedException({
+      ok: false,
+      message: 'Vous devez être connecté pour accéder à cette ressource.',
+      statusCode: HttpStatus.UNAUTHORIZED,
+    });
   const schoolId =
     (req.headers['x-school-id'] as string) || (req.query?.schoolId as string);
 

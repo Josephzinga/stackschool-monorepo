@@ -2,23 +2,48 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  ServiceUnavailableException,
+  InternalServerErrorException,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { LoginDto, RegisterDto } from './dto/auth-dto';
-import { catchError, firstValueFrom, pipe, throwError } from 'rxjs';
-import { AUTH_PATTERNS, UserInMe } from '@stackschool/shared';
-import { Request, Response } from 'express';
-import { mapAuthError } from './errors/auth.error-maper';
+import { RegisterDto } from './dto/auth-dto';
+import { catchError, firstValueFrom, map, throwError, timeout } from 'rxjs';
+import {
+  AUTH_PATTERNS,
+  UserWithRelationsContract,
+  type ForgotPasswordResponse,
+  forgotPasswordResponse,
+  type ResetPasswordResponse,
+  resetPasswordResponse,
+  type CreateUserSessionResponse,
+  createUserSessionResponse,
+  RefreshTokenResponse,
+  refreshTokenResponse,
+  type VerifyCodeInput,
+  type VerifyCodeResponse,
+  verifyCodeResponse,
+  safeValidateSchema,
+} from '@stackschool/messaging';
+import type { Request, Response } from 'express';
+import { mapAuthError } from './../../errors/auth.error-maper';
 import { ConfigService } from '@nestjs/config';
+import { RESET_TOKEN_EXP_MINUTES } from '../../constant/config';
+import { validateWith } from '../../utils/validate.operator';
+import { DoneCallback } from 'passport';
+import { Profile as GoogleProfile } from 'passport-google-oauth20';
+import { Profile as FacebookProfile } from 'passport-facebook';
 
-interface Session {
-  id: string;
-  userId: string;
-  sessionToken: string;
-  expires: Date;
+interface ValidateOAuthUserParams {
+  accessToken: string;
+  refreshToken: string;
+  profileOAuth: ProfileOAuth;
+  done: DoneCallback;
 }
+
+type ProfileOAuth =
+  | { provider: 'google'; profile: GoogleProfile }
+  | { provider: 'facebook'; profile: FacebookProfile };
 
 @Injectable()
 export class AuthService {
@@ -28,12 +53,19 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const user = await firstValueFrom<UserInMe | null>(
+    const result = await firstValueFrom<UserWithRelationsContract | undefined>(
       this.authClient
         .send(AUTH_PATTERNS.CREATE_USER, dto)
         .pipe(catchError((err) => throwError(() => mapAuthError(err)))),
     );
-    return user;
+    const { success, data, errors } = safeValidateSchema(
+      UserWithRelationsContract,
+      result,
+    );
+    if (!success) {
+      console.error(errors);
+    }
+    return data;
   }
 
   async login(
@@ -42,13 +74,14 @@ export class AuthService {
     isRefresh: boolean = false,
   ) {
     if (!user) throw new UnauthorizedException('Utilisateur non authentifier.');
-    const { sessionToken, expires } = await firstValueFrom<Session>(
-      this.authClient
-        .send(AUTH_PATTERNS.CREATE_USER_SESSION, user.id)
-        .pipe(catchError((err) => throwError(() => mapAuthError(err)))),
-    );
 
-    this.setResponseCookies(res, sessionToken, new Date(expires));
+    const session = await this.createUserSession(user.id);
+    this.setResponseCookies(
+      res,
+      session.sessionToken,
+      'refresh_token',
+      new Date(session.expires),
+    );
     return res.status(HttpStatus.OK).json({
       ok: true,
       ...(!isRefresh && {
@@ -63,20 +96,221 @@ export class AuthService {
           provider: user?.accounts?.map((acc) => acc.provider).join(',') || '',
           profile: {
             id: user?.profile?.id,
-            firstname: user?.profile?.firstname,
-            lastname: user?.profile?.lastname,
-            photo: user?.profile?.photo,
+            firstname: user?.profile?.firstname ?? null,
+            lastname: user?.profile?.lastname ?? null,
+            avatarUrl: user?.profile?.avatarUrl,
           },
         },
       }),
     });
   }
+
+  async forgotPassword(identifier: string, res: Response) {
+    const result = await firstValueFrom<ForgotPasswordResponse>(
+      this.authClient.send(AUTH_PATTERNS.FORGOT_PASSWORD, { identifier }).pipe(
+        timeout(3000),
+        catchError((err) => throwError(() => mapAuthError(err))),
+      ),
+    );
+
+    const { success, data, errors } = safeValidateSchema(
+      forgotPasswordResponse,
+      result,
+    );
+
+    if (!success || !data) {
+      console.log('Erreur de validation', errors);
+      return;
+    }
+    const expires = data.expires
+      ? new Date(data.expires)
+      : new Date(Date.now() + 1000 * 60 * RESET_TOKEN_EXP_MINUTES);
+
+    this.setResponseCookies(res, data.tempToken!, 'tempToken', expires);
+
+    return res.status(200).json({
+      ok: true,
+      message: data?.message,
+      method: data.method,
+    });
+  }
+
+  async handleSocialCallback(user: UserWithRelationsContract, res: Response) {
+    if (!user || !user.id) {
+      return res.redirect(`${process.env.FRONTEND_URL}/auth/login?error=1`);
+    }
+    const { sessionToken, expires } = await this.createUserSession(user.id);
+    this.setResponseCookies(
+      res,
+      sessionToken,
+      'refresh_token',
+      new Date(expires),
+    );
+    if (!user.profileCompleted) {
+      return res.redirect(`${process.env.FRONTEND_URL}/auth/complete-profile`);
+    }
+
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/finish`);
+  }
+
+  async validateOAuthUser({
+    accessToken,
+    refreshToken,
+    profileOAuth,
+    done,
+  }: ValidateOAuthUserParams) {
+    const result = await firstValueFrom<UserWithRelationsContract>(
+      this.authClient
+        .send(AUTH_PATTERNS.VALIDATE_OAUTH_USER, {
+          accessToken,
+          refreshToken,
+          profileOAuth,
+        })
+        .pipe(
+          timeout(3000),
+          catchError((err) => throwError(() => mapAuthError(err))),
+        ),
+    );
+    return done(null, result);
+  }
+
+  async validateLocalUser(identifier: string, password: string) {
+    const result = await firstValueFrom<UserWithRelationsContract>(
+      this.authClient
+        .send(AUTH_PATTERNS.VALIDATE_CREDENTIALS, { identifier, password })
+        .pipe(
+          timeout(3000),
+          validateWith(UserWithRelationsContract),
+          catchError((err: any) => throwError(() => mapAuthError(err))),
+        ),
+    );
+    return result;
+  }
+  async verifyCode(res: Response, code: string, tempToken: string) {
+    const result = await firstValueFrom<VerifyCodeResponse>(
+      this.authClient
+        .send(AUTH_PATTERNS.VERIFY_CODE, {
+          code,
+          tempToken,
+        })
+        .pipe(catchError((err) => throwError(() => mapAuthError(err)))),
+    );
+
+    const { success, errors, data } = safeValidateSchema(
+      verifyCodeResponse,
+      result,
+    );
+
+    if (!success || !data) {
+      console.error('Erreur de validation', errors);
+      return;
+    }
+
+    res.clearCookie('tempToken');
+
+    this.setResponseCookies(
+      res,
+      data.resetAccessToken,
+      'reset_access_token',
+      new Date(Date.now() + 1000 * 60 * RESET_TOKEN_EXP_MINUTES),
+    );
+
+    return {
+      ok: data.ok,
+      message: data.message,
+    };
+  }
+  async resetPassword({
+    res,
+    password,
+    token,
+    resetToken,
+  }: {
+    res: Response;
+    password: string;
+    token?: string;
+    resetToken?: string;
+  }) {
+    const result = await firstValueFrom<ResetPasswordResponse>(
+      this.authClient
+        .send(AUTH_PATTERNS.RESET_PASSWORD, {
+          token: token ?? null,
+          password,
+          resetToken,
+        })
+        .pipe(
+          timeout(3000),
+          catchError((err) => throwError(() => mapAuthError(err))),
+        ),
+    );
+    const { success, errors, data } = safeValidateSchema(
+      resetPasswordResponse,
+      result,
+    );
+
+    if (!success || !data) {
+      console.log('Erreur de validation', errors);
+      return;
+    }
+    return res.status(201).json({ ...data });
+  }
+
+  async refreshToken(req: Request, res: Response, refreshToken: string) {
+    res.clearCookie('refresh_token');
+    const result = await firstValueFrom<RefreshTokenResponse>(
+      this.authClient
+        .send(AUTH_PATTERNS.REFRESH_TOKEN, { refreshToken })
+        .pipe(catchError((err) => throwError(() => mapAuthError(err)))),
+    );
+
+    const { success, errors, data } = safeValidateSchema(
+      refreshTokenResponse,
+      result,
+    );
+    if (!success || !data) {
+      console.error('Erreur de validation', errors);
+      return;
+    }
+
+    req.logIn(data.user, (err) => {
+      if (err)
+        throw new InternalServerErrorException(
+          'Impossible de se connecter après rafraichisement.',
+        );
+      this.login(data.user, res, true).catch((err) => {
+        throw new InternalServerErrorException(err);
+      });
+    });
+  }
+
+  async resendCode(tempToken: string) {
+    const result = await firstValueFrom<{ ok: true; message: string }>(
+      this.authClient.send(AUTH_PATTERNS.RESEND_CODE, { tempToken }).pipe(
+        timeout(3000),
+        catchError((err) => throwError(() => mapAuthError(err))),
+      ),
+    );
+
+    return result;
+  }
+
+  private async createUserSession(userId: string) {
+    const result = await firstValueFrom<CreateUserSessionResponse>(
+      this.authClient.send(AUTH_PATTERNS.CREATE_USER_SESSION, { userId }).pipe(
+        validateWith(createUserSessionResponse),
+        catchError((err) => throwError(() => mapAuthError(err))),
+      ),
+    );
+    return result;
+  }
+
   private setResponseCookies(
     res: Response,
     sessionToken: string,
+    name: string,
     expires: Date,
   ) {
-    res.cookie('refresh_token', sessionToken, {
+    res.cookie(name, sessionToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
       sameSite: 'lax',

@@ -7,7 +7,7 @@ import {
   ResetPasswordType,
   authServices,
   parseAxiosError,
-} from '@stackschool/shared';
+} from '@stackschool/contracts';
 import { CheckCircle2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,11 +21,6 @@ export default function ResetPasswordPage() {
   const router = useRouter();
 
   const onSubmit = async (data: ResetPasswordType) => {
-    if (!token) {
-      toast.error('Token de réinitialisation manquant');
-      return;
-    }
-
     try {
       const res = await authServices.resetPassword(
         token,

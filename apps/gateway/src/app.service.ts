@@ -1,7 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import type { Response } from 'express';
-import { PrismaService } from './prisma/prisma.service';
-import type { UserInMe } from '@stackschool/shared';
 
 interface VerifiedData {
   email?: string;
@@ -11,18 +9,16 @@ interface VerifiedData {
 
 @Injectable()
 export class AppService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor() {}
   getHello(): string {
     return 'Hello World!';
   }
 
-  async validateUserField(res: Response, data: VerifiedData, user: UserInMe) {
+  async validateUserField(res: Response, data: VerifiedData, user: any) {
     const { selfCheck, email, phoneNumber } = data;
     // check email uniqueness
     if (selfCheck ? data.email && user?.email !== email : email) {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { email },
-      });
+      const existingUser = {};
 
       if (existingUser) {
         return res.json({
@@ -62,11 +58,5 @@ export class AppService {
       ok: true,
       valid: true,
     });
-  }
-  catch(err) {
-    throw new InternalServerErrorException(
-      "Erreur de vérification de l'email ou numéro de téléphone",
-      err,
-    );
   }
 }

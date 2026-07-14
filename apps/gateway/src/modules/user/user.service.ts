@@ -1,73 +1,46 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Prisma } from '@stackschool/db';
-import { PrismaService } from '../../prisma/prisma.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import {
+  AUTH_PATTERNS,
+  AUTH_SERVICE,
+  UserWithRelationsContract,
+} from '@stackschool/messaging';
+
+import { firstValueFrom, timeout, catchError, throwError } from 'rxjs';
+import { mapAuthError } from '../../errors/auth.error-maper';
+import { validateWith } from '../../utils/validate.operator';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
-  async create(createUserInput: Prisma.UserCreateInput) {
-    return await this.prisma.user.create({
-      data: createUserInput,
-    });
+  constructor(@Inject(AUTH_SERVICE) private readonly authClient: ClientProxy) {}
+  async findFullUser(userId: string) {
+    return await firstValueFrom<UserWithRelationsContract>(
+      this.authClient.send(AUTH_PATTERNS.FIND_FULL_USER, { userId }).pipe(
+        timeout(3000),
+        validateWith(UserWithRelationsContract),
+        catchError((err) => throwError(() => mapAuthError(err))),
+      ),
+    );
   }
 
-  async createArgs<T extends Prisma.UserCreateArgs>(
-    createUserInput: T,
-  ): Promise<Prisma.UserGetPayload<T> | null> {
-    return (await this.prisma.user.create(
-      createUserInput,
-    )) as Prisma.UserGetPayload<T> | null;
-  }
+  async validateField(phoneNumber: string | null, email: string | null) {
+    const result = await firstValueFrom<{
+      ok: boolean;
+      valid?: boolean;
+      field?: string;
+      message: string;
+    }>(
+      this.authClient
+        .send(AUTH_PATTERNS.VALIDATE_USER_FIELD, {
+          phoneNumber,
+          email,
+        })
+        .pipe(
+          timeout(1500),
+          catchError((err) => throwError(() => mapAuthError(err))),
+        ),
+    );
 
-  async findAll() {
-    try {
-      const users = await this.prisma.user.findMany();
-      return users;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        error,
-        'Erreur lors de requête de users',
-      );
-    }
-  }
-
-  async findOne<T extends Prisma.UserFindFirstArgs>(
-    args: T,
-  ): Promise<Prisma.UserGetPayload<T> | null> {
-    return (await this.prisma.user.findFirst(
-      args,
-    )) as Prisma.UserGetPayload<T> | null;
-  }
-  async findUnique<T extends Prisma.UserFindUniqueArgs>(
-    args: T,
-  ): Promise<Prisma.UserGetPayload<T> | null> {
-    return (await this.prisma.user.findFirst(
-      args,
-    )) as Prisma.UserGetPayload<T> | null;
-  }
-  async getMembership(schoolId: string, userId: string) {
-    return await this.prisma.schoolUser.findUnique({
-      where: {
-        schoolId_userId: {
-          userId,
-          schoolId,
-        },
-      },
-    });
-  }
-  async getMembershipById(schoolUserId: string) {
-    return this.prisma.schoolUser.findUnique({
-      where: {
-        id: schoolUserId,
-      },
-    });
-  }
-
-  update(id: number, _updateUserInput: Prisma.UserCreateInput) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    return result;
   }
 }

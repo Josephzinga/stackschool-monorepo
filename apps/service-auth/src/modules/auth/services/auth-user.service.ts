@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { toUserWithRelationsContract } from '../../../mappers/user.mapper';
 
 export interface UpsertOauthUserParams {
   provider: 'google' | 'facebook';
@@ -29,7 +30,7 @@ export class AuthUserService {
     avatar,
     accessToken,
     refreshToken,
-  }: UpsertOauthUserParams): Promise<Request['user'] | undefined> {
+  }: UpsertOauthUserParams) {
     const existingAccount = await this.prisma.account.findUnique({
       where: {
         provider_providerAccountId: { provider, providerAccountId },
@@ -77,14 +78,14 @@ export class AuthUserService {
             data: {
               firstname,
               lastname,
-              photo: avatar,
+              avatarUrl: avatar,
               user: { connect: { id: user.id } },
             },
           });
-        } else if (!user.profile?.photo && avatar) {
+        } else if (!user.profile?.avatarUrl && avatar) {
           await this.prisma.profile.update({
             where: { id: user.profile?.id },
-            data: { photo: avatar },
+            data: { avatarUrl: avatar },
           });
         }
 
@@ -122,7 +123,7 @@ export class AuthUserService {
       include: { profile: true, accounts: true },
     });
 
-    return this.excludePassword(newUser);
+    return toUserWithRelationsContract(newUser);
   }
 
   private excludePassword(user: Request['user']) {

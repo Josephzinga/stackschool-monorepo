@@ -70,7 +70,7 @@ const config: CodegenConfig = {
         addInfiniteQuery: true,
 
         fetcher: {
-          func: '../lib/graphql-fetcher#fetcher',
+          func: '../../../contracts/src/lib/graphql-fetcher#fetcher',
         },
         exposeQueryKeys: true,
         exposeFetcher: true,

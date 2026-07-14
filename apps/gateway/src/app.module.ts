@@ -1,27 +1,30 @@
-import { Module, UnauthorizedException } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { join } from 'node:path';
-import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { DataloaderModule } from './modules/dataloader/dataloader.module';
 import { SchoolModule } from './modules/school/school.module';
 import { CompleteProfileModule } from './modules/complete-profile/complete-profile.module';
 import { createContext } from './graphql/context';
-import { PrismaService } from './prisma/prisma.service';
 import { ProfileModule } from './modules/profile/profile.module';
 import { MembershipModule } from './modules/membership/membership.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { Request } from 'express';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { RateLimiterModule } from './modules/rate-limiter/rate-limiter.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CacheModule } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
+import { Keyv } from '@keyv/redis';
+import { KeyvCacheableMemory } from 'cacheable';
+import { IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
+import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
+import { AuthenticatedDataSource } from './graphql/autentificated-datasource';
+import { SchoolContextInterceptor } from './common/interceptors/school-context.interceptor';
+import { MembershipService } from './modules/membership/membership.service';
+import { SchoolService } from './modules/school/school.service';
 
 @Module({
   imports: [
@@ -36,30 +39,40 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         },
       ],
     }),
-    GraphQLModule.forRootAsync<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      inject: [PrismaService],
-      imports: [PrismaModule],
-      useFactory: (prisma: PrismaService) => ({
-        driver: ApolloDriver,
-        typePaths: [join('../../packages/shared/src/graphql/**/*.graphql')],
-        context: async ({ req }: { req: Request }) => {
-          if (req.isUnauthenticated())
-            throw new UnauthorizedException({
-              statusCode: 401,
-              message: 'Utilisateur non authentifier.',
-            });
-
-          await createContext(req, prisma);
-        },
-        definitions: { path: join(process.cwd(), 'src/graphql.ts') },
-        playground: true,
-      }),
+    GraphQLModule.forRoot<ApolloGatewayDriverConfig>({
+      driver: ApolloGatewayDriver,
+      server: {
+        context: async ({ req }: { req: Request }) => createContext(req),
+        plugins: [ApolloServerPluginLandingPageLocalDefault()],
+        playground: false,
+        allowBatchedHttpRequests: true,
+      },
+      gateway: {
+        supergraphSdl: new IntrospectAndCompose({
+          subgraphs: [
+            { name: 'auth', url: 'http://localhost:4001/graphql' },
+            { name: 'core', url: 'http://localhost:4002/graphql' },
+          ],
+        }),
+        buildService: ({ url }) => new AuthenticatedDataSource({ url }),
+      },
+    }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => {
+        return {
+          stores: [
+            new Keyv({
+              store: new KeyvCacheableMemory({ ttl: 60000, lruSize: 5000 }),
+            }),
+            new KeyvRedis(configService.get('REDIS_URL')),
+          ],
+        };
+      },
     }),
 
-    PrismaModule,
-    DataloaderModule,
-    NotificationsModule,
     SchoolModule,
     CompleteProfileModule,
     ProfileModule,
@@ -69,10 +82,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   controllers: [AppController],
   providers: [
     AppService,
+    MembershipService,
+    SchoolService,
     {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      provide: APP_INTERCEPTOR,
+      useClass: SchoolContextInterceptor,
     },
   ],
+  exports: [CacheModule],
 })
 export class AppModule {}

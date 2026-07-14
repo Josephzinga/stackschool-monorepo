@@ -22,7 +22,7 @@ import {
   parseAxiosError,
   VerifyCodeFormType,
   VerifyCodeSchema,
-} from '@stackschool/shared';
+} from '@stackschool/contracts';
 
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import Link from 'next/link';
@@ -63,8 +63,9 @@ export default function VerifyCode() {
         router.push(`/auth/reset-password`);
       }
     } catch (error: any) {
-      const { message } = parseAxiosError(error);
-      toast.error(message || 'Code invalide ou éxpiré');
+      const { message, status, data } = parseAxiosError(error);
+      console.log('Data', data);
+      toast.error(error?.data?.errors?.message || 'Code invalide ou éxpiré');
 
       document.getElementById('code')?.focus();
     }
@@ -78,8 +79,7 @@ export default function VerifyCode() {
         setCountdown(60); // 60 secondes d'attente
       }
     } catch (error: any) {
-      const { message } = parseAxiosError(error);
-      toast.error(message || "Erreur lors de l'envoi");
+      toast.error(error?.errors?.message || "Erreur lors de l'envoi");
     }
   };
 

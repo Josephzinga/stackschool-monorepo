@@ -29,7 +29,7 @@ import {
   parseAxiosError,
   StudentFormDataType,
   studentFormSchema,
-} from '@stackschool/shared';
+} from '@stackschool/contracts';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { SubmitButton } from '@/components/submit-button';
 import {

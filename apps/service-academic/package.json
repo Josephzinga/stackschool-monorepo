@@ -20,17 +20,22 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@stackschool/db-academic": "workspace:*",
-    "@stackschool/shared": "workspace:*",
+    "@apollo/subgraph": "^2.14.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/mapped-types": "*",
-    "@nestjs/platform-express": "^11.0.1",
-    "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
     "@nestjs/microservices": "^11.1.27",
+    "@nestjs/platform-express": "^11.0.1",
+    "@prisma/adapter-pg": "catalog:",
+    "@prisma/extension-accelerate": "^2.0.2",
+    "@stackschool/messaging": "workspace:*",
+    "@strv/nestjs-dataloader": "^0.4.0",
     "amqp-connection-manager": "^5.0.0",
-    "amqplib": "^2.0.1"
+    "amqplib": "^2.0.1",
+    "dataloader": "^2.2.3",
+    "prisma": "catalog:",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -38,6 +43,9 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@prisma/client": "catalog:",
+    "@swc/cli": "^0.8.1",
+    "@swc/core": "^1.15.43",
     "@types/express": "^5.0.0",
     "@types/supertest": "^7.0.0",
     "eslint": "^9.18.0",

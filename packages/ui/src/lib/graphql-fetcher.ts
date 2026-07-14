@@ -1,4 +1,4 @@
-import { api } from '@stackschool/shared';
+import { api } from '@stackschool/contracts';
 
 /**
  * Fetcher personnalisé pour React Query Codegen.
@@ -33,7 +33,9 @@ export const fetcher = <TData, TVariables>(
       // Gestion des erreurs Axios (Réseau, 4xx, 5xx)
       if (error.response) {
         // Le serveur a répondu avec un code d'erreur
-        const serverError = error.response.data?.errors?.[0]?.message || error.response.statusText;
+        const serverError =
+          error.response.data?.errors?.[0]?.message ||
+          error.response.statusText;
         throw new Error(serverError);
       }
       // Erreur JS ou Réseau pure

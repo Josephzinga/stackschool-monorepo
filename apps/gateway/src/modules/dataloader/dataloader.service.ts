@@ -1,20 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import DataLoader from 'dataloader';
-import {
-  Class,
-  ClassSubjects,
-  Group,
-  Lesson,
-  Student,
-  Subject,
-  Teacher,
-  TeacherAssignment,
-  User,
-  Profile,
-  Permission,
-  SchoolUser,
-} from '@stackschool/db';
-import { PrismaService } from '../../prisma/prisma.service';
 
 /**
  * Token d'injection du client Prisma.

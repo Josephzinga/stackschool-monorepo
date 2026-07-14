@@ -1,4 +1,4 @@
-import { parseAxiosError, RedisService, api } from '@stackschool/shared';
+import { parseAxiosError, RedisService, api } from '@stackschool/contracts';
 import { create } from 'zustand';
 import { CompleteProfileStep } from '../types';
 import { createJSONStorage, persist } from 'zustand/middleware';

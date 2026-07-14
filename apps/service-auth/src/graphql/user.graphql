@@ -1,0 +1,26 @@
+type User @key(fields: "id") {
+  id: ID!
+  email: String
+  username: String
+  phoneNumber: String
+  profileCompleted: Boolean
+  hasMembership: Boolean
+  profile: Profile
+  isActive: Boolean
+  accounts: [Account]
+}
+
+type Account @key(fields: "id") {
+  id: ID!
+  provider: String
+  userId: ID
+}
+
+type Profile @key(fields: "id") {
+  id: ID!
+  firstname: String
+  lastname: String
+  photo: String
+  gender: String
+  address: String
+}

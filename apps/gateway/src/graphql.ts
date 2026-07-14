@@ -448,7 +448,7 @@ export interface AttendanceSessionPayload {
 
 export interface AttendanceRecord {
     id?: Nullable<string>;
-    person?: Nullable<Person>;
+    member?: Nullable<Member>;
     status?: Nullable<AttendanceStatus>;
     date?: Nullable<DateTime>;
     checkInTime?: Nullable<DateTime>;
@@ -785,7 +785,7 @@ export interface Staff {
     position: string;
     hireDate?: Nullable<DateTime>;
     salary?: Nullable<number>;
-    departement?: Nullable<string>;
+    department?: Nullable<string>;
 }
 
 export interface TeachingTeamMember {
@@ -908,6 +908,7 @@ export interface SchoolMembership {
     schoolId?: Nullable<string>;
     school?: Nullable<School>;
     permissions?: Nullable<Nullable<Permission>[]>;
+    member?: Nullable<Member>;
     teacher?: Nullable<Teacher>;
     student?: Nullable<Student>;
     parent?: Nullable<Parent>;
@@ -936,5 +937,5 @@ export interface User {
 
 export type DateTime = any;
 export type SchoolId = any;
-export type Person = Student | Teacher | Staff;
+export type Member = Student | Teacher | Staff | Parent;
 type Nullable<T> = T | null;

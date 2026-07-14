@@ -1,43 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CreateSchoolInput } from './dto/create-school.input';
 import { UpdateSchoolInput } from './dto/update-school.input';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma } from '@stackschool/db';
+import {
+  CORE_PATTERNS,
+  CORE_SERVICE,
+  SchoolContract,
+} from '@stackschool/messaging';
+import { ClientProxy } from '@nestjs/microservices';
+import { catchError, firstValueFrom, throwError } from 'rxjs';
+import { validateWith } from '../../utils/validate.operator';
 
 @Injectable()
 export class SchoolService {
-  constructor(private readonly prisma: PrismaService) {}
-  create(createSchoolInput: CreateSchoolInput) {
-    return 'This action adds a new school';
+  constructor(
+    @Inject(CORE_SERVICE) private readonly coreService: ClientProxy,
+  ) {}
+  async findById(id: string) {
+    const school = await firstValueFrom<SchoolContract>(
+      this.coreService
+        .send(CORE_PATTERNS.SCHOOL.FIND_ONE, { schoolId: id })
+
+        .pipe(
+          validateWith(SchoolContract),
+          catchError((err) => throwError(() => new BadRequestException(err))),
+        ),
+    );
+
+    return school;
   }
 
-  findAll() {
-    return `This action returns all school`;
-  }
+  async search(search: string) {
+    const schools = await firstValueFrom<SchoolContract[]>(
+      this.coreService.send(CORE_PATTERNS.SCHOOL.SEARCH, {
+        searchTerm: search,
+      }),
+    );
 
-  async findOne(where: Prisma.SchoolWhereInput) {
-    return this.prisma.school.findFirst({
-      where,
-    });
-  }
-
-  async search(term: string) {
-    return await this.prisma.school.findMany({
-      where: {
-        OR: [
-          { name: { contains: term, mode: 'insensitive' } },
-          { address: { contains: term, mode: 'insensitive' } },
-          { slug: { contains: term, mode: 'insensitive' } },
-        ],
-      },
-    });
-  }
-
-  update(id: number, updateSchoolInput: UpdateSchoolInput) {
-    return `This action updates a #${id} school`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} school`;
+    return schools;
   }
 }

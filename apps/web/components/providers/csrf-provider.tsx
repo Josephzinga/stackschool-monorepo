@@ -1,4 +1,4 @@
-import { api, parseAxiosError, setHeaders } from '@stackschool/shared';
+import { api, parseAxiosError, setHeaders } from '@stackschool/contracts';
 export default async function CsrfProvider({
   children,
 }: {
@@ -14,8 +14,6 @@ export default async function CsrfProvider({
       console.log('CSRF-Token', res.csrfToken);
     }
   } catch (err) {
-    const { message, status } = parseAxiosError(err);
-    console.log('Satus', status, message);
     console.error('Erreur csrf', err);
   }
   return <>{children}</>;

@@ -6,60 +6,31 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UnauthorizedException } from '@nestjs/common';
-import { UserService } from './user.service';
-import type { GraphQLContext } from '../../graphql/context';
-import { User, Profile, SchoolMembership } from '../../graphql/graphql';
-import { Loaders } from '../dataloader/decorators/dataloader.decorator';
-import type { DataLoaders } from '../dataloader/dataloader.service';
-import type { UserInMe } from '@stackschool/shared';
+
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import type { Request } from 'express';
+import { UserService } from './user.service';
+import { MembershipService } from '../membership/membership.service';
+import { UserWithRelationsContract } from '@stackschool/messaging';
+import { SchoolMembership } from '../../graphql/graphql';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
-
+  constructor(
+    private readonly userService: UserService,
+    private readonly memberService: MembershipService,
+  ) {}
   @Query('me')
-  findOne(@CurrentUser() user: UserInMe) {
+  getMe(@CurrentUser() user: Request['user']) {
     return user;
   }
 
   @ResolveField('memberships')
-  async memberships(
-    @Parent() parent: User,
-    @Loaders() loaders: DataLoaders,
-    @Context() ctx: GraphQLContext,
+  async getMemberShips(
+    @Context() ctx: any,
+    @CurrentUser() user: Request['user'],
+    @Parent() parent: UserWithRelationsContract,
   ): Promise<SchoolMembership[]> {
-    if (!ctx?.schoolUser?.id) return [];
-
-    return (await loaders.membershipLoader.load(ctx?.schoolUser.id)) ?? [];
-  }
-
-  @ResolveField('schoolContext')
-  async schoolContext(
-    @Parent() parent: User,
-    @Context() ctx: GraphQLContext,
-    @Args('schoolId')
-    schoolId: string,
-  ): Promise<SchoolMembership | null> {
-    if (!schoolId || !ctx?.schoolUser?.id)
-      throw new UnauthorizedException(
-        "L'Id de l'école est requis pour accéder au contexte de l'école.",
-      );
-
-    if (schoolId !== ctx?.schoolUser?.schoolId) {
-      throw new UnauthorizedException(
-        "Vous n'avez pas accès au contexte de cette école.",
-      );
-    }
-    let memberships: SchoolMembership | null = null;
-    if (schoolId) {
-      memberships = await this.userService.getMembershipById(
-        ctx?.schoolUser?.id,
-      );
-    } else {
-      memberships = await this.userService.getMembership(schoolId, parent.id);
-    }
-    return memberships;
+    return this.memberService.findManyByUserId(parent.id);
   }
 }

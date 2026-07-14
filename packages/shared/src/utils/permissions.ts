@@ -1,5 +1,4 @@
-import { PermissionCode } from '@stackschool/db';
-
+export type PermissionCode = '';
 interface HasPermissionOptions {
   /**
    * Si 'all' est vrai, l'utilisateur doit posséder TOUTES les permissions demandées.

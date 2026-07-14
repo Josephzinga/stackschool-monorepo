@@ -1,15 +1,106 @@
 services:
-  db:
-    image: postgres:17
-    container_name: stackschool-postgres
+  service-auth:
+    build:
+      context: .
+      dockerfile: infra/docker/service-auth.dockerfile
+    container_name: stackschool-service-auth
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - db_data:/var/lib/postgresql/data
+      DATABASE_URL: postgresql://${POSTGRES_AUTH_USER}:${POSTGRES_AUTH_PASSWORD}@auth_db:5432/${POSTGRES_AUTH_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+      REDIS_URL: redis://redis:6379
+    expose:
+      - '4001'
+    depends_on:
+      auth_db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+  service-core:
+    build:
+      context: .
+      dockerfile: infra/docker/service-core.dockerfile
+    container_name: stackschool-service-core
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_CORE_USER}:${POSTGRES_CORE_PASSWORD}@core_db:5432/${POSTGRES_CORE_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+    expose:
+      - '4002'
+    depends_on:
+      core_db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+  service-academic:
+    build:
+      context: .
+      dockerfile: infra/docker/service-academic.dockerfile
+    container_name: stackschool-service-academic
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_ACADEMIC_USER}:${POSTGRES_ACADEMIC_PASSWORD}@academic_db:5432/${POSTGRES_ACADEMIC_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+    expose:
+      - '4003'
+    depends_on:
+      academic_db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+  service-operations:
+    build:
+      context: .
+      dockerfile: infra/docker/service-operations.dockerfile
+    container_name: stackschool-service-operations
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_OPERATIONS_USER}:${POSTGRES_OPERATIONS_PASSWORD}@operations_db:5432/${POSTGRES_OPERATIONS_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+    expose:
+      - '4004'
+    depends_on:
+      operations_db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+  gateway:
+    build:
+      context: .
+      dockerfile: infra/docker/gateway.dockerfile
+    container_name: stackschool-gateway
+    environment:
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      REDIS_URL: redis://redis:6379
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
     ports:
-      - '5432:5432'
+      - '4000:4000' # seul service exposé publiquement
+    depends_on:
+      service-auth:
+        condition: service_started
+      service-core:
+        condition: service_started
+      service-academic:
+        condition: service_started
+      service-operations:
+        condition: service_started
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - stackschool-net
 

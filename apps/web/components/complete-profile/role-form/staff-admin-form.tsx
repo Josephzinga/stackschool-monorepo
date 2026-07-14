@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useCompleteProfileStore, zodResolver } from '@stackschool/ui';
 import { Briefcase, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { StaffFormSchema, StaffFormDataType } from '@stackschool/shared';
+import { StaffFormSchema, StaffFormDataType } from '@stackschool/contracts';
 import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Calendar } from '@/components/ui/calendar';

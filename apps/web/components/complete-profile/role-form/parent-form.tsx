@@ -18,7 +18,7 @@ import {
   parentFormSchema,
   parseAxiosError,
   RelationTypeEnum,
-} from '@stackschool/shared';
+} from '@stackschool/contracts';
 import { toast } from 'sonner';
 import { SubmitButton } from '@/components/submit-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

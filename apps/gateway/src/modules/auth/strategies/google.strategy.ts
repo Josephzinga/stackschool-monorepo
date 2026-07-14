@@ -25,7 +25,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     refreshToken: string,
     profile: Profile,
     done: DoneCallback,
-  ): Promise<any> {
+  ) {
     return this.authService.validateOAuthUser({
       accessToken,
       refreshToken,

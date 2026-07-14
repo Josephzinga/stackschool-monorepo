@@ -9,6 +9,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@stackschool/shared": "workspace:*",
+    "@stackschool/contracts": "workspace:*",
     "@tanstack/react-query": "^5.90.16",
     "@tanstack/react-query-persist-client": " ^5.90.16",
     "clsx": "^2.1.1",

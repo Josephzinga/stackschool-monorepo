@@ -6,7 +6,7 @@ import {
   useGetDashboardContextQuery,
   useUserStore,
 } from '@stackschool/ui';
-import { parseAxiosError } from '@stackschool/shared';
+import { parseAxiosError } from '@stackschool/contracts';
 import { LoaderCircleIcon } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -28,10 +28,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     },
   );
 
-  
-
   const contextData = data?.me?.schoolContext;
-  const role = currentMemberShip?.role || contextData?.role
+  const role = currentMemberShip?.role || contextData?.role;
 
   // Logique de redirection basée sur le rôle
   useEffect(() => {

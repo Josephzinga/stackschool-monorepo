@@ -23,7 +23,7 @@ import {
   parseAxiosError,
   profileSchema,
   ProfileType,
-} from '@stackschool/shared';
+} from '@stackschool/contracts';
 import { Field, FieldError, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';

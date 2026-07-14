@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import StudentForm from '@/components/complete-profile/role-form/student-form';
 import { allRoles, useCompleteProfileStore } from '@stackschool/ui';
-import { SchoolRole } from '@stackschool/shared';
+import { SchoolRole } from '@stackschool/contracts';
 import { ParentForm } from '@/components/complete-profile/role-form/parent-form';
 import { toast } from 'sonner';
 import { TeacherForm } from './role-form/teacher-form';

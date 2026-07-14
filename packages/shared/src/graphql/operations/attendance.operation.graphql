@@ -11,7 +11,7 @@ mutation MarkAttendance($input: [MarkAttendanceInput!]) {
         lastname
       }
     }
-    person {
+    member {
       ... on Student {
         id
         schoolClass {

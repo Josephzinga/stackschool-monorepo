@@ -38,7 +38,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24",
     "@types/react": "catalog:",
-    "@types/react-dom": "catalog",
+    "@types/react-dom": "catalog:",
     "eslint": "^9",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
@@ -54,8 +54,8 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "ts-node-dev": "^2.0.0"
   },
   "packageManager": "pnpm@11.9.0"

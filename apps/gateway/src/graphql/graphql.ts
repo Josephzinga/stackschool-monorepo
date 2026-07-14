@@ -307,7 +307,7 @@ export class AttendanceSessionPayload {
 export class AttendanceRecord {
     __typename?: 'AttendanceRecord';
     id?: Nullable<string>;
-    person?: Nullable<Person>;
+    member?: Nullable<Member>;
     status?: Nullable<AttendanceStatus>;
     date?: Nullable<DateTime>;
     checkInTime?: Nullable<DateTime>;
@@ -725,7 +725,7 @@ export class Staff {
     position: string;
     hireDate?: Nullable<DateTime>;
     salary?: Nullable<number>;
-    departement?: Nullable<string>;
+    department?: Nullable<string>;
 }
 
 export class TeachingTeamMember {
@@ -894,5 +894,5 @@ export class User {
 
 export type DateTime = any;
 export type SchoolId = any;
-export type Person = Student | Teacher | Staff;
+export type Member = Student | Teacher | Staff | Parent;
 type Nullable<T> = T | null;

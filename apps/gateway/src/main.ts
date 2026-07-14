@@ -11,7 +11,6 @@ import { doubleCsrf } from 'csrf-csrf';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response, NextFunction } from 'express';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -50,6 +49,8 @@ async function bootstrap() {
     origin: [
       (configService.get('FRONTEND_URL') as string) || '*',
       'http://localhost:3000',
+      'https://sandbox.embed.apollographql.com',
+      'https://studio.apollographql.com',
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -61,6 +62,8 @@ async function bootstrap() {
       'CSRF-Token',
       'X-Requested-With',
       'x-school-id',
+      'Access-Control-Allow-Origin',
+      'Cookie',
     ],
     exposedHeaders: ['x-csrf-token'],
   });

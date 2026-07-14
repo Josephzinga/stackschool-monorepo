@@ -1,0 +1,22 @@
+{
+  "name": "@stackschool/messaging",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm && tsc --emitDeclarationOnly --declaration --outDir dist",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@stackschool/contracts": "workspace:*",
+    "dotenv": "^17.2.3",
+    "zod": "^4.2.1",
+    "@nestjs/microservices": "11.1.28",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1"
+  }
+}

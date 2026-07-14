@@ -13,12 +13,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus() ?? 500;
-    console.log(
-      'Exception',
-      exception.getResponse(),
-      'message',
-      exception.message,
-    );
     const exceptionResponse = exception.getResponse() as
       { errors?: unknown } | string | number | boolean | null;
     const errors =
@@ -28,6 +22,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exceptionResponse.errors
         : exceptionResponse;
     response.status(status).json({
+      ok: false,
       errors,
       statusCode: status,
       timestamp: new Date().toISOString(),

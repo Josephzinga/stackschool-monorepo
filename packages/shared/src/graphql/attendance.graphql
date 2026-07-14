@@ -37,11 +37,10 @@ type AttendanceSessionPayload {
 
 type AttendanceRecord {
   id: String
-  person: Person
+  member: Member
   status: AttendanceStatus
   date: DateTime
   checkInTime: DateTime
   recordedBy: User
   type: AttendanceType
 }
-union Person = Student | Teacher | Staff

@@ -4,7 +4,7 @@ import SchoolStep from '../../../components/complete-profile/schoolStep';
 import { Container } from '@/components/Container';
 
 import { useCompleteProfileStore, useUserStore } from '@stackschool/ui';
-import { School } from '@stackschool/shared';
+import { SchoolContract } from '@stackschool/contracts';
 import ProtectedRoute from '@/components/providers/protected-route';
 import Stepper from '@/components/Stepper';
 import RoleStep from '@/components/complete-profile/RoleStep';
@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 export type CompleteProfileData = {
   school: {
     schoolId?: string;
-    newSchool?: School;
+    newSchool?: SchoolContract;
     invitationCode?: string;
   };
 };

@@ -1,19 +1,17 @@
-import { Session } from '@stackschool/db-auth';
-import { generateToken } from '../../../utils/generate-token';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import crypto from 'crypto';
 import { randomInt } from 'crypto';
-import { Prisma } from '@stackschool/db-auth';
-
-const SESSION_EXPIRES_DAY = Number(process.env.SESSION_EXPIRES_DAY ?? '25');
+import { SESSION_EXPIRES_DAY } from '../../../constant/config';
+import { Prisma } from '../../../prisma/db/generated/client';
 
 @Injectable()
 export class TokenService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUserSession(userId: string): Promise<Session> {
-    const refreshToken = generateToken(16);
+  async createUserSession(userId: string) {
+    const refreshToken = this.generateToken(16);
+    const hashToken = this.hashToken(refreshToken);
     const expires = new Date(
       Date.now() + 1000 * 60 * 60 * 24 * SESSION_EXPIRES_DAY,
     );
@@ -21,12 +19,17 @@ export class TokenService {
     const session = await this.prisma.session.create({
       data: {
         userId,
-        sessionToken: refreshToken,
+        sessionToken: hashToken,
         expires,
       },
     });
 
-    return session;
+    return {
+      ...session,
+      sessionToken: refreshToken,
+      userId: session.userId as string,
+      expires: session.expires.toISOString(),
+    };
   }
 
   async findOne(where: Prisma.VerificationTokenWhereInput) {
@@ -55,5 +58,9 @@ export class TokenService {
 
   hashCode(code: string) {
     return this.hashToken(code);
+  }
+
+  randomUUID() {
+    return crypto.randomUUID().toString();
   }
 }

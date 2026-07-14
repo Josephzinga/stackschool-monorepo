@@ -1,4 +1,4 @@
-import { prisma } from './index.js';
+import { prisma } from './';
 import {
   AttendanceStatus,
   Day,

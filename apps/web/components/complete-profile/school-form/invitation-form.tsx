@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { api, parseAxiosError } from '@stackschool/shared';
+import { api, parseAxiosError } from '@stackschool/contracts';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 
 // Schéma simple pour vérifier le code

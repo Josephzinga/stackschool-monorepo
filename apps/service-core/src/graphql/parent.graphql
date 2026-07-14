@@ -1,0 +1,16 @@
+type Parent {
+  id: ID!
+  profession: String
+  isDelegate: Boolean
+  parentStudent: [ParentStudent]
+  schoolUserId: ID
+  user: User
+}
+
+type ParentStudent {
+  relationType: RelationType
+  student: Student
+  studentId: ID
+  parentId: ID
+  parent: Parent
+}

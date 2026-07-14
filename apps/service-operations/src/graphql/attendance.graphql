@@ -1,0 +1,8 @@
+type AttendanceStats {
+  rate: Float!
+  presentCount: Int!
+  absentCount: Int!
+  lateCount: Int!
+  totalExpected: Int!
+  history: [DailyAttendance!]
+}

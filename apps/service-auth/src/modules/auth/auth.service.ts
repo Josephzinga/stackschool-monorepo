@@ -8,37 +8,24 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
-import { VerifyCallback } from 'passport-google-oauth20';
 import { PrismaService } from '../../prisma/prisma.service';
 import { TokenService } from './services/token.service';
 import { AuthUserService } from './services/auth-user.service';
-import { Profile as GoogleProfile } from 'passport-google-oauth20';
-import { Profile as FacebookProfile } from 'passport-facebook';
-import { LoginDto, RegisterDto } from './dto/auth-dto';
 import type { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
-import { Prisma } from '@stackschool/db-auth';
-import { ForgotPasswordService } from './services/forgot-password/forgot-password.service';
-import { ResendCodeService } from './services/resend-code/resend-code.service';
-import { ResetPasswordService } from './services/reset-password/reset-password.service';
-import { VerifyCodeService } from './services/verify-code/verify-code.service';
-import { AppRpcException } from '@stackschool/shared';
-
-interface ValidateOAuthUserParams {
-  accessToken: string;
-  refreshToken: string;
-  profileOAuth: ProfileOAuth;
-  done: VerifyCallback;
-}
-
-type AuthenticatedUser = Prisma.UserGetPayload<{
-  include: { accounts: true; profile: true };
-}>;
-
-type ProfileOAuth =
-  | { provider: 'google'; profile: GoogleProfile }
-  | { provider: 'facebook'; profile: FacebookProfile };
+import { ForgotPasswordService } from './services/forgot-password.service';
+import { ResendCodeService } from './services/resend-code.service';
+import { ResetPasswordService } from './services/reset-password.service';
+import { VerifyCodeService } from './services/verify-code.service';
+import {
+  AuthRpcException,
+  ResetPasswordInput,
+  CreateUserSessionResponse,
+  CreateUserInput,
+  ValidateCredentialsInput,
+} from '@stackschool/messaging';
+import { toUserWithRelationsContract } from '../../mappers/user.mapper';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +41,7 @@ export class AuthService {
     private readonly verifyCodeService: VerifyCodeService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: CreateUserInput) {
     console.log('Register service-auth', registerDto);
     const safeEmail = registerDto?.email?.trim();
     const safePhone = registerDto?.phoneNumber?.trim();
@@ -77,16 +64,16 @@ export class AuthService {
 
     if (existing) {
       if (safeEmail && existing?.email === safeEmail) {
-        throw new AppRpcException('EMAIL_TAKEN', 'Email déjà utilisé.');
+        throw new AuthRpcException('EMAIL_TAKEN', 'Email déjà utilisé.');
       }
       if (existing?.username === registerDto.username) {
-        throw new AppRpcException(
+        throw new AuthRpcException(
           'USERNAME_TAKEN',
           "Nom d'utilisateur déjà utilisé.",
         );
       }
       if (safePhone && existing.phoneNumber === safePhone) {
-        throw new AppRpcException(
+        throw new AuthRpcException(
           'PHONE_TAKEN',
           'Numéro de téléphone déjà utilisé.',
         );
@@ -148,7 +135,7 @@ export class AuthService {
     });
   }
 
-  async login(user: AuthenticatedUser | Request['user'], res: Response) {
+  async login(user: Request['user'], res: Response) {
     if (!user?.id) {
       throw new UnauthorizedException('Utilisateur non authentifié.');
     }
@@ -156,7 +143,6 @@ export class AuthService {
     const { sessionToken, expires } = await this.tokenService.createUserSession(
       user.id,
     );
-    this.setResponseCookies(res, sessionToken, expires);
 
     return res.status(HttpStatus.OK).json({
       ok: true,
@@ -173,27 +159,18 @@ export class AuthService {
           id: user?.profile?.id,
           firstname: user?.profile?.firstname,
           lastname: user?.profile?.lastname,
-          photo: user?.profile?.photo,
+          avatarUrl: user?.profile?.avatarUrl,
         },
       },
     });
   }
-  async validateLocalUser(loginDto: LoginDto) {
-    const user = await this.userService.findOne({
-      where: {
-        isActive: true,
-        OR: [
-          { email: { equals: loginDto.identifier, mode: 'insensitive' } },
-          { phoneNumber: loginDto.identifier },
-          { username: { equals: loginDto.identifier, mode: 'insensitive' } },
-        ],
-      },
-      include: { accounts: true, profile: true },
-    });
+  async validateLocalUser(data: ValidateCredentialsInput) {
+    const user = await this.userService.findByIdentifierWithRelations(
+      data.identifier,
+    );
 
-    if (!user) {
-      throw new AppRpcException('USER_NOT_FOUND', 'Utilisateur non trouvé.');
-    }
+    if (!user)
+      throw new AuthRpcException('USER_NOT_FOUND', 'Utilisateur non trouvé.');
 
     const hasLocalPassword =
       typeof user.password === 'string' && user.password.length > 0;
@@ -202,7 +179,7 @@ export class AuthService {
       .map((acc) => acc.provider);
 
     if (!hasLocalPassword && socialProviders.length > 0) {
-      throw new AppRpcException(
+      throw new AuthRpcException(
         'SOCIAL_ONLY_ACCOUNT',
         `Ce compte utilise : ${socialProviders.join(', ')}. Veuillez vous connecter avec.`,
         { providers: socialProviders },
@@ -210,27 +187,28 @@ export class AuthService {
     }
 
     if (!hasLocalPassword) {
-      throw new AppRpcException('INVALID_CREDENTIALS', 'Identifiant invalide.');
+      throw new AuthRpcException(
+        'INVALID_CREDENTIALS',
+        'Identifiant invalide.',
+      );
     }
 
     const validPassword = await bcrypt.compare(
-      loginDto.password,
+      data.password,
       user.password as string,
     );
     if (!validPassword) {
-      throw new AppRpcException('INVALID_CREDENTIALS', 'Identifiant invalide.');
+      throw new AuthRpcException(
+        'INVALID_CREDENTIALS',
+        'Identifiant invalide.',
+      );
     }
 
-    return user;
+    return toUserWithRelationsContract(user);
   }
-
-  async validateOAuthUser({
-    accessToken,
-    refreshToken,
-    profileOAuth,
-    done,
-  }: ValidateOAuthUserParams) {
+  async validateOAuthUser({ accessToken, refreshToken, profileOAuth }: any) {
     try {
+      console.log('Validate OAuthUser service auth', profileOAuth);
       const profile = profileOAuth.profile;
       const providerAccountId = profile?.id;
       const emailRaw = profile?.emails?.[0]?.value || null;
@@ -258,120 +236,78 @@ export class AuthService {
         refreshToken,
       });
 
-      return done(null, user);
-    } catch (error) {
-      return done(error);
-    }
-  }
-
-  async handleSocialCallback(req: Request, res: Response) {
-    const user = req.user;
-    if (!user || !user.id) {
-      return res.redirect(`${process.env.FRONTEND_URL}/auth/login?error=1`);
-    }
-
-    const { sessionToken, expires } = await this.tokenService.createUserSession(
-      user.id,
-    );
-    this.setResponseCookies(res, sessionToken, expires);
-
-    if (!user.profileCompleted) {
-      return res.redirect(`${process.env.FRONTEND_URL}/auth/complete-profile`);
-    }
-
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/finish`);
-  }
-  // ─── Reset Password ───
-  async resetPassword(
-    token: string | undefined,
-    password: string,
-    req: Request,
-    res: Response,
-  ) {
-    return await this.resetPasswordService.execute(token, password, req, res);
-  }
-
-  // ─── Verify Code ───
-  async verifyCode(code: string, req: Request, res: Response) {
-    return await this.verifyCodeService.execute(code, req, res);
-  }
-
-  // ─── Resend Code ───
-  resendCode(req: Request) {
-    return this.resendCodeService.execute(req);
-  }
-
-  async forgotPassword(identifier: string, res: Response) {
-    return this.forgotPasswordService.forgotPassword(identifier, res);
-  }
-
-  async generateSession(userId: string) {
-    return this.tokenService.createUserSession(userId);
-  }
-
-  async refreshToken(req: Request, res: Response, refreshToken: string) {
-    try {
-      const dbSession = await this.prisma.session.findFirst({
-        where: { sessionToken: refreshToken },
-      });
-
-      if (!dbSession || dbSession.expires < new Date()) {
-        // si token abssent ou expiré
-        if (dbSession) {
-          await this.prisma.session.delete({
-            where: { id: dbSession.id },
-          });
-        }
-        res.clearCookie('refresh_token');
-        throw new UnauthorizedException(
-          'Token de rafraîchissement invalide ou expiré.',
-        );
-      }
-      const user = await this.userService.findUnique({
-        where: { id: dbSession.userId as string },
-      });
-
-      if (!user) {
-        await this.prisma.session.delete({
-          where: { id: dbSession.id },
-        });
-        res.clearCookie('refresh_token');
-        throw new NotFoundException('Utilisateur non trouvé.');
-      }
-
-      await this.prisma.session.delete({
-        where: {
-          id: dbSession.id,
-        },
-      });
-
-      req.logIn(user, (err) => {
-        if (err)
-          throw new InternalServerErrorException(
-            'Impossible de se connecter après rafraichisement.',
-          );
-        this.login(user, res).catch((err) => {
-          throw new InternalServerErrorException(err);
-        });
-      });
-    } catch (err: any) {
-      throw new InternalServerErrorException(
-        'Erreur lors du rafréchisement du token.',
-        err,
+      return user;
+    } catch (err) {
+      throw new AuthRpcException(
+        'INTERNAL_ERROR',
+        "Erreur lors de la création de l'utilisateur",
       );
     }
   }
 
-  private setResponseCookies(
-    res: Response,
-    sessionToken: string,
-    expires: Date,
-  ) {
-    res.cookie('refresh_token', sessionToken, {
-      httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'lax',
-      maxAge: expires.getTime() - Date.now(),
+  // ─── Reset Password ───
+  async resetPassword(dto: ResetPasswordInput) {
+    return await this.resetPasswordService.execute(dto);
+  }
+
+  // ─── Verify Code ───
+  async verifyCode(code: string, tempToken: string) {
+    return await this.verifyCodeService.execute(code, tempToken);
+  }
+
+  // ─── Resend Code ───
+  resendCode(tempToken: string) {
+    return this.resendCodeService.execute(tempToken);
+  }
+
+  async forgotPassword(identifier: string) {
+    return this.forgotPasswordService.execute(identifier);
+  }
+
+  async generateSession(userId: string): Promise<CreateUserSessionResponse> {
+    return await this.tokenService.createUserSession(userId);
+  }
+
+  async refreshToken(refreshToken: string) {
+    const hashToken = this.tokenService.hashToken(refreshToken);
+    const dbSession = await this.prisma.session.findFirst({
+      where: { sessionToken: hashToken },
     });
+
+    if (!dbSession || dbSession.expires < new Date()) {
+      // si token abssent ou expiré
+      if (dbSession) {
+        await this.prisma.session.delete({
+          where: { id: dbSession.id },
+        });
+      }
+      throw new AuthRpcException(
+        'INVALID_CREDENTIALS',
+        'Token de rafraîchissement invalide ou expiré.',
+      );
+    }
+    const user = await this.userService.findUnique({
+      where: { id: dbSession.userId as string },
+    });
+
+    if (!user) {
+      await this.prisma.session.delete({
+        where: { id: dbSession.id },
+      });
+      throw new AuthRpcException(
+        'INVALID_CREDENTIALS',
+        'Token de rafraîchissement invalide ou expiré.',
+      );
+    }
+
+    await this.prisma.session.delete({
+      where: {
+        id: dbSession.id,
+      },
+    });
+    return {
+      ok: true,
+      user: toUserWithRelationsContract({ ...user, accounts: [] }),
+    };
   }
 }

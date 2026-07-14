@@ -1,0 +1,29 @@
+type TeacherAssignments @key(fields: "id") {
+  id: ID!
+  teacher: Teacher
+  teacherId: ID!
+  classSubjectId: ID!
+  classSubjects: ClassSubject
+  lessons: [Lesson!]
+  schoolId: ID
+}
+type Teacher @key(fields: "id") {
+  id: ID!
+  schoolUserId: ID
+  diploma: String
+  experience: String
+  hireDate: DateTime
+  isActive: Boolean
+  bio: String
+  salary: Float
+  department: String
+  specialization: String
+  assignments: [TeacherAssignments]
+  supervisedClasses: [Class]
+  createdAt: DateTime
+  updatedAt: DateTime
+  attendances(date: Date): [AttendanceRecord!]
+  weeklyHours: Float
+  classesCount: Int
+  user: User
+}

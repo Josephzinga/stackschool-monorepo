@@ -1,4 +1,5 @@
-POST  http://localhost:4000/api/auth/login HTTP/1.1
+POST http://localhost:4000/graphql HTTP/1.1
+X-Request-Type: GraphQL
 User-Agent: rest-client
 Accept-Language: en-GB,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4
 X-Download-Options: noopen
@@ -6,12 +7,19 @@ X-Frame-Options: SAMEORIGIN
 X-Permitted-Cross-Domain-Policies: none
 Content-Type: application/json; charset=utf-8
 Access-Control-Allow-Credentials: true
+Set-Cookie: refresh_token=9e39ab5cab35710d13213648d2dcc6d5; Max-Age=2159999; Path=/; Expires=Sat, 08 Aug 2026 19:26:33 GMT; HttpOnly; SameSite=Lax,sid=s%3AtWtJwVK5xb-jgOQnJfOk2e3DHB4xGJ-W.pg2L%2B5F0yET9sDtE1zTX0lcnQkjrn3YbhugFzvzU1WY; Path=/; Expires=Tue, 14 Jul 2026 20:26:33 GMT; HttpOnly; SameSite=Lax
+x-school-id: 
 
-{
-  "identifier": "futizingajoseph@gmail.com",
-  "password": "JJJJ.8888"
+query Me {
+  me {
+    id 
+    username
+    email
+    memberships {
+      id
+    }
+  }
 }
-
 
 
 

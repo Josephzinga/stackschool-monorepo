@@ -1,0 +1,29 @@
+type User @key(fields: "id") {
+  id: ID!
+  memberships: [SchoolMembership]
+  schoolContext(schoolId: ID!): SchoolMembership
+}
+
+type Profile @key(fields: "id") {
+  id: ID!
+}
+
+type ClassSubject @key(fields: "id") {
+  id: ID!
+}
+
+type Lesson @key(fields: "id") {
+  id: ID!
+}
+
+type Class @key(fields: "id") {
+  id: ID!
+}
+
+type AttendanceRecord @key(fields: "id") {
+  id: ID!
+}
+
+type StudentDisciplinaryAction @key(fields: "id") {
+  id: ID!
+}

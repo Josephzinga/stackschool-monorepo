@@ -17,7 +17,8 @@ import {
   forgotPasswordSchema,
   FormDataType,
   parseAxiosError,
-} from '@stackschool/shared';
+  api,
+} from '@stackschool/contracts';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm, zodResolver } from '@stackschool/ui';
@@ -185,6 +186,13 @@ export default function ForgotPasswordPage() {
               className="hover:underline block text-sm text-primary/90 font-inter "
             >
               ← Retour à la connexion
+            </Link>
+
+            <Link
+              href="/auth/verify-code"
+              className="hover:underline block text-sm text-primary/90 font-inter "
+            >
+              Vérifier le code{' '}
             </Link>
 
             <p className="text-sm font-jost text-foreground/85 tracking-tight">

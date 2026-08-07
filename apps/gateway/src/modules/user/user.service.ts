@@ -6,9 +6,8 @@ import {
   UserWithRelationsContract,
 } from '@stackschool/messaging';
 
-import { firstValueFrom, timeout, catchError, throwError } from 'rxjs';
+import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import { mapAuthError } from '../../errors/auth.error-maper';
-import { validateWith } from '../../utils/validate.operator';
 
 @Injectable()
 export class UserService {
@@ -17,7 +16,6 @@ export class UserService {
     return await firstValueFrom<UserWithRelationsContract>(
       this.authClient.send(AUTH_PATTERNS.FIND_FULL_USER, { userId }).pipe(
         timeout(3000),
-        validateWith(UserWithRelationsContract),
         catchError((err) => throwError(() => mapAuthError(err))),
       ),
     );

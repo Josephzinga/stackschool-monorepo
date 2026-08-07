@@ -27,3 +27,40 @@ type Teacher @key(fields: "id") {
   classesCount: Int
   user: User
 }
+
+input CreateTeacherInput {
+  firstName: String!
+  lastName: String!
+  email: String
+  phoneNumber: String
+  gender: Gender!
+  diploma: String
+  specialization: String!
+}
+type TeacherList {
+  data: [Teacher!]!
+  meta: PaginationMeta!
+}
+
+input GetSchoolTeachersInput {
+  page: Int! = 0
+  limit: Int! = 10
+  searchTerm: String
+
+  classId: ID
+  subjectId: ID
+  isActive: Boolean
+  isSupervisor: Boolean
+
+  day: Day
+}
+
+input CreateTeacherAssignmentInput {
+  classId: ID!
+  subjectIds: [ID!]!
+  teacherId: ID!
+}
+type TeacherTodaySubject {
+  teachers: Teacher
+  classes: ClassLessons
+}

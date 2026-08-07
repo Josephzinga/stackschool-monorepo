@@ -22,10 +22,6 @@ export interface CurrentUserOptions {
   optional?: boolean;
 }
 
-/**
- * @CurrentUser()                       → UserInMe        (route protégée)
- * @CurrentUser({ optional: true })     → UserInMe | undefined  (route publique)
- */
 export const CurrentUser = createParamDecorator(
   (data: CurrentUserOptions | undefined, ctx: ExecutionContext) => {
     const user = getRequest(ctx).user;

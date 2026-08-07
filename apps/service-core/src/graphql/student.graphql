@@ -44,3 +44,50 @@ input StudentSortInput {
   field: StudentSortField
   order: SortOrder
 }
+
+input CreateStudentInput {
+  firstname: String!
+  lastname: String!
+  email: String
+  phoneNumber: String
+  gender: Gender!
+  classId: ID!
+  matricule: String!
+  birthDate: DateTime
+  birthPlace: DateTime
+  enrollmentYear: String
+  nationality: String
+  enrollmentDate: DateTime
+  previousClass: String
+  studentNumber: Int
+  address: String
+  bloodGroup: String
+  birthCertificateNumber: String
+  medicalCondition: String
+  allergies: String
+  parentData: UpdateStudentParentData
+  transportMode: TransportMode
+  previousSchool: String
+  status: StudentStatus
+}
+
+type StudentDisciplinaryAction {
+  id: String
+  studentId: ID
+  type: DisciplinaryType
+  reason: String
+  startDate: DateTime
+  endDate: DateTime
+}
+
+type StudentList {
+  data: [Student!]
+  meta: PaginationMeta!
+}
+
+input StudentSearchInput {
+  schoolId: ID
+  searchTerm: String
+  getSubject: Boolean
+  limit: Int
+}

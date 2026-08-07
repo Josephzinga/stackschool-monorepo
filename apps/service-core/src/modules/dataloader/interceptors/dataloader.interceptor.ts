@@ -11,7 +11,7 @@ import { GraphQLContext } from '@stackschool/messaging';
 import { DataLoaders } from '../dataloader.service';
 
 export interface GraphqlContextWithLoaders extends GraphQLContext {
-  loaders?: DataLoaders;
+  loaders: DataLoaders;
 }
 
 @Injectable()
@@ -23,7 +23,7 @@ export class DataLoaderInterceptor implements NestInterceptor {
       GqlExecutionContext.create(
         context,
       ).getContext<GraphqlContextWithLoaders>();
-
+    console.log('interceptor');
     if (!ctx.loaders) {
       ctx.loaders = this.loadersService.createLoaders();
     }

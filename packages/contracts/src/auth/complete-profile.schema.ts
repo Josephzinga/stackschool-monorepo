@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { profileSchema } from '../../src/index.js';
+import {z} from 'zod';
+import {profileSchema} from '../../src/index.js';
 
 z.config(z.locales.fr());
 
@@ -162,22 +162,22 @@ export const completeProfileDataSchema = z
     school: schoolDataSchema.nullable(),
     currentStep: z.coerce.number<number>(),
   })
-  .superRefine((data, ctx) => {
-    if (data.currentStep === 1 && !data.school) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['school'],
-        message: "Vous devriez remplir les information de l'ecole",
-      });
-    }
-    if (data.currentStep === 2 && !data.profile) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['profile'],
-        message: 'Remplisez le donné du profile',
-      });
-    }
-  });
+    .superRefine((data, ctx) => {
+      if (data.currentStep === 2 && !data.school) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['school'],
+          message: "Vous devriez remplir les information de l'école",
+        });
+      }
+      if (data.currentStep === 3 && !data.profile) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['profile'],
+          message: 'Remplissez le donné du profile',
+        });
+      }
+    });
 
 // Types inférés
 export type StaffFormDataType = z.infer<typeof StaffFormSchema>;

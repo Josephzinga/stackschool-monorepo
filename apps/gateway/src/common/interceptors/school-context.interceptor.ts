@@ -22,7 +22,6 @@ export class SchoolContextInterceptor implements NestInterceptor {
       GqlExecutionContext.create(context).getContext<GraphQLContext>();
     const req = gqlCtx.req;
     const schoolId = req.headers['x-school-id'] as string | undefined;
-
     if (schoolId && gqlCtx.user) {
       gqlCtx.schoolUser = await this.memberService.findBySchoolIdAndUserId({
         schoolId,

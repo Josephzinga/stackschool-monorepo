@@ -13,6 +13,8 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
       process.env.GATEWAY_INTERNAL_SECRET!,
     );
 
+    console.log('Contexte', context.schoolUser);
+
     if (context.user) {
       request.http?.headers.set('x-user-id', context.user.id);
       request.http?.headers.set('x-user-role', context?.user?.role);

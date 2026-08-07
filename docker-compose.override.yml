@@ -1,0 +1,138 @@
+services:
+  service-auth:
+    build:
+      context: .
+      dockerfile: infra/docker/dev/service-auth.dockerfile.dev
+    container_name: stackschool-service-auth-dev
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_AUTH_USER}:${POSTGRES_AUTH_PASSWORD}@auth_db:5432/${POSTGRES_AUTH_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - .:/repo               # Synchronise tout votre projet local dans le conteneur
+      - /repo/node_modules    # Empêche l'écrasement du node_modules du conteneur par celui du host
+      - /repo/apps/auth/node_modules
+    expose:
+      - '4001'
+    depends_on:
+      auth_db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+  service-core:
+    build:
+      context: .
+      dockerfile: infra/docker/dev/service-core.dockerfile.dev
+    container_name: stackschool-service-core-dev
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_CORE_USER}:${POSTGRES_CORE_PASSWORD}@core_db:5432/${POSTGRES_CORE_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+    volumes:
+      - .:/repo
+      - /repo/node_modules
+      - /repo/apps/core/node_modules
+    expose:
+      - '4002'
+    depends_on:
+      core_db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+  service-academic:
+    build:
+      context: .
+      dockerfile: infra/docker/dev/service-academic.dockerfile.dev
+    container_name: stackschool-service-academic-dev
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_ACADEMIC_USER}:${POSTGRES_ACADEMIC_PASSWORD}@academic_db:5432/${POSTGRES_ACADEMIC_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+    volumes:
+      - .:/repo
+      - /repo/node_modules
+      - /repo/apps/academic/node_modules
+    expose:
+      - '4003'
+    depends_on:
+      academic_db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+  service-operations:
+    build:
+      context: .
+      dockerfile: infra/docker/dev/service-operations.dockerfile.dev
+    container_name: stackschool-service-operations-dev
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_OPERATIONS_USER}:${POSTGRES_OPERATIONS_PASSWORD}@operations_db:5432/${POSTGRES_OPERATIONS_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+    volumes:
+      - .:/repo
+      - /repo/node_modules
+      - /repo/apps/operations/node_modules
+    expose:
+      - '4004'
+    depends_on:
+      operations_db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+  gateway:
+    build:
+      context: .
+      dockerfile: infra/docker/dev/gateway.dockerfile.dev
+    container_name: stackschool-gateway-dev
+    environment:
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      REDIS_URL: redis://redis:6379
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+    volumes:
+      - .:/repo
+      - /repo/node_modules
+      - /repo/apps/gateway/node_modules
+    ports:
+      - '4000:4000' # seul service exposé publiquement
+    depends_on:
+      service-auth:
+        condition: service_started
+      service-core:
+        condition: service_started
+      service-academic:
+        condition: service_started
+      service-operations:
+        condition: service_started
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stackschool-net
+
+volumes:
+  db_data:
+  auth_data:
+  core_data:
+  operations_data:
+  academic_data:
+  redis_data:
+  rabbitmq_data:
+
+networks:
+  stackschool-net:
+    driver: bridge

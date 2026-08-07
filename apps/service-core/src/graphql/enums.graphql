@@ -8,7 +8,10 @@ enum RelationType {
   GRAND_FATHER
   AUNT
 }
-
+enum Gender {
+  MALE
+  FEMALE
+}
 enum Day {
   MONDAY
   TUESDAY
@@ -74,11 +77,19 @@ enum PermissionCode {
   MANAGE_PAYMENTS
   VIEW_FINANCIAL_REPORTS
 }
-
+enum ParentStudentUpdateMode {
+  CREATE
+  CONNECT
+}
 enum PermissionModule {
   ATTENDANCE
   ACADEMICS
   USERS
   FINANCE
   SETTINGS
+}
+enum DisciplinaryType {
+  SUSPENSION
+  EXPULSION
+  WARNING
 }

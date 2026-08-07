@@ -24,6 +24,6 @@ type AttendanceRecord @key(fields: "id") {
   id: ID!
 }
 
-type StudentDisciplinaryAction @key(fields: "id") {
+type ClassLessons @key(fields: "id") {
   id: ID!
 }

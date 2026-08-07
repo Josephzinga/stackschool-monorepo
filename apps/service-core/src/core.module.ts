@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { SchoolModule } from './modules/school/school.module';
 import { MembershipModule } from './modules/membership/membership.module';
@@ -11,6 +9,8 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { join } from 'node:path';
+import { Request, Response } from 'express';
+import { DataLoaderService } from './modules/dataloader/dataloader.service';
 import { DataloaderModule } from './modules/dataloader/dataloader.module';
 
 @Module({
@@ -19,13 +19,21 @@ import { DataloaderModule } from './modules/dataloader/dataloader.module';
     SchoolModule,
     MembershipModule,
     TeacherModule,
-    DataloaderModule,
     GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
-      useFactory: () => ({
+      imports: [DataloaderModule],
+      inject: [DataLoaderService],
+      useFactory: (dataLoaderService: DataLoaderService) => ({
         typePaths: [join(process.cwd(), '/src/graphql/**/*.graphql')],
-        context: ({ req }) => {
-          console.log('Headers', req?.headers);
+        context: ({ req, res }: { req: Request; res: Response }) => {
+          const userId = req.headers['x-user-id'];
+          const schoolId = req.headers['x-school-id'];
+          console.log('userId', userId, 'SchoolId', schoolId);
+          return {
+            req,
+            res,
+            loaders: dataLoaderService.createLoaders(),
+          };
         },
         buildSchemaOptions: {
           dateScalarMode: 'timestamp',
@@ -37,7 +45,5 @@ import { DataloaderModule } from './modules/dataloader/dataloader.module';
       }),
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
-export class AppModule {}
+export class CoreModule {}

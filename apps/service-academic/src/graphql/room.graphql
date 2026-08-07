@@ -1,0 +1,29 @@
+type Room {
+  id: ID!
+  name: String!
+  code: String
+  capacity: Int
+  type: String
+  class: [Class]
+  defaultForClass: Class
+}
+type RoomList {
+  data: [Room]!
+  meta: PaginationMeta
+}
+
+input CreateRoomInput {
+  id: ID
+  name: String!
+  capacity: Int
+  type: String
+  code: String
+  defaultClassId: String
+}
+input GetSchoolRoomInput {
+  page: Int! = 0
+  limit: Int! = 10
+  classId: String
+  teacherId: String
+  searchTerm: String
+}

@@ -14,3 +14,34 @@ type ParentStudent {
   parentId: ID
   parent: Parent
 }
+
+input CreateParentInput {
+  firstName: String!
+  lastName: String!
+  phoneNumber: String!
+  isDelegate: Boolean
+  email: String
+  address: String!
+  profession: String!
+  children: [ParentStudentInput!]
+}
+input UpdateStudentParentData {
+  mode: ParentStudentUpdateMode
+  parentId: ID
+  newParent: CreateParentInput
+}
+input ParentStudentInput {
+  id: ID!
+  relationType: RelationType!
+}
+
+input GetSchoolParentsInput {
+  page: Int! = 0
+  limit: Int! = 10
+  searchTerm: String
+  studentId: String
+}
+type ParentList {
+  data: [Parent!]
+  meta: PaginationMeta
+}

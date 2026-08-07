@@ -19,18 +19,18 @@ model User {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   deletedAt         DateTime?
-  hasMembership     Boolean?            @default(false)
-  profileCompleted  Boolean?            @default(false)
-  username          String?             @unique
-  isVerified        Boolean?
+  hasMembership     Boolean             @default(false)
+  profileCompleted  Boolean             @default(false)
+  username          String
+  isVerified        Boolean             @default(false)
   phoneNumber       String?             @unique
   emailVerifiedAt   DateTime?
-  emailVerified     Boolean?            @default(false)
+  emailVerified     Boolean             @default(false)
   isActive          Boolean             @default(true)
   accounts          Account[]
   payments          String[]
   profile           Profile?
-  membershipIds       String[]
+  membershipIds     String[]
   sessions          Session[]
   VerificationCode  VerificationCode[]
   VerificationToken VerificationToken[]
@@ -40,9 +40,9 @@ model User {
 
 model Profile {
   id        String   @id @default(uuid())
-  firstname String?
-  lastname  String?
-  gender    Gender?
+  firstname String
+  lastname  String
+  gender    Gender
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String   @unique

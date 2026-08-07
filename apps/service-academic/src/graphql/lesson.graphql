@@ -1,0 +1,78 @@
+type Lesson {
+  id: ID!
+  title: String
+  startTime: DateTime
+  endTime: DateTime
+  day: Day
+  teacherAssignmentId: ID!
+  teacherAssignment: TeacherAssignments
+  status: LessonStatus!
+  room: Room
+}
+
+type LessonsEvents {
+  id: ID!
+  resourceId: ID
+  title: String!
+  startTime: String!
+  endTime: String!
+  day: Day!
+  status: LessonStatus
+  subject: Subject!
+  group: Group
+  teacher: LessonTeacher
+  room: Room
+}
+type LessonTeacher {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  weeklyHours: Float
+}
+input GetLessonsInput {
+  groupId: ID
+  teacherId: ID
+  classId: ID
+  department: String
+  mode: ResourceMode!
+  hasLessonOnly: Boolean = true
+  section: String
+  status: LessonStatus
+  level: String
+  limit: Int! = 6
+  page: Int! = 0
+}
+input CreateLessonInput {
+  day: Day!
+  mode: ResourceMode!
+  startTime: DateTime!
+  endTime: DateTime!
+  subjectId: ID!
+  teacherId: ID
+  groupId: ID
+}
+
+input UpdateLessonInput {
+  id: ID!
+  startTime: DateTime
+  endTime: DateTime
+  groupId: ID
+  teacherId: ID
+  subjectId: ID
+  day: Day
+  mode: ResourceMode!
+}
+
+type LessonsData {
+  events: [LessonsEvents!]
+  resources: [LessonResources!]
+}
+type LessonsList {
+  data: LessonsData!
+  meta: PaginationMeta
+}
+type LessonResources {
+  id: ID!
+  title: String!
+  weeklyHours: Int
+}

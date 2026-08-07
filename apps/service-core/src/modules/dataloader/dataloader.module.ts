@@ -5,10 +5,7 @@ import { DataLoaderInterceptor } from './interceptors/dataloader.interceptor';
 
 @Module({
   imports: [],
-  providers: [
-    DataLoaderService,
-    { provide: APP_INTERCEPTOR, useClass: DataLoaderInterceptor },
-  ],
+  providers: [DataLoaderService],
   exports: [DataLoaderService],
 })
 export class DataloaderModule {}

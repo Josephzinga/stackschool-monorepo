@@ -6,3 +6,57 @@ type AttendanceStats {
   totalExpected: Int!
   history: [DailyAttendance!]
 }
+type DailyAttendance {
+  date: String!
+  rate: Float!
+  present: Int!
+  absent: Int!
+  late: Int!
+}
+
+input MarkAttendanceInput {
+  id: String!
+  classId: String
+  status: AttendanceStatus!
+  date: Date!
+  userType: SchoolRole!
+  isSubjectMode: Boolean! = false
+  subjectId: String
+}
+
+input MarkEmployeeAttendanceInput {
+  schoolUserId: String!
+  status: AttendanceStatus!
+  date: Date
+}
+
+input GetTeacherForAttendanceInput {
+  search: String
+  day: Day
+  page: Int! = 0
+  limit: Int! = 10
+
+  attendanceDate: Date
+}
+
+input GenerateSessionInput {
+  targetRole: String! # TEACHER ou STAFF
+  durationMinutes: Int # par défaut 10
+}
+
+type AttendanceSessionPayload {
+  sessionId: String!
+  qrCodeDataUrl: String!
+  secretCode: String!
+  expiresAt: DateTime!
+}
+
+type AttendanceRecord {
+  id: String
+  member: Member
+  status: AttendanceStatus
+  date: DateTime
+  checkInTime: DateTime
+  recordedBy: User
+  type: AttendanceType
+}

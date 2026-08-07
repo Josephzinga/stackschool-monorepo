@@ -8,15 +8,20 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export class SchoolMembership {
+export enum Gender {
+    MALE = "MALE",
+    FEMALE = "FEMALE"
+}
+
+export interface SchoolMembership {
     id: string;
 }
 
-export abstract class IQuery {
-    abstract me(): Nullable<User> | Promise<Nullable<User>>;
+export interface IQuery {
+    me(): Nullable<User> | Promise<Nullable<User>>;
 }
 
-export class User {
+export interface User {
     id: string;
     email?: Nullable<string>;
     username?: Nullable<string>;
@@ -28,18 +33,18 @@ export class User {
     accounts?: Nullable<Nullable<Account>[]>;
 }
 
-export class Account {
+export interface Account {
     id: string;
     provider?: Nullable<string>;
     userId?: Nullable<string>;
 }
 
-export class Profile {
+export interface Profile {
     id: string;
-    firstname?: Nullable<string>;
-    lastname?: Nullable<string>;
+    firstname: string;
+    lastname: string;
     photo?: Nullable<string>;
-    gender?: Nullable<string>;
+    gender: Gender;
     address?: Nullable<string>;
 }
 

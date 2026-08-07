@@ -1,0 +1,12 @@
+type Group {
+  id: ID!
+  name: String!
+  type: GroupType
+  classes: [Class!]!
+  classSubjects: [ClassSubject]
+}
+
+input CreateGroupInput {
+  name: String!
+  classIds: [ID!]!
+}

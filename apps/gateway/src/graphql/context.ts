@@ -1,7 +1,8 @@
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { UnauthorizedException, HttpStatus } from '@nestjs/common';
 import { DataLoaders } from '../modules/dataloader/dataloader.service';
 import type { SchoolUserContract } from '@stackschool/contracts';
+import { MembershipService } from '../modules/membership/membership.service';
 
 export interface GraphQLContext {
   req: Request;
@@ -14,7 +15,11 @@ export interface GraphQLContext {
   loaders?: DataLoaders;
 }
 
-export function createContext(req: Request): Promise<GraphQLContext> {
+export async function createContext(
+  req: Request,
+  res: Response,
+  memberService: MembershipService,
+): Promise<GraphQLContext> {
   const user = req.user;
 
   if (!user)
@@ -28,12 +33,15 @@ export function createContext(req: Request): Promise<GraphQLContext> {
 
   const context: GraphQLContext = { req, schoolId, user };
 
-  /* if (user && schoolId) {
-    const schoolUser = await prisma.schoolUser.findUnique({
-      where: {
-        schoolId_userId: { schoolId, userId: user.id },
-      },
+  if (user && schoolId) {
+    const schoolUser = await memberService.findBySchoolIdAndUserId({
+      schoolId,
+      userId: user.id,
     });
+
+    console.log('schooLuser', schoolUser);
+
+    context.schoolId = schoolId;
 
     if (!schoolUser)
       throw new UnauthorizedException(
@@ -42,7 +50,7 @@ export function createContext(req: Request): Promise<GraphQLContext> {
 
     context.schoolUser = schoolUser;
 
-    switch (schoolUser.role) {
+    /* switch (schoolUser.role) {
       case 'TEACHER': {
         const teacher = await prisma.teacher.findFirst({
           where: { schoolUserId: schoolUser.id },
@@ -69,9 +77,8 @@ export function createContext(req: Request): Promise<GraphQLContext> {
       }
       default:
         break;
+    }*/
   }
-       
-  }
-   */
+
   return context;
 }

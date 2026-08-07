@@ -1,0 +1,17 @@
+type Mutation {
+  createClass(data: CreateClassInput!): Class!
+  updateClass(data: CreateClassInput!, schoolId: ID!, classId: ID!): ApiResponse
+  deleteClasses(classIds: [ID!]!, schoolId: ID!): ApiResponse
+  createSubject(input: CreateSubjectInput!): Subject
+  deleteSubjects(subjectIds: [ID!]!): ApiResponse
+  createClassSubject(input: ClassSubjectInput!): ClassSubject!
+  updateClassSubject(input: ClassSubjectInput!): ClassSubject!
+  deleteClassSubjects(ids: [ID!]!): ApiResponse
+  createLesson(input: CreateLessonInput!): Lesson
+  updateLessonStatus(status: LessonStatus!, id: ID!): Lesson
+  updateLesson(input: UpdateLessonInput!): Lesson
+  deleteLesson(id: ID!): ApiResponse
+  createRoom(input: CreateRoomInput!): Room!
+  updateRoom(input: CreateRoomInput!): Room!
+  createGroup(input: CreateGroupInput!): Group!
+}

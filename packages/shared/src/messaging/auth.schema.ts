@@ -1,9 +1,6 @@
-import { z } from 'zod';
-import {
-  loginFormSchema,
-  forgotPasswordSchema,
-} from '../validation/auth.schema.ts';
-import { UserWithRelationsContract } from '../contracts/user.contract.ts';
+import {z} from 'zod';
+import {forgotPasswordSchema, loginFormSchema,} from '@stackschool/messaging';
+import {UserWithRelationsContract} from '../contracts/user.contract.ts';
 
 export const ValidateCredentialsInput = loginFormSchema;
 export type ValidateCredentialsInput = z.infer<typeof ValidateCredentialsInput>;
@@ -30,8 +27,6 @@ export const refreshTokenResponse = z.object({
   ok,
   user: UserWithRelationsContract,
 });
-
-export const findFullUserInput = createUserSessionInput;
 
 export const createUserSessionResponse = z.object({
   id: z.string(),

@@ -1,11 +1,15 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { DataLoaders } from '../dataloader.service';
-import { GraphQLContext } from '@stackschool/messaging';
+import { GraphqlContextWithLoaders } from '../interceptors/dataloader.interceptor';
 
 export const Loaders = createParamDecorator(
   (_: unknown, context: ExecutionContext): DataLoaders => {
-    const context =
-      GqlExecutionContext.create(context).getContext<GraphQLContext>();
+    const gqlCtx =
+      GqlExecutionContext.create(
+        context,
+      ).getContext<GraphqlContextWithLoaders>();
+
+    return gqlCtx.loaders;
   },
 );

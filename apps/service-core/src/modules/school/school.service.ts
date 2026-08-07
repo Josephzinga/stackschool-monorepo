@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-
 import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '../../prisma/db/generated/client';
 
 @Injectable()
 export class SchoolService {
@@ -29,6 +29,11 @@ export class SchoolService {
     });
   }
 
+  async findWhere(where: Prisma.SchoolWhereInput) {
+    return this.prisma.school.findFirst({
+      where,
+    });
+  }
   async search(search: string) {
     return this.prisma.school.findMany({
       where: {

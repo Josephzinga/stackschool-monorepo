@@ -6,7 +6,6 @@ import {
   Student,
   Permission,
 } from '../../prisma/db/generated/client';
-
 /**
  * Token d'injection du client Prisma.
  * À fournir dans ton module (voir data-loader.module.ts).

@@ -1,13 +1,13 @@
 import {
-  Resolver,
-  ResolveField,
+  Context,
   Parent,
   Query,
-  Context,
+  ResolveField,
+  Resolver,
   ResolveReference,
 } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { Profile, User } from '../../graphql';
+import { UserWithRelationsContract } from '@stackschool/messaging';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Resolver('User')
@@ -26,19 +26,23 @@ export class UserResolver {
     });
   }
   @ResolveField('profile')
-  async resolveProfile(@Parent() user: User): Promise<Profile | null> {
-    return this.prisma.profile.findUnique({
+  async resolveProfile(
+    @Parent() user: Omit<UserWithRelationsContract, 'profile'>,
+  ): Promise<UserWithRelationsContract['profile'] | null> {
+    const profile = await this.prisma.profile.findUnique({
       where: {
         userId: user.id,
       },
     });
+    console.log('profile', profile);
+    return profile;
   }
 
   @ResolveReference()
   async resolveReference(reference: {
     _typename: string;
     id: string;
-  }): Promise<User | null> {
+  }): Promise<Omit<UserWithRelationsContract, 'profile' | 'accounts'> | null> {
     return this.userService.findOne({
       where: {
         id: reference.id,

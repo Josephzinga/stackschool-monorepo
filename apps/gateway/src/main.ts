@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { GatewayModule } from './gateway.module';
 import * as cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session';
@@ -11,9 +11,10 @@ import { doubleCsrf } from 'csrf-csrf';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response, NextFunction } from 'express';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { SchoolContextInterceptor } from './common/interceptors/school-context.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(GatewayModule);
   const configService = app.get(ConfigService);
 
   const PORT = configService.get<number>('PORT', 4000);
@@ -85,7 +86,7 @@ async function bootstrap() {
   );
 
   app.use(cookieParser.default());
-
+  app.useGlobalInterceptors(new SchoolContextInterceptor());
   app.use(passport.initialize());
   app.use(passport.session());
 

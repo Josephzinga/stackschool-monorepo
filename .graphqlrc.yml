@@ -1,4 +1,0 @@
-{
-  "schema": "packages/shared/src/graphql/*.graphql",
-  "documents": "packages/shared/src/graphql/operations/**/*.graphql"
-}

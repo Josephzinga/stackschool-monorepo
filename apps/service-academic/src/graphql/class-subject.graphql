@@ -1,0 +1,30 @@
+type ClassSubject {
+  id: ID!
+  coefficient: Int
+  weeklyHours: Float
+  teacherId: ID
+  subjectId: ID
+  groupId: ID!
+  subject: Subject!
+  assignment: TeacherAssignments
+  group: Group!
+  assessments: [Assessment!]
+}
+
+input ClassSubjectInput {
+  id: ID
+  teacherId: ID
+  groupId: ID
+  classId: ID
+  subjectId: ID!
+  coefficient: Int!
+  weeklyHours: Float
+}
+type ClassAndSubject {
+  classes: [Class!]
+  subjects: [Subject!]
+}
+type SearchClassesAndSubjects {
+  searchClasses(search: String, limit: Int): [Class]
+  searchSubjects(search: String, limit: Int, classId: ID): [Subject]
+}

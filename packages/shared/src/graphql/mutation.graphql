@@ -1,43 +1,5 @@
 type Mutation {
   confirmCompleteProfile: UserPayload
-  createTeacher(input: CreateTeacherInput): Teacher
-  createTeacherAssignment(input: CreateTeacherAssignmentInput!): ApiResponse
-  syncTeacherAssignment(input: CreateTeacherAssignmentInput!): ApiResponse
-  deleteTeacherAssignment(id: ID!, subjectIds: [ID!]): ApiResponse
-  updateTeacher(teacherId: ID!, data: CreateTeacherInput!): Teacher
-  deleteTeachers(teacherIds: [ID!]!, soft: Boolean = true): ApiResponse
-  deleteStudents(
-    studentIds: [ID!]!
-    schoolId: ID!
-    soft: Boolean = true
-  ): ApiResponse
-  createListStudent(data: CreateStudentInput!, schoolId: ID!): ApiResponse
-  updateStudent(
-    studentId: ID!
-    data: CreateStudentInput!
-    schoolId: ID!
-  ): Student
-  createClass(data: CreateClassInput!): Class!
-  updateClass(data: CreateClassInput!, schoolId: ID!, classId: ID!): ApiResponse
-  deleteClasses(classIds: [ID!]!, schoolId: ID!): ApiResponse
-  createSubject(input: CreateSubjectInput!): Subject
-  deleteSubjects(subjectIds: [ID!]!): ApiResponse
-  createClassSubject(input: ClassSubjectInput!): ClassSubject!
-  updateClassSubject(input: ClassSubjectInput!): ClassSubject!
-  deleteClassSubjects(ids: [ID!]!): ApiResponse
-
-  createLesson(input: CreateLessonInput!): Lesson
-  updateLessonStatus(status: LessonStatus!, id: ID!): Lesson
-  updateLesson(input: UpdateLessonInput!): Lesson
-  deleteLesson(id: ID!): ApiResponse
-
-  createRoom(input: CreateRoomInput!): Room!
-  updateRoom(input: CreateRoomInput!): Room!
-  createGroup(input: CreateGroupInput!): Group!
-
-  createParent(input: CreateParentInput!): Parent!
-
-  markAttendance(input: [MarkAttendanceInput!]): AttendanceRecord!
 
   generateAttendanceSession(
     input: GenerateSessionInput!

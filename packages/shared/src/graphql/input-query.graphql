@@ -1,57 +1,6 @@
-input GetLessonsInput {
-  groupId: ID
-  teacherId: ID
-  classId: ID
-  department: String
-  mode: ResourceMode!
-  hasLessonOnly: Boolean = true
-  section: String
-  status: LessonStatus
-  level: String
-  limit: Int! = 6
-  page: Int! = 0
-}
-
-input GetSubjectInput {
-  page: Int! = 0
-  limit: Int! = 10
-  searchTerm: String
-  sort: SubjectSortInput
-  classId: ID
-  teacherId: ID
-}
 input GetAssignmentInput {
   groupId: ID
   classId: ID
   teacherId: ID
   limit: Int
-
-}
-input GetSchoolTeachersInput {
-  page: Int! = 0
-  limit: Int! = 10
-  searchTerm: String
-
-  classId: ID
-  subjectId: ID
-  isActive: Boolean
-  isSupervisor: Boolean
-
-  day: Day
-}
-
-input GetSchoolClassesInput {
-  page: Int! = 0
-  limit: Int! = 10
-  level: String
-  section: String
-  teacherId: String
-  searchTerm: String
-}
-input GetSchoolRoomInput {
-  page: Int! = 0
-  limit: Int! = 10
-  classId: String
-  teacherId: String
-  searchTerm: String
 }

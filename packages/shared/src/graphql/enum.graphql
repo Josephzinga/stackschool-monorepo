@@ -5,13 +5,7 @@ enum SchoolRole {
   PARENT
   STAFF
 }
-enum LessonStatus {
-  PLANNED
-  ONGOING
-  COMPLETED
-  CANCELLED
-  POSTPONED
-}
+
 enum AttendanceStatus {
   PRESENT
   ABSENT
@@ -19,32 +13,9 @@ enum AttendanceStatus {
   EXCUSED
 }
 
-
-
 enum AttendanceType {
   SUBJECT
   DAILY
-}
-enum AssessmentType {
-  EXAM
-  ASSIGNMENT
-  QUIZ
-  TEST
-  PRACTICAL
-  ORAL
-}
-
-enum AssessmentStatus {
-  DRAFT
-  PUBLISHED
-  CLOSED
-}
-
-enum SubjectCategory {
-  SCIENTIFIC
-  LITERARY
-  GENERAL
-  SPORT
 }
 
 enum RelationType {
@@ -56,11 +27,6 @@ enum RelationType {
   GRAND_MOTHER
   GRAND_FATHER
   AUNT
-}
-
-enum UpdateMode {
-  CREATE
-  CONNECT
 }
 
 enum ContactPreference {
@@ -83,12 +49,6 @@ enum SubjectSortField {
   coefficient
   name
   ponderation
-}
-
-enum DisciplinaryType {
-  SUSPENSION
-  EXPULSION
-  WARNING
 }
 
 enum Day {

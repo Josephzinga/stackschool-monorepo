@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  UseGuards,
-  Body,
-  UsePipes,
-  Inject,
-  Res,
-  Get,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import {
   completeProfileDataSchema,

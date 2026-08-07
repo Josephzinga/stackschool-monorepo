@@ -3,7 +3,6 @@ import { SchoolService } from './school.service';
 import { SchoolResolver } from './school.resolver';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CORE_SERVICE } from '@stackschool/messaging';
-import { MembershipModule } from '../membership/membership.module';
 
 @Module({
   imports: [

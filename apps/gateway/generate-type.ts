@@ -4,8 +4,8 @@ import { join } from 'node:path';
 const definitionsFactory = new GraphQLDefinitionsFactory();
 async function main() {
   await definitionsFactory.generate({
-    typePaths: ['../../packages/shared/src/graphql/**/*.graphql'],
-    path: join(process.cwd(), 'src/graphql/graphql.ts'),
+    typePaths: ['src/graphql/**/*.graphql'],
+    path: join(process.cwd(), 'src/graphql.ts'),
     outputAs: 'class',
     emitTypenameField: true,
     enumsAsTypes: true,

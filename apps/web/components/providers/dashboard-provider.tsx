@@ -9,6 +9,7 @@ import {
 import { parseAxiosError } from '@stackschool/contracts';
 import { LoaderCircleIcon } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
+import { useLoadingStore } from '@stackschool/ui';
 
 const DashboardContext = createContext<GetDashboardContextQuery | undefined>(
   undefined,
@@ -18,6 +19,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const { currentSchool, currentMemberShip } = useUserStore();
   const router = useRouter();
   const pathname = usePathname();
+  const { show, hide } = useLoadingStore();
 
   const schoolId = currentSchool?.id;
   const { data, isLoading, error, isError } = useGetDashboardContextQuery(
@@ -62,13 +64,13 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     // ... ajouter d'autres règles si besoin
   }, [role, pathname, isLoading, router]);
 
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full flex items-center bg-gray-50 dark:bg-gray-900 animate-pulse justify-center">
-        <LoaderCircleIcon className="h-15 w-15 animate-spin text-primary" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (isLoading) {
+      show();
+    } else {
+      hide();
+    }
+  }, [isLoading, show, hide]);
 
   if (isError) {
     const { message } = parseAxiosError(error);
@@ -78,7 +80,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   const value: GetDashboardContextQuery = {
     me: {
-      schoolContext: contextData,
+      schoolContext: contextData || null,
     },
   };
 

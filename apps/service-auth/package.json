@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@keyv/redis": "^5.1.6",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
@@ -29,17 +30,16 @@
     "@prisma/adapter-pg": "catalog:",
     "@prisma/extension-accelerate": "^2.0.2",
     "@stackschool/messaging": "workspace:*",
-    "@strv/nestjs-dataloader": "^0.4.0",
     "amqp-connection-manager": "^5.0.0",
     "amqplib": "^2.0.1",
-    "bcryptjs": "^3.0.2",
-    "client": "link:@db./src/prisma/db/generated/client/client",
-    "crypto-js": "^4.2.0",
+    "bcryptjs": "^3.0.3",
+    "cacheable": "^2.5.0",
     "dotenv": "^17.4.2",
     "jsonwebtoken": "^9.0.2",
     "prisma": "catalog:",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

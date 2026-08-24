@@ -4,29 +4,27 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
-  BadRequestException,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { RegisterDto } from './dto/auth-dto';
-import { catchError, firstValueFrom, map, throwError, timeout } from 'rxjs';
+import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import {
   AUTH_PATTERNS,
-  UserWithRelationsContract,
+  CreateUserSessionResponse,
+  createUserSessionResponse,
   type ForgotPasswordResponse,
   forgotPasswordResponse,
-  type ResetPasswordResponse,
-  resetPasswordResponse,
-  type CreateUserSessionResponse,
-  createUserSessionResponse,
   RefreshTokenResponse,
   refreshTokenResponse,
-  type VerifyCodeInput,
+  type ResetPasswordResponse,
+  resetPasswordResponse,
+  safeValidateSchema,
   type VerifyCodeResponse,
   verifyCodeResponse,
-  safeValidateSchema,
 } from '@stackschool/messaging';
+import { UserWithRelationsContract } from '@stackschool/contracts';
 import type { Request, Response } from 'express';
-import { mapAuthError } from './../../errors/auth.error-maper';
+import { mapAuthError } from '../../errors/auth.error-maper';
 import { ConfigService } from '@nestjs/config';
 import { RESET_TOKEN_EXP_MINUTES } from '../../constant/config';
 import { validateWith } from '../../utils/validate.operator';
@@ -53,19 +51,11 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const result = await firstValueFrom<UserWithRelationsContract | undefined>(
+    return await firstValueFrom<UserWithRelationsContract>(
       this.authClient
         .send(AUTH_PATTERNS.CREATE_USER, dto)
         .pipe(catchError((err) => throwError(() => mapAuthError(err)))),
     );
-    const { success, data, errors } = safeValidateSchema(
-      UserWithRelationsContract,
-      result,
-    );
-    if (!success) {
-      console.error(errors);
-    }
-    return data;
   }
 
   async login(
@@ -96,8 +86,8 @@ export class AuthService {
           provider: user?.accounts?.map((acc) => acc.provider).join(',') || '',
           profile: {
             id: user?.profile?.id,
-            firstname: user?.profile?.firstname ?? null,
-            lastname: user?.profile?.lastname ?? null,
+            firstName: user?.profile?.firstName,
+            lastName: user?.profile?.lastName,
             avatarUrl: user?.profile?.avatarUrl,
           },
         },
@@ -171,11 +161,11 @@ export class AuthService {
           catchError((err) => throwError(() => mapAuthError(err))),
         ),
     );
-    return done(null, result);
+    done(null, result);
   }
 
   async validateLocalUser(identifier: string, password: string) {
-    const result = await firstValueFrom<UserWithRelationsContract>(
+    const result = await firstValueFrom(
       this.authClient
         .send(AUTH_PATTERNS.VALIDATE_CREDENTIALS, { identifier, password })
         .pipe(
@@ -249,7 +239,6 @@ export class AuthService {
     );
 
     if (!success || !data) {
-      console.log('Erreur de validation', errors);
       return;
     }
     return res.status(201).json({ ...data });

@@ -1,0 +1,28 @@
+type Permission @key(fields: "id") {
+  id: ID!
+  code: PermissionCode
+  module: PermissionModule
+  name: String
+  description: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type SchoolMembership @key(fields: "userId") {
+  id: ID!
+  role: SchoolRole!
+  userId: ID!
+  schoolId: ID
+  school: School
+  isActive: Boolean!
+  isOwner: Boolean!
+  schoolProfile: SchoolProfile
+  permissions: [Permission]
+  member: Member
+  teacher: Teacher
+  student: Student
+  parent: Parent
+  staff: Staff
+}
+
+union Member = Teacher | Student | Parent | Staff

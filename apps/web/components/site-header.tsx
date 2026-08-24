@@ -1,13 +1,13 @@
-import { Separator } from '@/components/ui/separator';
-import { SidebarTrigger } from '@/components/ui/sidebar';
-import { SearchInput } from '@/components/search-input';
-import { Bell } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ThemeTogglerButton } from '@/components/animate-ui/components/buttons/theme-toogle';
+import {Separator} from '@/components/ui/separator';
+import {SidebarTrigger} from '@/components/ui/sidebar';
+import {SearchInput} from '@/components/search-input';
+import {Bell} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {ThemeTogglerButton} from '@/components/animate-ui/components/buttons/theme-toogle';
 
 export function SiteHeader() {
   return (
-    <section className="flex z-20 h-16 sticky w-full top-0 backdrop-blur-2xl border-b right-0 bg-sidebar/50 shadow-sm shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+    <section className="flex z-20 h-14 sticky w-full top-0 backdrop-blur-2xl border-b right-0 bg-sidebar/50 shadow-sm shrink-0 items-center gap-2 transition-[width,height] ease-linear">
       <div className="flex w-full items-center h-full gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
         <Separator

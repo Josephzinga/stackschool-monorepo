@@ -1,34 +1,18 @@
 'use client';
 
-import {
-  CreateTeacherInput,
-  useCreateTeacherMutation,
-  useForm,
-  useUpdateTeacherMutation,
-  zodResolver,
-} from '@stackschool/ui';
-import { toast } from 'sonner';
-import { SubmitButton } from '@/components/submit-button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  createTeacherSchema,
-  CreateTeacherValues,
-  GenderEnum,
-} from '@stackschool/shared';
+import {useCreateTeacherMutation, useForm, useUpdateTeacherMutation, zodResolver,} from '@stackschool/ui';
+import {toast} from 'sonner';
+import {SubmitButton} from '@/components/submit-button';
+import {Input} from '@/components/ui/input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
+import {CreateTeacherSchema, GenderEnum,} from '@stackschool/contracts';
 import 'react-phone-number-input/style.css';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { useQueryClient } from '@tanstack/react-query';
-import { Controller, FormProvider } from 'react-hook-form';
-import { ProfileSubForm } from '@/components/school/form/profile-sub-form';
+import {Field, FieldError, FieldLabel} from '@/components/ui/field';
+import {useQueryClient} from '@tanstack/react-query';
+import {Controller, FormProvider} from 'react-hook-form';
+import {ProfileSubForm} from '@/components/school/form/profile-sub-form';
 
-interface EditDefaultValues extends CreateTeacherValues {
+interface EditDefaultValues extends CreateTeacherSchema {
   id: string;
 }
 
@@ -43,13 +27,13 @@ export function CreateTeacherForm({
 }: CreateTeacherFormProps) {
   const queryClient = useQueryClient();
 
-  const methods = useForm<CreateTeacherValues>({
-    resolver: zodResolver(createTeacherSchema),
+  const methods = useForm<CreateTeacherSchema>({
+    resolver: zodResolver(CreateTeacherSchema),
     mode: 'onBlur',
     defaultValues: {
-      lastname: editDefaultValues?.lastname || '',
+      lastName: editDefaultValues?.lastName || '',
       gender: editDefaultValues?.gender,
-      firstname: editDefaultValues?.firstname || '',
+      firstName: editDefaultValues?.firstName || '',
       email: editDefaultValues?.email || '',
       phoneNumber: editDefaultValues?.phoneNumber || '',
       diploma: editDefaultValues?.diploma || '',
@@ -83,14 +67,20 @@ export function CreateTeacherForm({
 
   const isEdit = !!editDefaultValues;
 
-  const onSubmit = async (data: CreateTeacherInput) => {
+  const onSubmit = async (data: CreateTeacherSchema) => {
     const promise = isEdit
       ? updateMutateAsync({
-          data,
+          data: {
+            ...data,
+            email: data.email ?? null
+          },
           teacherId: editDefaultValues?.id as string,
         })
       : createMutateAsync({
-          input: data,
+          input: {
+            ...data,
+            email: data.email ?? null
+          },
         });
 
     toast.promise(promise, {
@@ -105,7 +95,6 @@ export function CreateTeacherForm({
     });
   };
 
-  // @ts-ignore
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

@@ -10,8 +10,8 @@ query GetMe {
     profile {
       id
       address
-      firstname
-      lastname
+      firstName
+      lastName
       gender
       photo
     }

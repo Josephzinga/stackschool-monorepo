@@ -4,10 +4,11 @@ import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import {
   CORE_PATTERNS,
   CORE_SERVICE,
-  FindManyMemberResponse,
-  SchoolUserContract,
   type FindBySchoolIdAndUserIdInput,
+  FindManyMemberResponse,
 } from '@stackschool/messaging';
+
+import { SchoolUserContract } from '@stackschool/contracts';
 import { ClientProxy } from '@nestjs/microservices';
 import { validateWith } from '../../utils/validate.operator';
 import { mapCoreError } from '../../errors/core.error-maper';
@@ -62,7 +63,11 @@ export class MembershipService {
     const result = await firstValueFrom<FindManyMemberResponse>(
       this.coreService
         .send(CORE_PATTERNS.MEMBERSHIP.FIND_MANY, { ids: schoolUserIds })
-        .pipe(validateWith(FindManyMemberResponse)),
+        .pipe(
+          timeout(3000),
+          validateWith(FindManyMemberResponse),
+          catchError((err) => throwError(() => mapCoreError(err))),
+        ),
     );
 
     return result.members;
@@ -75,11 +80,11 @@ export class MembershipService {
           userIds: [userId],
         })
         .pipe(
+          timeout(3000),
           validateWith(FindManyMemberResponse),
           catchError((err) => throwError(() => mapCoreError(err))),
         ),
     );
-    console.log('Result', result);
 
     return result.members;
   }

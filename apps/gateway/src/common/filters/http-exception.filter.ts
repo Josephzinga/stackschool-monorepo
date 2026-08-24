@@ -1,7 +1,7 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
@@ -15,6 +15,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus() ?? 500;
     const exceptionResponse = exception.getResponse() as
       { errors?: unknown } | string | number | boolean | null;
+    if (status === 500) {
+      console.log('ExceptionResponse', exception);
+    }
     const errors =
       typeof exceptionResponse === 'object' &&
       exceptionResponse !== null &&

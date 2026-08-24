@@ -1,20 +1,12 @@
 'use client';
-import { CardDescription, CardTitle } from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsContents,
-  TabsList,
-  TabsTrigger,
-} from '@/components/animate-ui/components/radix/tabs';
-import {
-  TabsHighlight,
-  TabsHighlightItem,
-} from '@/components/animate-ui/primitives/radix/tabs';
-import { useState } from 'react';
-import { CreateSchoolForm } from '@/components/complete-profile/school-form/create-school-form';
-import { InvitationForm } from '@/components/complete-profile/school-form/invitation-form';
-import { SearchSchoolFrom } from '@/components/complete-profile/school-form/search-school-from';
+import {CardDescription, CardTitle} from '@/components/ui/card';
+import {Tabs, TabsContent, TabsContents,} from '@/components/animate-ui/components/radix/tabs';
+import {TabsHighlight,} from '@/components/animate-ui/primitives/radix/tabs';
+import {useState} from 'react';
+import {CreateSchoolForm} from '@/components/complete-profile/school-form/create-school-form';
+import {InvitationForm} from '@/components/complete-profile/school-form/invitation-form';
+import {SearchSchoolFrom} from '@/components/complete-profile/school-form/search-school-from';
+import {AppTabsList, AppTabsTrigger} from "@/components/app-tabs";
 
 interface Value {
   value: 'join' | 'create' | 'invite';
@@ -44,18 +36,15 @@ export default function SchoolStep() {
       >
         <div className="w-full flex justify-center">
           <TabsHighlight className="w-full">
-            <TabsList className="h-10 gap-4">
+            <AppTabsList className="h-10 w-full bg-[#232423] duration-300">
               {constant.map((item) => (
-                <TabsHighlightItem key={item.value} value={item.value}>
-                  <TabsTrigger
-                    className="font-poppins font-semibold h-8 w-23"
+                  <AppTabsTrigger key={item.value}
                     value={item.value}
                   >
                     {item.label}
-                  </TabsTrigger>
-                </TabsHighlightItem>
+                  </AppTabsTrigger>
               ))}
-            </TabsList>
+            </AppTabsList>
           </TabsHighlight>
         </div>
 
@@ -64,7 +53,7 @@ export default function SchoolStep() {
             <SearchSchoolFrom />
           </TabsContent>
 
-          <TabsContent value="create">
+          <TabsContent className="flex-1" value="create">
             <CreateSchoolForm />
           </TabsContent>
 

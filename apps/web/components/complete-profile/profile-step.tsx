@@ -1,37 +1,18 @@
 'use client';
-import { useState } from 'react';
-import {
-  Controller,
-  useCompleteProfileStore,
-  useForm,
-  useUserStore,
-  zodResolver,
-} from '@stackschool/ui';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
-import { toast } from 'sonner';
+import {useState} from 'react';
+import {Controller, useCompleteProfileStore, useForm, useUserStore, zodResolver,} from '@stackschool/ui';
+import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from '../ui/select';
+import {toast} from 'sonner';
 import PhoneInput from 'react-phone-number-input';
-import {
-  api,
-  parseAxiosError,
-  profileSchema,
-  ProfileType,
-} from '@stackschool/contracts';
-import { Field, FieldError, FieldLabel } from '../ui/field';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
+import {api, parseAxiosError, ProfileFormType, profileSchema,} from '@stackschool/contracts';
+import {Field, FieldError, FieldLabel} from '../ui/field';
+import {Input} from '../ui/input';
+import {Button} from '../ui/button';
 import 'react-phone-number-input/style.css';
-import { checkField } from '@/lib/check-profile-field';
-import { UploadProfilePicture } from '../profile-upload';
-import { SubmitButton } from '@/components/submit-button';
-import { HomeIcon, Mail, User2Icon, UserIcon } from 'lucide-react';
+import {checkField} from '@/lib/check-profile-field';
+import {UploadProfilePicture} from '../profile-upload';
+import {SubmitButton} from '@/components/submit-button';
+import {HomeIcon, Mail, User2Icon, UserIcon} from 'lucide-react';
 
 export function ProfileStep() {
   const { user } = useUserStore();
@@ -50,22 +31,32 @@ export function ProfileStep() {
     watch,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<ProfileType>({
+  } = useForm<ProfileFormType>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstname: user?.profile?.firstname || profile?.firstname || '',
-      lastname: user?.profile?.lastname || profile?.lastname || '',
-      phoneNumber: user?.phoneNumber || profile?.phoneNumber || '',
+      firstName: user?.profile?.firstName || profile?.firstName || '',
+      lastName: user?.profile?.lastName || profile?.lastName || '',
+      phoneNumber: user?.phoneNumber ||  '',
       email: user?.email || profile?.email || '',
       gender: profile?.gender || undefined,
       address: profile?.address || undefined,
-      photo: user?.profile?.photo || profile?.photo || undefined,
+      avatarUrl: user?.profile?.avatarUrl || profile?.avatarUrl || undefined,
     },
     mode: 'onBlur',
   });
 
-  const validateField = async (fieldName: keyof ProfileType, value: string) => {
+  const validateField = async (fieldName: keyof ProfileFormType, value: string) => {
     if (!value) return;
+    if (
+      (fieldName &&
+        fieldName == 'phoneNumber' &&
+        value.toLocaleLowerCase() == user?.phoneNumber) ||
+      (fieldName &&
+        fieldName == 'email' &&
+        value.toLocaleLowerCase() == user?.email)
+    )
+      return;
+
     const safeData = await checkField(fieldName as string, value);
 
     if (safeData?.status === 401) {
@@ -81,27 +72,8 @@ export function ProfileStep() {
       clearErrors(fieldName);
     }
   };
-  const handleProfile = async (data: ProfileType) => {
+  const handleProfile = async (data: ProfileFormType) => {
     try {
-      if (data.email) {
-        const emailCheck = await checkField('email', data.email);
-        if (!emailCheck?.valid) {
-          setError('email', { type: 'manual', message: emailCheck?.message });
-          return;
-        }
-      }
-
-      if (data.phoneNumber) {
-        const phoneCheck = await checkField('phoneNumber', data.phoneNumber);
-        if (!phoneCheck?.valid) {
-          setError('phoneNumber', {
-            type: 'manual',
-            message: phoneCheck?.message,
-          });
-          return;
-        }
-      }
-
       setProfileData(data);
       setCurrentStep(3);
     } catch (error) {
@@ -145,14 +117,14 @@ export function ProfileStep() {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append('profilePicture', file);
+      formData.append('file', file);
 
-      const res = await api.post('/api/upload/profile-picture', formData);
+      const res = await api.post('/api/upload/avatar', formData);
 
       const data = res.data;
 
-      if (data.ok) {
-        setValue('photo', data.path);
+      if (data.success) {
+        setValue('avatarUrl', data.avatarUrl);
         toast.success(
           `${res.data.message}` || 'Photo de profil téléchargée avec succès !',
         );
@@ -179,7 +151,7 @@ export function ProfileStep() {
         <UploadProfilePicture
           onPhotoUpload={handlePhotoUpload}
           isLoading={isLoading}
-          photo={watch('photo')}
+          photo={watch('avatarUrl')}
         />
       </div>
 
@@ -187,17 +159,17 @@ export function ProfileStep() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Prénom */}
           <Field>
-            <FieldLabel htmlFor="firstname">Prénom</FieldLabel>
+            <FieldLabel htmlFor="firstName">Prénom</FieldLabel>
             <Input
               icon={UserIcon}
-              id="firstname"
+              id="firstName"
               type="text"
-              {...register('firstname')}
-              aria-invalid={!!errors.firstname}
+              {...register('firstName')}
+              aria-invalid={!!errors.firstName}
               placeholder="Votre prénom"
               required
             />
-            <FieldError>{errors.firstname?.message}</FieldError>
+            <FieldError>{errors.firstName?.message}</FieldError>
           </Field>
           {/* Nom */}
           <Field>
@@ -206,12 +178,12 @@ export function ProfileStep() {
               id="lastname"
               icon={User2Icon}
               type="text"
-              {...register('lastname')}
-              aria-invalid={!!errors.lastname}
+              {...register('lastName')}
+              aria-invalid={!!errors.lastName}
               placeholder="Votre nom de famille"
               required
             />
-            <FieldError>{errors.lastname?.message}</FieldError>
+            <FieldError>{errors.lastName?.message}</FieldError>
           </Field>
 
           <Field>
@@ -242,7 +214,7 @@ export function ProfileStep() {
                   onChange={handlePhoneChange}
                   onBlur={handlePhoneBlur}
                   placeholder="Entrez votre numéro"
-                  className="phone-input-custom"
+                  className="phone-input-custom h-8"
                 />
               )}
             />
@@ -261,6 +233,7 @@ export function ProfileStep() {
                     aria-invalid={!!errors.gender}
                     className="w-full"
                     id="gender"
+                    size="sm"
                   >
                     <SelectValue placeholder="Sélectionnez votre genre" />
                   </SelectTrigger>

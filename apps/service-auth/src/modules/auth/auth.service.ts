@@ -1,28 +1,18 @@
-import {
-  BadRequestException,
-  ConflictException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../prisma/prisma.service';
 import { TokenService } from './services/token.service';
 import { AuthUserService } from './services/auth-user.service';
-import type { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
-import { ConfigService } from '@nestjs/config';
 import { ForgotPasswordService } from './services/forgot-password.service';
 import { ResendCodeService } from './services/resend-code.service';
 import { ResetPasswordService } from './services/reset-password.service';
 import { VerifyCodeService } from './services/verify-code.service';
 import {
   AuthRpcException,
-  ResetPasswordInput,
-  CreateUserSessionResponse,
   CreateUserInput,
+  CreateUserSessionResponse,
+  ResetPasswordInput,
   ValidateCredentialsInput,
 } from '@stackschool/messaging';
 import { toUserWithRelationsContract } from '../../mappers/user.mapper';
@@ -34,7 +24,6 @@ export class AuthService {
     private readonly authUserService: AuthUserService,
     private readonly tokenService: TokenService,
     private readonly userService: UserService,
-    private readonly configService: ConfigService,
     private readonly forgotPasswordService: ForgotPasswordService,
     private readonly resendCodeService: ResendCodeService,
     private readonly resetPasswordService: ResetPasswordService,
@@ -42,7 +31,6 @@ export class AuthService {
   ) {}
 
   async register(registerDto: CreateUserInput) {
-    console.log('Register service-auth', registerDto);
     const safeEmail = registerDto?.email?.trim();
     const safePhone = registerDto?.phoneNumber?.trim();
 
@@ -50,13 +38,7 @@ export class AuthService {
       where: {
         isActive: true,
         OR: [
-          {
-            username: {
-              equals: registerDto.username?.trim(),
-              mode: 'insensitive',
-            },
-          },
-          { email: safeEmail },
+          { email: { equals: safeEmail, mode: 'insensitive' } },
           { phoneNumber: safePhone },
         ],
       },
@@ -79,8 +61,10 @@ export class AuthService {
         );
       }
     }
-
-    const passwordHash = await bcrypt.hash(registerDto.password, 12);
+    let passwordHash: string | undefined;
+    if (registerDto.password) {
+      passwordHash = await bcrypt.hash(registerDto.password, 12);
+    }
 
     const newUser = await this.userService.createArgs({
       data: {
@@ -135,35 +119,6 @@ export class AuthService {
     });
   }
 
-  async login(user: Request['user'], res: Response) {
-    if (!user?.id) {
-      throw new UnauthorizedException('Utilisateur non authentifié.');
-    }
-
-    const { sessionToken, expires } = await this.tokenService.createUserSession(
-      user.id,
-    );
-
-    return res.status(HttpStatus.OK).json({
-      ok: true,
-      message: 'Authentification réussi avec succès!',
-      user: {
-        id: user?.id,
-        email: user?.email,
-        username: user?.username,
-        phoneNumber: user?.phoneNumber,
-        profileCompleted: user?.profileCompleted,
-        emailVerified: user.emailVerified,
-        provider: user?.accounts?.map((acc) => acc.provider).join(',') || '',
-        profile: {
-          id: user?.profile?.id,
-          firstname: user?.profile?.firstname,
-          lastname: user?.profile?.lastname,
-          avatarUrl: user?.profile?.avatarUrl,
-        },
-      },
-    });
-  }
   async validateLocalUser(data: ValidateCredentialsInput) {
     const user = await this.userService.findByIdentifierWithRelations(
       data.identifier,
@@ -206,9 +161,9 @@ export class AuthService {
 
     return toUserWithRelationsContract(user);
   }
+
   async validateOAuthUser({ accessToken, refreshToken, profileOAuth }: any) {
     try {
-      console.log('Validate OAuthUser service auth', profileOAuth);
       const profile = profileOAuth.profile;
       const providerAccountId = profile?.id;
       const emailRaw = profile?.emails?.[0]?.value || null;
@@ -218,25 +173,23 @@ export class AuthService {
           : false) ?? false;
       const email = emailRaw ? emailRaw.toLowerCase() : null;
       const displayName = profile?.displayName ?? '';
-      const avatar = profile?.photos?.[0]?.value || null;
+      const avatar = profile?.picture || profile?.photos?.[0]?.value || null;
       const parts = displayName.trim() ? displayName.trim().split(/\s+/) : [];
       const firstname = parts.shift() ?? '';
       const lastname = parts.join(' ') ?? '';
 
-      const user = await this.authUserService.upsertOauthUser({
+      return await this.authUserService.upsertOauthUser({
         provider: profileOAuth.provider,
         providerAccountId,
         email,
         emailVerified,
         displayName,
-        firstname,
-        lastname,
+        firstName: firstname,
+        lastName: lastname,
         avatar,
         accessToken,
         refreshToken,
       });
-
-      return user;
     } catch (err) {
       throw new AuthRpcException(
         'INTERNAL_ERROR',
@@ -309,5 +262,22 @@ export class AuthService {
       ok: true,
       user: toUserWithRelationsContract({ ...user, accounts: [] }),
     };
+  }
+
+  async updateAfterProfileCompleted(userId: string) {
+    try {
+      await this.userService.update(userId, {
+        profileCompleted: true,
+        hasMembership: true,
+      });
+      return {
+        ok: true,
+      };
+    } catch (err) {
+      throw new AuthRpcException(
+        'INTERNAL_ERROR',
+        "Erreur lors de la mise à jour de l'utilisateur.",
+      );
+    }
   }
 }

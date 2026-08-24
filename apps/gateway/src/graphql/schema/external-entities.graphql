@@ -1,0 +1,3 @@
+type SchoolMembership @key(fields: "id") {
+  id: ID!
+}

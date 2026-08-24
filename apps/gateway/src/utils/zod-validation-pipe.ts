@@ -1,14 +1,14 @@
 import {
-  PipeTransform,
-  Injectable,
   BadRequestException,
   HttpStatus,
+  Injectable,
+  PipeTransform,
 } from '@nestjs/common';
-import { ZodType } from 'zod';
+import { ZodSchema } from 'zod';
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform {
-  constructor(private schema: ZodType) {}
+  constructor(private schema: ZodSchema) {}
 
   transform(value: unknown) {
     const result = this.schema.safeParse(value);
@@ -25,6 +25,7 @@ export class ZodValidationPipe implements PipeTransform {
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return result.data;
   }
 }

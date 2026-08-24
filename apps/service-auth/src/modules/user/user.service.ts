@@ -1,13 +1,21 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/db/generated/client';
-import { UserWithRelationsContract } from '@stackschool/messaging';
+import {
+  AuthRpcException,
+  UpdateProfileInput,
+  ValidateUserFieldInput,
+} from '@stackschool/messaging';
+import { Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cacheManager: Cache,
+  ) {}
   async create(createUserInput: Prisma.UserCreateInput) {
-    return await this.prisma.user.create({
+    return this.prisma.user.create({
       data: createUserInput,
     });
   }
@@ -30,18 +38,15 @@ export class UserService {
   async validateField({
     phoneNumber,
     email,
-    selfCheck = false,
-    user,
-  }: {
-    phoneNumber: string | null;
-    email: string | null;
-    selfCheck: boolean;
-    user: UserWithRelationsContract;
-  }) {
-    // check email uniqueness
-    if (selfCheck ? email && user?.email !== email : email) {
-      const existingUser = await this.findUnique({
-        where: { email: email ?? undefined },
+    selfCheck = true,
+    userId,
+  }: ValidateUserFieldInput) {
+    if (email) {
+      const existingUser = await this.prisma.user.findFirst({
+        where: {
+          ...(!selfCheck && { id: { not: userId! } }),
+          email,
+        },
       });
 
       if (existingUser) {
@@ -54,15 +59,10 @@ export class UserService {
       }
     }
 
-    if (
-      selfCheck
-        ? phoneNumber &&
-          user?.phoneNumber?.replace(/\s+/g, '') !==
-            phoneNumber?.replace(/\s+/g, '')
-        : phoneNumber
-    ) {
-      const existingUser = await this.prisma.user.findUnique({
+    if (phoneNumber) {
+      const existingUser = await this.prisma.user.findFirst({
         where: {
+          ...(!selfCheck && { id: { not: userId! } }),
           phoneNumber: phoneNumber?.replace(/\s+/g, ''),
         },
       });
@@ -129,11 +129,110 @@ export class UserService {
     )) as Prisma.UserGetPayload<T> | null;
   }
 
-  update(id: number, _updateUserInput: Prisma.UserCreateInput) {
-    return `This action updates a #${id} user`;
+  async update(id: string, _updateUserInput: Prisma.UserUpdateInput) {
+    const user = await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: _updateUserInput,
+    });
+    await this.cacheManager.del(`user:${id}`);
+    return user;
   }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+  async updateProfile(userId: string, data: Prisma.ProfileUpdateInput) {
+    return this.prisma.profile.update({
+      where: {
+        userId,
+      },
+      data,
+    });
+  }
+  async handleUpdateProfile(data: UpdateProfileInput) {
+    const orConditions: Prisma.UserWhereInput[] = [];
+
+    if (data.profileData.phoneNumber) {
+      orConditions.push({ phoneNumber: data.profileData.phoneNumber });
+    }
+
+    if (data.profileData.email) {
+      orConditions.push({ email: data.profileData.email });
+    }
+
+    if (orConditions.length === 0) {
+      return null;
+    }
+
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        id: { not: data.userId },
+        OR: orConditions,
+      },
+    });
+
+    if (existingUser) {
+      throw new AuthRpcException(
+        'EMAIL_TAKEN',
+        'Email où numéro de téléphone déjà utilisé.',
+      );
+    }
+    try {
+      const profile = await this.prisma.user.update({
+        where: {
+          id: data.userId,
+        },
+        data: {
+          ...(data.profileData.email && {
+            email: data.profileData.email,
+          }),
+          ...(data.profileData.phoneNumber && {
+            phoneNumber: data.profileData.phoneNumber,
+          }),
+          profile: {
+            upsert: {
+              create: {
+                firstName: data.profileData.firstName,
+                lastName: data.profileData.lastName,
+                gender: data.profileData.gender,
+                avatarUrl: data.profileData.avatarUrl,
+                address: data.profileData.address,
+              },
+              update: {
+                firstName: data.profileData.firstName,
+                lastName: data.profileData.lastName,
+                gender: data.profileData.gender,
+                avatarUrl: data.profileData.avatarUrl,
+                address: data.profileData.address,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          profile: {
+            select: {
+              id: true,
+              avatarUrl: true,
+            },
+          },
+        },
+      });
+      return {
+        ok: true,
+        message: 'Misse à jour du profile réussi avec succès.',
+        data: {
+          profileId: profile.profile?.id,
+        },
+      };
+    } catch (err) {
+      console.log('Erreur : ', err);
+      throw new AuthRpcException(
+        'INTERNAL_ERROR',
+        'Erreur lors de la mise à jour du profile.',
+      );
+    }
   }
 }

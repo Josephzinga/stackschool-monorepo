@@ -5,7 +5,6 @@ import {
   type CompleteProfileDataType,
 } from '@stackschool/contracts';
 import { ZodValidationPipe } from '../../utils/zod-validation-pipe';
-
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { Request, Response } from 'express';
 import { CompleteProfileService } from './complete-profile.service';
@@ -17,6 +16,11 @@ export class CompleteProfileController {
     private readonly completeProfileService: CompleteProfileService,
   ) {}
 
+  @Post('/')
+  async confirm(@CurrentUser() user: NonNullable<Request['user']>) {
+    return await this.completeProfileService.confirm(user.id);
+  }
+
   @Post('save-progress')
   async saveProgress(
     @CurrentUser() user: NonNullable<Request['user']>,
@@ -24,7 +28,6 @@ export class CompleteProfileController {
     dto: CompleteProfileDataType,
     @Res() res: Response,
   ) {
-    console.log('Data', dto);
     return await this.completeProfileService.saveProgress(user.id, dto, res);
   }
 

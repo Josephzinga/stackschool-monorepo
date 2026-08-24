@@ -3,11 +3,11 @@ import { MembershipService } from './membership.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   CORE_PATTERNS,
+  FindBySchoolIdAndUserIdInput,
   FindManyByUserIdInput,
   FindManyMemberInput,
-  ZodValidationPipe,
   SchoolUserContract,
-  FindBySchoolIdAndUserIdInput,
+  ZodValidationPipe,
 } from '@stackschool/messaging';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -36,8 +36,17 @@ export class MembershipController {
   async rpcFindBySchoolAndUserId(
     @Payload(new ZodValidationPipe(FindBySchoolIdAndUserIdInput))
     data: FindBySchoolIdAndUserIdInput,
-  ): Promise<SchoolUserContract | null> {
-    return this.membershipService.findBySchoolIdAndUserId(data);
+  ): Promise<Omit<
+    SchoolUserContract,
+    'parent' | 'staff' | 'teacher' | 'school' | 'student'
+  > | null> {
+    const schoolUser = await this.membershipService.findUnique({
+      schoolId_userId: {
+        schoolId: data.schoolId,
+        userId: data.userId,
+      },
+    });
+    return schoolUser || null;
   }
 
   @MessagePattern(CORE_PATTERNS.MEMBERSHIP.FIND_MANY_BY_USER_ID)

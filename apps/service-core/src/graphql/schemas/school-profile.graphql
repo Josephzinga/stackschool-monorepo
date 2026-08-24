@@ -1,0 +1,11 @@
+type SchoolProfile {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  address: String
+  gender: Gender!
+  avatarUrl: String
+  bio: String
+  schoolUserId: ID!
+  schoolId: ID!
+}

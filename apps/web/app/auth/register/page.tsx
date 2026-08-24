@@ -1,205 +1,49 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import {
-  authServices,
-  parseAxiosError,
-  registerFormSchema,
-  RegisterFormType,
-} from '@stackschool/shared';
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from '@/components/ui/field';
-import Link from 'next/link';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { FacebookIcon, GoogleIcon } from '@/components/icons';
-import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
-import { Lock, Mail, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Controller, useForm, zodResolver } from '@stackschool/ui';
-import { toast } from 'sonner';
-import { Container } from '@/components/Container';
-import { ButtonSocial } from '@/components/auth/button-social';
 import 'react-phone-number-input/style.css';
-import PhoneInput from 'react-phone-number-input';
-import { useState } from 'react';
+import StackSchoolLogo from "@/components/ui/StackSchoolLogo";
+import {AuthImageSlider} from "@/components/ui/auth-image-slider";
+import {RegisterForm} from "@/components/auth/register-form";
+
+
+const registerSlides = [
+  {
+    src: '/images/chalkboard-career-doodle-copy-space-corridor.jpg',
+    title: 'Bienvenue dans la communauté StackSchool',
+    description: 'Rejoignez des milliers d’élèves, enseignants et parents qui transforment l’éducation au quotidien.',
+  },
+  {
+    src: '/images/joyful-young-schoolgirl-wearing-backpack-holding-looking-phone-showing-yes-gesture.jpg',
+    title: 'Un apprentissage personnalisé',
+    description: 'Des ressources adaptées à votre niveau, pour progresser à votre rythme.',
+  },
+  {
+    src: '/images/little-boy-with-happy-new-month-lettering.jpg',
+    title: 'Votre réussite est notre priorité',
+    description: 'Une plateforme intuitive et sécurisée pour vous accompagner vers l’excellence.',
+  },
+];
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const {
-    handleSubmit,
-    register,
-    control,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormType>({
-    resolver: zodResolver(registerFormSchema),
-    mode: 'onBlur',
-  });
-
-  async function handleRegister(data: RegisterFormType) {
-    try {
-      const res = await authServices.register(data);
-      if (res.ok) {
-        toast.success(res.message);
-        router.push(`/auth/finish?from=${res.user.provider}`);
-      }
-    } catch (err: any) {
-      const error = parseAxiosError(err);
-      toast.error(error.message || 'Une erreur est survenue.');
-    }
-  }
-
   return (
-    <Container>
-      <Card className="max-w-lg w-100 md:w-md gap-4">
-        <CardHeader className="text-center mt-4">
-          <CardTitle className="text-xl">Bienvenue</CardTitle>
-          <CardDescription>
-            Connectez-vous à votre compte Google ou Facebook
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(handleRegister)} className="mt-0">
-            <FieldGroup className="gap-1.5 md:gap-2 text-sm md:text-base">
-              <Field>
-                <ButtonSocial provider="google" icon={<GoogleIcon />} />
-                <ButtonSocial provider="facebook" icon={<FacebookIcon />} />
-              </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card mt-1">
-                <span className="font-medium font-jost text-sm ">
-                  Ou continuer avec
-                </span>
-              </FieldSeparator>
-              <Field className=" mt-3">
-                <FieldLabel htmlFor="username">
-                  Nom d&apos;utilisateur
-                </FieldLabel>
-                <Input
-                  id="username"
-                  type="text"
-                  required
-                  icon={User}
-                  autoComplete="username"
-                  placeholder="John Doe"
-                  aria-invalid={!!errors.username}
-                  aria-describedby="username-error"
-                  {...register('username')}
-                />
+      <div className="relative grid min-h-dvh lg:grid-cols-2">
+        {/* Colonne gauche - Formulaire */}
+        <div className="flex flex-col items-center justify-center px-6 py-8 sm:px-10">
+          <div className="w-full max-w-md">
+            <div className="flex justify-center mb-4">
+              <StackSchoolLogo className="h-12 md:h-18 w-auto" />
+            </div>
+            <RegisterForm />
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              &copy; {new Date().getFullYear()} StackSchool. Tous droits réservés.
+            </p>
+          </div>
+        </div>
+        {/* Colonne droite - Slider */}
+        <div className="relative hidden lg:block bg-muted/50">
+          <div className="absolute -left-25 z-40 h-full w-50 bg-linear-to-l from-packground/80 via-background to-background/60"/>
 
-                <FieldError id="username-error">
-                  {errors.username?.message}{' '}
-                </FieldError>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  icon={Mail}
-                  id="email"
-                  type="email"
-                  placeholder="john.doe@example.com"
-                  {...register('email')}
-                  autoComplete="email"
-                  aria-invalid={!!errors.email}
-                  aria-describedby={errors.email ? 'email-error' : undefined}
-                />
-                <FieldError id="email-error">
-                  {errors.email?.message}{' '}
-                </FieldError>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="phoneNumber">Numéro WhatsApp</FieldLabel>
-
-                <Controller
-                  name="phoneNumber"
-                  control={control}
-                  render={({ field }) => (
-                    <PhoneInput
-                      {...field}
-                      id="phoneNumber"
-                      placeholder="+223 07 12 34 56 78"
-                      defaultCountry="ML"
-                      className="phone-input-custom "
-                      onCountryChange={(country) =>
-                        console.log('contry', country)
-                      }
-                      international
-                    />
-                  )}
-                />
-
-                <FieldError id="error-phone">
-                  {errors.phoneNumber?.message}{' '}
-                </FieldError>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
-
-                <Input
-                  isPassword
-                  icon={Lock}
-                  {...register('password')}
-                  id="password"
-                  required
-                  autoComplete="current-password"
-                  aria-invalid={!!errors.password}
-                  aria-describedby={
-                    errors.password ? 'password-error' : undefined
-                  }
-                />
-
-                <FieldError id="password-error">
-                  {errors.password?.message}{' '}
-                </FieldError>
-              </Field>
-              <Field className="gap-1.5 ">
-                <FieldLabel htmlFor="confirm">
-                  Confirmer le mot de passe
-                </FieldLabel>
-                <Input
-                  isPassword
-                  id="confirm"
-                  type="password"
-                  icon={Lock}
-                  {...register('confirm')}
-                  aria-invalid={!!errors.confirm}
-                  aria-describedby={
-                    errors.confirm ? 'confirm-error' : undefined
-                  }
-                />
-                <FieldError id="confirm-error">
-                  {errors.confirm?.message}
-                </FieldError>
-              </Field>
-
-              <Field>
-                <Button type="submit" className="font-semibold text-white mt-2">
-                  {isSubmitting ? (
-                    <>
-                      <Spinner /> Inscription en cours...
-                    </>
-                  ) : (
-                    <span>S&apos;inscrire</span>
-                  )}
-                </Button>
-                <FieldDescription className="text-center">
-                  Déjà un compte ? <Link href="/auth/login">Connexion</Link>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-    </Container>
+          <AuthImageSlider slides={registerSlides} interval={5000} />
+        </div>
+      </div>
   );
 }

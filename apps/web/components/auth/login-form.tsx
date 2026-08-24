@@ -1,39 +1,24 @@
 'use client';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { FacebookIcon, GoogleIcon } from '../icons';
-import { useState } from 'react';
-import { useForm, zodResolver } from '@stackschool/ui';
+import {cn} from '@/lib/utils';
+import {Button} from '@/components/ui/button';
+import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator,} from '@/components/ui/field';
+import {Input} from '@/components/ui/input';
+import {FacebookIcon, GoogleIcon} from '../icons';
+import {useState} from 'react';
+import {useForm, zodResolver} from '@stackschool/ui';
 import Link from 'next/link';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import { Spinner } from '../ui/spinner';
-import { loginFormSchema, LoginFormType } from '@stackschool/contracts';
-import { ButtonSocial } from './button-social';
+import {Eye, EyeOff, Lock, Mail} from 'lucide-react';
+import {Spinner} from '../ui/spinner';
+import {loginFormSchema, LoginFormType} from '@stackschool/contracts';
+import {ButtonSocial} from './button-social';
 
-export function LoginForm({
-  className,
-  handleLogin,
-}: {
+interface LoginFormProps {
   className?: string;
-  handleLogin: (value: LoginFormType) => void;
-}) {
-  const [showpwd, setShowpwd] = useState(false);
+  handleLogin: (values: LoginFormType) => void;
+}
+
+export function LoginForm({ className, handleLogin }: LoginFormProps) {
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -45,112 +30,105 @@ export function LoginForm({
   });
 
   return (
-    <>
-      <Card className="max-w-lg w-100 md:w-md xl:w-lg py-4 gap-2 font-inter-local">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl lg:text-2xl!">Bienvenue</CardTitle>
-          <CardDescription>
-            Connecter vous à votre compte Google ou Facebook
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(handleLogin)}>
-            <FieldGroup className="gap-3">
-              <Field>
-                <ButtonSocial provider="google" icon={<GoogleIcon />} />
-                <ButtonSocial provider="facebook" icon={<FacebookIcon />} />
-              </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                <span className="font-medium text-slate-700 dark:text-slate-300">
-                  Ou continuer avec
-                </span>
-              </FieldSeparator>
-              <Field className="last:mt-0">
-                <FieldLabel htmlFor="email">
-                  Email ou nom d&apos;utilisateur
-                </FieldLabel>
-                <Input
-                  placeholder="exmple@example.com"
-                  icon={Mail}
-                  id="email"
-                  type="text"
-                  required
-                  autoComplete="name"
-                  {...register('identifier')}
-                  aria-describedby={
-                    errors.identifier ? 'identifier-error' : undefined
-                  }
-                  aria-invalid={!!errors.identifier}
-                />
+      <form onSubmit={handleSubmit(handleLogin)} className={cn('w-full max-w-104 mx-auto', className)}>
+        <FieldGroup className="gap-6">
+          {/* Entête */}
+          <div className="flex flex-col items-center gap-1 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-primary">Bienvenue sur StackSchool</h1>
+            <p className="text-sm text-muted-foreground">
+              Connectez-vous pour accéder à vos cours, vos notes et votre espace pédagogique.
+            </p>
+          </div>
 
-                <FieldError id="identifier-error">
-                  {errors.identifier?.message}{' '}
-                </FieldError>
-              </Field>
-              <Field>
-                <div className="flex items-center relative">
-                  <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
-                  <Link
+          {/* Boutons sociaux */}
+          <div className="flex gap-3 w-full justify-center">
+            <ButtonSocial provider="google" className="flex-1 max-w-45" icon={<GoogleIcon />} />
+            <ButtonSocial provider="facebook" className="flex-1 max-w-45" icon={<FacebookIcon />} />
+          </div>
+
+          <FieldSeparator className="flex items-center">
+          <span className="px-2 text-xs font-medium text-muted-foreground bg-background">
+            Ou connectez-vous avec votre compte
+          </span>
+          </FieldSeparator>
+
+          {/* Champs du formulaire */}
+          <FieldGroup className="space-y-2">
+            <Field>
+              <FieldLabel htmlFor="identifier">Email ou nom d'utilisateur</FieldLabel>
+              <Input
+                  id="identifier"
+                  type="text"
+                  placeholder="exemple@ecole.fr ou nom.utilisateur"
+                  icon={Mail}
+                  autoComplete="username"
+                  {...register('identifier')}
+                  aria-invalid={!!errors.identifier}
+                  aria-describedby={errors.identifier ? 'identifier-error' : undefined}
+              />
+              <FieldError id="identifier-error">{errors.identifier?.message}</FieldError>
+            </Field>
+
+            <Field>
+              <div className="flex items-center justify-between">
+                <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
+                <Link
                     href="/auth/forgot-password"
-                    className="ml-auto text-sm font-semibold hover:underline hover:text-primary/50"
-                  >
-                    Mot de passe oublier?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <Input
-                    icon={Lock}
-                    {...register('password')}
-                    id="password"
-                    type={showpwd ? 'text' : 'password'}
-                    required
-                    placeholder="********"
-                    autoComplete="current-password"
-                    aria-invalid={!!errors.password}
-                    aria-describedby={
-                      errors.password ? 'password-error' : undefined
-                    }
-                  />
-                  <button
-                    aria-label="Toggle password visibility"
-                    type="button"
-                    tabIndex={-1}
-                    onClick={() => setShowpwd((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 dark:text-gray-400 cursor-pointer"
-                  >
-                    {showpwd ? <Eye size={18} /> : <EyeOff size={18} />}
-                  </button>
-                </div>
-                <FieldError id="password-error">
-                  {errors.password?.message}
-                </FieldError>
-              </Field>
-              <Field>
-                <Button
-                  disabled={isSubmitting}
-                  type="submit"
-                  className={cn(
-                    'font-semibold',
-                    isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer',
-                  )}
+                    className="text-xs font-medium text-primary hover:underline hover:text-primary/80"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Spinner /> Connection en cours...
-                    </>
-                  ) : (
-                    'Connexion'
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+              <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Votre mot de passe sécurisé"
+                  icon={Lock}
+                  autoComplete="current-password"
+                  {...register('password')}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
+                  rightElement={
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  }
+              />
+              <FieldError id="password-error">{errors.password?.message}</FieldError>
+            </Field>
+
+            <Field>
+              <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={cn(
+                      'w-full font-semibold transition-all',
+                      isSubmitting && 'opacity-70 cursor-not-allowed'
                   )}
-                </Button>
-                <FieldDescription className="text-center">
-                  Pas de compte ?{' '}
-                  <Link href="/auth/register">Creé un compte</Link>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-    </>
+              >
+                {isSubmitting ? (
+                    <>
+                      <Spinner className="mr-2 h-4 w-4 animate-spin" />
+                      Connexion en cours...
+                    </>
+                ) : (
+                    'Se connecter'
+                )}
+              </Button>
+              <FieldDescription className="text-center text-sm">
+                Pas encore inscrit ?{' '}
+                <Link href="/auth/register" className="font-medium text-primary hover:underline">
+                  Créer un compte
+                </Link>
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
+        </FieldGroup>
+      </form>
   );
 }

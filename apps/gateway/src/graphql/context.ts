@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
-import { UnauthorizedException, HttpStatus } from '@nestjs/common';
+import { HttpStatus, UnauthorizedException } from '@nestjs/common';
 import { DataLoaders } from '../modules/dataloader/dataloader.service';
-import type { SchoolUserContract } from '@stackschool/contracts';
-import { MembershipService } from '../modules/membership/membership.service';
+import { SchoolUserContract } from '@stackschool/contracts';
+import { ClientProxy } from '@nestjs/microservices';
+import { Cache } from '@nestjs/cache-manager';
+import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
+import { CORE_PATTERNS } from '@stackschool/messaging';
+import { mapCoreError } from '../errors/core.error-maper';
 
 export interface GraphQLContext {
   req: Request;
@@ -18,7 +22,8 @@ export interface GraphQLContext {
 export async function createContext(
   req: Request,
   res: Response,
-  memberService: MembershipService,
+  coreClient: ClientProxy,
+  cacheManager: Cache,
 ): Promise<GraphQLContext> {
   const user = req.user;
 
@@ -32,14 +37,32 @@ export async function createContext(
     (req.headers['x-school-id'] as string) || (req.query?.schoolId as string);
 
   const context: GraphQLContext = { req, schoolId, user };
-
+  let schoolUser: SchoolUserContract | undefined;
   if (user && schoolId) {
-    const schoolUser = await memberService.findBySchoolIdAndUserId({
-      schoolId,
-      userId: user.id,
-    });
+    const cachedKey = `school_user:${schoolId}:${user.id}`;
+    const cached = await cacheManager.get<string>(cachedKey);
+    if (cached) {
+      schoolUser = JSON.parse(cached) as SchoolUserContract;
+    } else {
+      schoolUser = await firstValueFrom(
+        coreClient
+          .send(CORE_PATTERNS.MEMBERSHIP.FIND_BY_SCHOOL_ID_AND_USER_ID, {
+            schoolId,
+            userId: user.id,
+          })
+          .pipe(
+            timeout(3000),
+            catchError((err) => throwError(() => mapCoreError(err))),
+          ),
+      );
+    }
 
-    console.log('schooLuser', schoolUser);
+    if (schoolUser)
+      await cacheManager.set(
+        cachedKey,
+        JSON.stringify(schoolUser),
+        1000 * 60 * 60 * 5,
+      );
 
     context.schoolId = schoolId;
 

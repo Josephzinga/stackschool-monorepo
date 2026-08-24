@@ -18,9 +18,9 @@ type Account @key(fields: "id") {
 
 type Profile @key(fields: "id") {
   id: ID!
-  firstname: String!
-  lastname: String!
-  photo: String
-  gender: Gender!
+  firstName: String!
+  lastName: String!
+  avatarUrl: String
+  gender: Gender
   address: String
 }

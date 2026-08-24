@@ -1,0 +1,53 @@
+scalar DateTime
+scalar Date
+
+type School @key(fields: "id") {
+  id: ID!
+  name: String!
+  slug: String
+  address: String!
+  code: String!
+  logo: String
+  stats: SchoolStats
+  settings: SchoolSettings
+  teachers: [Teacher]
+}
+
+type SchoolSettings @key(fields: "id") {
+  id: ID!
+  schoolId: ID
+  lessonDuration: Int
+  startHour: Int
+  endHour: Int
+  daysOfWeek: [Day]
+}
+
+type SchoolStats @key(fields: "id") {
+  id: ID!
+
+  # KPI Cards
+  totalStudents: Int!
+  totalTeachers: Int!
+
+  # Finance & Présence
+  monthlyRevenue: MonthlyRevenue
+  pendingPaymentsCount: Int
+
+  # Charts Data
+  studentGender: GenderStats
+  enrollmentPerMonth: [MonthlyStats!]
+}
+
+type MonthlyRevenue {
+  currentMonth: Float!
+  previousMonth: Float
+}
+
+input SchoolSearchInput {
+  searchTerm: String
+}
+
+type MonthlyStats {
+  month: String!
+  count: Int!
+}

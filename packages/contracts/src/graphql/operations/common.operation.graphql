@@ -1,0 +1,7 @@
+fragment basicProfile on Profile {
+    id
+    firstName
+    lastName
+    avatarUrl
+    gender
+}

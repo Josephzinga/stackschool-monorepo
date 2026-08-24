@@ -4,7 +4,8 @@ import type { Request } from 'express';
 
 @Injectable()
 export class GoogleAuthGuard extends AuthGuard('google') {
-  getAuthenticateOptions(context: ExecutionContext) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getAuthenticateOptions(_context: ExecutionContext) {
     return { scope: ['email', 'profile'], session: true };
   }
   async canActivate(context: ExecutionContext) {

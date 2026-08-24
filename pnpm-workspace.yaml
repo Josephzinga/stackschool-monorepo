@@ -1,5 +1,7 @@
 packages:
-  - 'packages/*'
+  - 'packages/messaging'
+  - 'packages/contracts'
+  - 'packages/ui'
   - 'apps/gateway'
   - 'apps/web'
   - 'apps/service-auth'
@@ -31,6 +33,7 @@ catalog:
   '@prisma/client': '7.8.0'
   'prisma': '7.8.0'
   '@prisma/adapter-pg': '7.8.0'
+  zod: '^4.4.3'
 
 overrides:
   react: 'catalog:'
@@ -41,6 +44,7 @@ overrides:
   '@prisma/client': 'catalog:'
   prisma: 'catalog:'
   '@prisma/adapter-pg': 'catalog:'
+  zod: 'catalog:'
 
 publicHoistPattern:
   - '*eslint*'

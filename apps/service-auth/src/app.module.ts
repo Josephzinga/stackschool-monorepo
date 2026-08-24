@@ -1,7 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -11,16 +8,29 @@ import {
 } from '@nestjs/apollo';
 import { join } from 'node:path';
 import { Request, Response } from 'express';
+import { AuthModule } from './modules/auth/auth.module';
+import { ExternalModule } from './modules/external/external.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import KeyvRedis, { Keyv } from '@keyv/redis';
+import { KeyvCacheableMemory } from 'cacheable';
 
 @Module({
   imports: [
     AuthModule,
     PrismaModule,
     UserModule,
+    ExternalModule,
     GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       useFactory: () => ({
-        typePaths: [join(process.cwd(), '/src/graphql/**/*.graphql')],
+        typePaths: [
+          join(process.cwd(), '/src/graphql/**/*.graphql'),
+          join(
+            process.cwd(),
+            '../../packages/contracts/src/graphql/common/common.graphql',
+          ),
+        ],
         context: ({ req, res }: { req: Request; res: Response }) => {
           const userId = req.headers['x-user-id'];
           const schoolId = req.headers['x-school-id'];
@@ -28,6 +38,8 @@ import { Request, Response } from 'express';
           return {
             req,
             res,
+            userId,
+            schoolId,
           };
         },
         buildSchemaOptions: {
@@ -35,12 +47,25 @@ import { Request, Response } from 'express';
         },
         definitions: {
           path: join(process.cwd(), 'src/graphql.ts'),
-          outputAs: 'interface',
+          outputAs: 'class',
         },
       }),
     }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => {
+        return {
+          stores: [
+            new Keyv({
+              store: new KeyvCacheableMemory({ ttl: 60000, lruSize: 5000 }),
+            }),
+            new KeyvRedis(configService.getOrThrow('REDIS_URL')),
+          ],
+        };
+      },
+    }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

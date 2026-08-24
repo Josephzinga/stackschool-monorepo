@@ -10,6 +10,12 @@ export const AUTH_PATTERNS = {
   RESEND_CODE: 'auth.resend_code',
   VALIDATE_OAUTH_USER: 'auth.validate_oauth_user',
   VALIDATE_USER_FIELD: 'auth.validate_user_field',
+  UPDATE_AVATAR: 'auth.update_avatar',
+  UPDATE_PROFILE: 'auth.update_profile',
+  PROFILE_UPDATED: 'auth.profile_updated',
+  GET_PROFILE: 'auth.get_profile',
+  UPDATE_USER_PROFILE : 'auth.update_user_profile',
+  UPDATE_USER_AFTER_PROFILE_COMPLETED: "auth.update_user_after_profile_completed",
 } as const;
 
 export const AUTH_EVENTS = {

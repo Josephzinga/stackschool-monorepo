@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
-import { cn } from '@/lib/utils';
+import {Button} from '@/components/ui/button';
+import {Spinner} from '@/components/ui/spinner';
+import {cn} from '@/lib/utils';
 
 export const SubmitButton = ({
   isSubmitting,
@@ -22,7 +22,7 @@ export const SubmitButton = ({
     type="submit"
     disabled={isSubmitting || disabled}
     className={cn(
-      'font-poppins font-semibold',
+      'font-poppins font-semibold cursor-pointer',
       (isSubmitting || disabled) && 'opacity-50 cursor-not-allowed',
       className,
     )}

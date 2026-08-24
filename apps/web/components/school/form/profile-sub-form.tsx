@@ -1,17 +1,17 @@
 'use client';
 
 import 'react-phone-number-input/style.css';
-import { Controller, useFormContext } from 'react-hook-form';
-import { GridForm } from '@/components/school/grid-form';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Mail, User, User2Icon } from 'lucide-react';
+import {Controller, useFormContext} from 'react-hook-form';
+import {GridForm} from '@/components/school/grid-form';
+import {Field, FieldError, FieldLabel} from '@/components/ui/field';
+import {Input} from '@/components/ui/input';
+import {Mail, User, User2Icon} from 'lucide-react';
 import PhoneInput from 'react-phone-number-input';
-import { checkField } from '@/lib/check-profile-field';
+import {checkField} from '@/lib/check-profile-field';
 
 interface ProfileSubFormField {
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   phoneNumber: string;
   email: string;
 }
@@ -48,22 +48,22 @@ export function ProfileSubForm() {
         <Field>
           <FieldLabel>Prénom</FieldLabel>
           <Input
-            {...register('firstname')}
-            aria-invalid={!!errors.firstname}
+            {...register('firstName')}
+            aria-invalid={!!errors.firstName}
             placeholder="Jean"
             icon={User}
           />
-          <FieldError>{errors.firstname?.message}</FieldError>
+          <FieldError>{errors.firstName?.message}</FieldError>
         </Field>
         <Field>
           <FieldLabel>Nom</FieldLabel>
           <Input
-            {...register('lastname')}
-            aria-invalid={!!errors.lastname}
+            {...register('lastName')}
+            aria-invalid={!!errors.lastName}
             placeholder="Dupont"
             icon={User2Icon}
           />
-          <FieldError>{errors.lastname?.message}</FieldError>
+          <FieldError>{errors.lastName?.message}</FieldError>
         </Field>
       </GridForm>
       <GridForm>

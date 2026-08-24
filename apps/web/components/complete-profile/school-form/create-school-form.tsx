@@ -1,12 +1,12 @@
 // components/complete-profile/school-step/create-school-form.tsx
-import { useCompleteProfileStore, useForm, zodResolver } from '@stackschool/ui';
-import { createSchoolSchema, CreateSchoolType } from '@stackschool/contracts';
-import { Input } from '@/components/ui/input';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { SubmitButton } from '@/components/submit-button';
-import { Building2, Hash } from 'lucide-react';
+import {useCompleteProfileStore, useForm, zodResolver} from '@stackschool/ui';
+import {createSchoolSchema, CreateSchoolType} from '@stackschool/contracts';
+import {Input} from '@/components/ui/input';
+import {Field, FieldError, FieldLabel} from '@/components/ui/field';
+import {Button} from '@/components/ui/button';
+import {Textarea} from '@/components/ui/textarea';
+import {SubmitButton} from '@/components/submit-button';
+import {Building2, Hash} from 'lucide-react';
 
 export function CreateSchoolForm() {
   const { setSchoolData, school, currentStep, setCurrentStep } =
@@ -61,7 +61,7 @@ export function CreateSchoolForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 px-2">
       <div className="space-y-3">
         {/* Nom de l'école */}
         <Field>

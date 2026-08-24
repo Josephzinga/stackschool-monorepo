@@ -42,12 +42,12 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage
-                  src={`/images/${user?.profile?.photo}`}
+                  src={user?.profile?.avatarUrl ?? undefined}
                   alt={user?.username}
                 />
                 <AvatarFallback className="rounded-lg">
-                  {user?.profile?.firstname[0].toUpperCase()}
-                  {user?.profile?.lastname[0].toUpperCase()}
+                  {user?.profile?.firstName[0].toUpperCase()}
+                  {user?.profile?.lastName[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">

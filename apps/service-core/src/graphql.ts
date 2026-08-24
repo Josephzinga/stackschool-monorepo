@@ -159,8 +159,8 @@ export class StudentSortInput {
 }
 
 export class CreateStudentInput {
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
     email?: Nullable<string>;
     phoneNumber?: Nullable<string>;
     gender: Gender;
@@ -212,53 +212,26 @@ export class GetSchoolTeachersInput {
     day?: Nullable<Day>;
 }
 
-export class CreateTeacherAssignmentInput {
-    classId: string;
-    subjectIds: string[];
-    teacherId: string;
-}
-
-export class ApiResponse {
-    ok?: Nullable<boolean>;
-    message?: Nullable<string>;
-    details?: Nullable<Nullable<string>[]>;
-}
-
-export class PaginationMeta {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-}
-
 export class User {
     id: string;
     memberships?: Nullable<Nullable<SchoolMembership>[]>;
     schoolContext?: Nullable<SchoolMembership>;
 }
 
-export class Profile {
+export class TeacherAssignment {
     id: string;
-}
-
-export class ClassSubject {
-    id: string;
-}
-
-export class Lesson {
-    id: string;
+    teacher?: Nullable<Teacher>;
 }
 
 export class Class {
     id: string;
+    supervisor?: Nullable<Teacher>;
+    students?: Nullable<Student[]>;
 }
 
-export class AttendanceRecord {
+export class Subject {
     id: string;
-}
-
-export class ClassLessons {
-    id: string;
+    mainTeacher?: Nullable<Teacher>;
 }
 
 export class Permission {
@@ -269,17 +242,19 @@ export class Permission {
     description?: Nullable<string>;
     createdAt?: Nullable<DateTime>;
     updatedAt?: Nullable<DateTime>;
-    user?: Nullable<User>;
 }
 
 export class SchoolMembership {
     id: string;
     role: SchoolRole;
+    userId: string;
     schoolId?: Nullable<string>;
     school?: Nullable<School>;
+    isActive: boolean;
+    isOwner: boolean;
+    schoolProfile?: Nullable<SchoolProfile>;
     permissions?: Nullable<Nullable<Permission>[]>;
     member?: Nullable<Member>;
-    user?: Nullable<User>;
     teacher?: Nullable<Teacher>;
     student?: Nullable<Student>;
     parent?: Nullable<Parent>;
@@ -288,12 +263,6 @@ export class SchoolMembership {
 
 export abstract class IMutation {
     abstract createTeacher(input?: Nullable<CreateTeacherInput>): Nullable<Teacher> | Promise<Nullable<Teacher>>;
-
-    abstract createTeacherAssignment(input: CreateTeacherAssignmentInput): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
-
-    abstract syncTeacherAssignment(input: CreateTeacherAssignmentInput): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
-
-    abstract deleteTeacherAssignment(id: string, subjectIds?: Nullable<string[]>): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
 
     abstract updateTeacher(teacherId: string, data: CreateTeacherInput): Nullable<Teacher> | Promise<Nullable<Teacher>>;
 
@@ -314,10 +283,11 @@ export class Parent {
     isDelegate?: Nullable<boolean>;
     parentStudent?: Nullable<Nullable<ParentStudent>[]>;
     schoolUserId?: Nullable<string>;
-    user?: Nullable<User>;
+    schoolProfile?: Nullable<SchoolProfile>;
 }
 
 export class ParentStudent {
+    id: string;
     relationType?: Nullable<RelationType>;
     student?: Nullable<Student>;
     studentId?: Nullable<string>;
@@ -352,7 +322,8 @@ export class SchoolProfile {
     id: string;
     firstName: string;
     lastName: string;
-    address: string;
+    address?: Nullable<string>;
+    gender: Gender;
     avatarUrl?: Nullable<string>;
     bio?: Nullable<string>;
     schoolUserId: string;
@@ -364,12 +335,11 @@ export class School {
     name: string;
     slug?: Nullable<string>;
     address: string;
-    code?: Nullable<string>;
+    code: string;
     logo?: Nullable<string>;
     stats?: Nullable<SchoolStats>;
     settings?: Nullable<SchoolSettings>;
     teachers?: Nullable<Nullable<Teacher>[]>;
-    lessons?: Nullable<Nullable<Lesson>[]>;
 }
 
 export class SchoolSettings {
@@ -382,12 +352,13 @@ export class SchoolSettings {
 }
 
 export class SchoolStats {
+    id: string;
     totalStudents: number;
     totalTeachers: number;
-    totalClasses: number;
     monthlyRevenue?: Nullable<MonthlyRevenue>;
     pendingPaymentsCount?: Nullable<number>;
     studentGender?: Nullable<GenderStats>;
+    enrollmentPerMonth?: Nullable<MonthlyStats[]>;
 }
 
 export class MonthlyRevenue {
@@ -395,9 +366,9 @@ export class MonthlyRevenue {
     previousMonth?: Nullable<number>;
 }
 
-export class GenderStats {
-    male: number;
-    female: number;
+export class MonthlyStats {
+    month: string;
+    count: number;
 }
 
 export class Staff {
@@ -407,6 +378,8 @@ export class Staff {
     hireDate?: Nullable<DateTime>;
     salary?: Nullable<number>;
     department?: Nullable<string>;
+    SchoolProfile?: Nullable<SchoolProfile>;
+    schoolUser?: Nullable<SchoolMembership>;
 }
 
 export class Student {
@@ -422,19 +395,17 @@ export class Student {
     birthCertificateNumber?: Nullable<string>;
     medicalCondition?: Nullable<string>;
     allergies?: Nullable<string>;
-    attendances?: Nullable<AttendanceRecord[]>;
     transportMode?: Nullable<TransportMode>;
     previousSchool?: Nullable<string>;
     enrollmentYear: string;
     status?: Nullable<StudentStatus>;
     disciplinaryActions?: Nullable<StudentDisciplinaryAction>;
     nationality?: Nullable<string>;
-    schoolClass?: Nullable<Class>;
     classId?: Nullable<string>;
     profileId?: Nullable<string>;
-    profile?: Nullable<Profile>;
     parentStudent?: Nullable<Nullable<ParentStudent>[]>;
-    user?: Nullable<User>;
+    schoolProfile?: Nullable<SchoolProfile>;
+    schoolUser?: Nullable<SchoolMembership>;
 }
 
 export class StudentDisciplinaryAction {
@@ -451,16 +422,6 @@ export class StudentList {
     meta: PaginationMeta;
 }
 
-export class TeacherAssignments {
-    id: string;
-    teacher?: Nullable<Teacher>;
-    teacherId: string;
-    classSubjectId: string;
-    classSubjects?: Nullable<ClassSubject>;
-    lessons?: Nullable<Lesson[]>;
-    schoolId?: Nullable<string>;
-}
-
 export class Teacher {
     id: string;
     schoolUserId?: Nullable<string>;
@@ -472,14 +433,12 @@ export class Teacher {
     salary?: Nullable<number>;
     department?: Nullable<string>;
     specialization?: Nullable<string>;
-    assignments?: Nullable<Nullable<TeacherAssignments>[]>;
-    supervisedClasses?: Nullable<Nullable<Class>[]>;
     createdAt?: Nullable<DateTime>;
     updatedAt?: Nullable<DateTime>;
-    attendances?: Nullable<AttendanceRecord[]>;
     weeklyHours?: Nullable<number>;
     classesCount?: Nullable<number>;
-    user?: Nullable<User>;
+    schoolUser?: Nullable<SchoolMembership>;
+    schoolProfile?: Nullable<SchoolProfile>;
 }
 
 export class TeacherList {
@@ -489,7 +448,24 @@ export class TeacherList {
 
 export class TeacherTodaySubject {
     teachers?: Nullable<Teacher>;
-    classes?: Nullable<ClassLessons>;
+}
+
+export class ApiResponse {
+    ok?: Nullable<boolean>;
+    message?: Nullable<string>;
+    details?: Nullable<Nullable<string>[]>;
+}
+
+export class PaginationMeta {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
+export class GenderStats {
+    male: number;
+    female: number;
 }
 
 export type DateTime = any;

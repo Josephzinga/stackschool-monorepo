@@ -1,0 +1,37 @@
+query GetClassesOptions(
+  $input: GetSchoolClassesInput!
+  $withMeta: Boolean = true
+) {
+  getSchoolClasses(input: $input) {
+    meta @include(if: $withMeta) {
+      limit
+      totalPages
+      total
+    }
+    data {
+      id
+      level
+      name
+      section
+      group {
+        id
+        name
+        type
+      }
+    }
+  }
+}
+
+mutation UpdateClass($classId: ID!, $data: CreateClassInput!, $schoolId: ID!) {
+  updateClass(classId: $classId, data: $data, schoolId: $schoolId) {
+    ok
+    message
+  }
+}
+
+mutation DeleteClasses($classIds: [ID!]!, $schoolId: ID!) {
+  deleteClasses(classIds: $classIds, schoolId: $schoolId) {
+    ok
+    message
+  }
+}

@@ -1,8 +1,5 @@
-import { VerifyCallback } from 'passport-google-oauth20';
-import {
-  upsertOauthUser,
-  UpsertOauthUserParams,
-} from '../services/auth-user.service';
+import {VerifyCallback} from 'passport-google-oauth20';
+import {upsertOauthUser, UpsertOauthUserParams,} from '../services/auth-user.service';
 
 /**
  * Gère les stratégies d'authentification OAuth (Google, Facebook, etc.) pour Passport.
@@ -41,8 +38,8 @@ export default async function handleOauthStrategy(
       email,
       displayName,
       avatar,
-      firstname,
-      lastname,
+      firstName: firstname,
+      lastName: lastname,
       providerAccountId,
       emailVerified,
       accessToken,

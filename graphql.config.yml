@@ -1,23 +1,30 @@
 projects:
-  # Configuration pour le service Utilisateurs
-  service-core:
-    schema: "apps/service-core/src/graphql/**/*.graphql"
-    documents: "packages/shared/src/graphql/operations/**/*.graphql"
-    extensions:
-      endpoints:
-        default: "http://localhost:4002/graphql"
-  # Configuration pour le service Produits
   service-auth:
-    schema: "apps/service-auth/src/graphql/**/*.graphql"
-    documents: "packages/shared/src/graphql/operations/**/*.graphql"
+    schema:
+      - "apps/service-auth/src/graphql/**/*.graphql"
+      - "packages/contracts/src/graphql/common/**/*.graphql"
+    documents: "packages/contracts/src/graphql/operations/**/*.graphql"
     extensions:
       endpoints:
         default: "http://localhost:4001/graphql"
 
+  service-core:
+    schema:
+    - "apps/service-core/src/graphql/**/*.graphql"
+    - "packages/contracts/src/graphql/common/**/*.graphql"
+    documents: "packages/contracts/src/graphql/operations/**/*.graphql"
+    extensions:
+      endpoints:
+        default: "http://localhost:4002/graphql"
+
   service-academic:
-    schema: "apps/service-academic/src/graphql/**/*.graphql"
+    schema:
+    - "apps/service-academic/src/graphql/**/*.graphql"
+    - "packages/contracts/src/graphql/common/**/*.graphql"
     documents: "packages/shared/src/graphql/operations/**/*.graphql"
 
   service-operations:
-    schema: "apps/service-operations/src/graphql/**/*.graphql"
+    schema:
+    - "apps/service-operations/src/graphql/**/*.graphql"
+    - "packages/contracts/src/graphql/common/**/*.graphql"
     documents: "packages/shared/src/graphql/operations/**/*.graphql"

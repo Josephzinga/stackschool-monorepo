@@ -4,6 +4,10 @@ const SCHOOL_PATTERNS = {
   FIND_MANY: 'core.school.find_many',
   SEARCH: 'core.school.search',
 } as const;
+const COMPLETE_PROFILE_PATTERNS = {
+  HANDLE_SCHOOL_DATA: 'auth.complete_profile.handle_school_data',
+  HANDLE_ROLE_DATA: 'auth.complete_profile.handle_role_data',
+} as const;
 
 const MEMBERSHIP_PATTERNS = {
   FIND_ONE: 'core.membership.find_one',
@@ -16,4 +20,5 @@ const MEMBERSHIP_PATTERNS = {
 export const CORE_PATTERNS = {
   SCHOOL: SCHOOL_PATTERNS,
   MEMBERSHIP: MEMBERSHIP_PATTERNS,
+  COMPLETE_PROFILE: COMPLETE_PROFILE_PATTERNS,
 } as const;

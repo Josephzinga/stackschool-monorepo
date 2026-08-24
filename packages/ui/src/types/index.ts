@@ -1,30 +1,30 @@
 import {
-  PermissionCode,
-  ProfileData,
+  ProfileFormType,
   RoleDataType,
+  SchoolContract,
   SchoolDataType,
-} from '@stackschool/shared';
-import { School, SchoolMembership, User } from '../generated/graphql';
+  SchoolUserContract,
+  UserWithRelationsContract,
+} from '@stackschool/contracts';
 
-type CurrentSchool = Omit<School, 'students' | 'teachers'>;
 
-type CurrentMemberShip = Omit<SchoolMembership, 'school'>;
+type CurrentMemberShip = Omit<SchoolUserContract, 'school'>;
 
 export interface UserStore {
-  user: User | null;
+  user: UserWithRelationsContract | null;
   loading: boolean;
   isAuthenticated: boolean;
-  setUser: (user: User | null) => void;
-  currentSchool: CurrentSchool | null;
+  setUser: (user: UserWithRelationsContract | null) => void;
+  currentSchool: SchoolContract | null;
   currentMemberShip: CurrentMemberShip | null;
 
-  setCurrentSchool: (school?: CurrentSchool) => void;
+  setCurrentSchool: (school?: SchoolContract) => void;
   setCurrentMemberShip: (memberShip: CurrentMemberShip) => void;
 }
 
 export interface CompleteProfileStep {
   school: SchoolDataType | null;
-  profile: ProfileData | null;
+  profile: ProfileFormType | null;
   role: RoleDataType | null;
   lastSavedAt: string | null;
   error?: string | null;
@@ -35,7 +35,7 @@ export interface CompleteProfileStep {
   setError: (err: string | null) => void;
 
   setSchoolData: (school: SchoolDataType) => void;
-  setProfileData: (profileData: ProfileData) => void;
+  setProfileData: (profileData: ProfileFormType) => void;
   setRoleData: (roleData: RoleDataType) => void;
   saveToRedis: () => Promise<void | { success: boolean; error?: string }>;
   loadFromRedis: () => Promise<

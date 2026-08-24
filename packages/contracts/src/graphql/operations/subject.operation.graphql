@@ -1,0 +1,9 @@
+query GetSubjectsOptions($input: GetSubjectInput!) {
+    getSchoolSubjects(input: $input) {
+        data {
+            id
+            name
+            code
+        }
+    }
+}

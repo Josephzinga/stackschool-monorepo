@@ -16,7 +16,7 @@ model School {
   name             String
   slug             String?         @unique
   address          String
-  code             String?         @unique
+  code             String          @unique
   planId           String?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -34,23 +34,37 @@ model School {
   settings         SchoolSettings?
 }
 
+model TempSchoolUser {
+  id       String     @id @default(cuid())
+  schoolId String
+  userId   String
+  role     SchoolRole
+  student  Student?
+  teacher  Teacher?
+  staff    Staff?
+  parent   Parent?
+
+  @@unique([userId, schoolId])
+  @@index([userId, schoolId])
+}
+
 /// *
 /// * pivot User <-> School
 model SchoolUser {
-  id          String                 @id @default(uuid())
-  schoolId    String
-  userId      String
-  isActive    Boolean                @default(true)
-  role        SchoolRole
-  isOwner     Boolean                @default(false)
-  createdAt   DateTime               @default(now())
-  Parent      Parent?
-  school      School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  staff       Staff?
-  student     Student?
-  teacher     Teacher?
-  permissions SchoolUserPermission[]
-  schoolProfile  SchoolProfile?
+  id            String                 @id @default(uuid())
+  schoolId      String
+  userId        String
+  isActive      Boolean                @default(true)
+  role          SchoolRole
+  isOwner       Boolean                @default(false)
+  createdAt     DateTime               @default(now())
+  Parent        Parent?
+  school        School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  staff         Staff?
+  student       Student?
+  teacher       Teacher?
+  permissions   SchoolUserPermission[]
+  schoolProfile SchoolProfile?
 
   @@unique([schoolId, userId])
   @@index([schoolId])
@@ -59,25 +73,23 @@ model SchoolUser {
 }
 
 model SchoolProfile {
-  id         String @id  @default(cuid())
-  firstName   String
-  lastName String
-  address  String
-  avatarUrl  String?
-  bio  String?
-  schoolUserId  String    @unique
-  schoolId  String
+  id           String  @id @default(cuid())
+  firstName    String
+  lastName     String
+  address      String?
+  gender       Gender
+  avatarUrl    String?
+  bio          String?
+  schoolUserId String  @unique
+  schoolId     String
 
-  
-  schoolUser  SchoolUser  @relation(fields: [schoolUserId], references: [id])
-  school   School @relation(fields: [schoolId] , references: [id])
-
+  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id])
+  school     School     @relation(fields: [schoolId], references: [id])
 }
 
 // Paramétre de l'ecole
 model SchoolSettings {
-  id String @id @default(cuid())
-
+  id             String @id @default(cuid())
   schoolId       String @unique
   lessonDuration Int    @default(50) // durée d'une lesson (5O min)
   startHour      Int    @default(8) // début de cours (8 heure)
@@ -88,7 +100,7 @@ model SchoolSettings {
   school         School @relation(fields: [schoolId], references: [id])
 }
 
-// table de permission 
+// table de permission
 model Permission {
   id          String           @id @default(cuid())
   code        PermissionCode   @unique // L'identifiant strict, ex: "MARK_STUDENT_ATTENDANCE"
@@ -114,8 +126,6 @@ model SchoolUserPermission {
   @@unique([schoolUserId, permissionId])
 }
 
-
-
 model StudentDisciplinaryAction {
   id        String           @id @default(cuid())
   studentId String
@@ -130,21 +140,25 @@ model StudentDisciplinaryAction {
 /// * Parent
 model Parent {
   id                String             @id @default(cuid())
-  schoolUserId      String             @unique
+  schoolUserId      String?            @unique
+  tempSchoolUserId  String             @unique
   profession        String?
+  needAdminConfirm  Boolean            @default(false)
   isDelegate        Boolean            @default(false)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   contactPreference ContactPreference? @default(WHATSAPP)
-  schoolUser        SchoolUser         @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  schoolUser        SchoolUser?        @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
   students          ParentStudent[]
+  tempSchoolUser    TempSchoolUser?    @relation(fields: [tempSchoolUserId], references: [id], onDelete: Cascade)
 }
 
 /// *
 /// * Etudiant
 model Student {
   id                     String                      @id @default(cuid())
-  profileId              String                      @unique
+  needAdminConfirm       Boolean                     @default(false)
+  tempSchoolUserId       String?                     @unique
   matricule              String
   enrollmentYear         String
   enrollmentDate         DateTime?
@@ -152,7 +166,7 @@ model Student {
   bloodGroup             String?
   allergies              String?
   medicalCondition       String?
-  schoolUserId           String                      @unique
+  schoolUserId           String?                     @unique
   birthDate              DateTime                    @db.Date()
   createdAt              DateTime                    @default(now())
   updatedAt              DateTime                    @updatedAt
@@ -169,8 +183,9 @@ model Student {
   status                 StudentStatus               @default(ACTIVE)
   parentStudent          ParentStudent[]
   school                 School                      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  schoolUser             SchoolUser                  @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  schoolUser             SchoolUser?                 @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
   disciplinaryActions    StudentDisciplinaryAction[]
+  tempSchoolUser         TempSchoolUser?             @relation(fields: [tempSchoolUserId], references: [id], onDelete: Cascade)
 
   @@unique([matricule, schoolId])
   @@index([schoolUserId])
@@ -180,49 +195,56 @@ model Student {
 /// *
 /// * Parent - Student pivot
 model ParentStudent {
-  id           String       @id @default(cuid())
-  studentId    String
-  createdAt    DateTime     @default(now())
-  parentId     String
-  relationType RelationType
-  parent       Parent       @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  id               String       @id @default(cuid())
+  studentId        String
+  createdAt        DateTime     @default(now())
+  parentId         String
+  relationType     RelationType
+  parent           Parent       @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student          Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  needAdminConfirm Boolean      @default(false)
 
   @@unique([parentId, studentId])
 }
 
 model Teacher {
-  id             String     @id @default(cuid())
-  schoolUserId   String     @unique
-  diploma        String?
-  experience     String?
-  hireDate       DateTime?
-  isActive       Boolean
-  salary         Float?
-  department     String?
-  specialization String?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  deletedAt      DateTime?
-  bio            String?
-  cvUrl          String?
-  schoolUser     SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  id                 String          @id @default(cuid())
+  needAdminConfirm   Boolean         @default(false)
+  schoolUserId       String?         @unique
+  tempSchoolUserId   String?         @unique
+  diploma            String?
+  experience         String?
+  hireDate           DateTime?
+  isActive           Boolean         @default(true)
+  salary             Float?
+  department         String?
+  specialization     String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  deletedAt          DateTime?
+  bio                String?
+  cvUrl              String?
+  pendingAssignments Json?
+  schoolUser         SchoolUser?     @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  tempSchoolUser     TempSchoolUser? @relation(fields: [tempSchoolUserId], references: [id], onDelete: Cascade)
 
   @@map("Teachers")
 }
 
 model Staff {
-  id            String        @id @default(cuid())
-  schoolUserId  String        @unique
-  hireDate      DateTime?
-  position      StaffPosition @default(OTHER)
-  positionOther String?
-  salary        Float?
-  department    String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  id               String          @id @default(cuid())
+  needAdminConfirm Boolean         @default(false)
+  schoolUserId     String?         @unique
+  tempSchoolUserId String          @unique
+  hireDate         DateTime?
+  position         StaffPosition   @default(OTHER)
+  positionOther    String?
+  salary           Float?
+  department       String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  schoolUser       SchoolUser?     @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  tempSchoolUser   TempSchoolUser? @relation(fields: [tempSchoolUserId], references: [id], onDelete: Cascade)
 
   @@index([schoolUserId])
   @@index([position])
@@ -392,5 +414,11 @@ enum StaffPosition {
   NURSE
   CLEANER
   MAINTENANCE
+  OTHER
+}
+
+enum Gender {
+  MALE
+  FEMALE
   OTHER
 }

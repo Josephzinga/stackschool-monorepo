@@ -132,6 +132,7 @@ volumes:
   academic_data:
   redis_data:
   rabbitmq_data:
+  minio_data:
 
 networks:
   stackschool-net:

@@ -1,7 +1,7 @@
-import { Profile, VerifyCallback } from 'passport-google-oauth20';
+import {Profile, VerifyCallback} from 'passport-google-oauth20';
 
-import { UpsertOauthUser, upsertOauthUser } from '../services/UpsertOauthUser';
-import { createUserSession } from '../services/session.service';
+import {UpsertOauthUser, upsertOauthUser} from '../services/UpsertOauthUser';
+import {createUserSession} from '../services/session.service';
 
 export default async function handleOauthCallback(
   accessToken: string,
@@ -27,8 +27,8 @@ export default async function handleOauthCallback(
       email,
       displayName,
       avatar,
-      firstname,
-      lastname,
+      firstName: firstname,
+      lastName: lastname,
       providerAccountId,
       emailVerified,
     });

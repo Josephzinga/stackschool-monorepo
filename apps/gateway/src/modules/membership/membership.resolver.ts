@@ -1,4 +1,4 @@
-import { Resolver } from '@nestjs/graphql';
+import { Mutation, Resolver } from '@nestjs/graphql';
 import { MembershipService } from './membership.service';
 import { ResolveField, Parent } from '@nestjs/graphql';
 import { SchoolMembership } from '../../graphql/graphql';
@@ -17,5 +17,9 @@ export class MembershipResolver {
     const schoolId = parent.schoolId;
     if (!schoolId) return null;
     return this.membershipService.getSchool(schoolId);
+  }
+  @Mutation('completeProfile')
+  completeProfile() {
+    console.log('complete-profile');
   }
 }

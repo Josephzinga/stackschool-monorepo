@@ -12,6 +12,9 @@
       <excludeFolder url="file://$MODULE_DIR$/packages/db/src/prisma/migrations/20260109134024_ajout_des_enum" />
       <excludeFolder url="file://$MODULE_DIR$/packages/db/src/prisma/client/generated" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludePattern pattern="packages/shared" />
+      <excludePattern pattern="packages/db" />
+      <excludePattern pattern="apps/api" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

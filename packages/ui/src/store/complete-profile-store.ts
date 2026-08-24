@@ -1,7 +1,7 @@
-import { parseAxiosError, RedisService, api } from '@stackschool/contracts';
-import { create } from 'zustand';
-import { CompleteProfileStep } from '../types';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import {api, authServices, parseAxiosError, RedisService} from '@stackschool/contracts';
+import {create} from 'zustand';
+import {CompleteProfileStep} from '../types';
+import {createJSONStorage, persist} from 'zustand/middleware';
 
 const redisService = new RedisService(api);
 
@@ -38,7 +38,6 @@ export const useCompleteProfileStore = create<CompleteProfileStep>()(
                 ? state.school.newSchool
                 : false)
           ) {
-            console.log('join');
             set({
               error: "Veuillez d'abord joindre ou crée une école.",
             });
@@ -80,8 +79,8 @@ export const useCompleteProfileStore = create<CompleteProfileStep>()(
         try {
           const state = get();
           const res = await redisService.saveProgressToRedis({
-            school: state.school,
-            profile: state.profile,
+            school: state.school || null,
+            profile: state.profile || null,
             role: state.role,
             currentStep: state.currentStep,
           });
@@ -142,7 +141,7 @@ export const useCompleteProfileStore = create<CompleteProfileStep>()(
         set({ isSubmitting: true });
 
         try {
-          const data = await authService.completeProfile({
+          const data = await authServices.completeProfile({
             school,
             role,
             profile,

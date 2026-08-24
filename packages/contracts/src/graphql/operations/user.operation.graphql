@@ -1,0 +1,33 @@
+query GetMe {
+  me {
+    id
+    username
+    phoneNumber
+    email
+    profileCompleted
+    hasMembership
+
+    profile {
+      id
+      address
+      firstName
+      lastName
+      gender
+      avatarUrl
+    }
+    memberships {
+      id
+      role
+      isActive
+      isOwner
+      school {
+        id
+        name
+        logo
+        code
+        slug
+        address
+      }
+    }
+  }
+}

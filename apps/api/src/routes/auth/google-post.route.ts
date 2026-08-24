@@ -1,12 +1,9 @@
-import { OAuth2Client } from 'google-auth-library';
-import {
-  upsertOauthUser,
-  UpsertOauthUserParams,
-} from '../../services/auth-user.service';
-import { Router } from 'express';
-import { sendApiResponse } from '../../middlewares/errorHandler';
-import { createServiceError } from '../../utils/api-errors';
-import { createMobileSession } from '../../lib/mobile-session';
+import {OAuth2Client} from 'google-auth-library';
+import {upsertOauthUser, UpsertOauthUserParams,} from '../../services/auth-user.service';
+import {Router} from 'express';
+import {sendApiResponse} from '../../middlewares/errorHandler';
+import {createServiceError} from '../../utils/api-errors';
+import {createMobileSession} from '../../lib/mobile-session';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const router = Router();
@@ -47,8 +44,8 @@ router.post('/google', async (req, res) => {
       email,
       emailVerified,
       displayName,
-      firstname: givenName,
-      lastname: familyName,
+      firstName: givenName,
+      lastName: familyName,
       avatar: picture,
       accessToken: undefined,
       refreshToken: undefined,

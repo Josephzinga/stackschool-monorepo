@@ -13,15 +13,16 @@ export enum Gender {
     FEMALE = "FEMALE"
 }
 
-export interface SchoolMembership {
-    id: string;
+export class SchoolMembership {
+    userId: string;
+    user?: Nullable<User>;
 }
 
-export interface IQuery {
-    me(): Nullable<User> | Promise<Nullable<User>>;
+export abstract class IQuery {
+    abstract me(): Nullable<User> | Promise<Nullable<User>>;
 }
 
-export interface User {
+export class User {
     id: string;
     email?: Nullable<string>;
     username?: Nullable<string>;
@@ -33,19 +34,37 @@ export interface User {
     accounts?: Nullable<Nullable<Account>[]>;
 }
 
-export interface Account {
+export class Account {
     id: string;
     provider?: Nullable<string>;
     userId?: Nullable<string>;
 }
 
-export interface Profile {
+export class Profile {
     id: string;
-    firstname: string;
-    lastname: string;
-    photo?: Nullable<string>;
-    gender: Gender;
+    firstName: string;
+    lastName: string;
+    avatarUrl?: Nullable<string>;
+    gender?: Nullable<Gender>;
     address?: Nullable<string>;
+}
+
+export class ApiResponse {
+    ok?: Nullable<boolean>;
+    message?: Nullable<string>;
+    details?: Nullable<Nullable<string>[]>;
+}
+
+export class PaginationMeta {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
+export class GenderStats {
+    male: number;
+    female: number;
 }
 
 type Nullable<T> = T | null;

@@ -21,8 +21,8 @@ export function toUserWithRelationsContract(
     profile: user?.profile
       ? {
           id: user.profile.id,
-          firstname: user.profile.firstname,
-          lastname: user.profile.lastname,
+          firstName: user.profile.firstName,
+          lastName: user.profile.lastName,
           avatarUrl: user.profile.avatarUrl,
           gender: user.profile.gender!,
           address: user.profile.address!,

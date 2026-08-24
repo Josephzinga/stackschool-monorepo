@@ -1,3 +1,9 @@
+# Attendance Stats
+extend type SchoolStats @key(fields: "id") {
+  id: ID!
+  attendance: AttendanceStats
+}
+
 type AttendanceStats {
   rate: Float!
   presentCount: Int!

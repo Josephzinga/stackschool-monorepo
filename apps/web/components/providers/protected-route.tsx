@@ -1,9 +1,8 @@
 'use client';
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useGetMeQuery, useUserStore } from '@stackschool/ui';
-import { Spinner } from '@/components/ui/spinner';
-import { api } from '@stackschool/contracts';
+import { useGetMeQuery, useLoadingStore, useUserStore } from '@stackschool/ui';
+import { api, toUserWithRelationsContract } from '@stackschool/contracts';
 
 export default function ProtectedRoute({
   children,
@@ -11,6 +10,7 @@ export default function ProtectedRoute({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const { show, hide } = useLoadingStore();
   const pathname = usePathname();
   const {
     setUser,
@@ -25,9 +25,7 @@ export default function ProtectedRoute({
 
   useEffect(() => {
     if (!isLoading && (!data?.me || error)) {
-      if (!pathname.startsWith('/auth')) {
-        router.replace('/auth/login');
-      }
+      router.replace('/auth/login');
       return;
     }
 
@@ -45,7 +43,7 @@ export default function ProtectedRoute({
 
     // 2. Si utilisateur connecté
     if (data?.me) {
-      setUser(data.me);
+      setUser(toUserWithRelationsContract(data?.me));
 
       const isProfileComplete =
         data.me.profileCompleted && data.me.hasMembership;
@@ -101,13 +99,13 @@ export default function ProtectedRoute({
     setCurrentMemberShip,
   ]);
 
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-background">
-        <Spinner className="h-8 w-8 text-primary" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (isLoading) {
+      show();
+    } else {
+      hide();
+    }
+  }, [isLoading, show, hide]);
 
   return <>{children}</>;
 }

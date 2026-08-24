@@ -1,5 +1,5 @@
-import {z} from 'zod';
-import {profileSchema} from '../../src/index.js';
+import { z } from 'zod';
+import { profileSchema, StaffPosition } from '../../src/index.js';
 
 z.config(z.locales.fr());
 
@@ -55,13 +55,13 @@ export const ACADEMIC_YEAR_REGEX = /^(20\d{2})-(20\d{2})$/;
 
 export const studentFormSchema = z.object({
   matricule: z.string().min(1, 'Le matricule est requis'),
-  birthDate: z.coerce.date({
+  birthDate: z.coerce.date<Date>({
     error: ({ input }) =>
       input === undefined
         ? 'Date de naissance requis'
         : 'Date de naissance invalide',
   }),
-  classId: z.cuid('Id invalide'),
+  classId: z.cuid2('Id invalide'),
   enrollmentYear: z
     .string()
     .regex(ACADEMIC_YEAR_REGEX)
@@ -126,9 +126,9 @@ export const teacherSchema = z.object({
 });
 
 export const StaffFormSchema = z.object({
-  position: z.string().min(2, 'Le poste est requis'),
-  departement: z.string().min(2, 'Le département est requis'),
-  hireDate: z.coerce.date().optional(),
+  position: z.lazy(() => StaffPosition),
+  department: z.string().min(2, 'Le département est requis'),
+  hireDate: z.coerce.date<Date>().optional(),
 });
 
 // Schéma global pour l'étape Rôle (Union)
@@ -162,22 +162,22 @@ export const completeProfileDataSchema = z
     school: schoolDataSchema.nullable(),
     currentStep: z.coerce.number<number>(),
   })
-    .superRefine((data, ctx) => {
-      if (data.currentStep === 2 && !data.school) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['school'],
-          message: "Vous devriez remplir les information de l'école",
-        });
-      }
-      if (data.currentStep === 3 && !data.profile) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['profile'],
-          message: 'Remplissez le donné du profile',
-        });
-      }
-    });
+  .superRefine((data, ctx) => {
+    if (data.currentStep === 2 && !data.school) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['school'],
+        message: "Vous devriez remplir les information de l'école",
+      });
+    }
+    if (data.currentStep === 3 && !data.profile) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['profile'],
+        message: 'Remplissez le donné du profile',
+      });
+    }
+  });
 
 // Types inférés
 export type StaffFormDataType = z.infer<typeof StaffFormSchema>;
@@ -186,7 +186,6 @@ export type CreateSchoolType = z.infer<typeof createSchoolSchema>;
 export type StudentFormDataType = z.infer<typeof studentFormSchema>;
 export type ParentFormDataType = z.infer<typeof parentFormSchema>;
 export type TeacherFormDataType = z.infer<typeof teacherSchema>;
-export type ProfileFormDataType = z.infer<typeof profileSchema>;
 export type SchoolDataType = z.infer<typeof schoolDataSchema>;
 export type RoleDataType = z.infer<typeof roleDataSchema>;
 export type CompleteProfileDataType = z.infer<typeof completeProfileDataSchema>;

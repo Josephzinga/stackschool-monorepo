@@ -1,0 +1,27 @@
+query SearchSchool($input: SchoolSearchInput!) {
+  searchSchool(filter: $input) {
+    id
+    name
+    address
+    code
+    logo
+  }
+}
+query SearchStudent($input: StudentSearchInput!) {
+  searchStudent(filter: $input) {
+    id
+    schoolUser {
+      user {
+        profile {
+          firstName
+          lastName
+          avatarUrl
+        }
+      }
+    }
+    schoolClass {
+      name
+    }
+    matricule
+  }
+}

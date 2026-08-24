@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, Profile } from 'passport-facebook';
+import { Profile, Strategy } from 'passport-facebook';
 import { AuthService } from '../auth.service';
 import { DoneCallback } from 'passport';
 import { config } from 'dotenv';
@@ -15,7 +15,8 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET ?? '',
       callbackURL: process.env.FACEBOOK_CALLBACK_URL ?? '',
       enableProof: true,
-      profileFields: ['id', 'displayName', 'emails', 'photos'],
+      scope: ['public_profile', 'email'],
+      profileFields: ['id', 'displayName', 'emails', 'photos', 'name'],
       passReqToCallback: false,
     });
   }

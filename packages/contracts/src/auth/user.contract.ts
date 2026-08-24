@@ -1,12 +1,15 @@
-import { z } from 'zod';
+import {z} from 'zod';
+
+export const GenderContract = z.literal(['MALE', 'FEMALE', 'OTHER']);
 
 export const ProfileContract = z.object({
   id: z.uuid(),
-  firstname: z.string().nullable(),
-  lastname: z.string().nullable(),
+  firstName: z.string(),
+  userId: z.uuid(),
+  lastName: z.string(),
   avatarUrl: z.url().nullable(),
-  address: z.string(),
-  gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
+  address: z.string().nullable(),
+  gender: GenderContract.nullable(),
 });
 export type ProfileContract = z.infer<typeof ProfileContract>;
 
@@ -26,6 +29,31 @@ export const UserContract = z.object({
   hasMembership: z.boolean(),
   isActive: z.boolean(),
 });
+
+
+export const ValidateUserFieldInput = z.object({
+  email: UserContract.shape.email,
+  phoneNumber: UserContract.shape.phoneNumber,
+  selfCheck: z.boolean().default(true),
+  userId: z.uuid().nullable()
+}).superRefine((data, ctx) => {
+  if (data.selfCheck && !data.userId) {
+    ctx.addIssue({
+      message: 'veuillez spécifié le userId',
+      path: ['userId'],
+      code: 'custom'
+    })
+  }
+})
+export type ValidateUserFieldInput = z.infer<typeof  ValidateUserFieldInput>
+
+export const ValidateUserFieldResponse = z.object({
+  ok: z.boolean().default(false),
+  valid: z.boolean().default(false),
+  field: z.string().optional(),
+  message: z.string().optional(),
+})
+export type ValidateUserFieldResponse = z.infer<typeof  ValidateUserFieldResponse>
 export type UserContract = z.infer<typeof UserContract>;
 
 export const UserWithRelationsContract = UserContract.extend({

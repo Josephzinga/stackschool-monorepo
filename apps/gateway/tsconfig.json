@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node", "express", "multer"],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
@@ -14,7 +15,6 @@
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": ".",
-    "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true,
     "incremental": true,
     "skipLibCheck": true,

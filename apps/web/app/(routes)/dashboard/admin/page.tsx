@@ -1,16 +1,34 @@
 'use client';
 
-import { SectionCards } from '@/components/section-cards';
-import AttendanceChart from '@/components/attendance-chart'; // Import du nouveau composant
-import { useGetAdminDashboardStatsQuery, useUserStore } from '@stackschool/ui';
-import { Spinner } from '@/components/ui/spinner';
-import { ChartRadialGender } from '@/components/student-gender-chart';
-import { ChartAreaInteractive } from '@/components/chart-area-interactive';
+import {SectionCards} from '@/components/section-cards';
+import AttendanceChart from '@/components/attendance-chart';
+import {useGetAdminDashboardStatsQuery, useUserStore} from '@stackschool/ui';
+import {Spinner} from '@/components/ui/spinner';
+import {ChartRadialGender} from '@/components/student-gender-chart';
+import {ChartAreaInteractive} from '@/components/chart-area-interactive';
 import EventSection from '@/components/event-section';
+import {useSocket} from '@/components/providers/socket-context';
+import {useEffect} from 'react';
 
 export default function AdminDashboard() {
   const { currentSchool } = useUserStore();
   const schoolId = currentSchool?.id;
+  const socket = useSocket();
+
+  useEffect(() => {
+    console.log('joseph', socket);
+    if (!socket) return;
+
+    console.log('Socket avaliable', socket.active);
+    socket.on('ENROLLMENT_COMPLETED', (data) => {
+      console.log('Data Socket: ', data);
+    });
+
+    return () => {
+      socket.off('ENROLLMENT_COMPLETED')
+    };
+
+  }, [socket]);
 
   const { data, isLoading, error } = useGetAdminDashboardStatsQuery(
     { schoolId: schoolId! },
@@ -49,7 +67,7 @@ export default function AdminDashboard() {
               {stats?.studentGender && (
                 <ChartRadialGender
                   stats={stats.studentGender}
-                  attendance={stats.attendance}
+                  attendance={stats?.attendance}
                 />
               )}
             </div>

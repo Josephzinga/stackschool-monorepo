@@ -1,0 +1,18 @@
+type User @key(fields: "id") {
+  id: ID!
+  memberships: [SchoolMembership]
+  schoolContext(schoolId: ID!): SchoolMembership
+}
+type TeacherAssignment @key(fields: "id") {
+  id: ID!
+  teacher: Teacher
+}
+type Class @key(fields: "id") {
+  id: ID!
+  supervisor: Teacher
+  students: [Student!]
+}
+type Subject @key(fields: "id") {
+  id: ID!
+  mainTeacher: Teacher
+}

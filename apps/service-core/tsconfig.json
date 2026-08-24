@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["zod"],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,

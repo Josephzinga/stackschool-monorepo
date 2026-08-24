@@ -18,8 +18,8 @@ import {
 
 export type TeacherColumns = {
   id: string | number;
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   email: string;
   photo?: string;
   phoneNumber?: string;
@@ -80,13 +80,13 @@ export const columns: ColumnDef<TeacherColumns>[] = [
             <Avatar className="h-10 w-10">
               <AvatarImage src={photo} />
               <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                {row.original.firstname?.[0]}
-                {row.original.lastname?.[0]}
+                {row.original.firstName?.[0]}
+                {row.original.lastName?.[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <span className="font-medium text-sm text-foreground">
-                {row.original.firstname} {row.original.lastname}
+                {row.original.firstName} {row.original.lastName}
               </span>
               <span className="text-xs text-muted-foreground">
                 {row.original.email}

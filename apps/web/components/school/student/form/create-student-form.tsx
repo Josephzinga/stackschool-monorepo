@@ -16,7 +16,7 @@ import {
   createStudentSchema,
   CreateStudentValues,
   generateStudentMatricule,
-} from '@stackschool/shared';
+} from '@stackschool/contracts';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';

@@ -2,6 +2,9 @@ export * from './auth/index.ts';
 export * from './lib/api.ts';
 export * from './services/auth/authServices.ts';
 export * from './services/redis/redisService.ts';
-export * from './core/school.contract.ts';
+export * from './core/index.ts';
 export * from './utils/matricule.util.ts';
-export * from './core/permission.contract.ts';
+export * from './constant/upload.config.ts';
+export * from './lib/graphql-fetcher.ts';
+export * from './mappers/user.mapper.ts';
+export * from './utils/generate-username.util.ts'

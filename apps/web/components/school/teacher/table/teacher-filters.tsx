@@ -51,7 +51,7 @@ export function TeacherFilters() {
   const hasActiveFilters = Object.values(filters).some((v) => v !== undefined);
 
   return (
-    <div className="flex flex-wrap items-end gap-4 p-4 bg-accent rounded-lg border shadow-lg">
+    <div className="flex flex-wrap items-end gap-4 p-4 bg-secondary rounded-lg border shadow-lg">
       {/* Filtre Classe */}
       <div className="flex flex-col gap-1.5">
         <Label className="text-xs font-medium">Classe</Label>

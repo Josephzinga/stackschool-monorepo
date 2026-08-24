@@ -2,21 +2,35 @@ import { PrismaService } from '../prisma.service';
 
 const prisma = new PrismaService();
 // ID de l'école cible
-const TARGET_SCHOOL_ID = 'c08f1b51-35e5-4277-9d11-bead44ad3d88';
-
-const START_HOUR = 8;
-const END_HOUR = 17;
-const DAYS: Day[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
-const LESSON_DURATION = 50; // minutes
-const BREAK_START = 12;
-const BREAK_DURATION = 1;
+const TARGET_SCHOOL_ID = '3769a14d-9367-4148-b1b5-a1d093bf4939';
 
 async function main() {
-  console.log('🌱 Début du seeding ciblé...');
-
+  // 1. Vérification / Création de l'école
   const schoolId = TARGET_SCHOOL_ID;
-  const adminId = '68240f02-c006-4fc5-acb1-d2f3a7691520';
-  const adminSchoolUserId = '6fdbc867-5e57-42ad-bb07-7d9eb68e43df';
+
+  const subjectIds = [];
+  const userIds = [''];
+
+  // 4. Création des Professeurs
+  const teachers: any[] = [];
+  for (const userId of userIds) {
+    const schoolUser = await prisma.schoolUser.create({
+      data: { userId, schoolId, role: 'TEACHER' },
+    });
+
+    const teacher = await prisma.teacher.create({
+      data: {
+        schoolUserId: schoolUser.id,
+        isActive: true,
+      },
+    });
+
+    teachers.push({
+      ...teacher,
+      subjectId: subjectIds[Math.floor(Math.random() * subjectIds.length)],
+    });
+  }
+  console.log(`👨‍🏫 ${teachers.length} professeurs créés.`);
 }
 main()
   .catch((e) => {

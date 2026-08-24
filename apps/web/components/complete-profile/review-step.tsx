@@ -1,13 +1,9 @@
-import {
-  allRoles,
-  useCompleteProfileStore,
-  useConfirmCompleteProfileMutation,
-} from '@stackschool/ui';
-import { Button } from '@/components/ui/button';
-import { SubmitButton } from '@/components/submit-button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import {allRoles, useCompleteProfileStore,} from '@stackschool/ui';
+import {Button} from '@/components/ui/button';
+import {SubmitButton} from '@/components/submit-button';
+import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
+import {Badge} from '@/components/ui/badge';
+import {Separator} from '@/components/ui/separator';
 import {
   BookOpen,
   Briefcase,
@@ -22,11 +18,12 @@ import {
   User,
   Users,
 } from 'lucide-react';
-import { ParentFormDataType, StudentFormDataType } from '@stackschool/shared';
-import { useRouter } from 'next/navigation';
-import { useGSAP } from '@gsap/react';
+import {api, ParentFormDataType, parseAxiosError, StudentFormDataType,} from '@stackschool/contracts';
+import {useRouter} from 'next/navigation';
+import {useGSAP} from '@gsap/react';
 import gsap from 'gsap';
-import { toast } from 'sonner';
+import {toast} from 'sonner';
+import {useMutation} from '@tanstack/react-query';
 
 // --- Sous-composants de Review ---
 
@@ -99,12 +96,12 @@ function ParentReview({ data }: { data: ParentFormDataType }) {
             <p className="font-medium">{data.profession}</p>
           </div>
         )}
-        {data.address && (
+        {data?.address && (
           <div>
             <p className="text-muted-foreground flex items-center gap-1">
               <MapPin className="h-3 w-3" /> Adresse
             </p>
-            <p className="font-medium">{data.address}</p>
+            <p className="font-medium">{data?.address}</p>
           </div>
         )}
         <div>
@@ -201,21 +198,26 @@ export default function ReviewStep() {
   const { profile, school, role, setCurrentStep } = useCompleteProfileStore();
   const router = useRouter();
 
-  const { mutateAsync, isPending, error } = useConfirmCompleteProfileMutation({
-    onSuccess: (data, context) => {
-      if (!data.confirmCompleteProfile) return;
-      if (data.confirmCompleteProfile.ok) {
-        toast.success(data.confirmCompleteProfile.message);
-        setTimeout(() => router.push('/onboard'));
-      }
+  const { isPending, mutateAsync } = useMutation({
+    mutationKey: ['complete-profile'],
+    mutationFn: async () => {
+        const res = await api.post('/api/complete-profile');
+        if (res.data?.ok) {
+          toast.success(res?.data?.message);
+          return res.data;
+        }
     },
-    onError: (error: any) => {
-      toast.error(error.message);
+    onSuccess: () => {
+      router.push('/onboard');
     },
+    onError: (err) => {
+      const {message} = parseAxiosError(err)
+      toast.error(message)
+    }
   });
 
   const handleSubmit = async () => {
-    await mutateAsync({});
+    await mutateAsync();
   };
 
   if (!profile || !school || !role) return null;
@@ -301,7 +303,7 @@ export default function ReviewStep() {
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="h-14 w-14">
-              <AvatarImage src={`${profile.photo}`} />
+              <AvatarImage src={`${profile.avatarUrl}`} />
               <AvatarFallback className="border-chart-4 border">
                 <User className="h-9 w-9 text-chart-4" />
               </AvatarFallback>
@@ -310,7 +312,7 @@ export default function ReviewStep() {
             <div>
               <p>Informations personnelles</p>
               <p className="font-bold text-xl">
-                {profile.firstname} {profile.lastname}
+                {profile.firstName} {profile.lastName}
               </p>
               <p className="text-muted-foreground">
                 {profile?.email} {profile?.phoneNumber}

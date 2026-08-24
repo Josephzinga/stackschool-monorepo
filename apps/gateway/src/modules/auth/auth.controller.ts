@@ -1,19 +1,18 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
+  InternalServerErrorException,
   Post,
+  Query,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
   UsePipes,
-  InternalServerErrorException,
-  UnauthorizedException,
-  HttpCode,
-  BadRequestException,
-  Query,
-  HttpStatus,
-  Param,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -30,14 +29,13 @@ import type {
 import {
   forgotPasswordSchema,
   registerFormSchema,
-  VerifyCodeSchema,
   resetPasswordSchema,
+  VerifyCodeSchema,
 } from '@stackschool/contracts';
 import { UserService } from '../user/user.service';
 import type { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { Public } from '../../common/decorators/public.decorator';
-import { Throttle, ThrottlerGuard, ThrottlerStorage } from '@nestjs/throttler';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('api/auth')
 @UseGuards(ThrottlerGuard)
@@ -55,8 +53,10 @@ export class AuthController {
     @Body() registerDto: RegisterDto,
   ) {
     const newUser = await this.authService.register(registerDto);
-
-    req.logIn(newUser!, (err) => {
+    if (!newUser) {
+      throw new InternalServerErrorException('Erreur interne du serveur.');
+    }
+    req.logIn(newUser, (err) => {
       if (err || !newUser)
         throw new InternalServerErrorException(
           "Impossible de se connecter après l'inscription.",
@@ -82,13 +82,10 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  async googleAuthCallback(
-    @CurrentUser() user: Request['user'],
-    @Res() res: Response,
-  ) {
-    if (!user)
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+    if (!req?.user)
       throw new UnauthorizedException("Erreur lors de l'authentification");
-    return this.authService.handleSocialCallback(user, res);
+    return this.authService.handleSocialCallback(req.user, res);
   }
 
   @Get('facebook')
@@ -99,13 +96,10 @@ export class AuthController {
 
   @Get('facebook/callback')
   @UseGuards(FacebookAuthGuard)
-  async facebookAuthCallback(
-    @CurrentUser() user: Request['user'],
-    @Res() res: Response,
-  ) {
-    if (!user)
+  async facebookAuthCallback(@Req() req: Request, @Res() res: Response) {
+    if (!req.user)
       throw new UnauthorizedException("Erreur lors de l'authentification");
-    return this.authService.handleSocialCallback(user, res);
+    return this.authService.handleSocialCallback(req.user, res);
   }
 
   @UseGuards(AuthenticatedGuard)

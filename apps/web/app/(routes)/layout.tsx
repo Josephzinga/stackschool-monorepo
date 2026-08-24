@@ -1,10 +1,10 @@
-import { AppSidebar } from '@/components/app-sidebar';
-import { SiteHeader } from '@/components/site-header';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import {AppSidebar} from '@/components/app-sidebar';
+import {SiteHeader} from '@/components/site-header';
+import {SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
 import ProtectedRoute from '@/components/providers/protected-route';
-import { DashboardProvider } from '@/components/providers/dashboard-provider';
-import { Toaster } from '@/components/ui/sonner';
-import { SocketProvider } from '@/lib/socket-context';
+import {DashboardProvider} from '@/components/providers/dashboard-provider';
+import {Toaster} from '@/components/ui/sonner';
+import {SocketProvider} from '@/components/providers/socket-context';
 
 export default function DashboardLayout({
   children,
@@ -18,7 +18,7 @@ export default function DashboardLayout({
           <SidebarProvider
             style={
               {
-                '--sidebar-width': 'calc(var(--spacing) * 72)',
+                '--sidebar-width': 'calc(var(--spacing) * 64)',
                 '--header-height': 'calc(var(--spacing) * 12)',
               } as React.CSSProperties
             }

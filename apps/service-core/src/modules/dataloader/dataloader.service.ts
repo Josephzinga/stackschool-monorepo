@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import DataLoader from 'dataloader';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
+  Permission,
+  SchoolProfile,
   SchoolUser,
   Student,
-  Permission,
 } from '../../prisma/db/generated/client';
+
 /**
  * Token d'injection du client Prisma.
  * À fournir dans ton module (voir data-loader.module.ts).
@@ -58,6 +60,21 @@ export class DataLoaderService {
             where: { id: { in: [...schoolUserIds] } },
           });
           const map = groupBy(schoolUsers, (su) => su.id);
+          return schoolUserIds.map((id) => map.get(id));
+        },
+      ),
+
+      schoolProfileLoader: new DataLoader<string, SchoolProfile | undefined>(
+        async (schoolUserIds) => {
+          const schoolProfiles = await prisma.schoolProfile.findMany({
+            where: {
+              schoolUserId: {
+                in: [...schoolUserIds],
+              },
+            },
+          });
+
+          const map = indexBy(schoolProfiles, (item) => item.schoolUserId);
           return schoolUserIds.map((id) => map.get(id));
         },
       ),

@@ -8,6 +8,7 @@ import {
 
 import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import { mapAuthError } from '../../errors/auth.error-maper';
+import { Request } from 'express';
 
 @Injectable()
 export class UserService {
@@ -21,7 +22,11 @@ export class UserService {
     );
   }
 
-  async validateField(phoneNumber: string | null, email: string | null) {
+  async validateField(
+    user: NonNullable<Request['user']>,
+    phoneNumber: string | null,
+    email: string | null,
+  ) {
     const result = await firstValueFrom<{
       ok: boolean;
       valid?: boolean;
@@ -32,6 +37,7 @@ export class UserService {
         .send(AUTH_PATTERNS.VALIDATE_USER_FIELD, {
           phoneNumber,
           email,
+          userId: user.id,
         })
         .pipe(
           timeout(1500),

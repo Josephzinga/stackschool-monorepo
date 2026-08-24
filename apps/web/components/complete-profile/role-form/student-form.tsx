@@ -38,6 +38,7 @@ import {
   PopoverTrigger,
 } from '@/components/animate-ui/components/radix/popover';
 import { toast } from 'sonner';
+import { GridForm } from '@/components/school/grid-form';
 
 export default function StudentForm({ onBack }: { onBack: () => void }) {
   const { setRoleData, school, role, setCurrentStep, profile } =
@@ -59,7 +60,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
       nationality: studentData?.nationality || 'Malienne',
       matricule:
         studentData?.matricule ||
-        generateStudentMatricule(profile?.firstname!, profile?.lastname!),
+        generateStudentMatricule(profile?.firstName!, profile?.lastName!),
       classId: studentData?.classId || '',
       enrollmentYear: studentData?.enrollmentYear || '',
     },
@@ -78,8 +79,10 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
   const { data, error, isError } = useGetClassesOptionsQuery(
     {
       input: {
-        limit: 100,
+        limit: 50,
+        schoolId,
       },
+      withMeta: false,
     },
     {
       enabled: !!schoolId,
@@ -121,7 +124,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
                 onValueChange={(year) => field.onChange(year)}
                 value={field.value}
               >
-                <SelectTrigger>
+                <SelectTrigger size="sm">
                   <SelectValue placeholder="Sélectionner la date" />
                 </SelectTrigger>
                 <SelectContent>
@@ -146,6 +149,8 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
+                  aria-invalid={!!errors.birthPlace}
+                  size="sm"
                   variant="outline"
                   id="date"
                   className="w-full justify-between font-normal"
@@ -234,11 +239,11 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
           name="classId"
           render={({ field: { onChange, value } }) => (
             <Select value={value} onValueChange={onChange}>
-              <SelectTrigger aria-invalid={!!errors.classId}>
+              <SelectTrigger size="sm" aria-invalid={!!errors.classId}>
                 <SelectValue placeholder="Sélectionnez votre classe" />
               </SelectTrigger>
               <SelectContent className="bg-background">
-                {data?.getClassAndSubjects?.map((classe) => (
+                {data?.getSchoolClasses.data?.map((classe) => (
                   <SelectItem key={classe?.id} value={classe?.id as string}>
                     <p className="font-semibold ">{classe?.name}</p>
                     <p>{classe?.section}</p>

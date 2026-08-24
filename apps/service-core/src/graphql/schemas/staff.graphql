@@ -1,0 +1,10 @@
+type Staff @key(fields: "id") {
+  id: ID!
+  schoolUserId: String!
+  position: String!
+  hireDate: DateTime
+  salary: Float
+  department: String
+  SchoolProfile: SchoolProfile
+  schoolUser: SchoolMembership
+}

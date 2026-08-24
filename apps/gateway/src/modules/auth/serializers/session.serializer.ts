@@ -4,7 +4,7 @@ import { DoneCallback } from 'passport';
 
 import { UserService } from '../../user/user.service';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { UserWithRelationsContract } from '@stackschool/messaging';
+import { UserWithRelationsContract } from '@stackschool/contracts';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
@@ -21,7 +21,7 @@ export class SessionSerializer extends PassportSerializer {
 
   async deserializeUser(payload: string, done: DoneCallback) {
     try {
-      const userKey = `user-${payload}`;
+      const userKey = `user:${payload}`;
       const userStr = await this.cacheManager.get<string>(userKey);
 
       const cachedUser = userStr
@@ -30,7 +30,11 @@ export class SessionSerializer extends PassportSerializer {
 
       if (!cachedUser) {
         const user = await this.userService.findFullUser(payload);
-        await this.cacheManager.set(userKey, JSON.stringify(user));
+        await this.cacheManager.set(
+          userKey,
+          JSON.stringify(user),
+          1000 * 60 * 60 * 10,
+        );
         return done(null, user);
       }
       return done(null, cachedUser);

@@ -5,11 +5,8 @@ import { Card } from '@/components/ui/card';
 import { IconWrapper } from '@/components/animate-ui/icons/icon';
 import { MoreHorizontal } from 'lucide-react';
 import { LectureCard } from '@/components/lecture-card';
-import { useSocket } from '@/lib/socket-context';
 
 export default function EventSection() {
-  const io = useSocket();
-  io?.emit('join_room', { message: 'bonjour' });
   return (
     <Card className="h-screen! lg:flex md:max-w-120 px-2 w-full xl:w-[30%]  mt-4 border">
       <div className="flex justify-center w-full items-center h-100 text-center text-lg">

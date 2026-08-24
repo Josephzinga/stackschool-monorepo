@@ -1,0 +1,47 @@
+type Class @key(fields: "id") {
+  id: ID!
+  name: String!
+  level: String!
+  section: String
+  defaultRoom: Room
+  groupId: ID!
+  group: Group
+  teachingTeamMembers: [TeacherAssignment!]
+  statistics: ClassStatistics
+  totalCoefficient: Int
+  totalWeeklyHours: Float
+}
+
+type SubjectAssignments {
+  id: ID!
+  subject: Subject!
+}
+type ClassList {
+  data: [Class!]
+  meta: PaginationMeta!
+}
+type ClassStatistics {
+  teachers: Int!
+  subjects: Int!
+  students: GenderStats!
+}
+
+input CreateClassInput {
+  section: String
+  name: String!
+  level: String!
+  supervisorId: String
+}
+input GetSchoolClassesInput {
+  page: Int! = 0
+  limit: Int! = 10
+  level: String
+  section: String
+  teacherId: String
+  searchTerm: String
+  schoolId: ID
+}
+type ClassLessons {
+  classSubject: ClassSubject
+  lesson: Lesson
+}

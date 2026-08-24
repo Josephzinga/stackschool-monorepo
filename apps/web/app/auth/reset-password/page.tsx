@@ -1,71 +1,47 @@
-'use client';
+import {useQueryState} from 'nuqs';
+import {AuthPageLayout} from "@/components/auth/auth-page-layout";
+import Link from "next/link";
+import {ResetPasswordForm} from "@/components/auth/reset-password-form";
 
-import { Container } from '@/components/Container';
-import { Card, CardContent } from '@/components/ui/card';
-import { toast } from 'sonner';
-import {
-  ResetPasswordType,
-  authServices,
-  parseAxiosError,
-} from '@stackschool/contracts';
-import { CheckCircle2, Lock } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { ResetPasswordForm } from './reset-password-view';
-import { useQueryStates, useQueryState, parseAsString } from 'nuqs';
+const resetPasswordSlides = [
+  {
+    src: '/images/chalkboard-career-doodle-copy-space-corridor.jpg',
+    title: 'Un mot de passe fort pour un compte sécurisé',
+    description: 'Choisissez un mot de passe unique que vous n’utilisez pas ailleurs.',
+  },
+  {
+    src: '/images/joyful-young-schoolgirl-wearing-backpack-holding-looking-phone-showing-yes-gesture.jpg',
+    title: 'La sécurité, au cœur de StackSchool',
+    description: 'Nous protégeons vos données avec des technologies de pointe.',
+  },
+  {
+    src: '/images/little-boy-with-happy-new-month-lettering.jpg',
+    title: 'Reprenez le contrôle',
+    description: 'Votre compte est maintenant sécurisé. Vous pouvez reprendre vos activités.',
+  },
+];
 
 export default function ResetPasswordPage() {
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [token, setToken] = useQueryState('token');
-  const router = useRouter();
+  const [token] = useQueryState('token');
 
-  const onSubmit = async (data: ResetPasswordType) => {
-    try {
-      const res = await authServices.resetPassword(
-        token,
-        data.password,
-        data.confirm,
-      );
-
-      if (res.ok) {
-        toast.success(
-          res.data?.message || 'Mot de passe réinitialisé avec succès',
-        );
-        // Redirection après 3 secondes
-        setTimeout(() => {
-          router.push('/auth/login');
-        }, 3000);
-      }
-    } catch (error: any) {
-      const { message } = parseAxiosError(error);
-      toast.error(message || 'Erreur lors de la réinitialisation');
-
-      // Si le token est invalide, rediriger vers forgot-password
-      if (error.response?.status === 400) {
-        setTimeout(() => {
-          router.push('/auth/forgot-password');
-        }, 2000);
-      }
-    }
-  };
-
-  if (isSuccess) {
+  if (!token) {
+    // Rediriger vers forgot-password si pas de token
+    // On peut aussi afficher un message
     return (
-      <Container>
-        <Card className="max-w-md mx-auto text-center w-100!">
-          <CardContent className="space-y-4 py-8">
-            <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto" />
-            <h2 className="text-2xl font-bold">Mot de passe réinitialisé !</h2>
-            <p>Votre mot de passe a été modifié avec succès.</p>
-            <p className="text-sm text-gray-600">
-              Redirection vers la page de connexion...
-            </p>
-          </CardContent>
-        </Card>
-      </Container>
+        <AuthPageLayout slides={resetPasswordSlides}>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">Token manquant. Veuillez refaire une demande.</p>
+            <Link href="/auth/forgot-password" className="text-primary hover:underline">
+              Demander un nouveau lien
+            </Link>
+          </div>
+        </AuthPageLayout>
     );
   }
 
-  return <ResetPasswordForm onSubmit={onSubmit} />;
+  return (
+      <AuthPageLayout slides={resetPasswordSlides}>
+        <ResetPasswordForm token={token} />
+      </AuthPageLayout>
+  );
 }

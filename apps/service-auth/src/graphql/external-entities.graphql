@@ -1,3 +1,4 @@
-type SchoolMembership @key(fields: "id") {
-  id: ID!
+type SchoolMembership @key(fields: "userId") {
+  userId: ID! @external
+  user: User
 }

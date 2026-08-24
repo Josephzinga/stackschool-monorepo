@@ -49,19 +49,19 @@ function TeachersView() {
     () =>
       data?.getSchoolTeachers?.data?.map((t) => ({
         id: t?.id ?? '',
-        firstname: t.user?.profile?.firstname || '',
-        lastname: t.user?.profile?.lastname || '',
+        firstName: t.schoolProfile?.firstName || '',
+        lastName: t.schoolProfile?.lastName || '',
         email: t.user?.email || '',
         phoneNumber: t.user?.phoneNumber || '',
-        photo: t.user?.profile?.photo ?? undefined,
+        photo: t.schoolProfile?.avatarUrl ?? undefined,
         specialization: t.specialization ? [t.specialization] : [],
-        gender: t?.user?.profile?.gender as Gender,
+        gender: t?.schoolProfile?.gender,
         diploma: t?.diploma ?? '',
         assignments:
           t.assignments?.flatMap((ass) =>
-            ass?.classSubjects?.group?.classes?.map((c) => ({
+            ass?.classSubject?.group?.classes?.map((c) => ({
               class: c,
-              subject: ass?.classSubjects?.subject ?? undefined,
+              subject: ass?.classSubject?.subject ?? undefined,
             })),
           ) ?? [],
         status: t.isActive || false,

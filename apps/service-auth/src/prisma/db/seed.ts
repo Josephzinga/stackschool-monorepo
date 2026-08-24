@@ -1,23 +1,43 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from './generated/client';
+import { Gender, PrismaClient, User } from './generated/client';
 
 const connectionString = `${process.env.DATABASE_URL}`;
 
 export const adapter = new PrismaPg({ connectionString });
 export const prisma = new PrismaClient({ adapter });
 
+const TARGET_SCHOOL_ID = '3769a14d-9367-4148-b1b5-a1d093bf4939';
+const users = [
+  {
+    username: 'Amadou',
+    firstName: 'Amadou',
+    lastName: 'Konate',
+  },
+];
+
 async function main() {
-  const adminId = '68240f02-c006-4fc5-acb1-d2f3a7691520';
-  const user = await prisma.user.update({
-    where: {
-      id: adminId,
-    },
-    data: {
-      profileCompleted: true,
-      hasMembership: true,
-    },
-  });
-  console.log('user', user);
+  const userCreatedIds: string[] = [];
+  for (const user of users) {
+    const u = await prisma.user.create({
+      data: {
+        email: `${user.username}@stackschool.com`,
+        username: user.username,
+        password: 'password123',
+        phoneNumber: `+243 85${Math.floor(100000 + Math.random() * 900000)}`,
+        profileCompleted: true,
+        hasMembership: true,
+        profile: {
+          create: {
+            firstName: `${user.firstName}prof`,
+            lastName: user.lastName,
+            gender: Gender.MALE,
+          },
+        },
+      },
+    });
+    userCreatedIds.push(u.id);
+  }
+  console.log('UserIds: \t', userCreatedIds);
 }
 
 main()

@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { createServiceError } from '../../utils/api-errors';
-import { verifyFacebookToken } from '../../services/facebook-token.service';
-import { upsertOauthUser } from '../../services/auth-user.service';
-import { createMobileSession } from '../../lib/mobile-session';
-import { sendApiResponse } from '../../middlewares/errorHandler';
+import {Router} from 'express';
+import {createServiceError} from '../../utils/api-errors';
+import {verifyFacebookToken} from '../../services/facebook-token.service';
+import {upsertOauthUser} from '../../services/auth-user.service';
+import {createMobileSession} from '../../lib/mobile-session';
+import {sendApiResponse} from '../../middlewares/errorHandler';
 
 const router = Router();
 
@@ -21,8 +21,8 @@ router.post('/facebook', async (req, res) => {
       email: profile.email ?? null,
       emailVerified: !!profile.email,
       displayName: profile.name,
-      firstname: profile.first_name ?? '',
-      lastname: profile.last_name ?? '',
+      firstName: profile.first_name ?? '',
+      lastName: profile.last_name ?? '',
       avatar: profile.avatar ?? null,
       accessToken,
     });

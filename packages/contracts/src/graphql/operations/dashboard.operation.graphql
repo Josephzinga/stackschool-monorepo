@@ -1,0 +1,78 @@
+query GetAdminDashboardStats($schoolId: ID!) {
+  school(schoolId: $schoolId) {
+    id
+    name
+    logo
+    stats {
+      totalStudents
+      totalTeachers
+      totalClasses
+
+      monthlyRevenue {
+        previousMonth
+        currentMonth
+      }
+      pendingPaymentsCount
+
+      studentGender {
+        male
+        female
+      }
+
+      classesOccupancy {
+        className
+        studentCount
+      }
+
+      enrollmentPerMonth {
+        month
+        count
+      }
+    }
+  }
+}
+
+query GetDashboardContext($input: ID!) {
+  me {
+    schoolContext(schoolId: $input) {
+      id
+      role
+      permissions {
+        id
+        code
+        name
+        description
+        module
+      }
+      teacher {
+        id
+        department
+        specialization
+        supervisedClasses {
+          id
+          section
+        }
+      }
+      staff {
+        id
+        position
+        department
+        schoolUserId
+      }
+      parent {
+        id
+        isDelegate
+        parentStudent {
+          student {
+            id
+            matricule
+          }
+        }
+      }
+      student {
+        id
+        matricule
+      }
+    }
+  }
+}

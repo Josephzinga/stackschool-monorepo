@@ -1,6 +1,5 @@
-// users/schemas.ts
-
-import * as z from 'zod';
+import {z} from 'zod';
+import {ACCEPTED_IMAGE_TYPES, AVATAR_MAX_FILE_SIZE} from "../constant/upload.config.ts";
 
 z.config(z.locales.fr());
 export enum GenderEnum {
@@ -180,11 +179,11 @@ export const resetPasswordSchema = z
 
 export const profileSchema = z
   .object({
-    firstname: z
+    firstName: z
       .string()
       .min(3, 'Le prénom doit contenir au moins 3 caractères.')
       .max(30, 'Le prénom ne peut pas dépasser 30 caractères.'),
-    lastname: z
+    lastName: z
       .string()
       .min(3, 'Le nom doit contenir au moins 3 caractères')
       .max(30, 'Le nom  ne peut pas dépasser 30 caractères.'),
@@ -192,14 +191,13 @@ export const profileSchema = z
       GenderEnum,
       'Veuillez sélectionner un genre valid. MALE ou FEMALE',
     ),
-    photo: z.string().nullish(),
+    avatarUrl: z.string().nullish(),
     address: z
       .string()
       .min(5, "L'adresse doit être plus précise")
       .max(200, "L'adresse est trop longue"),
     email: z
       .email({
-        pattern: z.regexes.email,
         message: 'Veuillez entrer un email valide.',
       })
       .optional()
@@ -232,11 +230,29 @@ export const profileSchema = z
       });
     }
   });
-export type ProfileType = z.infer<typeof profileSchema>;
+
+export const avatarFileSchema = z.object({
+    fieldname: z.string(),
+    originalname: z.string(),
+    encoding: z.string(),
+    mimetype: z.string().refine(
+        (type) => ACCEPTED_IMAGE_TYPES.includes(type),
+        { message: "Seuls les formats .jpg et .png sont supportés." }
+    ),
+    size: z.number().refine(
+        (size) => size <= AVATAR_MAX_FILE_SIZE,
+        { message: "La taille maximale du fichier est de 5 Mo." }
+    ),
+    buffer: z.instanceof(Buffer), // Contient les données binaires du fichier
+});
+
+
+export type AvatarFileType = z.infer<typeof avatarFileSchema>
+export type ProfileFormType = z.infer<typeof profileSchema>;
 
 export type ResetPasswordType = z.infer<typeof resetPasswordSchema>;
 
-export type FormDataType = z.infer<typeof forgotPasswordSchema>;
+export type ForgotPasswordType = z.infer<typeof forgotPasswordSchema>;
 
 export type VerifyCodeFormType = z.infer<typeof VerifyCodeSchema>;
 

@@ -1,19 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/db/generated/client';
+import { MembershipService } from '../membership/membership.service';
 
 @Injectable()
 export class SchoolService {
-  constructor(private readonly prisma: PrismaService) {}
-  async create(dto: any) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly memberService: MembershipService,
+  ) {}
+  async create(dto: Prisma.SchoolCreateInput) {
     return this.prisma.school.create({
-      data: {
-        name: dto.name,
-        address: dto.address,
-        code: dto.code,
-        logo: dto.logo ?? null,
-        slug: dto.slug ?? null,
-      },
+      data: dto,
     });
   }
 
@@ -26,6 +24,12 @@ export class SchoolService {
       where: {
         id,
       },
+    });
+  }
+
+  async findUnique(where: Prisma.SchoolWhereUniqueInput) {
+    return this.prisma.school.findUnique({
+      where,
     });
   }
 
@@ -46,7 +50,26 @@ export class SchoolService {
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} school`;
+  async getSchoolStats(schoolId: string) {
+    const totalStudents = await this.prisma.student.count({
+      where: {
+        schoolUser: {
+          schoolId,
+        },
+      },
+    });
+
+    const totalTeachers = await this.prisma.teacher.count({
+      where: {
+        schoolUser: {
+          schoolId,
+        },
+      },
+    });
+    return {
+      id: schoolId,
+      totalStudents,
+      totalTeachers,
+    };
   }
 }

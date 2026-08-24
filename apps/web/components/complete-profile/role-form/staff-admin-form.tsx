@@ -1,19 +1,23 @@
 import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { useCompleteProfileStore, zodResolver } from '@stackschool/ui';
-import { Briefcase, Calendar as CalendarIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { StaffFormSchema, StaffFormDataType } from '@stackschool/contracts';
-import { Input } from '@/components/ui/input';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Calendar } from '@/components/ui/calendar';
+import {Controller, useForm} from 'react-hook-form';
+import {useCompleteProfileStore, zodResolver} from '@stackschool/ui';
+import {Briefcase, Calendar as CalendarIcon} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {StaffFormDataType, StaffFormSchema} from '@stackschool/contracts';
+import {Input} from '@/components/ui/input';
+import {Field, FieldError, FieldLabel} from '@/components/ui/field';
+import {Calendar} from '@/components/ui/calendar';
+import {Popover, PopoverContent, PopoverTrigger,} from '@/components/ui/popover';
+import {SubmitButton} from '@/components/submit-button';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { SubmitButton } from '@/components/submit-button';
-import { cn } from '@/lib/utils';
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 interface Props {
   role: 'ADMIN' | 'STAFF';
@@ -36,25 +40,24 @@ export default function StaffAdminForm({
     handleSubmit,
     control,
     formState: { errors },
+      register,
   } = useForm<StaffFormDataType>({
     resolver: zodResolver(StaffFormSchema),
     defaultValues: {
       position: isAdmin
-        ? 'Administrateur'
-        : roleData?.role === 'STAFF'
-          ? roleData.staff.position
-          : '',
-      departement: isAdmin
+        ? 'SUPERVISOR'
+        : 'OTHER',
+      department: isAdmin
         ? 'Direction'
         : roleData?.role === 'STAFF'
-          ? roleData.staff.departement
+          ? roleData.staff.department
           : '',
     },
   });
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit, (err) => {console.log("Erreur : ", err)})}
       className="space-y-4 animate-in fade-in duration-500"
     >
       <div className="grid grid-cols-1 gap-6">
@@ -67,15 +70,23 @@ export default function StaffAdminForm({
             control={control}
             name="position"
             render={({ field: { value, onChange } }) => (
-              <Input
-                icon={Briefcase}
-                value={value}
-                onChange={onChange}
-                placeholder="Ex: Comptable, Secrétaire, Surveillant..."
-                disabled={isAdmin}
-                className={cn(isAdmin && 'bg-muted')}
-                aria-invalid={!!errors.position}
-              />
+                <Select onValueChange={onChange} value={value}>
+                  <SelectTrigger
+                      aria-invalid={!!errors.position}
+                      className="w-full"
+                      id="position"
+                      size="sm"
+                  >
+                    <SelectValue placeholder="Sélectionnez votre genre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Poste</SelectLabel>
+                      <SelectItem value="SUPERVISOR">Directeur</SelectItem>
+                      <SelectItem value="GUARDIAN">Gardien</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
             )}
           />
           {errors.position && (
@@ -86,23 +97,16 @@ export default function StaffAdminForm({
         {/* Champ Département */}
         <Field>
           <FieldLabel>Département</FieldLabel>
-          <Controller
-            name="departement"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <Input
-                aria-invalid={!!errors.departement}
-                value={value}
-                onChange={onChange}
-                icon={Briefcase}
-                placeholder="Ex: Finance, Ressources Humaines..."
-                className={isAdmin ? 'bg-muted' : ''}
-                disabled={isAdmin}
-              />
-            )}
+          <Input
+              {...register('department')}
+              aria-invalid={!!errors.department}
+              icon={Briefcase}
+              placeholder="Ex: Finance, Ressources Humaines..."
+              className={isAdmin ? 'bg-muted' : ''}
+              disabled={isAdmin}
           />
-          {errors.departement && (
-            <FieldError>{errors.departement.message}</FieldError>
+          {errors.department && (
+            <FieldError>{errors.department.message}</FieldError>
           )}
         </Field>
 

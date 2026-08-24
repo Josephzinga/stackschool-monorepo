@@ -5,7 +5,16 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-
+images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '9000',
+        pathname: '/**',
+      },
+    ],
+  },
   async rewrites() {
     return [
       {

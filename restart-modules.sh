@@ -1,6 +1,5 @@
 REP="node_modules"
-
-sudo find . -type d -name "$REP" -prune -exec rm -rf {} +
+find . -type d -name "$REP" -prune -exec rm -rf {} +
 rm pnpm-lock.yaml
 pnpm install
 

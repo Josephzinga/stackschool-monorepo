@@ -189,6 +189,21 @@ services:
     networks:
       - stackschool-net
 
+  minio:
+    image: minio/minio:latest
+    container_name: stackschool-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    ports:
+      - '9000:9000'   # API S3
+      - '9001:9001'   # Console admin
+    networks:
+      - stackschool-net
+
 volumes:
   db_data:
   auth_data:
@@ -197,6 +212,7 @@ volumes:
   academic_data:
   redis_data:
   rabbitmq_data:
+  minio_data:
 
 networks:
   stackschool-net:

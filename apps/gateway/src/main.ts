@@ -3,28 +3,26 @@ import { GatewayModule } from './gateway.module';
 import * as cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session';
-import connectPgSimple from 'connect-pg-simple';
-import { Pool } from 'pg';
 import helmet from 'helmet';
-import type { ErrorRequestHandler } from 'express';
+import type {
+  ErrorRequestHandler,
+  NextFunction,
+  Request,
+  Response,
+} from 'express';
 import { doubleCsrf } from 'csrf-csrf';
 import { ConfigService } from '@nestjs/config';
-import type { Request, Response, NextFunction } from 'express';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { SchoolContextInterceptor } from './common/interceptors/school-context.interceptor';
+import { RedisIoAdapter } from './modules/notifications/redis-io.adpter';
+import { SESSION_STORE } from './modules/session/session-store.provider';
+import { PGStore } from 'connect-pg-simple';
 
 async function bootstrap() {
   const app = await NestFactory.create(GatewayModule);
   const configService = app.get(ConfigService);
 
   const PORT = configService.get<number>('PORT', 4000);
-
-  const pgSession = connectPgSimple(session);
-  const pgPool = new Pool({
-    connectionString: configService.get('DATABASE_URL'),
-  });
+  const sessionStore = app.get<PGStore>(SESSION_STORE);
   const SESSION_TTL = 1000 * 60 * 60; // 1h;
-
   app.use(
     helmet({
       crossOriginEmbedderPolicy: false,
@@ -71,7 +69,7 @@ async function bootstrap() {
 
   app.use(
     session({
-      store: new pgSession({ pool: pgPool, tableName: 'Session' }),
+      store: sessionStore,
       name: 'sid',
       secret: configService.get('SESSION_SECRET') || 'default_secret_key',
       resave: false,
@@ -86,7 +84,6 @@ async function bootstrap() {
   );
 
   app.use(cookieParser.default());
-  app.useGlobalInterceptors(new SchoolContextInterceptor());
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -128,9 +125,9 @@ async function bootstrap() {
   };
 
   app.use(csrfErrorHandler);
-
-  app.useGlobalFilters(new HttpExceptionFilter());
-
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisIoAdapter);
   await app.listen(PORT, () => {
     console.log('Server is running on Port', PORT);
   });

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { ROLES_KEY } from '../decorators/role.decorator';
+import { SCHOOL_ROLES_KEY } from '../decorators/role.decorator';
 import { GraphQLContext } from '../../graphql/context';
 import { SchoolRole } from '../../graphql/graphql';
 
@@ -17,7 +17,7 @@ export class RolesGuard implements CanActivate {
 
   canActivate(ctx: ExecutionContext): boolean {
     const required = this.reflector.getAllAndOverride<SchoolRole[] | undefined>(
-      ROLES_KEY,
+      SCHOOL_ROLES_KEY,
       [ctx.getHandler(), ctx.getClass()],
     );
     if (!required?.length) return true; // pas de @Permissions → on laisse passer

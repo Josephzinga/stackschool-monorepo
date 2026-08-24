@@ -1,13 +1,11 @@
 // components/complete-profile/school-step/create-school-form.tsx
-import { useForm } from '@stackschool/ui';
-import { zodResolver } from '@stackschool/ui';
-import { z } from 'zod';
-import { Input } from '@/components/ui/input';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { useCompleteProfileStore } from '@stackschool/ui';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
+import {useCompleteProfileStore, useForm, zodResolver} from '@stackschool/ui';
+import {z} from 'zod';
+import {Input} from '@/components/ui/input';
+import {Field, FieldError, FieldLabel} from '@/components/ui/field';
+import {Button} from '@/components/ui/button';
+import {Spinner} from '@/components/ui/spinner';
+import {Textarea} from '@/components/ui/textarea';
 
 // Schéma de validation pour la création d'école
 const createSchoolSchema = z.object({
@@ -43,15 +41,15 @@ export function CreateSchoolForm() {
 
   const generateSchoolCode = () => {
     // Générer un code basé sur le nom + timestamp
-    const initials =
+    let initials =
       nameValue
         ?.split(' ')
         .map((word: string) => word.charAt(0))
         .join('')
         .toUpperCase()
-        .substring(0, 3) || 'SCH';
-
-    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+        .substring(0, 6) || 'SCH';
+initials = crypto.getRandomValues(["College"])
+    const random = Math.random().toString(36).substring(2, 7).toUpperCase();
     return `${initials}${random}`;
   };
 
@@ -60,8 +58,8 @@ export function CreateSchoolForm() {
     const finalData = {
       address: data.address,
       name: data.name,
-      inposedRole: 'ADMIN',
-      code: data.code || generateSchoolCode(),
+      imposedRole: 'ADMIN',
+      code: data.code && !!errors.code ? data.code : generateSchoolCode(),
     };
     setSchoolData({
       type: 'create',

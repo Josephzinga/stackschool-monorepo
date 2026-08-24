@@ -34,7 +34,6 @@ export class UserResolver {
         userId: user.id,
       },
     });
-    console.log('profile', profile);
     return profile;
   }
 

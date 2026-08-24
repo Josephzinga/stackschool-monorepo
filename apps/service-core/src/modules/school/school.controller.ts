@@ -3,13 +3,12 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { SchoolService } from './school.service';
 
 import {
-  ZodValidationPipe,
-  createSchoolInput,
   CORE_PATTERNS,
+  CoreRpcException,
+  createSchoolInput,
   SchoolContract,
-  AppRpcException,
+  ZodValidationPipe,
 } from '@stackschool/messaging';
-import { z } from 'zod';
 
 @Controller()
 export class SchoolController {
@@ -23,14 +22,14 @@ export class SchoolController {
 
   @MessagePattern(CORE_PATTERNS.SCHOOL.FIND_ONE)
   async findOne(
-    @Payload(new ZodValidationPipe(z.object({ schoolId: z.string() })))
+    @Payload()
     data: {
       schoolId: string;
     },
   ): Promise<SchoolContract> {
     const school = await this.schoolService.findOne(data.schoolId);
     if (!school) {
-      throw new AppRpcException('SCHOOL_NOT_FOUND', 'école non trouvé');
+      throw new CoreRpcException('SCHOOL_NOT_FOUND', 'école non trouvé');
     }
     return {
       id: school.id,
@@ -57,10 +56,5 @@ export class SchoolController {
       createdAt: school?.createdAt.toDateString(),
       logo: school.logo,
     }));
-  }
-
-  @MessagePattern('removeSchool')
-  remove(@Payload() id: number) {
-    return this.schoolService.remove(id);
   }
 }

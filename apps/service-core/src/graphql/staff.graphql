@@ -1,8 +1,0 @@
-type Staff {
-  id: ID!
-  schoolUserId: String!
-  position: String!
-  hireDate: DateTime
-  salary: Float
-  department: String
-}

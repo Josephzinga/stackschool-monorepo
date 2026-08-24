@@ -1,12 +1,39 @@
 import './styles/globals.css';
 import './styles/search-input.css';
 import NextTopLoader from 'nextjs-toploader';
-import { ThemeProvider } from '@/components/ui/ThemeProvider';
-import { Toaster } from '@/components/ui/sonner';
-import { inter, jost, poppins, sans } from '@/lib/fonts';
+import {ThemeProvider} from '@/components/ui/ThemeProvider';
+import {Toaster} from '@/components/ui/sonner';
 import QueryProvider from '@/components/providers/queryClientProvider';
-import { NuqsAdapter } from 'nuqs/adapters/next';
+import {NuqsAdapter} from 'nuqs/adapters/next';
 import CsrfProvider from '@/components/providers/csrf-provider';
+import {Geist, Jost, Noto_Serif, Poppins, Public_Sans,} from 'next/font/google';
+import {cn} from '@/lib/utils';
+import {GlobalSpinner} from '@/components/global-spinner';
+
+const publicSansHeading = Public_Sans({
+  subsets: ['latin'],
+  variable: '--font-heading',
+});
+
+const notoSerif = Noto_Serif({ subsets: ['latin'], variable: '--font-serif',  weight: ['400', '500', '600', '700'],  });
+
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  variable: '--font-poppins',
+  weight: ['400', '500', '600', '700'],
+});
+const jost = Jost({
+  subsets: ['latin'],
+  variable: '--font-jost',
+  weight: ['400', '500', '600', '700'],
+});
+const inter = Jost({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  weight: ['400', '500', '600', '700'],
+});
 
 /**
  * RootLayout est le composant racine de l'application.
@@ -22,21 +49,30 @@ export default async function RootLayout({
     <html
       lang="fr"
       suppressHydrationWarning
-      className={`${jost.variable}  ${inter.variable} ${poppins.variable} ${sans.variable}`}
+      className={cn(
+        jost.variable,
+        inter.variable,
+        poppins.variable,
+        geist.variable,
+        'font-serif',
+        notoSerif.variable,
+        publicSansHeading.variable,
+      )}
     >
       <body>
         <QueryProvider>
-          <ThemeProvider attribute="class" enableSystem={false}>
-            <NuqsAdapter>
+          <NuqsAdapter>
+            <ThemeProvider
+              attribute="class"
+              enableSystem={true}
+              defaultTheme="system"
+            >
               <CsrfProvider>{children}</CsrfProvider>
-            </NuqsAdapter>
-            <NextTopLoader />
-            <Toaster
-              position="top-center"
-              className="bg-sky-500! text-lg"
-              duration={4000}
-            />
-          </ThemeProvider>
+              <GlobalSpinner />
+              <Toaster position="top-center" duration={4000} />
+            </ThemeProvider>
+          </NuqsAdapter>
+          <NextTopLoader />
         </QueryProvider>
       </body>
     </html>

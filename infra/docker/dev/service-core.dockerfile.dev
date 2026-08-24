@@ -1,23 +1,15 @@
-FROM ghcr.io/pnpm/pnpm:11
-ENV PNPM_CONFIG_FETCH_TIMEOUT=90000
+FROM node:lts-slim AS base
+ENV PNPM_CONFIG_FETCH_TIMEOUT=900000
 ENV PNPM_CONFIG_FETCH_RETRIES=10
 ENV PNPM_CONFIG_NETWORK_CONCURRENCY=1
-RUN pnpm runtime set node 24 -g
-RUN pnpm add --g nx
+RUN npm install -g pnpm@11.9.0 nx
 WORKDIR /repo
 
-RUN pnpm add --global nx
-WORKDIR /repo
-
-# Copie uniquement des fichiers nécessaires pour installer les dépendances
-COPY pnpm-workspace.yaml package.json tsconfig.base.json nx.json ./
-RUN apt-get update -y && apt-get install -y openssl
+COPY pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY apps/service-core ./apps/service-core
 COPY packages/messaging ./packages/messaging
+COPY packages/contracts ./packages/contracts
 
-# Installation des dépendances (y compris devDependencies)
 RUN pnpm install --no-frozen-lockfile
 
-# Lancement en mode développement (hot-reload)
-# --host 0.0.0.0 est requis pour que le port soit accessible depuis l'extérieur du conteneur
-CMD ["npx", "nx", "start:dev", "service-core"]
+CMD ["pnpm", "nx", "start:dev" , "service-core", "--host", "0.0.0.0"]

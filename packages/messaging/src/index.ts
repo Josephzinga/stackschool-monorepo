@@ -8,3 +8,9 @@ export * from './patterns/core/index.ts';
 export * from './errors/core-rpc.error.ts';
 export * from './types/graphql.contex.ts';
 export * from '@stackschool/contracts';
+export * from './patterns/academic/index.ts';
+export * from './errors/academic-rcp.error.ts';
+export * from './mappers/core.error-maper.ts'
+export * from './mappers/auth.error-maper.ts'
+export * from './rabbitmq/rabbitmq-request.helper.ts'
+export * from './guards/index.ts'

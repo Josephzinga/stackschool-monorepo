@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiErrorPayload } from '../types/api-response.type.ts';
+import {ApiErrorPayload} from '../types/api-response.type.ts';
 
 const URL = 'http://localhost:4000';
 
@@ -33,14 +33,13 @@ export class ApiError extends Error {
   }
 }
 
-export function parseAxiosError(err: any): ApiError {
+export function parseAxiosError(err: any) {
   // Axios error shape
 
   const status = err?.response?.status ?? null;
-  const data = err?.response?.data ?? null;
-
-  const message = data?.message || err?.message || 'Erreur réseau';
-  return new ApiError({ status, message, data, ok: false });
+  const data = err?.response?.data || err?.data || null
+  const message = data?.message ||  data?.errors?.message || 'Erreur réseau';
+  return {data, message, ok: false, status}
 }
 
 // --- Logique de Refresh Token ---

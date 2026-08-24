@@ -1,7 +1,6 @@
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import crypto from 'crypto';
-import { randomInt } from 'crypto';
+import crypto, { randomInt } from 'node:crypto';
 import { SESSION_EXPIRES_DAY } from '../../../constant/config';
 import { Prisma } from '../../../prisma/db/generated/client';
 
@@ -33,13 +32,13 @@ export class TokenService {
   }
 
   async findOne(where: Prisma.VerificationTokenWhereInput) {
-    return await this.prisma.verificationToken.findFirst({
+    return this.prisma.verificationToken.findFirst({
       where,
     });
   }
 
   async create(data: Prisma.VerificationTokenCreateInput) {
-    return await this.prisma.verificationToken.create({
+    return this.prisma.verificationToken.create({
       data,
     });
   }

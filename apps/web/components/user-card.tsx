@@ -1,8 +1,8 @@
-import { Card, CardAction, CardDescription } from '@/components/ui/card';
-import { IconTrendingUp } from '@tabler/icons-react';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { LucideIcon } from 'lucide-react';
+import {Card, CardAction, CardTitle} from '@/components/ui/card';
+import {IconTrendingUp} from '@tabler/icons-react';
+import {Badge} from '@/components/ui/badge';
+import {cn} from '@/lib/utils';
+import {LucideIcon} from 'lucide-react';
 
 interface UserCardProps {
   title: number | string;
@@ -27,23 +27,24 @@ export default function UserCard({
   return (
     <Card
       className={cn(
-        'shadow-[2px_4px_2px_0_rgba(0,0,0,0.1)]! bg-linear-to-t! gap-2! md:px-1 min-w-45 w-full flex-1 flex' +
-          ' even:from-chart-2/70 even:bg-linear-to-tr! even:to-chart-5 odd:from-chart-5 odd:to-chart-2/70 py-2 px-1!' +
+        'shadow-[2px_4px_2px_0_rgba(0,0,0,0.1)]! bg-linear-to-t! gap-2! md:px-1 min-w-45 w-full flex-1 flex' ,
+          ' even:bg-linear-to-tr! even:from-card even:to-secondary odd:bg-linear-to-tl odd:from-card odd:to-secondary py-2' +
+          ' px-1!' ,
           ' font-poppins',
         className,
       )}
     >
       <div className="flex flex-col flex-1">
         <div className="flex justify-between items-center px-1">
-          <CardDescription className="flex font-medium font-poppins items-center gap-1">
+          <CardTitle className="flex font-medium font-poppins items-center gap-1">
             {DescriptionIcon && <DescriptionIcon className="h-4 w-4" />}
             {description}
-          </CardDescription>
+          </CardTitle>
           <CardAction className="flex flex-wrap">
             <Badge
               variant="outline"
               className={cn(
-                'border-primary flex items-center gap-1',
+                'border-primary flex items-center h-4!',
                 badgeClassName,
               )}
             >
@@ -52,7 +53,7 @@ export default function UserCard({
               ) : (
                 <IconTrendingUp className="h-3 w-3" />
               )}
-              <span className="text-xs">{badgeTitle}</span>
+              <span className="text-xs font-poppins">{badgeTitle}</span>
             </Badge>
           </CardAction>
         </div>

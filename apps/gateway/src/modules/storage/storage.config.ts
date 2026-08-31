@@ -10,4 +10,6 @@ export default registerAs('storage', () => ({
     public: 'stackschool-public', // avatars, logos d'école
     private: 'stackschool-private', // documents, photos élèves
   },
+
+  forcePathStyle: true,
 }));

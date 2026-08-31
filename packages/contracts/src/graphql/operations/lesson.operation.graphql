@@ -1,0 +1,106 @@
+query GetSchoolLessons($filter: GetLessonsInput!) {
+  getLessons(filter: $filter) {
+    meta {
+      page
+      totalPages
+      total
+      limit
+    }
+    data {
+      resources {
+        id
+        title
+        weeklyHours
+      }
+      events {
+        id
+        resourceId
+        title
+        status
+        startTime
+        day
+        endTime
+        group {
+          id
+          name
+          type
+          classes {
+            id
+            name
+          }
+        }
+        subject {
+          id
+          name
+        }
+        teacher {
+          id
+          firstName
+          lastName
+          weeklyHours
+        }
+      }
+    }
+  }
+}
+
+mutation CreateLesson($input: CreateLessonInput!) {
+  createLesson(input: $input) {
+    id
+    status
+    startTime
+    endTime
+    day
+    teacherAssignment {
+      classSubject {
+        id
+        subject {
+          id
+          name
+          code
+        }
+        group {
+          classes {
+            name
+            level
+          }
+        }
+        assignment {
+          id
+          teacher {
+            id
+            schoolProfile {
+              firstName
+              lastName
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+mutation UpdateLessonStatus($status: LessonStatus!, $id: ID!) {
+  updateLessonStatus(status: $status, id: $id) {
+    id
+    status
+  }
+}
+
+mutation UpdateLesson($input: UpdateLessonInput!) {
+  updateLesson(input: $input) {
+    id
+    status
+    startTime
+    endTime
+    day
+  }
+}
+
+mutation DeleteLesson($id: ID!) {
+  deleteLesson(id: $id) {
+    ok
+    message
+    details
+  }
+}

@@ -6,13 +6,13 @@ export async function sendRmqRequest<T>(
     client: ClientProxy,
     pattern: string,
     payload: unknown,
-    mapError: (payload: any) => HttpException | RpcException,
+    mapError?: (payload: any) => HttpException | RpcException,
     timeoutMs = 3000,
 ): Promise<T> {
     return firstValueFrom(
         client.send<T>(pattern, payload).pipe(
             timeout(timeoutMs),
-            catchError((err) => throwError(() =>  mapError(err))),
+            catchError((err) => throwError(() =>  mapError ? mapError(err) : new RpcException(err))),
         ),
     );
 }

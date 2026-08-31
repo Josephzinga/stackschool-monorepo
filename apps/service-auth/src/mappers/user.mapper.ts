@@ -7,7 +7,7 @@ export type UserWithRelations = User & {
 };
 
 export function toUserWithRelationsContract(
-  user: UserWithRelations,
+  user: any,
 ): UserWithRelationsContract {
   return {
     id: user.id,
@@ -21,6 +21,7 @@ export function toUserWithRelationsContract(
     profile: user?.profile
       ? {
           id: user.profile.id,
+          userId: user.id,
           firstName: user.profile.firstName,
           lastName: user.profile.lastName,
           avatarUrl: user.profile.avatarUrl,

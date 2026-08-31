@@ -3,25 +3,25 @@
     "paths": {
       "*": ["./"],
       "@stackschool/db/*": ["./packages/db/*"],
-      "@stackschool/shared/*": ["./packages/shared/*"],
+      "@stackschool/messaging/*": ["./packages/messaging/*"],
       "@stackschool/ui/*": ["./packages/ui/*"],
       "@stackschool/api/*": ["./apps/api/*"],
       "@stackschool/web/*": ["./apps/web/*"],
       "@stackschool/mobile/*": ["./apps/mobile/*"],
-      "@stackschool/api-nest/*": ["./apps/api-nest/*"]
+      "@stackschool/contracts/*": ["./packages/contracts/*"]
     },
 
     "composite": true,
     "declaration": true,
     "declarationMap": true,
     "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "target": "ESNext",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "include": ["packages/**/*", "apps/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["./packages/**/*", "./apps/**/*"],
+  "exclude": ["./node_modules", "dist"]
 }

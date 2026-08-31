@@ -1,0 +1,19 @@
+type TeacherAssignment @key(fields: "id") {
+  id: ID!
+  teacherId: ID!
+  schoolId: ID
+  classSubjectId: ID
+  classSubject: ClassSubject
+  lessons: [Lesson]
+}
+input CreateTeacherAssignmentInput {
+  classId: ID!
+  subjectIds: [ID!]!
+  teacherId: ID!
+}
+input GetTeacherAssignmentInput {
+  groupId: ID
+  classId: ID
+  teacherId: ID
+  limit: Int
+}

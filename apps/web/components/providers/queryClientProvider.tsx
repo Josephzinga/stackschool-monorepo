@@ -1,7 +1,7 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState } from 'react';
+import { QueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createIDBPersister } from '@/lib/idb-keyval-setup';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
@@ -27,13 +27,16 @@ export default function QueryProvider({
   const persister = createIDBPersister();
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      persistOptions={{ persister }}
+      client={queryClient}
+    >
       {children}
       <ReactQueryDevtools
         position="left"
         buttonPosition="bottom-left"
         initialIsOpen={false}
       />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }

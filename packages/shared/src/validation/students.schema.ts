@@ -1,10 +1,6 @@
-import { z } from 'zod';
-import {
-  parentFormSchema,
-  RelationTypeEnum,
-  studentFormSchema,
-} from './complete-profile.schema.js';
-import { profileSchema, registerFormSchema } from './auth.schema.js';
+import {z} from 'zod';
+import {parentFormSchema, RelationTypeEnum, studentFormSchema,} from './complete-profile.schema.js';
+import {profileSchema, registerFormSchema} from '.';
 
 export enum StudentStatusEnum {
   ACTIVE = 'ACTIVE',

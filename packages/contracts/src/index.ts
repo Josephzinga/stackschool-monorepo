@@ -7,4 +7,8 @@ export * from './utils/matricule.util.ts';
 export * from './constant/upload.config.ts';
 export * from './lib/graphql-fetcher.ts';
 export * from './mappers/user.mapper.ts';
-export * from './utils/generate-username.util.ts'
+export * from './utils/generate-username.util.ts';
+export * from './academic/index.ts';
+export * from './constant/day.ts';
+export * from './lib/lesson-status-check.ts';
+export * from './utils/time.util.ts';

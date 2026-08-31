@@ -3,10 +3,10 @@ import { SubjectCategory, useGetSchoolSubjectsQuery } from '@stackschool/ui';
 import {
   columns,
   SubjectColumns,
-} from '@/components/school/subject/table/columns';
-import { SubjectDataTable } from '@/components/school/subject/table/data-table';
-import TableHeader from '@/components/school/subject/table/table-header';
-import { useSubjectTable } from '@/components/school/subject/table/table-provider';
+} from '@/components/lists/subject/table/columns';
+import { SubjectDataTable } from '@/components/lists/subject/table/data-table';
+import TableHeader from '@/components/lists/subject/table/table-header';
+import { useSubjectTable } from '@/components/lists/subject/table/table-provider';
 
 export function SubjectView() {
   const { searchTerm, pagination, filters } = useSubjectTable();
@@ -28,11 +28,11 @@ export function SubjectView() {
       category: s?.category as SubjectCategory,
       mainTeacher: {
         id: s?.mainTeacher?.id!,
-        firstname: s?.mainTeacher?.user?.profile?.firstname!,
-        lastname: s?.mainTeacher?.user?.profile?.lastname!,
-        photo: s?.mainTeacher?.user?.profile?.photo,
+        firstName: s?.mainTeacher?.schoolProfile?.firstName!,
+        lastName: s?.mainTeacher?.schoolProfile?.lastName!,
+        avatarUrl: s?.mainTeacher?.schoolProfile?.avatarUrl,
       },
-      classes: s.classSubject?.map((cs) => cs?.group?.classes) || [],
+      classes: s.classSubjects?.map((cs) => cs?.group?.classes) || [],
       totalWeeklyHours: s.totalWeeklyHours ?? 0,
     })) || [];
   return (

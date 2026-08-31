@@ -23,11 +23,6 @@ export class PrismaService
     await this.$disconnect();
   }
 
-  /*// Helper pour les transactions
-  async transaction<T>(fn: (prisma: PrismaClient) => Promise<T>): Promise<T> {
-    return this.$transaction<T>(fn);
-  }
-*/
   /* // Helper pour la pagination
   async paginate<T>(
     model: any,

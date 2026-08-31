@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { HttpStatus, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { DataLoaders } from '../modules/dataloader/dataloader.service';
 import { SchoolUserContract } from '@stackschool/contracts';
 import { ClientProxy } from '@nestjs/microservices';
@@ -28,17 +28,15 @@ export async function createContext(
   const user = req.user;
 
   if (!user)
-    throw new UnauthorizedException({
-      ok: false,
-      message: 'Vous devez être connecté pour accéder à cette ressource.',
-      statusCode: HttpStatus.UNAUTHORIZED,
-    });
+    throw new UnauthorizedException(
+      'Vous devez être connecté pour accéder à cette ressource.',
+    );
   const schoolId =
     (req.headers['x-school-id'] as string) || (req.query?.schoolId as string);
-
   const context: GraphQLContext = { req, schoolId, user };
   let schoolUser: SchoolUserContract | undefined;
   if (user && schoolId) {
+    context.schoolId = schoolId;
     const cachedKey = `school_user:${schoolId}:${user.id}`;
     const cached = await cacheManager.get<string>(cachedKey);
     if (cached) {
@@ -63,8 +61,6 @@ export async function createContext(
         JSON.stringify(schoolUser),
         1000 * 60 * 60 * 5,
       );
-
-    context.schoolId = schoolId;
 
     if (!schoolUser)
       throw new UnauthorizedException(

@@ -1,44 +1,21 @@
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import {Input} from '@/components/ui/input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
 
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Controller,
-  useCompleteProfileStore,
-  useForm,
-  useGetClassesOptionsQuery,
-  zodResolver,
-} from '@stackschool/ui';
-import {
-  Calendar as CalendarIcon,
-  Flag,
-  IdCard,
-  MapPin,
-  User,
-} from 'lucide-react';
-import { useState } from 'react';
+import {Button} from '@/components/ui/button';
+import {Calendar} from '@/components/ui/calendar';
+import {Controller, useCompleteProfileStore, useForm, useGetClassesOptionsQuery, zodResolver,} from '@stackschool/ui';
+import {Calendar as CalendarIcon, Flag, IdCard, MapPin, User,} from 'lucide-react';
+import {useState} from 'react';
 import {
   generateStudentMatricule,
   parseAxiosError,
   StudentFormDataType,
   studentFormSchema,
 } from '@stackschool/contracts';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { SubmitButton } from '@/components/submit-button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/animate-ui/components/radix/popover';
-import { toast } from 'sonner';
-import { GridForm } from '@/components/school/grid-form';
+import {Field, FieldError, FieldLabel} from '@/components/ui/field';
+import {SubmitButton} from '@/components/submit-button';
+import {Popover, PopoverContent, PopoverTrigger,} from '@/components/animate-ui/components/radix/popover';
+import {toast} from 'sonner';
 
 export default function StudentForm({ onBack }: { onBack: () => void }) {
   const { setRoleData, school, role, setCurrentStep, profile } =
@@ -244,7 +221,7 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
               </SelectTrigger>
               <SelectContent className="bg-background">
                 {data?.getSchoolClasses.data?.map((classe) => (
-                  <SelectItem key={classe?.id} value={classe?.id as string}>
+                  <SelectItem key={classe.id} value={classe.id}>
                     <p className="font-semibold ">{classe?.name}</p>
                     <p>{classe?.section}</p>
                   </SelectItem>

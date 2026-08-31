@@ -25,3 +25,15 @@ query SearchStudent($input: StudentSearchInput!) {
     matricule
   }
 }
+
+query GetSchoolSettings($schoolId: ID!) {
+  school(schoolId: $schoolId) {
+    settings {
+      id
+      startHour
+      endHour
+      daysOfWeek
+      lessonDuration
+    }
+  }
+}

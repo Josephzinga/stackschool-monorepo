@@ -1,5 +1,5 @@
-import { AttendanceTableHeader } from '@/components/school/attendance/table/table-header';
-import { AttendanceTable } from '@/components/school/attendance/table/manual-attendance-table';
+import { AttendanceTableHeader } from '@/components/lists/attendance/table/table-header';
+import { AttendanceTable } from '@/components/lists/attendance/table/manual-attendance-table';
 
 function AttendancePage() {
   return (

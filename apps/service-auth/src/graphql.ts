@@ -13,6 +13,24 @@ export enum Gender {
     FEMALE = "FEMALE"
 }
 
+export enum LessonStatus {
+    PLANNED = "PLANNED",
+    ONGOING = "ONGOING",
+    COMPLETED = "COMPLETED",
+    CANCELLED = "CANCELLED",
+    POSTPONED = "POSTPONED"
+}
+
+export enum ResourceMode {
+    TEACHER = "TEACHER",
+    CLASS = "CLASS"
+}
+
+export enum link__Purpose {
+    SECURITY = "SECURITY",
+    EXECUTION = "EXECUTION"
+}
+
 export class SchoolMembership {
     userId: string;
     user?: Nullable<User>;
@@ -67,4 +85,17 @@ export class GenderStats {
     female: number;
 }
 
+export class _Service {
+    sdl?: Nullable<string>;
+}
+
+export type link__Import = any;
+export type federation__FieldSet = any;
+export type _Any = any;
+
+export class ISchema {
+    Query: IQuery;
+}
+
+export type _Entity = Account | Profile | SchoolMembership | User;
 type Nullable<T> = T | null;

@@ -1,15 +1,15 @@
 'use client';
-import { DataTable } from '@/components/school/student/table/data-table';
+import { DataTable } from '@/components/lists/student/table/data-table';
 import { useGetSchoolStudentsQuery } from '@stackschool/ui';
 import {
   columns,
-  StudentColumns,
-} from '@/components/school/student/table/columns';
+  StudentsData,
+} from '@/components/lists/student/table/columns';
 import {
   TableProvider,
-  useTable,
-} from '@/components/school/student/table/table-provider';
-import { DataTableHeader } from '@/components/school/student/table/data-table-header';
+  useStudentTable,
+} from '@/components/lists/student/table/table-provider';
+import { DataTableHeader } from '@/components/lists/student/table/data-table-header';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useSearchParams } from 'next/navigation';
 
@@ -25,7 +25,7 @@ function StudentView() {
   const searchParams = useSearchParams();
   const teacherId = searchParams.get('teacherId');
 
-  const { filters, pagination, searchTerm } = useTable();
+  const { filters, pagination, searchTerm } = useStudentTable();
 
   const search = useDebounce(searchTerm, 400);
   const { data, isPending } = useGetSchoolStudentsQuery({
@@ -39,18 +39,16 @@ function StudentView() {
     },
   });
 
-  const StudentsData: StudentColumns[] =
-    data?.getSchoolStudents?.data.map((s) => ({
+  const StudentsData: StudentsData[] =
+    data?.getSchoolStudents?.data?.map((s) => ({
       id: s.id,
-      phoneNumber: s.user?.phoneNumber ?? '',
-      firstname: s.user?.profile?.firstname ?? '',
-      lastname: s.user?.profile?.lastname ?? '',
-      email: s.user?.email ?? '',
+      firstName: s.schoolProfile?.firstName ?? '',
+      lastName: s.schoolProfile?.lastName ?? '',
       level: s.schoolClass?.level!,
       status: true,
       className: s.schoolClass?.name ?? '',
       section: s.schoolClass?.section ?? '',
-      photo: s.user?.profile?.photo,
+      avatarUrl: s.schoolProfile?.avatarUrl,
       enrollmentYear: s?.enrollmentYear ?? '',
       matricule: s.matricule,
     })) || [];

@@ -169,7 +169,7 @@ export class AuthService {
       this.authClient
         .send(AUTH_PATTERNS.VALIDATE_CREDENTIALS, { identifier, password })
         .pipe(
-          timeout(3000),
+          timeout(4000),
           validateWith(UserWithRelationsContract),
           catchError((err: any) => throwError(() => mapAuthError(err))),
         ),

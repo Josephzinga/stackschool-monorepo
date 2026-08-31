@@ -51,7 +51,7 @@ export function NavMain({ items }: { items: NavSecondaryItem['items'] }) {
                 className="w-full space-y-1"
               >
                 <SidebarMenuButton
-                  className="font-jost text-sm xl:text-base font-medium"
+                  className="font-meduim"
                   isActive={
                     (pathname.includes('dashboard') &&
                       item.href === '/dashboard') ||

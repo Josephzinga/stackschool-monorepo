@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {InternalAxiosRequestConfig} from 'axios';
 import {ApiErrorPayload} from '../types/api-response.type.ts';
 
 const URL = 'http://localhost:4000';
@@ -16,7 +16,7 @@ export function getApiBaseUrl() {
   return api.defaults.baseURL;
 }
 export function setHeaders(key: string, value: any) {
-  api.defaults.headers.common[key] = value;
+  api.defaults.headers.common[key] = value
 }
 export class ApiError extends Error {
   status?: number | null;
@@ -61,15 +61,17 @@ const processQueue = (error: any, token: any = null) => {
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
-    const originalRequest = err.config;
+    const originalRequest = err.config as InternalAxiosRequestConfig & {
+      _retry: boolean
+    };
 
     // Si erreur 401 et qu'on n'a pas déjà essayé de refresh
     // On exclut aussi la route de refresh elle-même pour éviter une boucle infinie
 
     if (
-      err.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url?.includes('/api/auth/refresh')
+        (err.response?.status === 401 || err?.response?.data?.errors?.some((err: any) => err?.statusCode === 401)) &&
+        !originalRequest?._retry &&
+      !originalRequest?.url?.includes('/auth/refresh')
     ) {
       if (isRefreshing) {
         // Si un refresh est déjà en cours, on met la requête en file d'attente
@@ -104,6 +106,7 @@ api.interceptors.response.use(
         // Si le refresh échoue, on redirige vers le login (si on est dans un navigateur)
         if (typeof window !== 'undefined' && window.location) {
           // On peut ajouter un paramètre pour rediriger après login
+          window.location.href = '/auth/login'
           // window.location.href = '/auth/login';
           // Pour l'instant on laisse l'app gérer la redirection via l'état global (user null)
         }

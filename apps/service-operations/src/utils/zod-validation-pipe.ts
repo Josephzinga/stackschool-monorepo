@@ -1,6 +1,9 @@
 import { PipeTransform, Injectable } from '@nestjs/common';
 import { ZodType } from 'zod';
-import { AppRpcException, safeValidateSchema } from '@stackschool/shared';
+import {
+  OperationsRpcException,
+  safeValidateSchema,
+} from '@stackschool/messaging';
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform {
@@ -10,7 +13,7 @@ export class ZodValidationPipe implements PipeTransform {
     const { success, errors, data } = safeValidateSchema(this.schema, value);
 
     if (!success) {
-      throw new AppRpcException(
+      throw new OperationsRpcException(
         'VALIDATION_ERROR',
         errors?.[0]?.message ?? 'Erreur de validation.',
       );

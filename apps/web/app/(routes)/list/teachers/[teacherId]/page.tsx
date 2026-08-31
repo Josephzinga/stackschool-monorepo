@@ -35,9 +35,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import TeacherScheduleGrid from '@/components/school/teacher/schedule-grid';
-import ClassesSection from '@/components/school/teacher/classes-section';
-import { InfoItem } from '@/components/school/info-item';
+import { InfoItem } from '@/components/lists/info-item';
 import {
   AppTabs,
   AppTabsContent,
@@ -102,7 +100,7 @@ export default function TeacherDetailsPage() {
   }
 
   const teacher = data.teacher;
-  const profile = teacher.user?.profile;
+  const profile = teacher?.schoolProfile;
 
   return (
     <div className="flex-1 sm:p-4 flex justify-center gap-4 ">
@@ -139,17 +137,17 @@ export default function TeacherDetailsPage() {
               <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background shadow-sm">
                 <AvatarImage
                   className="object-cover"
-                  src={profile?.photo || undefined}
+                  src={profile?.avatarUrl || undefined}
                 />
                 <AvatarFallback className="text-3xl bg-primary/10 font-jost text-primary">
-                  {profile?.firstname?.[0]}
-                  {profile?.lastname?.[0]}
+                  {profile?.firstName?.[0]}
+                  {profile?.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div className="w-full space-y-2 md:space-y-4">
               <h1 className="text-2xl md:text-3xl font-bold">
-                {profile?.firstname} {profile?.lastname}
+                {profile?.firstName} {profile?.lastName}
               </h1>
               <p className="text-muted-foreground text-sm md:text-base">
                 {teacher.specialization || 'Enseignant'}
@@ -158,10 +156,10 @@ export default function TeacherDetailsPage() {
               <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2 gap-2 w-full pr-1">
                   <InfoItem icon={Phone}>
-                    {teacher.user?.phoneNumber || 'Non renseigné'}
+                    {teacher?.schoolUser?.user?.phoneNumber || 'Non renseigné'}
                   </InfoItem>
                   <InfoItem icon={Mail}>
-                    {teacher.user?.email || 'Non renseigné'}
+                    {teacher.schoolUser?.user?.email || 'Non renseigné'}
                   </InfoItem>
                   <InfoItem icon={MapPin}>
                     {profile?.address || 'Adresse non renseignée'}
@@ -258,11 +256,11 @@ export default function TeacherDetailsPage() {
             </AppTabsContent>
 
             <AppTabsContent id="classes" value="classes">
-              <ClassesSection teacherId={teacher?.id} />
+              {/*   <ClassesSection teacherId={teacher?.id} /> */}
             </AppTabsContent>
 
             <AppTabsContent value="schedule">
-              <TeacherScheduleGrid id={teacherId} />
+              {/*   <TeacherScheduleGrid id={teacherId} /> */}
             </AppTabsContent>
           </AppTabs>
         </div>

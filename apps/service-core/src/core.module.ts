@@ -10,17 +10,8 @@ import {
 } from '@nestjs/apollo';
 import { join } from 'node:path';
 import { Request, Response } from 'express';
-import {
-  ClientProxy,
-  ClientsModule,
-  RpcException,
-  Transport,
-} from '@nestjs/microservices';
-import {
-  ACADEMIC_SERVICE,
-  AUTH_SERVICE,
-  CoreRpcException,
-} from '@stackschool/messaging';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { AUTH_SERVICE, CoreRpcException } from '@stackschool/messaging';
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -31,6 +22,9 @@ import { PrismaService } from './prisma/prisma.service';
 import { DataLoaderModule } from './modules/dataloader/dataLoaderModule';
 import { DataLoaderService } from './modules/dataloader/dataloader.service';
 import { createContext } from './graphql/context';
+import { StudentModule } from './modules/student/student.module';
+import { RabbitMQClientsModule } from './modules/rabbitmq/rabbitmq-clients.module';
+import { ExternalModule } from './modules/external/external.module';
 
 @Module({
   imports: [
@@ -41,29 +35,8 @@ import { createContext } from './graphql/context';
     EnrolmentModule,
     DataLoaderModule,
     TeacherModule,
-    ClientsModule.register({
-      isGlobal: true,
-      clients: [
-        {
-          name: AUTH_SERVICE,
-          transport: Transport.RMQ,
-          options: {
-            urls: [process.env.RABBITMQ_URL!],
-            queue: 'auth_queue',
-            queueOptions: { durable: true },
-          },
-        },
-        {
-          name: ACADEMIC_SERVICE,
-          transport: Transport.RMQ,
-          options: {
-            urls: [process.env.RABBITMQ_URL!],
-            queue: 'academic_queue',
-            queueOptions: { durable: true },
-          },
-        },
-      ],
-    }),
+    RabbitMQClientsModule,
+    ExternalModule,
     CacheModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -143,15 +116,15 @@ import { createContext } from './graphql/context';
         },
         buildSchemaOptions: {
           dateScalarMode: 'timestamp',
-          enumValues: 'enum',
         },
         definitions: {
           path: join(process.cwd(), 'src/graphql.ts'),
           outputAs: 'class',
-          enumAsTypes: true,
+          enumsAsTypes: true,
         },
       }),
     }),
+    StudentModule,
   ],
   exports: [MembershipModule, CacheModule],
 })

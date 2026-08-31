@@ -6,6 +6,7 @@ import {
   AUTH_SERVICE,
   CORE_SERVICE,
   OPERATIONS_SERVICE,
+  RABBITMQ_QUEUES,
 } from '@stackschool/messaging';
 
 const buildRmqClient = (queue: string) => ({
@@ -25,10 +26,13 @@ const buildRmqClient = (queue: string) => ({
 @Module({
   imports: [
     ClientsModule.registerAsync([
-      { name: CORE_SERVICE, ...buildRmqClient('core_queue') },
-      { name: AUTH_SERVICE, ...buildRmqClient('auth_queue') },
-      { name: ACADEMIC_SERVICE, ...buildRmqClient('academic_queue') },
-      { name: OPERATIONS_SERVICE, ...buildRmqClient('operations_queue') },
+      { name: CORE_SERVICE, ...buildRmqClient(RABBITMQ_QUEUES.CORE) },
+      { name: AUTH_SERVICE, ...buildRmqClient(RABBITMQ_QUEUES.AUTH) },
+      { name: ACADEMIC_SERVICE, ...buildRmqClient(RABBITMQ_QUEUES.ACADEMIC) },
+      {
+        name: OPERATIONS_SERVICE,
+        ...buildRmqClient(RABBITMQ_QUEUES.OPERATIONS),
+      },
     ]),
   ],
   exports: [ClientsModule],

@@ -1,17 +1,25 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { Transport } from '@nestjs/microservices';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { GatewayGuard, RABBITMQ_QUEUES } from '@stackschool/messaging';
+import { OperationsModule } from './operations.module';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice(AppModule, {
+  const app = await NestFactory.create(OperationsModule);
+  const config = app.get(ConfigService);
+  app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: [process.env.RABBITMQ_URL!],
-      queue: 'operations_queue',
+      urls: [config.getOrThrow<string>('RABBITMQ_URL')],
+      queue: RABBITMQ_QUEUES.CORE,
       queueOptions: { durable: true },
     },
   });
-  app.listen();
+  app.useGlobalGuards(new GatewayGuard());
+  await app.startAllMicroservices();
+  await app.listen(4004, () => {
+    console.log('Service is running on port 4002');
+  });
 }
 bootstrap();

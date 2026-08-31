@@ -5,13 +5,8 @@ export * from './store/complete-profile-store';
 export * from './store/user-store';
 export * from './lib/relation-types';
 export * from './constant/role';
-export * from './store/loading-store'
+export * from './store/loading-store';
 export * from './constant/student-status';
-export {
-  QueryClientProvider,
-  QueryClient,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
-export { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-export * from './generated/v2/graphql'
+export * from './generated/v2/graphql';
+export * from './constant/lesson-status';
+export * from './store/lesson-store';

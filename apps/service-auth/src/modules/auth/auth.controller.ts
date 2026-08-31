@@ -18,6 +18,7 @@ import {
   RefreshTokenResponse,
   resetPasswordInput,
   type ResetPasswordInput,
+  UpdateAvatarInput,
   UpdateProfileInput,
   UserWithRelationsContract,
   ValidateCredentialsInput,
@@ -65,13 +66,10 @@ export class AuthController {
     @Payload(new ZodValidationPipe(findFullUserInput))
     data: FindFullUserInput,
   ) {
-    if (!data.userId)
-      throw new AuthRpcException(
-        'INVALID_CREDENTIALS',
-        "L'identifiant manquat.",
-      );
     const user = await this.authService.findFullUser(data.userId);
-    return toUserWithRelationsContract(user!);
+    if (!user)
+      throw new AuthRpcException('USER_NOT_FOUND', 'Utiilisateur not trouvé.');
+    return toUserWithRelationsContract(user);
   }
 
   @MessagePattern(AUTH_PATTERNS.CREATE_USER_SESSION)
@@ -118,16 +116,10 @@ export class AuthController {
     return this.authService.resendCode(data.tempToken);
   }
 
-  @MessagePattern(AUTH_PATTERNS.VALIDATE_USER_FIELD)
-  async rpcValidateUserField(
-    @Payload(new ZodValidationPipe(ValidateUserFieldInput))
-    data: ValidateUserFieldInput,
-  ): Promise<ValidateUserFieldResponse> {
-    return this.userService.validateField(data);
-  }
-
   @MessagePattern(AUTH_PATTERNS.UPDATE_AVATAR)
-  async updateAvatar(@Payload() data: { userId: string; avatarUrl: string }) {
+  async updateAvatar(
+    @Payload(new ZodValidationPipe(UpdateAvatarInput)) data: UpdateAvatarInput,
+  ) {
     return this.userService.updateProfile(data.userId, {
       avatarUrl: data.avatarUrl,
     });

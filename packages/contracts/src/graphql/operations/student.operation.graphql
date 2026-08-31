@@ -1,0 +1,149 @@
+query GetSchoolStudents($input: GetSchoolStudentsInput!) {
+    getSchoolStudents(input: $input) {
+        meta {
+            total
+            totalPages
+            limit
+            page
+        }
+        data {
+            id
+            matricule
+            enrollmentYear
+            schoolProfile {
+                id
+                firstName
+                lastName
+                avatarUrl
+            }
+            parentStudent {
+                relationType
+                parent {
+                    id
+                }
+            }
+            schoolClass {
+                id
+                name
+                section
+                level
+            }
+        }
+    }
+}
+query GetStudentDetails($id: ID!, $includeParent: Boolean) {
+    student(id: $id) {
+        id
+        matricule
+        enrollmentYear
+        birthDate
+        birthPlace
+        nationality
+        status
+        previousClass
+        previousSchool
+        bloodGroup
+        allergies
+        medicalCondition
+        studentNumber
+        birthCertificateNumber
+        enrollmentDate
+        transportMode
+        schoolClass {
+            id
+            name
+            section
+            level
+        }
+        schoolProfile {
+            firstName
+            lastName
+            avatarUrl
+            gender
+            address
+        }
+        parentStudent {
+            parent {
+                id
+                profession
+                schoolProfile {
+                    firstName
+                    lastName
+                    avatarUrl
+                }
+            }
+        }
+    }
+}
+
+mutation UpdateStudent(
+    $studentId: ID!
+    $input: CreateStudentInput!
+) {
+    updateStudent(studentId: $studentId, input: $input) {
+        ...StudentDetails
+    }
+}
+
+mutation CreateStudent($input: CreateStudentInput!) {
+    createStudent(input: $input) {
+        id
+        schoolProfile {
+            firstName
+            lastName
+            avatarUrl
+        }
+    }
+}
+mutation DeleteStudents( $studentIds: [ID!]!, $soft: Boolean) {
+    deleteStudents( studentIds: $studentIds, soft: $soft) {
+        ok
+        message
+    }
+}
+
+fragment StudentDetails on Student {
+    id
+    matricule
+    enrollmentYear
+    birthDate
+    birthPlace
+    nationality
+    status
+    previousClass
+    previousSchool
+    bloodGroup
+    allergies
+    medicalCondition
+    studentNumber
+    birthCertificateNumber
+    enrollmentDate
+    transportMode
+    parentStudent{
+        relationType
+        parent {
+            id
+            profession
+            schoolProfile {
+                firstName
+                lastName
+                gender
+                address
+                avatarUrl
+            }
+        }
+    }
+    schoolClass {
+        id
+        name
+        section
+        level
+    }
+    schoolProfile {
+        firstName
+        lastName
+        avatarUrl
+        gender
+        address
+    }
+}

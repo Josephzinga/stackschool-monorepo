@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { GroupDataTable } from '@/components/school/group/data-table';
-import { columns } from '@/components/school/group/columns';
-import DataHeaderInput from '@/components/school/data-filters';
+import { GroupDataTable } from '@/components/lists/group/data-table';
+import { columns } from '@/components/lists/group/columns';
+import DataHeaderInput from '@/components/lists/data-filters';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

@@ -98,7 +98,7 @@ export function ProfileStep() {
     validateField('email', e.target.value);
   };
 
-  const handlePhotoUpload = async (
+  const handleUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
@@ -119,7 +119,7 @@ export function ProfileStep() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await api.post('/api/upload/avatar', formData);
+      const res = await api.post('/api/upload/temp', formData);
 
       const data = res.data;
 
@@ -139,7 +139,7 @@ export function ProfileStep() {
       setIsLoading(false);
     }
   };
-
+console.log("AvatarUrl: ", watch('avatarUrl'))
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -149,7 +149,7 @@ export function ProfileStep() {
 
       <div className="w-full flex justify-center items-center">
         <UploadProfilePicture
-          onPhotoUpload={handlePhotoUpload}
+          onPhotoUpload={handleUpload}
           isLoading={isLoading}
           photo={watch('avatarUrl')}
         />

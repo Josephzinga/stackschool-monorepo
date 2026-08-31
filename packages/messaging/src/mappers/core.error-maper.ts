@@ -5,18 +5,19 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import {CoreErrorCode} from '../errors/core-rpc.error.ts';
-import {ZodError} from 'zod';
+import { CoreErrorCode } from '../errors/core-rpc.error.ts';
+import { ZodError } from 'zod';
 
 export function mapCoreError(payload: {
   code?: CoreErrorCode;
   message: string;
   meta?: any;
 }) {
+  console.log('Core Error', payload);
+
   if (payload instanceof ZodError) {
     return new BadRequestException(payload.message);
   }
-
   switch (payload?.code) {
     case 'MEMBERSHIP_NOT_FOUND':
       return new BadRequestException(payload.message);

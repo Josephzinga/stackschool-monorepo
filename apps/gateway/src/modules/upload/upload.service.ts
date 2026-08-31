@@ -14,6 +14,7 @@ import { AUTH_PATTERNS, AUTH_SERVICE } from '@stackschool/messaging';
 import { mapAuthError } from '../../errors/auth.error-maper';
 import { randomUUID } from 'crypto';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { UploadResult } from '../storage/storage.types';
 
 @Injectable()
 export class UploadService {
@@ -22,14 +23,23 @@ export class UploadService {
     private readonly storage: StorageService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
+
   async uploadAvatar(file: Express.Multer.File, userId: string) {
-    const result = await this.storage.upload(file, {
-      visibility: 'public',
-      folder: 'avatars',
-      ownerId: userId,
-      allowedMimeTypes: ACCEPTED_IMAGE_TYPES,
-      maxSizeBytes: 5 * 1024 * 1024,
-    });
+    let result: UploadResult;
+    try {
+      result = await this.storage.upload(file, {
+        visibility: 'public',
+        folder: 'avatars',
+        ownerId: userId,
+        allowedMimeTypes: ACCEPTED_IMAGE_TYPES,
+        maxSizeBytes: 5 * 1024 * 1024,
+      });
+    } catch (err: any) {
+      throw new InternalServerErrorException(
+        "Erreur lors de l'upload de l'avatar.",
+        err,
+      );
+    }
 
     const updateResult = await firstValueFrom<ProfileContract>(
       this.authClient
@@ -50,12 +60,13 @@ export class UploadService {
   async uploadAvatarTemp(file: Express.Multer.File, userId: string) {
     try {
       const result = await this.storage.upload(file, {
-        visibility: 'public', // ou 'private' selon le type final visé
+        visibility: 'public',
         folder: 'tmp',
         ownerId: userId,
         allowedMimeTypes: ACCEPTED_IMAGE_TYPES,
         maxSizeBytes: 5 * 1024 * 1024,
       });
+
       const tempId = randomUUID();
       const ttlSeconds = 30 * 60; // 30 min
 
@@ -71,7 +82,8 @@ export class UploadService {
 
       return {
         tempId,
-        url: result.url, // preview direct, pas besoin de repasser par Redis pour l'affichage
+        avatarUrl: this.storage.getStaticUrl(result.key), // preview direct, pas besoin de repasser par Redis pour
+        // l'affichage
         expiresIn: ttlSeconds,
       };
     } catch (err: any) {

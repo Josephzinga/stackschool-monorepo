@@ -54,7 +54,7 @@ export const SearchSchoolFrom = () => {
     setCurrentStep(2);
     toast.success(`vous avez selectionner l'école ${school.name}`);
 
-    console.log('currentStep search-school', currentStep);
+    console.log('currentStep search-lists', currentStep);
   };
 
   return (

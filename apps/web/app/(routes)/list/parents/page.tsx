@@ -1,7 +1,7 @@
 'use client';
 
 import { useDebounce } from '@/hooks/useDebounce';
-import { DataTable } from '@/components/school/parent/table/data-table';
+import { DataTable } from '@/components/lists/parent/table/data-table';
 import { useGetSchoolParentsQuery, useUserStore } from '@stackschool/ui';
 import {
   parseAsInteger,
@@ -9,9 +9,9 @@ import {
   SearchParams,
   useQueryStates,
 } from 'nuqs';
-import { columns, ParentColumn } from '@/components/school/parent/table/column';
-import { DataTableHeader } from '@/components/school/parent/table/data-table-header';
-import { TableProvider } from '@/components/school/parent/table/table-provider';
+import { columns, ParentColumn } from '@/components/lists/parent/table/column';
+import { DataTableHeader } from '@/components/lists/parent/table/data-table-header';
+import { TableProvider } from '@/components/lists/parent/table/table-provider';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 

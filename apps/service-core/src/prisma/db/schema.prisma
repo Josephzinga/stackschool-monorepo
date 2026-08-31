@@ -160,7 +160,7 @@ model Student {
   needAdminConfirm       Boolean                     @default(false)
   tempSchoolUserId       String?                     @unique
   matricule              String
-  enrollmentYear         String
+  enrollmentYear         String?
   enrollmentDate         DateTime?
   studentNumber          Int                         @default(autoincrement())
   bloodGroup             String?

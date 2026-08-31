@@ -1,8 +1,8 @@
 'use client';
-import { useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useGetMeQuery, useLoadingStore, useUserStore } from '@stackschool/ui';
-import { api, toUserWithRelationsContract } from '@stackschool/contracts';
+import {useEffect} from 'react';
+import {usePathname, useRouter} from 'next/navigation';
+import {useGetMeQuery, useLoadingStore, useUserStore} from '@stackschool/ui';
+import {api, toUserWithRelationsContract} from '@stackschool/contracts';
 
 export default function ProtectedRoute({
   children,
@@ -36,7 +36,7 @@ export default function ProtectedRoute({
 
           api.defaults.headers.common['x-school-id'] = member?.school?.id;
         } else {
-          setCurrentSchool(data?.me?.memberships[0]?.school ?? undefined);
+          setCurrentSchool(data?.me?.memberships[0]?.school);
         }
       }
     }
@@ -49,7 +49,7 @@ export default function ProtectedRoute({
         data.me.profileCompleted && data.me.hasMembership;
       const isOnCompleteProfile = pathname === '/auth/complete-profile';
       const isOnAuthPage = pathname.startsWith('/auth') && !isOnCompleteProfile;
-      const isOnSelectSchool = pathname === '/dashboard/select-school';
+      const isOnSelectSchool = pathname === '/dashboard/select-lists';
 
       // Cas A : Profil incomplet
       if (!isProfileComplete && !isOnCompleteProfile && !isOnAuthPage) {

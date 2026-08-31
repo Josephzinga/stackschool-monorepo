@@ -1,4 +1,4 @@
-// components/complete-profile/school-step/create-school-form.tsx
+// components/complete-profile/lists-step/create-lists-form.tsx
 import {useCompleteProfileStore, useForm, zodResolver} from '@stackschool/ui';
 import {z} from 'zod';
 import {Input} from '@/components/ui/input';

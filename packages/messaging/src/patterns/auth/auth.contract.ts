@@ -1,15 +1,14 @@
-import {z} from 'zod';
+import { z } from 'zod';
 import {
   forgotPasswordSchema,
   loginFormSchema,
   profileSchema,
   registerFormSchema,
-  UserWithRelationsContract
+  UserWithRelationsContract,
 } from '@stackschool/contracts';
 
 export const ValidateCredentialsInput = loginFormSchema;
 export type ValidateCredentialsInput = z.infer<typeof ValidateCredentialsInput>;
-
 
 const ok = z.boolean().default(false);
 const message = z.string();
@@ -20,6 +19,7 @@ export const createUserInput = z.object({
   phoneNumber: registerFormSchema.shape.phoneNumber.optional(),
   password: registerFormSchema.shape.password.optional(),
   confirm: registerFormSchema.shape.confirm.optional(),
+  isActive: z.boolean().default(true),
   username: z.string(),
 });
 
@@ -82,8 +82,8 @@ export const ValidateCredentialsOutput = z
     username: z.string(),
     profile: z
       .object({
-        firstname: z.string(),
-        lastname: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
         photo: z.string().nullable(),
       })
       .nullable(),

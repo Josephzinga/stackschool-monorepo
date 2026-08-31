@@ -1,3 +1,17 @@
+query GetSchoolClasses($input: GetSchoolClassesInput!) {
+  getSchoolClasses(input: $input) {
+    meta {
+      limit
+      totalPages
+      total
+    }
+
+    data {
+      ...ClassListFragment
+    }
+  }
+}
+
 query GetClassesOptions(
   $input: GetSchoolClassesInput!
   $withMeta: Boolean = true
@@ -17,6 +31,48 @@ query GetClassesOptions(
         id
         name
         type
+      }
+    }
+  }
+}
+mutation CreateClass($data: CreateClassInput!) {
+  createClass(data: $data) {
+    ...ClassListFragment
+  }
+}
+fragment ClassListFragment on Class {
+  id
+  name
+  section
+  level
+  studentCount {
+    male
+    female
+  }
+  supervisor {
+    id
+    schoolProfile {
+      firstName
+      lastName
+      avatarUrl
+    }
+  }
+  group {
+    classSubjects {
+      subject {
+        id
+        name
+        code
+      }
+      assignment {
+        teacher {
+          id
+          schoolProfile {
+            firstName
+            lastName
+            avatarUrl
+          }
+        }
       }
     }
   }

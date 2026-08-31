@@ -7,6 +7,7 @@ import {
   SchoolUser,
   Student,
 } from '../../prisma/db/generated/client';
+import { StudentCount } from '../../graphql';
 
 /**
  * Token d'injection du client Prisma.
@@ -79,10 +80,44 @@ export class DataLoaderService {
         },
       ),
 
+      studentCountLoaderByClass: new DataLoader<string, StudentCount>(
+        async (classIds) => {
+          const [maleCount, femaleCount] = await Promise.all([
+            prisma.student.count({
+              where: {
+                classId: { in: [...classIds] },
+                deletedAt: null,
+                schoolUser: {
+                  schoolProfile: {
+                    gender: 'MALE',
+                  },
+                },
+              },
+            }),
+            prisma.student.count({
+              where: {
+                classId: { in: [...classIds] },
+                deletedAt: null,
+                schoolUser: {
+                  schoolProfile: {
+                    gender: 'FEMALE',
+                  },
+                },
+              },
+            }),
+          ]);
+
+          return classIds.map(() => ({
+            male: maleCount,
+            female: femaleCount,
+          }));
+        },
+      ),
+
       studentsByClassLoader: new DataLoader<string, Student[]>(
         async (classIds) => {
           const students = await prisma.student.findMany({
-            where: { classId: { in: [...classIds] } },
+            where: { deletedAt: null, classId: { in: [...classIds] } },
           });
           const map = groupBy(students, (s) => s.classId);
           return classIds.map((id) => map.get(id) ?? []);

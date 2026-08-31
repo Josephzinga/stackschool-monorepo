@@ -148,7 +148,7 @@ export class CompleteProfileService {
     console.log(schoolResult);
     if (!schoolResult?.ok)
       throw new InternalServerErrorException(
-        "Erreur lors de la procédure de l'étape school",
+        "Erreur lors de la procédure de l'étape lists",
       );
     const roleResult = await this.handleRoleCreation(
       userId,

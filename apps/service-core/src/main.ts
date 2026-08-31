@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { CoreModule } from './core.module';
 import { ConfigService } from '@nestjs/config';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { GatewayGuard } from '@stackschool/messaging';
+import { GatewayGuard, RABBITMQ_QUEUES } from '@stackschool/messaging';
 
 async function bootstrap() {
   const app = await NestFactory.create(CoreModule);
@@ -13,7 +13,7 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: [config.getOrThrow<string>('RABBITMQ_URL')],
-      queue: 'core_queue',
+      queue: RABBITMQ_QUEUES.CORE,
       queueOptions: { durable: true },
     },
   });

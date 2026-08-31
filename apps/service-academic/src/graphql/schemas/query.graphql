@@ -1,0 +1,13 @@
+type Query {
+  getClassSubjects(
+    classId: ID
+    teacherId: ID
+    groupId: ID
+    searchTerm: String
+  ): [ClassSubject!]
+  class(id: ID!): Class
+  getSchoolClasses(input: GetSchoolClassesInput!): ClassList!
+  getSchoolSubjects(input: GetSubjectInput!): SubjectList
+  getSchoolRooms(filter: GetSchoolRoomInput!): RoomList!
+  getTeacherAssignments(filter: GetTeacherAssignmentInput): [TeacherAssignment]
+}

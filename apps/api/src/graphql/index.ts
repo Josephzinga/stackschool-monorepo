@@ -116,7 +116,7 @@ export default graphqlMiddleware;
 
 const getSchoolMember = async (req: any) => {
   const user = req.raw.user;
-  const schoolId = req.raw.headers['x-school-id'] as string;
+  const schoolId = req.raw.headers['x-lists-id'] as string;
   let membership: SchoolUser | null = null;
   if (user && schoolId) {
     membership = await prisma.schoolUser.findUnique({

@@ -30,22 +30,9 @@ export enum AssessmentStatus {
     CLOSED = "CLOSED"
 }
 
-export enum LessonStatus {
-    PLANNED = "PLANNED",
-    ONGOING = "ONGOING",
-    COMPLETED = "COMPLETED",
-    CANCELLED = "CANCELLED",
-    POSTPONED = "POSTPONED"
-}
-
 export enum GroupType {
     SOLO = "SOLO",
     MULTIPLE = "MULTIPLE"
-}
-
-export enum ResourceMode {
-    TEACHER = "TEACHER",
-    CLASS = "CLASS"
 }
 
 export enum Day {
@@ -58,12 +45,30 @@ export enum Day {
     SUNDAY = "SUNDAY"
 }
 
+export enum LessonStatus {
+    PLANNED = "PLANNED",
+    ONGOING = "ONGOING",
+    COMPLETED = "COMPLETED",
+    CANCELLED = "CANCELLED",
+    POSTPONED = "POSTPONED"
+}
+
+export enum ResourceMode {
+    TEACHER = "TEACHER",
+    CLASS = "CLASS"
+}
+
+export enum link__Purpose {
+    SECURITY = "SECURITY",
+    EXECUTION = "EXECUTION"
+}
+
 export class ClassSubjectInput {
     id?: Nullable<string>;
     teacherId?: Nullable<string>;
     groupId?: Nullable<string>;
     classId?: Nullable<string>;
-    subjectId: string;
+    subjectId?: Nullable<string>;
     coefficient: number;
     weeklyHours?: Nullable<number>;
 }
@@ -90,20 +95,6 @@ export class CreateGroupInput {
     classIds: string[];
 }
 
-export class GetLessonsInput {
-    groupId?: Nullable<string>;
-    teacherId?: Nullable<string>;
-    classId?: Nullable<string>;
-    department?: Nullable<string>;
-    mode: ResourceMode;
-    hasLessonOnly?: Nullable<boolean>;
-    section?: Nullable<string>;
-    status?: Nullable<LessonStatus>;
-    level?: Nullable<string>;
-    limit: number;
-    page: number;
-}
-
 export class CreateLessonInput {
     day: Day;
     mode: ResourceMode;
@@ -112,6 +103,8 @@ export class CreateLessonInput {
     subjectId: string;
     teacherId?: Nullable<string>;
     groupId?: Nullable<string>;
+    roomId?: Nullable<string>;
+    title?: Nullable<string>;
 }
 
 export class UpdateLessonInput {
@@ -155,13 +148,25 @@ export class CreateSubjectInput {
     code: string;
     mainTeacherId?: Nullable<string>;
     category: SubjectCategory;
-    classSubject?: Nullable<ClassSubjectInput[]>;
+    classSubjects?: Nullable<ClassSubjectInput[]>;
+}
+
+export class DeleteSubjectsInput {
+    subjectIds: string[];
+    soft: boolean;
 }
 
 export class CreateTeacherAssignmentInput {
     classId: string;
     subjectIds: string[];
     teacherId: string;
+}
+
+export class GetTeacherAssignmentInput {
+    groupId?: Nullable<string>;
+    classId?: Nullable<string>;
+    teacherId?: Nullable<string>;
+    limit?: Nullable<number>;
 }
 
 export class Assessment {
@@ -177,12 +182,11 @@ export class ClassSubject {
     id: string;
     coefficient?: Nullable<number>;
     weeklyHours?: Nullable<number>;
-    teacherId?: Nullable<string>;
-    subjectId?: Nullable<string>;
+    subjectId: string;
     groupId: string;
-    subject: Subject;
+    subject?: Nullable<Subject>;
     assignment?: Nullable<TeacherAssignment>;
-    group: Group;
+    group?: Nullable<Group>;
     assessments?: Nullable<Assessment[]>;
 }
 
@@ -239,6 +243,7 @@ export class Teacher {
 
 export class Student {
     id: string;
+    classId: string;
     schoolClass?: Nullable<Class>;
 }
 
@@ -257,7 +262,7 @@ export class Group {
     id: string;
     name: string;
     type?: Nullable<GroupType>;
-    classes: Class[];
+    classes?: Nullable<Class[]>;
     classSubjects?: Nullable<Nullable<ClassSubject>[]>;
 }
 
@@ -273,41 +278,30 @@ export class Lesson {
     room?: Nullable<Room>;
 }
 
-export class LessonsEvents {
+export class LessonEvents {
     id: string;
-    resourceId?: Nullable<string>;
-    title: string;
-    startTime: string;
-    endTime: string;
-    day: Day;
-    status?: Nullable<LessonStatus>;
-    subject: Subject;
-    group?: Nullable<Group>;
-    teacher?: Nullable<LessonTeacher>;
+    subject?: Nullable<Subject>;
     room?: Nullable<Room>;
 }
 
-export class LessonTeacher {
+export class Subject {
     id: string;
-    firstName: string;
-    lastName: string;
-    weeklyHours?: Nullable<number>;
+    name: string;
+    code?: Nullable<string>;
+    category?: Nullable<SubjectCategory>;
+    totalWeeklyHours?: Nullable<number>;
+    mainTeacherId?: Nullable<string>;
+    classSubjects?: Nullable<Nullable<ClassSubject>[]>;
 }
 
-export class LessonsData {
-    events?: Nullable<LessonsEvents[]>;
-    resources?: Nullable<LessonResources[]>;
-}
-
-export class LessonsList {
-    data: LessonsData;
-    meta?: Nullable<PaginationMeta>;
-}
-
-export class LessonResources {
+export class Room {
     id: string;
-    title: string;
-    weeklyHours?: Nullable<number>;
+    name: string;
+    code?: Nullable<string>;
+    capacity?: Nullable<number>;
+    type?: Nullable<string>;
+    class?: Nullable<Nullable<Class>[]>;
+    defaultForClass?: Nullable<Class>;
 }
 
 export abstract class IMutation {
@@ -319,7 +313,7 @@ export abstract class IMutation {
 
     abstract createSubject(input: CreateSubjectInput): Nullable<Subject> | Promise<Nullable<Subject>>;
 
-    abstract deleteSubjects(subjectIds: string[]): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
+    abstract deleteSubjects(input: DeleteSubjectsInput): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
 
     abstract createClassSubject(input: ClassSubjectInput): ClassSubject | Promise<ClassSubject>;
 
@@ -341,7 +335,7 @@ export abstract class IMutation {
 
     abstract createGroup(input: CreateGroupInput): Group | Promise<Group>;
 
-    abstract createTeacherAssignment(input: CreateTeacherAssignmentInput): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
+    abstract createTeacherAssignment(input: CreateTeacherAssignmentInput): TeacherAssignment | Promise<TeacherAssignment>;
 
     abstract syncTeacherAssignment(input: CreateTeacherAssignmentInput): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
 
@@ -355,36 +349,16 @@ export abstract class IQuery {
 
     abstract getSchoolClasses(input: GetSchoolClassesInput): ClassList | Promise<ClassList>;
 
-    abstract getLessons(filter: GetLessonsInput): Nullable<LessonsList> | Promise<Nullable<LessonsList>>;
-
     abstract getSchoolSubjects(input: GetSubjectInput): Nullable<SubjectList> | Promise<Nullable<SubjectList>>;
 
     abstract getSchoolRooms(filter: GetSchoolRoomInput): RoomList | Promise<RoomList>;
-}
 
-export class Room {
-    id: string;
-    name: string;
-    code?: Nullable<string>;
-    capacity?: Nullable<number>;
-    type?: Nullable<string>;
-    class?: Nullable<Nullable<Class>[]>;
-    defaultForClass?: Nullable<Class>;
+    abstract getTeacherAssignments(filter?: Nullable<GetTeacherAssignmentInput>): Nullable<Nullable<TeacherAssignment>[]> | Promise<Nullable<Nullable<TeacherAssignment>[]>>;
 }
 
 export class RoomList {
     data: Nullable<Room>[];
     meta?: Nullable<PaginationMeta>;
-}
-
-export class Subject {
-    id: string;
-    name: string;
-    code?: Nullable<string>;
-    category?: Nullable<SubjectCategory>;
-    totalWeeklyHours?: Nullable<number>;
-    mainTeacherId?: Nullable<string>;
-    classSubject?: Nullable<Nullable<ClassSubject>[]>;
 }
 
 export class SubjectList {
@@ -419,5 +393,19 @@ export class GenderStats {
     female: number;
 }
 
+export class _Service {
+    sdl?: Nullable<string>;
+}
+
 export type DateTime = any;
+export type link__Import = any;
+export type federation__FieldSet = any;
+export type _Any = any;
+
+export class ISchema {
+    Query: IQuery;
+    Mutation: IMutation;
+}
+
+export type _Entity = Class | ClassStats | LessonEvents | Room | SchoolStats | Student | Subject | Teacher | TeacherAssignment;
 type Nullable<T> = T | null;

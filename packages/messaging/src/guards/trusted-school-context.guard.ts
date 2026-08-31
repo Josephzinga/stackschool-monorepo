@@ -23,12 +23,12 @@ export class TrustedSchoolContextGuard implements CanActivate {
 
     if (!requiredRoles) return true;
 
-    const schoolRole = req.headers['x-school-role'];
+    const schoolRole = req.headers['x-lists-role'];
     if (!schoolRole || !requiredRoles.includes(schoolRole)) {
       throw new ForbiddenException('Rôle insuffisant pour cette ressource.');
     }
     req.schoolContext = {
-      schoolId: req.headers['x-school-id'],
+      schoolId: req.headers['x-lists-id'],
       role: schoolRole,
     };
     return true;

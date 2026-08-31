@@ -9,17 +9,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { TeacherView } from '@/components/school/class/teacher-view';
-import { ClassStudentList } from '@/components/school/class/class-student-list';
-import { TodaySubjects } from '@/components/school/class/today-subjects';
-import ClassScheduleGrid from '@/components/school/class/schedule/schedule-grid';
+import { TeacherView } from '@/components/lists/class/teacher-view';
+import { ClassStudentList } from '@/components/lists/class/class-student-list';
+import { TodaySubjects } from '@/components/lists/class/today-subjects';
+import ClassScheduleGrid from '@/components/lists/class/schedule/schedule-grid';
 import {
   AppTabs,
   AppTabsContent,
   AppTabsList,
   AppTabsTrigger,
 } from '@/components/app-tabs';
-import { ClassSubjectsView } from '@/components/school/class-subject/subject-view/subjects-view';
+import { ClassSubjectsView } from '@/components/lists/class-subject/subject-view/subjects-view';
 
 export default function ClassDetailsPage() {
   const params = useParams();

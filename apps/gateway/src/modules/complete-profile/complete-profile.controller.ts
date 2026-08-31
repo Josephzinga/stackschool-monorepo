@@ -9,6 +9,8 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { Request, Response } from 'express';
 import { CompleteProfileService } from './complete-profile.service';
 
+type User = NonNullable<Request['user']>;
+
 @Controller('api/complete-profile')
 @UseGuards(AuthenticatedGuard)
 export class CompleteProfileController {
@@ -17,13 +19,13 @@ export class CompleteProfileController {
   ) {}
 
   @Post('/')
-  async confirm(@CurrentUser() user: NonNullable<Request['user']>) {
+  async confirm(@CurrentUser() user: User) {
     return await this.completeProfileService.confirm(user.id);
   }
 
   @Post('save-progress')
   async saveProgress(
-    @CurrentUser() user: NonNullable<Request['user']>,
+    @CurrentUser() user: User,
     @Body(new ZodValidationPipe(completeProfileDataSchema))
     dto: CompleteProfileDataType,
     @Res() res: Response,
@@ -32,10 +34,7 @@ export class CompleteProfileController {
   }
 
   @Get('load-progress')
-  async loadProgress(
-    @CurrentUser() user: NonNullable<Request['user']>,
-    @Res() res: Response,
-  ) {
+  async loadProgress(@CurrentUser() user: User, @Res() res: Response) {
     return this.completeProfileService.loadProgress(user.id, res);
   }
 }

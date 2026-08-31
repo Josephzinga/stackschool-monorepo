@@ -108,7 +108,7 @@ export class AuthService {
   }
 
   async findFullUser(userId: string) {
-    return await this.userService.findOne({
+    return this.prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -123,13 +123,13 @@ export class AuthService {
     const user = await this.userService.findByIdentifierWithRelations(
       data.identifier,
     );
+    const invalidMsg = 'Votre Identifiant où mot de passe est invalide';
 
-    if (!user)
-      throw new AuthRpcException('USER_NOT_FOUND', 'Utilisateur non trouvé.');
+    if (!user) throw new AuthRpcException('INVALID_CREDENTIALS', invalidMsg);
 
     const hasLocalPassword =
       typeof user.password === 'string' && user.password.length > 0;
-    const socialProviders = (user.accounts as Array<{ provider: string }>)
+    const socialProviders = user.accounts
       .filter((acc) => acc.provider !== 'local')
       .map((acc) => acc.provider);
 
@@ -142,10 +142,7 @@ export class AuthService {
     }
 
     if (!hasLocalPassword) {
-      throw new AuthRpcException(
-        'INVALID_CREDENTIALS',
-        'Identifiant invalide.',
-      );
+      throw new AuthRpcException('INVALID_CREDENTIALS', invalidMsg);
     }
 
     const validPassword = await bcrypt.compare(
@@ -153,10 +150,7 @@ export class AuthService {
       user.password as string,
     );
     if (!validPassword) {
-      throw new AuthRpcException(
-        'INVALID_CREDENTIALS',
-        'Identifiant invalide.',
-      );
+      throw new AuthRpcException('INVALID_CREDENTIALS', invalidMsg);
     }
 
     return toUserWithRelationsContract(user);

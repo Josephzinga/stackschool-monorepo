@@ -1,10 +1,10 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import { Gender, PrismaClient, User } from './generated/client';
+import { PrismaService } from '../prisma.service';
 
 const connectionString = `${process.env.DATABASE_URL}`;
 
 export const adapter = new PrismaPg({ connectionString });
-export const prisma = new PrismaClient({ adapter });
+export const prisma = new PrismaService();
 
 const TARGET_SCHOOL_ID = '3769a14d-9367-4148-b1b5-a1d093bf4939';
 const users = [
@@ -16,6 +16,7 @@ const users = [
 ];
 
 async function main() {
+  await prisma.session.deleteMany();
   const userCreatedIds: string[] = [];
   for (const user of users) {
     const u = await prisma.user.create({

@@ -56,10 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5! h-14"
-            >
+            <SidebarMenuButton className="data-[slot=sidebar-menu-button]:p-1.5! h-14">
               <a href="#">
                 <Avatar className="w-11 h-11 rounded-xl">
                   <AvatarImage src={currentSchool?.logo ?? undefined} />

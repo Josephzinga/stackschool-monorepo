@@ -21,5 +21,6 @@
       "database": "stackschool",
       "username": "joseph"
     }
-  ]
+  ],
+  "js/ts.experimental.useTsgo": false
 }

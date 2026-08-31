@@ -1,11 +1,14 @@
 import { PrismaService } from '../prisma.service';
-import { Class, Group, Subject, ClassSubjects } from './generated/client';
+import { Class, ClassSubjects, Group, Subject } from './generated/client';
 
 const prisma = new PrismaService();
-const schoolId = '3769a14d-9367-4148-b1b5-a1d093bf4939';
+const schoolId = 'd4ce7ab1-6d85-49b7-a763-a86504e72f66';
 
 async function main() {
   // 3. Création des matières
+  await prisma.subject.deleteMany({ where: { schoolId } });
+  await prisma.class.deleteMany({ where: { schoolId } });
+  await prisma.group.deleteMany({ where: { schoolId } });
   const subjectsList = [
     { name: 'Mathématiques', code: 'MATH' },
     { name: 'Physique', code: 'PC' },
@@ -35,13 +38,51 @@ async function main() {
     { name: 'Terminale Lettres', level: 'Tle', section: 'Lettres' },
     { name: 'Terminal Commercial', level: 'Tle', section: 'Commercial' },
   ];
-  const classes: Array<
+  let classes: Array<
     Class & { group: Group & { classSubjects: ClassSubjects[] } }
   > = [];
 
-  const teacherIds = [];
+  for (const classe of classesList) {
+    const clas = await prisma.class.create({
+      data: {
+        name: classe.name,
+        level: classe.level,
+        section: classe.section,
+        schoolId,
+        group: {
+          create: {
+            name: classe.name,
+            type: 'SOLO',
+            schoolId,
+          },
+        },
+      },
+      include: {
+        group: {
+          include: {
+            classSubjects: true,
+          },
+        },
+      },
+    });
+    classes.push(clas);
+  }
+  let classSubjects = [] as ClassSubjects[];
+  for (const classe of classes) {
+    for (const subject of subjects) {
+      const classSubject = await prisma.classSubjects.create({
+        data: {
+          groupId: classe.groupId,
+          subjectId: subject.id,
+          schoolId,
+        },
+      });
+      classSubjects.push(classSubject);
+    }
+  }
 
-  console.log(`🎓 ${classes.length} classes créées.`);
+  console.log(`🎓 ${classes} classes créées.`);
+  console.log(`${classSubjects}`);
 
   console.log(
     subjects.map((s) => ({

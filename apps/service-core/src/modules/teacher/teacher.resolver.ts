@@ -16,38 +16,51 @@ import {
   TeacherList,
 } from '../../graphql';
 import { PrismaService } from '../../prisma/prisma.service';
-import { RequiredRoles } from '../../common/decorators/role.decorator';
 import { UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../../common/guards/role.guard';
 import * as dataloaderService from '../dataloader/dataloader.service';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
+import {
+  CreateTeacherSchema,
+  Roles,
+  ZodValidationPipe,
+} from '@stackschool/messaging';
+import z from 'zod';
 
 @Resolver('Teacher')
 export class TeacherResolver {
-  constructor(
-    private readonly teacherService: TeacherService,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly teacherService: TeacherService) {}
 
-  @RequiredRoles('TEACHER', 'STAFF', 'ADMIN')
+  @Roles('TEACHER', 'STAFF', 'ADMIN')
   @UseGuards(RolesGuard)
   @Query('getSchoolTeachers')
   async getSchoolTeachers(
     @Args('input') input: GetSchoolTeachersInput,
     @Context('schoolId') schoolId: string,
   ): Promise<TeacherList> {
-    const teachers = await this.teacherService.getMany(input, schoolId);
+    const teachers = await this.teacherService.getSchool(input, schoolId);
     return teachers;
   }
 
-  @RequiredRoles('ADMIN')
+  @Roles('ADMIN')
   @UseGuards(RolesGuard)
   @Mutation('createTeacher')
   async createTeacher(
-    @Args('input') data: CreateTeacherInput,
+    @Args('input', new ZodValidationPipe(CreateTeacherSchema))
+    data: CreateTeacherInput,
     @Context('schoolId') schoolId: string,
   ): Promise<Teacher> {
     return await this.teacherService.create(data, schoolId);
+  }
+
+  @Query('teacher')
+  @Roles('ADMIN', 'STAFF', 'TEACHER')
+  @UseGuards(RolesGuard)
+  async getOne(
+    @Context('schoolId') schoolId: string,
+    @Args('id', new ZodValidationPipe(z.string())) id: string,
+  ): Promise<Teacher> {
+    return this.teacherService.findOne(id, schoolId);
   }
 
   @ResolveField('schoolProfile')

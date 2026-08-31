@@ -1,4 +1,4 @@
-// apps/gateway/src/school/school-context.interceptor.ts
+// apps/gateway/src/lists/lists-context.interceptor.ts
 import {
   Injectable,
   NestInterceptor,

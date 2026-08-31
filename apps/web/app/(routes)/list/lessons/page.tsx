@@ -2,17 +2,17 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '@/app/styles/schedule-grid.css';
-import TimeGrid, { renderEventContent } from '@/components/school/time-grid';
+import TimeGrid, { renderEventContent } from '@/components/lists/time-grid';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import LessonDialog from '@/components/school/lesson/lesson-dialog';
+import LessonDialog from '@/components/lists/lesson/lesson-dialog';
 import { ResourceLabelContentArg } from '@fullcalendar/resource';
-import { CalendarFilter } from '@/components/school/lesson/calendar-filter';
-import { useLessonEvents } from '@/components/school/lesson/hooks/useLessonEvents';
-import { useLessonFilters } from '@/components/school/lesson/hooks/useLessonFilters';
-import { useLessonCalendar } from '@/components/school/lesson/hooks/useLessonCalendar';
+import { CalendarFilter } from '@/components/lists/lesson/calendar-filter';
+import { useLessonEvents } from '@/components/lists/lesson/hooks/useLessonEvents';
+import { useLessonFilters } from '@/components/lists/lesson/hooks/useLessonFilters';
+import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonCalendar';
 import { useLessonStore } from '@/store/lesson-store';
 import { useQueryClient } from '@tanstack/react-query';
-import LessonAlertDialog from '@/components/school/lesson/lesson-alert-dialog';
+import LessonAlertDialog from '@/components/lists/lesson/lesson-alert-dialog';
 import { LoaderOne } from '@/components/ui/loader';
 
 import {
@@ -27,7 +27,7 @@ import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import {
   RenderResourceContent,
   TimeGridContainer,
-} from '@/components/school/lesson/render-resource-content';
+} from '@/components/lists/lesson/render-resource-content';
 import { ResourceMode } from '@stackschool/ui';
 
 function LessonsListPage() {

@@ -5,8 +5,8 @@ import {
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
-import {AuthErrorCode} from '../errors/auth-rcp.error.ts';
-import {ZodError} from 'zod';
+import { AuthErrorCode } from '../errors/auth-rpc.error.ts';
+import { ZodError } from 'zod';
 
 export function mapAuthError(payload: {
   code?: AuthErrorCode;

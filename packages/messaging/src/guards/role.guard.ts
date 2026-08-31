@@ -1,14 +1,9 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { SCHOOL_ROLES_KEY } from '../decorators/role.decorator';
-import { SchoolRole } from '..';
+import { SchoolRole } from '@stackschool/contracts';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -26,12 +21,10 @@ export class RolesGuard implements CanActivate {
 
     if (!schoolUser) {
       // Pas connecté, ou pas membre de cette école.
-      throw new UnauthorizedException(
-        'Aucun SchoolUser actif pour cette école.',
-      );
+      throw new RpcException('Aucun SchoolUser actif pour cette école.');
     }
     if (!required.includes(schoolUser.role)) {
-      throw new ForbiddenException(`Rôle requis : ${required.join(' ou ')}.`);
+      throw new RpcException(`Rôle requis : ${required.join(' ou ')}.`);
     }
     return true;
   }

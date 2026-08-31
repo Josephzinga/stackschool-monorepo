@@ -1,11 +1,11 @@
 'use client';
 
 import { useGetSchoolClassesQuery } from '@stackschool/ui';
-import { DataTable } from '@/components/school/class/table/data-table'; // À créer ou adapter
-import { ClassData, columns } from '@/components/school/class/table/columns';
+import { DataTable } from '@/components/lists/class/table/data-table'; // À créer ou adapter
+import { ClassData, columns } from '@/components/lists/class/table/columns';
 import { useDebounce } from '@/hooks/useDebounce';
-import DataTableHeader from '@/components/school/class/table/data-table-header';
-import { useClassTable } from '@/components/school/class/table/table-provider';
+import DataTableHeader from '@/components/lists/class/table/data-table-header';
+import { useClassTable } from '@/components/lists/class/table/table-provider';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 
@@ -31,28 +31,18 @@ export function ClassView() {
       data?.getSchoolClasses?.data?.map((c) => ({
         ...c,
         supervisor: {
-          id: c.supervisor?.user?.id,
+          id: c.supervisor?.id,
           profile: {
-            id: c.supervisor?.user?.profile?.id,
-            firstname: c.supervisor?.user?.profile?.firstname ?? '',
-            lastname: c.supervisor?.user?.profile?.lastname ?? '',
-            photo: c.supervisor?.user?.profile?.photo ?? undefined,
+            id: c.supervisor?.schoolProfile?.id ?? '',
+            firstName: c.supervisor?.schoolProfile?.firstName ?? '',
+            lastName: c.supervisor?.schoolProfile?.lastName ?? '',
+            avatarUrl: c.supervisor?.schoolProfile?.avatarUrl ?? undefined,
           },
         },
-        teachers:
-          c.teachers?.map((t) => ({
-            id: t?.id ?? '',
-            firstname: t?.user?.profile?.firstname ?? '',
-            lastname: t?.user?.profile?.lastname ?? '',
-          })) || [],
-        subjects: c.subjects,
-        _count: {
-          students:
-            (c?._count?.students?.male || 0) +
-            (c?._count?.students?.female || 0),
-          subjects: c._count?.subjects || 0,
-          teachers: c._count?.teachers || 0,
+        count: {
+          students: (c.studentCount?.male || 0) + (c.studentCount?.female || 0),
         },
+        subjects: c.group?.classSubjects?.map((s) => s?.subject),
       })) || [],
     [data],
   );
@@ -62,7 +52,6 @@ export function ClassView() {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 gap-4">
       <DataTableHeader />
-
       <DataTable
         columns={columns}
         data={classesData}

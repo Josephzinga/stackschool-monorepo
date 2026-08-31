@@ -43,7 +43,7 @@ export class UploadController {
   ) {
     const result = await this.uploadService.uploadAvatarTemp(file, user.id);
     return {
-      ok: true,
+      success: true,
       message: 'Image enregistré temporairement avec succès.',
       ...result,
     };

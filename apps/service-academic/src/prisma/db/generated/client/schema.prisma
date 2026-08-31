@@ -16,6 +16,7 @@ model Subject {
   schoolId      String
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
+  deletedAt     DateTime?
   classSubjects ClassSubjects[]
 
   @@unique([name, schoolId])
@@ -59,19 +60,20 @@ model TeacherAssignment {
 }
 
 model Class {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String
   level         String
   section       String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
   schoolId      String
   teacherId     String?
   defaultRoomId String?
   supervisorId  String?
   groupId       String
-  group         Group    @relation(fields: [groupId], references: [id])
-  defaultRoom   Room?    @relation("DefaultRoom", fields: [defaultRoomId], references: [id], onDelete: SetNull)
+  group         Group     @relation(fields: [groupId], references: [id])
+  defaultRoom   Room?     @relation("DefaultRoom", fields: [defaultRoomId], references: [id], onDelete: SetNull)
 
   @@unique([name, schoolId])
   @@unique([defaultRoomId])
@@ -85,6 +87,7 @@ model Group {
   classes       Class[]
   classSubjects ClassSubjects[]
   schoolId      String
+  deletedAt     DateTime?
 
   @@unique([name, schoolId])
   @@index([schoolId])
@@ -92,14 +95,15 @@ model Group {
 
 // * Salle
 model Room {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   name            String
   code            String?
-  type            String?  @default("CLASSIC")
+  type            String?   @default("CLASSIC")
   capacity        Int?
-  defaultForClass Class?   @relation("DefaultRoom")
+  defaultForClass Class?    @relation("DefaultRoom")
   lessons         Lesson[]
   schoolId        String
+  deletedAt       DateTime?
 
   @@unique([name, schoolId])
   @@unique([code, schoolId])
@@ -113,7 +117,7 @@ model Lesson {
   startTime           DateTime          @db.Time()
   status              LessonStatus      @default(PLANNED)
   day                 Day
-  date                DateTime          @db.Date()
+  date                DateTime?         @db.Date()
   endTime             DateTime          @db.Time()
   schoolId            String
   roomId              String?
@@ -180,6 +184,7 @@ model AssessmentResult {
   gradedAt     DateTime?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
   assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 
   @@unique([assessmentId, studentId])

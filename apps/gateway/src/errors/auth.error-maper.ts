@@ -1,9 +1,9 @@
 import {
+  BadRequestException,
   ConflictException,
   NotFoundException,
-  BadRequestException,
-  UnauthorizedException,
   ServiceUnavailableException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthErrorCode } from '@stackschool/messaging';
 import { ZodError } from 'zod';
@@ -16,7 +16,7 @@ export function mapAuthError(payload: {
   if (payload instanceof ZodError) {
     return new BadRequestException(payload.message);
   }
-
+  console.log('Auth Error: ', payload);
   switch (payload?.code) {
     case 'EMAIL_TAKEN':
     case 'USERNAME_TAKEN':

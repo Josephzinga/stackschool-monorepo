@@ -30,6 +30,7 @@ import { join } from 'node:path';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { SessionModule } from './modules/session/session.module';
 import { RabbitMQClientsModule } from './modules/rabbitmq/rabbitmq-clients.module';
+import { gqlFormatError } from './graphql/graphql-format-error';
 
 @Module({
   imports: [
@@ -66,12 +67,15 @@ import { RabbitMQClientsModule } from './modules/rabbitmq/rabbitmq-clients.modul
           playground: true,
           injectRequest: true,
           includeStacktraceInErrorResponses: true,
+          formatError: (formattedError, error) =>
+            gqlFormatError(formattedError, error),
         },
         typePaths: [join(process.cwd(), '/src/graphql/**/*.graphql')],
         definitions: {
           path: join(process.cwd(), 'src/graphql.ts'),
           outputAs: 'class',
         },
+
         gateway: {
           supergraphSdl: new IntrospectAndCompose({
             subgraphs: [

@@ -44,7 +44,7 @@ export class UserService {
     if (email) {
       const existingUser = await this.prisma.user.findFirst({
         where: {
-          ...(!selfCheck && { id: { not: userId! } }),
+          ...(selfCheck && { id: { not: userId! } }),
           email,
         },
       });
@@ -62,7 +62,7 @@ export class UserService {
     if (phoneNumber) {
       const existingUser = await this.prisma.user.findFirst({
         where: {
-          ...(!selfCheck && { id: { not: userId! } }),
+          ...(selfCheck && { id: { not: userId! } }),
           phoneNumber: phoneNumber?.replace(/\s+/g, ''),
         },
       });
@@ -98,20 +98,25 @@ export class UserService {
   }
 
   async findByIdentifierWithRelations(identifier: string) {
-    return await this.findOne({
-      where: {
-        isActive: true,
-        OR: [
-          { username: { equals: identifier.trim(), mode: 'insensitive' } },
-          { phoneNumber: { equals: identifier.trim(), mode: 'insensitive' } },
-          { email: { equals: identifier.trim(), mode: 'insensitive' } },
-        ],
-      },
-      include: {
-        profile: true,
-        accounts: true,
-      },
-    });
+    try {
+      return await this.findOne({
+        where: {
+          isActive: true,
+          OR: [
+            { username: { equals: identifier.trim(), mode: 'insensitive' } },
+            { phoneNumber: { equals: identifier.trim(), mode: 'insensitive' } },
+            { email: { equals: identifier.trim(), mode: 'insensitive' } },
+          ],
+        },
+        include: {
+          profile: true,
+          accounts: true,
+        },
+      });
+    } catch (e) {
+      console.log('DB_ERROR', e);
+      throw new AuthRpcException('DB_ERROR', 'Erreur Interne du serveur.');
+    }
   }
 
   async findOne<T extends Prisma.UserFindFirstArgs>(
@@ -144,11 +149,16 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
   async updateProfile(userId: string, data: Prisma.ProfileUpdateInput) {
-    return this.prisma.profile.update({
+    return this.prisma.profile.upsert({
       where: {
         userId,
       },
-      data,
+      create: {
+        avatarUrl: data?.avatarUrl,
+      },
+      update: {
+        avatarUrl: data?.avatarUrl,
+      },
     });
   }
   async handleUpdateProfile(data: UpdateProfileInput) {
@@ -234,5 +244,12 @@ export class UserService {
         'Erreur lors de la mise à jour du profile.',
       );
     }
+  }
+
+  disableByIds(schoolUserIds: string[]) {
+    return this.prisma.user.updateMany({
+      where: { id: { in: schoolUserIds } },
+      data: { isActive: false },
+    });
   }
 }

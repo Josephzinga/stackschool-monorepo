@@ -1,6 +1,6 @@
-import { SetMetadata } from '@nestjs/common';
-import { SchoolRole } from '@stackschool/contracts';
+import {SetMetadata} from '@nestjs/common';
+import {SchoolRole} from '@stackschool/contracts';
 
 export const SCHOOL_ROLES_KEY = 'roles';
-export const PermissionsRule = (...roles: SchoolRole[]) =>
+export const Roles = (...roles: SchoolRole[]) =>
   SetMetadata(SCHOOL_ROLES_KEY, roles);

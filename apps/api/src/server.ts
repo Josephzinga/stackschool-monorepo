@@ -41,7 +41,7 @@ app.use(
     origin: [FRONTEND_ORIGIN],
     credentials: true,
     methods: ['POST', 'GET', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-school-id'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-lists-id'],
   }),
 );
 

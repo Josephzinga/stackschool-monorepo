@@ -1,0 +1,36 @@
+enum SubjectCategory {
+  SCIENTIFIC
+  LITERARY
+  GENERAL
+  SPORT
+}
+
+enum AssessmentType {
+  EXAM
+  ASSIGNMENT
+  QUIZ
+  TEST
+  PRACTICAL
+  ORAL
+}
+
+enum AssessmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum GroupType {
+  SOLO
+  MULTIPLE
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}

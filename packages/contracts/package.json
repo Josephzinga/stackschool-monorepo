@@ -5,7 +5,7 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm && tsc --emitDeclarationOnly --declaration --outDir dist",
+    "build": "tsup src/index.ts --clean --format esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "build:bun": "bun build --target=node --outfile=dist/index.js ./src/index.ts"
   },

@@ -1,5 +1,5 @@
 import { Day, LessonStatus, PaginationMeta } from '@stackschool/ui';
-import { InitialData } from '@/components/school/lesson/lesson-dialog';
+import { InitialData } from '@/components/lists/lesson/lesson-dialog';
 
 export interface Event {
   daysOfWeek: number[];

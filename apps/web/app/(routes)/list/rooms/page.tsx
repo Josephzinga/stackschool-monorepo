@@ -1,12 +1,12 @@
 'use client';
 
-import { RoomDataTable } from '@/components/school/room/data-table';
-import { columns, RoomColumns } from '@/components/school/room/columns';
+import { RoomDataTable } from '@/components/lists/room/data-table';
+import { columns, RoomColumns } from '@/components/lists/room/columns';
 import { useGetSchoolRoomQuery } from '@stackschool/ui';
 import { useState } from 'react';
-import { RoomFormDialog } from '@/components/school/room/room-form-dialog';
+import { RoomFormDialog } from '@/components/lists/room/room-form-dialog';
 import { useDebounce } from '@/hooks/useDebounce';
-import { RoomTableHeader } from '@/components/school/room/table-header';
+import { RoomTableHeader } from '@/components/lists/room/table-header';
 
 export default function RoomsPage() {
   const [open, setOpen] = useState(false);

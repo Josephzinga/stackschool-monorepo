@@ -18,3 +18,15 @@ type GenderStats @shareable {
   male: Int!
   female: Int!
 }
+
+enum LessonStatus {
+  PLANNED
+  ONGOING
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
+enum ResourceMode {
+  TEACHER
+  CLASS
+}

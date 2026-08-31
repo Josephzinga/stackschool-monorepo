@@ -1,0 +1,31 @@
+query GetTeacherAssignments($filter: GetTeacherAssignmentInput!) {
+  getTeacherAssignments(filter: $filter) {
+    id
+    teacher {
+      id
+      department
+      schoolProfile {
+        firstName
+        lastName
+      }
+    }
+    classSubject {
+      subject {
+        id
+        name
+        code
+      }
+      group {
+        id
+        type
+        name
+        classes {
+          id
+          name
+          level
+          section
+        }
+      }
+    }
+  }
+}

@@ -1,12 +1,8 @@
 import { getDay } from 'date-fns';
-import { REFERENCE_DATE } from '@stackschool/shared';
 import { Event } from '@/types/lessons-types';
 
 // Convertir un événement en plage horaire absolue pour une semaine de référence
-export const getEventDateTimeRange = (
-  event: Event,
-  referenceDate: Date = REFERENCE_DATE,
-) => {
+export const getEventDateTimeRange = (event: Event, referenceDate: Date) => {
   // Trouver le prochain jour correspondant au daysOfWeek
   const eventDayOfWeek = event.daysOfWeek?.[0] ?? getDay(referenceDate);
   const currentDayOfWeek = getDay(referenceDate);
@@ -52,7 +48,7 @@ export const checkEventConflicts = (
   specificDate?: Date,
 ): boolean => {
   // la date de reférence
-  const referenceDate = specificDate || REFERENCE_DATE;
+  const referenceDate = specificDate;
 
   // Obtenir la plage du nouvel événement
   const newRange = getEventDateTimeRange(newEvent, referenceDate);

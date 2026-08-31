@@ -4,24 +4,23 @@ projects:
       - "apps/service-auth/src/graphql/**/*.graphql"
       - "packages/contracts/src/graphql/common/**/*.graphql"
     documents: "packages/contracts/src/graphql/operations/**/*.graphql"
-    extensions:
-      endpoints:
-        default: "http://localhost:4001/graphql"
+
 
   service-core:
     schema:
     - "apps/service-core/src/graphql/**/*.graphql"
     - "packages/contracts/src/graphql/common/**/*.graphql"
     documents: "packages/contracts/src/graphql/operations/**/*.graphql"
-    extensions:
-      endpoints:
-        default: "http://localhost:4002/graphql"
+
 
   service-academic:
     schema:
     - "apps/service-academic/src/graphql/**/*.graphql"
     - "packages/contracts/src/graphql/common/**/*.graphql"
     documents: "packages/shared/src/graphql/operations/**/*.graphql"
+    extensions:
+      endpoints:
+        default: "http://localhost:4003/graphql"
 
   service-operations:
     schema:

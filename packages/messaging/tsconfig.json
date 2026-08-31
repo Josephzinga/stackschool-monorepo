@@ -1,5 +1,4 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "types": ["zod"],
     "strict": true,
@@ -12,12 +11,13 @@
     "declaration": true,
     "declarationMap": true,
     "allowImportingTsExtensions": true,
+    "ignoreDeprecations": "6.0",
     "emitDeclarationOnly": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./src/index.ts", "src/**/*"],
-  "exclude": ["node_modules", "dist"],
+  "include": ["./src/**/*"],
+  "exclude": ["./node_modules", "./dist"],
   "ts-node": {
     "esm": true
   }

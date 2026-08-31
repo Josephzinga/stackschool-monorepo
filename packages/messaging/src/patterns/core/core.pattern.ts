@@ -1,8 +1,8 @@
 const SCHOOL_PATTERNS = {
-  CREATE: 'core.school.create',
-  FIND_ONE: 'core.school.find_one',
-  FIND_MANY: 'core.school.find_many',
-  SEARCH: 'core.school.search',
+  CREATE: 'core.lists.create',
+  FIND_ONE: 'core.lists.find_one',
+  FIND_MANY: 'core.lists.find_many',
+  SEARCH: 'core.lists.search',
 } as const;
 const COMPLETE_PROFILE_PATTERNS = {
   HANDLE_SCHOOL_DATA: 'auth.complete_profile.handle_school_data',

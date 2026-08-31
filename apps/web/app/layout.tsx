@@ -1,21 +1,32 @@
 import './styles/globals.css';
 import './styles/search-input.css';
 import NextTopLoader from 'nextjs-toploader';
-import {ThemeProvider} from '@/components/ui/ThemeProvider';
-import {Toaster} from '@/components/ui/sonner';
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
+import { Toaster } from '@/components/ui/sonner';
 import QueryProvider from '@/components/providers/queryClientProvider';
-import {NuqsAdapter} from 'nuqs/adapters/next';
+import { NuqsAdapter } from 'nuqs/adapters/next';
 import CsrfProvider from '@/components/providers/csrf-provider';
-import {Geist, Jost, Noto_Serif, Poppins, Public_Sans,} from 'next/font/google';
-import {cn} from '@/lib/utils';
-import {GlobalSpinner} from '@/components/global-spinner';
+import {
+  Geist,
+  Jost,
+  Noto_Serif,
+  Poppins,
+  Public_Sans,
+} from 'next/font/google';
+import { cn } from '@/lib/utils';
+import { GlobalSpinner } from '@/components/global-spinner';
+import React from 'react';
 
 const publicSansHeading = Public_Sans({
   subsets: ['latin'],
   variable: '--font-heading',
 });
 
-const notoSerif = Noto_Serif({ subsets: ['latin'], variable: '--font-serif',  weight: ['400', '500', '600', '700'],  });
+const notoSerif = Noto_Serif({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  weight: ['400', '500', '600', '700'],
+});
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -67,6 +78,7 @@ export default async function RootLayout({
               enableSystem={true}
               defaultTheme="system"
             >
+              {' '}
               <CsrfProvider>{children}</CsrfProvider>
               <GlobalSpinner />
               <Toaster position="top-center" duration={4000} />

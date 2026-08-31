@@ -1,5 +1,5 @@
 import { Container } from '@/components/Container';
-import { CreateInvitationForm } from '@/components/school/create-invitation-form';
+import { CreateInvitationForm } from '@/components/lists/create-invitation-form';
 import { Card } from '@/components/ui/card';
 
 export default function CreateInvitation() {

@@ -10,10 +10,52 @@ query GetSchoolTeachers($input: GetSchoolTeachersInput!) {
     }
   }
 }
-
+query GetTeacherOptions($input: GetSchoolTeachersInput!) {
+  getSchoolTeachers(input: $input) {
+    data {
+      id
+      schoolProfile {
+        firstName
+        lastName
+        avatarUrl
+      }
+    }
+  }
+}
 mutation CreateTeacher($input: CreateTeacherInput!) {
   createTeacher(input: $input) {
     ...TeacherListData
+  }
+}
+query GetTeacherDetails($id: ID!) {
+  teacher(id: $id) {
+    id
+    specialization
+    diploma
+    experience
+    bio
+    hireDate
+    salary
+    department
+    weeklyHours
+    isActive
+    createdAt
+    classesCount
+    schoolUser {
+      user {
+        id
+        email
+        phoneNumber
+      }
+    }
+    schoolProfile {
+      id
+      firstName
+      lastName
+      avatarUrl
+      gender
+      address
+    }
   }
 }
 
@@ -27,6 +69,33 @@ mutation DeleteTeachers($teacherIds: [ID!]!, $soft: Boolean) {
 mutation UpdateTeacher($teacherId: ID!, $data: CreateTeacherInput!) {
   updateTeacher(teacherId: $teacherId, data: $data) {
     ...TeacherListData
+  }
+}
+mutation CreateTeacherAssignment($input: CreateTeacherAssignmentInput!) {
+  createTeacherAssignment(input: $input) {
+    id
+    classSubject {
+      subject {
+        id
+        name
+        code
+      }
+      group {
+        classes {
+          id
+          name
+          level
+        }
+      }
+    }
+  }
+}
+
+mutation SyncTeacherAssignment($input: CreateTeacherAssignmentInput!) {
+  syncTeacherAssignment(input: $input) {
+    ok
+    message
+    details
   }
 }
 

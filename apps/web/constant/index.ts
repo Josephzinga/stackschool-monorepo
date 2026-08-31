@@ -1,4 +1,4 @@
-import { SubjectCategory, TransportMode } from '@stackschool/ui';
+import { SubjectCategory, TransportMode } from '@stackschool/contracts';
 import { Calendar, Check, Clock, Play, X } from 'lucide-react';
 
 export const studentStatusLabel = {
@@ -51,18 +51,18 @@ export const lessonStatusConfig = {
   },
 } as const;
 
-export const categoryMap = [
+export const categoryMap: { value: SubjectCategory; label: string }[] = [
   { value: SubjectCategory.General, label: 'Géneral' },
   { value: SubjectCategory.Literary, label: 'Litérature' },
   { value: SubjectCategory.Scientific, label: 'Science' },
   { value: SubjectCategory.Sport, label: 'Sport' },
 ];
 
-export const transportMode = [
-  { value: TransportMode.Walk, label: 'Pied' },
-  { value: TransportMode.Bus, label: 'Bus' },
-  { value: TransportMode.Car, label: 'Voiture' },
-  { value: TransportMode.Moto, label: 'Moto' },
-  { value: TransportMode.Taxi, label: 'Taxi' },
-  { value: TransportMode.Other, label: 'Autre' },
+export const transportMode: { value: TransportMode; label: string }[] = [
+  { value: 'WALK', label: 'Pied' },
+  { value: 'BUS', label: 'Bus' },
+  { value: 'CAR', label: 'Voiture' },
+  { value: 'MOTO', label: 'Moto' },
+  { value: 'TAXI', label: 'Taxi' },
+  { value: 'OTHER', label: 'Autre' },
 ];

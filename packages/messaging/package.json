@@ -5,8 +5,9 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm  && tsc --emitDeclarationOnly --declaration --outDir dist",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+    "build": "tsup src/index.ts --format esm --dts && tsc --emitDeclarationOnly --declaration --outDir dist",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "build:tsup": "tsup"
   },
   "keywords": [],
   "author": "",

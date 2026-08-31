@@ -3,58 +3,79 @@ import { Prisma } from '../../prisma/db/generated/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateTeacherInput, GetSchoolTeachersInput } from '../../graphql';
 import {
+  ACADEMIC_PATTERNS,
+  ACADEMIC_SERVICE,
   AUTH_PATTERNS,
   AUTH_SERVICE,
   CoreRpcException,
   generateUsername,
+  mapCoreError,
+  sendRmqRequest,
   UserWithRelationsContract,
+  ValidateUserFieldInput,
+  ValidateUserFieldResponse,
 } from '@stackschool/messaging';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 
 @Injectable()
 export class TeacherService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(AUTH_SERVICE) private readonly authClient: ClientProxy,
+    @Inject(ACADEMIC_SERVICE) private readonly academicClient: ClientProxy,
   ) {}
   async create(data: CreateTeacherInput, schoolId: string) {
-    const user = await firstValueFrom<UserWithRelationsContract>(
-      this.authClient
-        .send(AUTH_PATTERNS.CREATE_USER, {
-          phoneNumber: data?.phoneNumber,
-          email: data.email,
-          username: generateUsername({
-            firstName: data.firstName,
-            lastName: data.lastName,
-            includeSuffix: true,
-          }),
-        })
-        .pipe(
-          timeout(3000),
-          catchError((err: any) =>
-            throwError(
-              () => new CoreRpcException(err?.code, err?.message, err?.meta),
-            ),
-          ),
-        ),
+    const userFields: ValidateUserFieldInput = {
+      phoneNumber: data.phoneNumber ?? null,
+      ...(data.email && {
+        email: data.email,
+      }),
+      selfCheck: false,
+      userId: null,
+    };
+    const existing = await sendRmqRequest<ValidateUserFieldResponse>(
+      this.authClient,
+      AUTH_PATTERNS.VALIDATE_USER_FIELD,
+      userFields,
     );
+    console.log('Existing', existing);
+
+    if (!existing.valid) {
+      throw new CoreRpcException(
+        'CONFLICT',
+        existing.message ?? 'Entré déjà utiliser.',
+      );
+    }
+
+    const user = await sendRmqRequest<UserWithRelationsContract>(
+      this.authClient,
+      AUTH_PATTERNS.CREATE_USER,
+      {
+        phoneNumber: data?.phoneNumber,
+        email: data.email,
+        username: generateUsername({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          includeSuffix: true,
+        }),
+      },
+      mapCoreError,
+    );
+
     return this.prisma.$transaction(async (tx) => {
       const schoolUser = await tx.schoolUser.create({
         data: {
           userId: user.id,
           schoolId,
           role: 'TEACHER',
-        },
-      });
-
-      await tx.schoolProfile.create({
-        data: {
-          schoolUserId: schoolUser.id,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          schoolId,
-          gender: data.gender,
+          schoolProfile: {
+            create: {
+              firstName: data.firstName,
+              lastName: data.lastName,
+              schoolId,
+              gender: data.gender,
+            },
+          },
         },
       });
 
@@ -68,7 +89,7 @@ export class TeacherService {
     });
   }
 
-  async getMany(input: GetSchoolTeachersInput, schoolId: string) {
+  async getSchool(input: GetSchoolTeachersInput, schoolId: string) {
     const {
       page = 0,
       limit = 10,
@@ -84,10 +105,23 @@ export class TeacherService {
     const search = searchTerm?.trim();
 
     // 1. Filtre de base : L'école
-    const whereClause: Prisma.TeacherWhereInput = {
+    let whereClause: Prisma.TeacherWhereInput = {
       needAdminConfirm: false,
       schoolUser: { schoolId },
     };
+
+    if (classId || subjectId) {
+      const result = await sendRmqRequest<{ ids: string[] }>(
+        this.academicClient,
+        ACADEMIC_PATTERNS.FIND_TEACHER_IDS_BY_CLASS_SUBJECT,
+        { classId, subjectId, schoolId },
+      );
+      console.log('TeacherIds', result.ids);
+      whereClause = {
+        ...whereClause,
+        id: { in: result.ids },
+      };
+    }
 
     // 2. Filtres spécifiques
     if (isActive !== undefined && isActive !== null) {
@@ -96,7 +130,8 @@ export class TeacherService {
 
     // 3. Filtre de recherche (si présent)
     if (search) {
-      const searchCondition = {
+      whereClause = {
+        ...whereClause,
         OR: [
           {
             specialization: {
@@ -104,25 +139,22 @@ export class TeacherService {
               mode: 'insensitive' as Prisma.QueryMode,
             },
           },
+          {
+            schoolUser: {
+              schoolProfile: {
+                OR: [
+                  {
+                    firstName: { contains: search, mode: 'insensitive' },
+                  },
+                  {
+                    lastName: { contains: search, mode: 'insensitive' },
+                  },
+                ],
+              },
+            },
+          },
         ],
       };
-
-      // Si on a déjà un OR (à cause de classId), on doit utiliser AND pour combiner
-      if (whereClause.OR) {
-        whereClause.AND = [
-          { OR: whereClause.OR }, // La condition classId
-          searchCondition, // La condition search
-        ];
-        delete whereClause.OR; // On nettoie l'ancien OR
-      } else {
-        // Sinon on ajoute simplement le AND avec la recherche
-        const existingAnd = Array.isArray(whereClause.AND)
-          ? whereClause.AND
-          : whereClause.AND
-            ? [whereClause.AND]
-            : [];
-        whereClause.AND = [...existingAnd, searchCondition];
-      }
     }
 
     const [total, teachers] = await Promise.all([
@@ -141,7 +173,7 @@ export class TeacherService {
       }),
     ]);
     return {
-      data: teachers,
+      data: teachers || [],
       meta: {
         total,
         page,
@@ -149,5 +181,20 @@ export class TeacherService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async findOne(id: string, schoolId: string) {
+    const teacher = await this.prisma.teacher.findFirst({
+      where: {
+        id,
+        schoolUser: {
+          schoolId,
+        },
+      },
+    });
+    if (!teacher) {
+      throw new CoreRpcException('TEACHER_NOT_FOUND', 'Enseignant non trouvé.');
+    }
+    return teacher;
   }
 }

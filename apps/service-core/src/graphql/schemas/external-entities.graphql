@@ -11,8 +11,14 @@ type Class @key(fields: "id") {
   id: ID!
   supervisor: Teacher
   students: [Student!]
+  studentCount: StudentCount
 }
 type Subject @key(fields: "id") {
   id: ID!
   mainTeacher: Teacher
+}
+
+type StudentCount {
+  male: Int!
+  female: Int!
 }

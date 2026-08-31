@@ -1,6 +1,1 @@
-input GetAssignmentInput {
-  groupId: ID
-  classId: ID
-  teacherId: ID
-  limit: Int
-}
+

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-
+import type { Request, Response } from 'express';
 import { AuthModule } from './auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import {
@@ -7,19 +7,64 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { join } from 'path';
-import { SchoolModule } from './modules/school/school.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ClassModule } from './modules/class/class.module';
-
+import { DataLoaderModule } from './modules/dataloader/dataloader.module';
+import { RabbitMQClientsModule } from './modules/rabbitmq/rabbitmq-clients.module';
+import { Cache, CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import KeyvRedis, { Keyv } from '@keyv/redis';
+import { KeyvCacheableMemory } from 'cacheable';
+import { createContext, GqlContext } from './graphql/context';
+import {
+  AcademicRpcException,
+  AUTH_SERVICE,
+  CORE_SERVICE,
+} from '@stackschool/messaging';
+import { DataLoaderService } from './modules/dataloader/dataloader.service';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { SubjectModule } from './modules/subject/subject.module';
+import { GroupModule } from './modules/group/group.module';
+import { ClassSubjectModule } from './modules/class-subject/class-subject.module';
+import { TeacherModule } from './modules/externals/teacher/teacher.module';
+import { SchoolModule } from './modules/externals/school/school.module';
+import { StudentModule } from './modules/externals/student/student.module';
+import { TeacherAssignmentModule } from './modules/teacher-assignment/teacher-assignment.module';
+import { LessonModule } from './modules/lesson/lesson.module';
 @Module({
   imports: [
     AuthModule,
     SchoolModule,
     PrismaModule,
     ClassModule,
+    DataLoaderModule,
+    TeacherModule,
+    RabbitMQClientsModule,
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => {
+        return {
+          stores: [
+            new Keyv({
+              store: new KeyvCacheableMemory({ ttl: 60000, lruSize: 5000 }),
+            }),
+            new KeyvRedis(configService.get('REDIS_URL')),
+          ],
+        };
+      },
+    }),
     GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
-      useFactory: () => ({
+      imports: [DataLoaderModule],
+      inject: [CACHE_MANAGER, CORE_SERVICE, AUTH_SERVICE, DataLoaderService],
+      useFactory: (
+        cacheManager: Cache,
+        coreClient: ClientProxy,
+        authClient: ClientProxy,
+        dataLoader: DataLoaderService,
+      ) => ({
         typePaths: [
           join(process.cwd(), '/src/graphql/**/*.graphql'),
           join(
@@ -27,17 +72,49 @@ import { ClassModule } from './modules/class/class.module';
             '../../packages/contracts/src/graphql/common/**/*.graphql',
           ),
         ],
-        context: ({ req, res }: { req: Request; res: Response }) => {
-          const userId = req.headers['x-user-id'];
-          const schoolId = req.headers['x-school-id'];
-          const role = req.headers['x-school-role'];
-          console.log('UserId: ', userId, 'SchoolId: ', schoolId, 'Role', role);
-          return {
+        context: async ({ req, res }: { req: Request; res: Response }) => {
+          const gqlContext = await createContext({
             req,
             res,
-            userId,
-            schoolId,
-            role,
+            cacheManager,
+            authClient,
+            coreClient,
+          });
+          return {
+            ...gqlContext,
+            loaders: dataLoader.createLoaders(),
+          } as GqlContext;
+        },
+        formatError: (formattedError, error: any) => {
+          // 1. On extrait l'erreur d'origine cachée par Apollo
+          const originalError =
+            error.originalError || error.extensions?.originalError || error;
+          console.log('Original Error', originalError);
+          // 2. On vérifie l'instance sur l'erreur d'origine
+          if (originalError instanceof AcademicRpcException) {
+            return {
+              message: originalError.message as string, // Requis par GraphQL
+              extensions: {
+                code: originalError.code,
+                details: originalError.meta, // Tes métadonnées
+              },
+            };
+          } else if (originalError instanceof RpcException) {
+            return {
+              message: originalError.message,
+              extensions: {
+                code: 'FORBIDDEN',
+                details: originalError.cause,
+              },
+            };
+          }
+
+          // 3. Fallback pour les erreurs non gérées (ex: erreurs de syntaxe GraphQL)
+          return {
+            message: 'Erreur interne du serveur.',
+            extensions: {
+              code: 'INTERNAL_ERROR',
+            },
           };
         },
         buildSchemaOptions: {
@@ -49,6 +126,12 @@ import { ClassModule } from './modules/class/class.module';
         },
       }),
     }),
+    SubjectModule,
+    GroupModule,
+    ClassSubjectModule,
+    StudentModule,
+    TeacherAssignmentModule,
+    LessonModule,
   ],
 })
 export class AcademicModule {}

@@ -1,9 +1,91 @@
 query GetSubjectsOptions($input: GetSubjectInput!) {
-    getSchoolSubjects(input: $input) {
-        data {
+  getSchoolSubjects(input: $input) {
+    data {
+      id
+      name
+      code
+    }
+  }
+}
+
+query GetSchoolSubjects($input: GetSubjectInput!) {
+  getSchoolSubjects(input: $input) {
+    meta {
+      page
+      totalPages
+      total
+      limit
+    }
+
+    data {
+      id
+      name
+      code
+      category
+      totalWeeklyHours
+      mainTeacher {
+        id
+        schoolProfile {
+          lastName
+          firstName
+          avatarUrl
+        }
+      }
+      classSubjects {
+        id
+        group {
+          classes {
             id
             name
-            code
+            level
+            section
+          }
         }
+      }
     }
+  }
+}
+mutation CreateSubject($input: CreateSubjectInput!) {
+  createSubject(input: $input) {
+    id
+    name
+    code
+    totalWeeklyHours
+    mainTeacher {
+      id
+      schoolProfile {
+        firstName
+        lastName
+        avatarUrl
+      }
+    }
+    classSubjects {
+      id
+      group {
+        classes {
+          id
+          name
+          level
+        }
+      }
+      assignment {
+        id
+        teacher {
+          id
+          schoolProfile {
+            firstName
+            lastName
+            avatarUrl
+          }
+        }
+      }
+    }
+  }
+}
+
+mutation DeleteSubjects($input: DeleteSubjectsInput!) {
+  deleteSubjects(input: $input) {
+    ok
+    message
+  }
 }

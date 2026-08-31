@@ -29,14 +29,13 @@
 /* header jours (Lun, Mar…) */
 .fc-col-header-cell {
   padding: 0.1rem 0.1rem !important;
-  font-size: 0.70rem;
+  font-size: 0.7rem;
   font-weight: 700;
   font-family: var(--font-inter), serif;
   border-radius: 1rem;
   text-transform: uppercase;
-  color: #000000FF;
+  color: #000000ff;
 }
-
 
 /* cellules jours */
 .fc-daygrid-day-frame {

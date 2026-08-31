@@ -34,8 +34,8 @@ import {
 import { FileUpload } from '@/components/ui/file-upload';
 import { toast } from 'sonner';
 import { api, parseAxiosError } from '@stackschool/shared';
-import { UpdateStudentDetails } from '@/components/school/student/update-student-details';
-import { TabsOverview } from '@/components/school/student/tabs-overview';
+import { UpdateStudentDetails } from '@/components/lists/student/update-student-details';
+import { TabsOverview } from '@/components/lists/student/tabs-overview';
 
 export default function StudentDetailsPage() {
   const [openSheet, setOpenSheet] = useState(false);

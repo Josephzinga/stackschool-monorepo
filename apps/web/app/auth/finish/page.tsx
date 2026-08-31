@@ -2,11 +2,11 @@
 
 import { Container } from '@/components/Container';
 import { Spinner } from '@/components/ui/spinner';
-import { authServices } from '@stackschool/shared';
+import { toUserWithRelationsContract } from '@stackschool/contracts';
 import { LucideOctagonX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useUserStore, useQuery, useGetMeQuery } from '@stackschool/ui';
+import { useGetMeQuery, useUserStore } from '@stackschool/ui';
 
 export default function AuthFinish() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function AuthFinish() {
     useUserStore();
 
   const [status, setStatus] = useState<
-    'loading' | 'ok' | 'need_onboar' | 'error'
+    'loading' | 'ok' | 'need_onboard' | 'error'
   >('loading');
   const [msg, setMsg] = useState('');
 
@@ -39,12 +39,12 @@ export default function AuthFinish() {
     }
 
     const user = data.me;
-    setUser(user);
+    setUser(toUserWithRelationsContract(user));
 
     const profile = user?.profile;
     // si le profile est manquant
     if (!profile || !user.profileCompleted) {
-      setStatus('need_onboar');
+      setStatus('need_onboard');
       router.replace(`/auth/complete-profile`);
       return;
     }
@@ -73,7 +73,7 @@ export default function AuthFinish() {
         id: singleMembership?.id!,
         role: singleMembership?.role!,
       };
-      setCurrentMemberShip(membershipWithoutSchool!);
+      setCurrentMemberShip(singleMembership!);
       if (singleMembership?.school) {
         setCurrentSchool(singleMembership.school);
       }

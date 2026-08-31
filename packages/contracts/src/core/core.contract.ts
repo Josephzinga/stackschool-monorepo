@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import { z } from 'zod';
 import {
   ContactPreference,
   Day,
@@ -10,7 +10,9 @@ import {
   StudentStatus,
   TransportMode,
 } from './enums.contract.ts';
-import {SchoolContract} from './school.contract.ts';
+import { SchoolContract } from './school.contract.ts';
+import { UserContract } from '../auth';
+
 // --- Teacher ---
 export const TeacherContract = z.object({
   id: z.cuid2(),
@@ -67,23 +69,22 @@ export type TempSchoolUserContract = z.infer<typeof TempSchoolUserContract>;
 // --- SchoolUser ---
 export const SchoolUserContract = z.object({
   id: z.uuid(),
-  schoolId: z.string(),
-  userId: z.string(),
+  schoolId: z.uuid().nullish(),
+  userId: z.string().nullish(),
   isActive: z.boolean().default(true),
   role: SchoolRole,
   isOwner: z.boolean().default(false),
-  createdAt: z.coerce.date().default(() => new Date()),
-  parent: z
-    .lazy(() => ParentContract.nullish())
+  createdAt: z.coerce
+    .date()
+    .default(() => new Date())
     .nullish(),
+  parent: z.lazy(() => ParentContract.nullish()).nullish(),
   staff: z.any().nullish(), // Staff non défini
   student: z
     .lazy(() => StudentContract)
     .nullable()
     .nullish(),
-  teacher: z
-    .lazy(() => TeacherContract)
-    .nullish(),
+  teacher: z.lazy(() => TeacherContract).nullish(),
   permissions: z.array(z.lazy(() => SchoolUserPermissionContract)).nullish(),
   school: z.lazy(() => SchoolContract.nullish()).nullish(),
 });
@@ -95,14 +96,46 @@ export const SchoolProfileContract = z.object({
   firstName: z.string(),
   lastName: z.string(),
   address: z.string(),
+  gender: z.enum(['MALE', 'FEMALE']),
   avatarUrl: z.string().nullable().optional(),
   bio: z.string().nullable().optional(),
   schoolUserId: z.string(),
-  schoolId: z.string(),
-  schoolUser: z.lazy(() => SchoolUserContract),
-  school: SchoolContract,
+  schoolId: z.uuid(),
 });
 export type SchoolProfileContract = z.infer<typeof SchoolProfileContract>;
+
+// --- Student ---
+export const StudentContract = z.object({
+  id: z.uuid(),
+  needAdminConfirm: z.boolean().default(false),
+  tempSchoolUserId: z.string().nullable().optional(),
+  schoolProfile: SchoolProfileContract.optional(),
+  user: UserContract.optional(),
+
+  schoolId: z.uuid(),
+  classId: z.string(),
+  profileId: z.string(),
+  matricule: z.string(),
+  enrollmentYear: z.string(),
+  enrollmentDate: z.coerce.date().nullable().optional(),
+  studentNumber: z.number().int(),
+  bloodGroup: z.string().nullable().optional(),
+  allergies: z.string().nullable().optional(),
+  medicalCondition: z.string().nullable().optional(),
+  schoolUserId: z.string().nullable().optional(),
+  birthDate: z.coerce.date(),
+  createdAt: z.coerce.date().default(() => new Date()),
+  updatedAt: z.coerce.date(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  birthPlace: z.string().nullable().optional(),
+  nationality: z.string().nullable().optional(),
+  previousClass: z.string().nullable().optional(),
+  previousLevel: z.string().nullable().optional(),
+  birthCertificateNumber: z.string().nullable().optional(),
+  previousSchool: z.string().nullable().optional(),
+  transportMode: TransportMode.default('WALK'),
+  status: StudentStatus.default('ACTIVE'),
+});
 
 // --- SchoolSettings ---
 export const SchoolSettingsContract = z.object({
@@ -114,7 +147,7 @@ export const SchoolSettingsContract = z.object({
   daysOfWeek: z.array(Day),
   breakStartHour: z.number().int().default(12),
   breakDuration: z.number().int().default(60),
-  // school: non défini
+  // lists: non défini
 });
 export type SchoolSettingsContract = z.infer<typeof SchoolSettingsContract>;
 
@@ -176,43 +209,14 @@ export const ParentContract = z.object({
 });
 export type ParentContract = z.infer<typeof ParentContract>;
 
-// --- Student ---
-export const StudentContract = z.object({
-  id: z.cuid2(),
-  needAdminConfirm: z.boolean().default(false),
-  tempSchoolUserId: z.string().nullable().optional(),
-  profileId: z.string(),
-  matricule: z.string(),
-  enrollmentYear: z.string(),
-  enrollmentDate: z.coerce.date().nullable().optional(),
-  studentNumber: z.number().int(),
-  bloodGroup: z.string().nullable().optional(),
-  allergies: z.string().nullable().optional(),
-  medicalCondition: z.string().nullable().optional(),
-  schoolUserId: z.string().nullable().optional(),
-  birthDate: z.coerce.date(),
-  createdAt: z.coerce.date().default(() => new Date()),
-  updatedAt: z.coerce.date(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  birthPlace: z.string().nullable().optional(),
-  nationality: z.string().nullable().optional(),
-  previousClass: z.string().nullable().optional(),
-  previousLevel: z.string().nullable().optional(),
-  birthCertificateNumber: z.string().nullable().optional(),
-  previousSchool: z.string().nullable().optional(),
-  schoolId: z.string(),
-  classId: z.string(),
-  transportMode: TransportMode.default('WALK'),
-  status: StudentStatus.default('ACTIVE'),
-});
 export type StudentContract = z.infer<typeof StudentContract>;
 
 // --- ParentStudent ---
 export const ParentStudentContract = z.object({
-  id: z.cuid2(),
-  studentId: z.string(),
-  createdAt: z.coerce.date().default(() => new Date()),
-  parentId: z.string(),
+  id: z.uuid(),
+  studentId: z.uuid(),
+  createdAt: z.coerce.date<Date>().default(() => new Date()),
+  parentId: z.uuid(),
   relationType: RelationType,
   parent: z.lazy(() => ParentContract),
   student: z.lazy(() => StudentContract),

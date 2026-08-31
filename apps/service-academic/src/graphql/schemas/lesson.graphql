@@ -1,0 +1,48 @@
+type Lesson {
+  id: ID!
+  title: String
+  startTime: DateTime
+  endTime: DateTime
+  day: Day
+  teacherAssignmentId: ID!
+  teacherAssignment: TeacherAssignment
+  status: LessonStatus!
+  room: Room
+}
+
+input CreateLessonInput {
+  day: Day!
+  mode: ResourceMode!
+  startTime: DateTime!
+  endTime: DateTime!
+  subjectId: ID!
+  teacherId: ID
+  groupId: ID
+  roomId: ID
+  title: String
+}
+
+input UpdateLessonInput {
+  id: ID!
+  startTime: DateTime
+  endTime: DateTime
+  groupId: ID
+  teacherId: ID
+  subjectId: ID
+  day: Day
+  mode: ResourceMode!
+}
+
+type LessonEvents @key(fields: "id") {
+  id: ID!
+  subject: Subject
+  room: Room
+}
+
+type Subject @key(fields: "id") {
+  id: ID!
+}
+
+type Room @key(fields: "id") {
+  id: ID!
+}

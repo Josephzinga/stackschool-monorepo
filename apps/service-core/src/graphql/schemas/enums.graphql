@@ -54,8 +54,9 @@ enum SortOrder {
   DESC
 }
 enum StudentSortField {
-  firstname
-  lastname
+  firstName
+  lastName
+  level
   enrolementYear
 }
 

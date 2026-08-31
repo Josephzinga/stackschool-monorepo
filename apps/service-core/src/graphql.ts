@@ -7,106 +7,34 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export type RelationType = "FATHER" | "MOTHER" | "GUARDIAN" | "UNCLE" | "OTHER" | "GRAND_MOTHER" | "GRAND_FATHER" | "AUNT";
+export type Gender = "MALE" | "FEMALE";
+export type Day = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
+export type TransportMode = "BUS" | "WALK" | "CAR" | "MOTO" | "TAXI" | "PARENT" | "OTHER";
+export type SchoolRole = "ADMIN" | "TEACHER" | "STUDENT" | "PARENT" | "STAFF";
+export type StudentStatus = "ACTIVE" | "SUSPENDED" | "EXPELLED" | "TRANSFERRED" | "DROPPED_OUT" | "GRADUATED" | "INACTIVE" | "DECEASED";
+export type SortOrder = "ASC" | "DESC";
+export type StudentSortField = "firstName" | "lastName" | "level" | "enrolementYear";
+export type PermissionCode = "MARK_STUDENT_ATTENDANCE" | "MARK_TEACHER_ATTENDANCE" | "MARK_STAFF_ATTENDANCE" | "VIEW_ATTENDANCE_REPORTS" | "MANAGE_SUBJECTS" | "INPUT_GRADES" | "PUBLISH_BULLETINS" | "CREATE_USER" | "UPDATE_USER" | "DELETE_USER" | "MANAGE_USER_PERMISSIONS" | "MANAGE_PAYMENTS" | "VIEW_FINANCIAL_REPORTS";
+export type ParentStudentUpdateMode = "CREATE" | "CONNECT";
+export type PermissionModule = "ATTENDANCE" | "ACADEMICS" | "USERS" | "FINANCE" | "SETTINGS";
+export type DisciplinaryType = "SUSPENSION" | "EXPULSION" | "WARNING";
+export type LessonStatus = "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED" | "POSTPONED";
+export type ResourceMode = "TEACHER" | "CLASS";
+export type link__Purpose = "SECURITY" | "EXECUTION";
 
-export enum RelationType {
-    FATHER = "FATHER",
-    MOTHER = "MOTHER",
-    GUARDIAN = "GUARDIAN",
-    UNCLE = "UNCLE",
-    OTHER = "OTHER",
-    GRAND_MOTHER = "GRAND_MOTHER",
-    GRAND_FATHER = "GRAND_FATHER",
-    AUNT = "AUNT"
-}
-
-export enum Gender {
-    MALE = "MALE",
-    FEMALE = "FEMALE"
-}
-
-export enum Day {
-    MONDAY = "MONDAY",
-    TUESDAY = "TUESDAY",
-    WEDNESDAY = "WEDNESDAY",
-    THURSDAY = "THURSDAY",
-    FRIDAY = "FRIDAY",
-    SATURDAY = "SATURDAY",
-    SUNDAY = "SUNDAY"
-}
-
-export enum TransportMode {
-    BUS = "BUS",
-    WALK = "WALK",
-    CAR = "CAR",
-    MOTO = "MOTO",
-    TAXI = "TAXI",
-    PARENT = "PARENT",
-    OTHER = "OTHER"
-}
-
-export enum SchoolRole {
-    ADMIN = "ADMIN",
-    TEACHER = "TEACHER",
-    STUDENT = "STUDENT",
-    PARENT = "PARENT",
-    STAFF = "STAFF"
-}
-
-export enum StudentStatus {
-    ACTIVE = "ACTIVE",
-    SUSPENDED = "SUSPENDED",
-    EXPELLED = "EXPELLED",
-    TRANSFERRED = "TRANSFERRED",
-    DROPPED_OUT = "DROPPED_OUT",
-    GRADUATED = "GRADUATED",
-    INACTIVE = "INACTIVE",
-    DECEASED = "DECEASED"
-}
-
-export enum SortOrder {
-    ASC = "ASC",
-    DESC = "DESC"
-}
-
-export enum StudentSortField {
-    firstname = "firstname",
-    lastname = "lastname",
-    enrolementYear = "enrolementYear"
-}
-
-export enum PermissionCode {
-    MARK_STUDENT_ATTENDANCE = "MARK_STUDENT_ATTENDANCE",
-    MARK_TEACHER_ATTENDANCE = "MARK_TEACHER_ATTENDANCE",
-    MARK_STAFF_ATTENDANCE = "MARK_STAFF_ATTENDANCE",
-    VIEW_ATTENDANCE_REPORTS = "VIEW_ATTENDANCE_REPORTS",
-    MANAGE_SUBJECTS = "MANAGE_SUBJECTS",
-    INPUT_GRADES = "INPUT_GRADES",
-    PUBLISH_BULLETINS = "PUBLISH_BULLETINS",
-    CREATE_USER = "CREATE_USER",
-    UPDATE_USER = "UPDATE_USER",
-    DELETE_USER = "DELETE_USER",
-    MANAGE_USER_PERMISSIONS = "MANAGE_USER_PERMISSIONS",
-    MANAGE_PAYMENTS = "MANAGE_PAYMENTS",
-    VIEW_FINANCIAL_REPORTS = "VIEW_FINANCIAL_REPORTS"
-}
-
-export enum ParentStudentUpdateMode {
-    CREATE = "CREATE",
-    CONNECT = "CONNECT"
-}
-
-export enum PermissionModule {
-    ATTENDANCE = "ATTENDANCE",
-    ACADEMICS = "ACADEMICS",
-    USERS = "USERS",
-    FINANCE = "FINANCE",
-    SETTINGS = "SETTINGS"
-}
-
-export enum DisciplinaryType {
-    SUSPENSION = "SUSPENSION",
-    EXPULSION = "EXPULSION",
-    WARNING = "WARNING"
+export class GetLessonsInput {
+    groupId?: Nullable<string>;
+    teacherId?: Nullable<string>;
+    classId?: Nullable<string>;
+    department?: Nullable<string>;
+    mode: ResourceMode;
+    hasLessonOnly?: Nullable<boolean>;
+    section?: Nullable<string>;
+    status?: Nullable<LessonStatus>;
+    level?: Nullable<string>;
+    limit: number;
+    page: number;
 }
 
 export class CreateParentInput {
@@ -167,7 +95,7 @@ export class CreateStudentInput {
     classId: string;
     matricule: string;
     birthDate?: Nullable<DateTime>;
-    birthPlace?: Nullable<DateTime>;
+    birthPlace?: Nullable<string>;
     enrollmentYear?: Nullable<string>;
     nationality?: Nullable<string>;
     enrollmentDate?: Nullable<DateTime>;
@@ -227,11 +155,52 @@ export class Class {
     id: string;
     supervisor?: Nullable<Teacher>;
     students?: Nullable<Student[]>;
+    studentCount?: Nullable<StudentCount>;
 }
 
 export class Subject {
     id: string;
     mainTeacher?: Nullable<Teacher>;
+}
+
+export class StudentCount {
+    male: number;
+    female: number;
+}
+
+export class LessonsEvents {
+    id: string;
+    resourceId?: Nullable<string>;
+    title: string;
+    startTime: string;
+    endTime: string;
+    teacherId?: Nullable<string>;
+    day: Day;
+    status?: Nullable<LessonStatus>;
+    teacher?: Nullable<Teacher>;
+}
+
+export class LessonTeacher {
+    id: string;
+    firstName: string;
+    lastName: string;
+    weeklyHours?: Nullable<number>;
+}
+
+export class LessonsData {
+    events?: Nullable<LessonsEvents[]>;
+    resources?: Nullable<LessonResources[]>;
+}
+
+export class LessonResources {
+    id: string;
+    title: string;
+    weeklyHours?: Nullable<number>;
+}
+
+export class LessonsList {
+    data: LessonsData;
+    meta?: Nullable<PaginationMeta>;
 }
 
 export class Permission {
@@ -268,11 +237,11 @@ export abstract class IMutation {
 
     abstract deleteTeachers(teacherIds: string[], soft?: Nullable<boolean>): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
 
-    abstract deleteStudents(studentIds: string[], schoolId: string, soft?: Nullable<boolean>): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
+    abstract deleteStudents(studentIds: string[], soft?: Nullable<boolean>): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
 
-    abstract createListStudent(data: CreateStudentInput, schoolId: string): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
+    abstract createStudent(input: CreateStudentInput): Nullable<Student> | Promise<Nullable<Student>>;
 
-    abstract updateStudent(studentId: string, data: CreateStudentInput, schoolId: string): Nullable<Student> | Promise<Nullable<Student>>;
+    abstract updateStudent(studentId: string, input: CreateStudentInput): Nullable<Student> | Promise<Nullable<Student>>;
 
     abstract createParent(input: CreateParentInput): Parent | Promise<Parent>;
 }
@@ -310,6 +279,8 @@ export abstract class IQuery {
     abstract teacher(id: string): Nullable<Teacher> | Promise<Nullable<Teacher>>;
 
     abstract student(id: string): Nullable<Student> | Promise<Nullable<Student>>;
+
+    abstract getLessons(filter: GetLessonsInput): Nullable<LessonsList> | Promise<Nullable<LessonsList>>;
 
     abstract getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList | Promise<TeacherList>;
 
@@ -397,11 +368,11 @@ export class Student {
     allergies?: Nullable<string>;
     transportMode?: Nullable<TransportMode>;
     previousSchool?: Nullable<string>;
+    classId: string;
     enrollmentYear: string;
     status?: Nullable<StudentStatus>;
     disciplinaryActions?: Nullable<StudentDisciplinaryAction>;
     nationality?: Nullable<string>;
-    classId?: Nullable<string>;
     profileId?: Nullable<string>;
     parentStudent?: Nullable<Nullable<ParentStudent>[]>;
     schoolProfile?: Nullable<SchoolProfile>;
@@ -468,6 +439,20 @@ export class GenderStats {
     female: number;
 }
 
+export class _Service {
+    sdl?: Nullable<string>;
+}
+
 export type DateTime = any;
+export type link__Import = any;
+export type federation__FieldSet = any;
+export type _Any = any;
+
+export class ISchema {
+    Query: IQuery;
+    Mutation: IMutation;
+}
+
 export type Member = Teacher | Student | Parent | Staff;
+export type _Entity = Class | Parent | ParentStudent | Permission | School | SchoolMembership | SchoolSettings | SchoolStats | Staff | Student | Subject | Teacher | TeacherAssignment | User;
 type Nullable<T> = T | null;

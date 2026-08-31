@@ -64,6 +64,9 @@ export const createContext = async ({
             userId,
           },
         },
+        include: {
+          permissions: true,
+        },
       });
       if (schoolUser) {
         await cacheManager.set(schoolUserKey, schoolUser, 1000 * 60 * 60 * 5);

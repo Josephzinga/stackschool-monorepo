@@ -1,20 +1,16 @@
 'use client';
 
-import { DataTable } from '@/components/school/teacher/table/data-table';
+import { DataTable } from '@/components/lists/teacher/table/data-table';
 import {
   columns,
-  TeacherColumns,
-} from '@/components/school/teacher/table/columns';
+  TeachersData,
+} from '@/components/lists/teacher/table/columns';
 import {
   TableProvider,
-  useTable,
-} from '@/components/school/teacher/table/table-provider';
-import { DataTableHeader } from '@/components/school/teacher/table/data-table-header';
-import {
-  Gender,
-  useGetSchoolTeachersQuery,
-  useUserStore,
-} from '@stackschool/ui';
+  useTeacherTable,
+} from '@/components/lists/teacher/table/table-provider';
+import { DataTableHeader } from '@/components/lists/teacher/table/data-table-header';
+import { useGetSchoolTeachersQuery, useUserStore } from '@stackschool/ui';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useMemo } from 'react';
 
@@ -27,7 +23,7 @@ export default function TeacherPage() {
 }
 
 function TeachersView() {
-  const { pagination, searchTerm, filters } = useTable();
+  const { pagination, searchTerm, filters } = useTeacherTable();
   const { currentSchool } = useUserStore();
   const search = useDebounce(searchTerm.length > 1 ? searchTerm : '', 400);
 
@@ -45,15 +41,20 @@ function TeachersView() {
     },
   );
 
-  const teacherData: TeacherColumns[] = useMemo(
+  const teacherData: TeachersData[] = useMemo(
     () =>
       data?.getSchoolTeachers?.data?.map((t) => ({
         id: t?.id ?? '',
-        firstName: t.schoolProfile?.firstName || '',
-        lastName: t.schoolProfile?.lastName || '',
-        email: t.user?.email || '',
-        phoneNumber: t.user?.phoneNumber || '',
-        photo: t.schoolProfile?.avatarUrl ?? undefined,
+        contact: {
+          email: t.schoolUser?.user?.email || '',
+          phoneNumber: t.schoolUser?.user?.phoneNumber || '',
+        },
+        profile: {
+          firstName: t.schoolProfile?.firstName || '',
+          lastName: t.schoolProfile?.lastName || '',
+          avatarUrl: t.schoolProfile?.avatarUrl ?? undefined,
+        },
+
         specialization: t.specialization ? [t.specialization] : [],
         gender: t?.schoolProfile?.gender,
         diploma: t?.diploma ?? '',
@@ -75,7 +76,6 @@ function TeachersView() {
   return (
     <div className="flex flex-col h-full p-3 md:p-6 z-10 gap-3">
       <DataTableHeader />
-
       <DataTable
         columns={columns}
         data={teacherData}

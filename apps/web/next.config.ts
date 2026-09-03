@@ -2,10 +2,13 @@ import { NextConfig } from 'next';
 
 const nextConfig = {
   reactStrictMode: true,
+  turbopack: {
+    root: '/home/joseph/Projects/stackschool-monorepo',
+  },
   typescript: {
     ignoreBuildErrors: false,
   },
-images: {
+  images: {
     remotePatterns: [
       {
         protocol: 'http',
@@ -14,16 +17,6 @@ images: {
         pathname: '/**',
       },
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        // Si une requête commence par /images
-        source: '/images/:path*',
-        // Redirigez-la vers le serveur Express (qui sert les fichiers statiques)
-        destination: 'http://localhost:4000/images/:path*',
-      },
-    ];
   },
 } as NextConfig;
 

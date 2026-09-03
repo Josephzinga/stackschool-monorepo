@@ -98,7 +98,7 @@ model Room {
   id              String    @id @default(cuid())
   name            String
   code            String?
-  type            String?   @default("CLASSIC")
+  type            RoomType? @default(CLASSROOM)
   capacity        Int?
   defaultForClass Class?    @relation("DefaultRoom")
   lessons         Lesson[]
@@ -240,4 +240,23 @@ enum GroupType {
 enum SessionStatus {
   FINISHED
   STARTED
+}
+
+enum RoomType {
+  CLASSROOM
+  LECTURE_HALL
+  COMPUTER_LAB
+  LIBRARY
+  STUDY_ROOM
+  TEACHERS_ROOM
+  ADMINISTRATIVE_OFFICE
+  MEETING_ROOM
+  EXAM_ROOM
+  SPORTS_HALL
+  GYM
+  CANTEEN
+  MEDICAL_ROOM
+  STORAGE_ROOM
+  MULTIPURPOSE_ROOM
+  OTHER
 }

@@ -17,7 +17,7 @@ export class RolesGuard implements CanActivate {
     if (!required?.length) return true; // pas de @Permissions → on laisse passer
 
     const gqlCtx = GqlExecutionContext.create(ctx).getContext<any>();
-    const schoolUser = gqlCtx.schoolUser;
+    const schoolUser = gqlCtx?.schoolUser;
 
     if (!schoolUser) {
       // Pas connecté, ou pas membre de cette école.

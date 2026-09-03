@@ -43,6 +43,7 @@ import {
   AppTabsTrigger,
 } from '@/components/app-tabs';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import ClassesSection from '@/components/lists/teacher/classes-section';
 
 export default function TeacherDetailsPage() {
   const params = useParams();
@@ -103,12 +104,10 @@ export default function TeacherDetailsPage() {
   const profile = teacher?.schoolProfile;
 
   return (
-    <div className="flex-1 sm:p-4 flex justify-center gap-4 ">
-      {/* GAUCHE (Scrollable) */}
-
-      <div className="w-full h-full py-2 space-y-4 max-w-350 px-3">
-        <CardHeader className=" px-2 flex flex-col gap-4">
-          <div className="flex justify-between items-center w-full">
+    <div className="flex-1 sm:p-2 flex justify-center gap-4">
+      <div className="w-full h-full py-2 space-y-4 max-w-350">
+        <Card className=" px-2 flex flex-col gap-4">
+          <CardHeader className="flex justify-between items-center w-full">
             <Button variant="ghost" size="icon" onClick={() => router.back()}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -131,8 +130,8 @@ export default function TeacherDetailsPage() {
                 Supprimer
               </Button>
             </div>
-          </div>
-          <div className="flex items-center py-4 md:p-4 rounded-md bg-accent h-full w-full gap-4 md:gap-6">
+          </CardHeader>
+          <CardContent className="flex items-center py-4 md:p-4 rounded-md bg-secondary h-full w-full gap-4 md:gap-6">
             <div className="h-full flex items-center max-w-50 max-h-50 justify-center">
               <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background shadow-sm">
                 <AvatarImage
@@ -154,16 +153,14 @@ export default function TeacherDetailsPage() {
               </p>
 
               <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2 gap-2 w-full pr-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2  gap-2 w-full pr-1">
                   <InfoItem icon={Phone}>
-                    {teacher?.schoolUser?.user?.phoneNumber || 'Non renseigné'}
+                    {teacher?.schoolUser?.user?.phoneNumber}
                   </InfoItem>
                   <InfoItem icon={Mail}>
-                    {teacher.schoolUser?.user?.email || 'Non renseigné'}
+                    {teacher.schoolUser?.user?.email}
                   </InfoItem>
-                  <InfoItem icon={MapPin}>
-                    {profile?.address || 'Adresse non renseignée'}
-                  </InfoItem>
+                  <InfoItem icon={MapPin}>{profile?.address}</InfoItem>
                   <InfoItem icon={ActivityIcon}>
                     <Badge
                       variant={teacher.isActive ? 'default' : 'secondary'}
@@ -175,8 +172,8 @@ export default function TeacherDetailsPage() {
                 </div>
               </div>
             </div>
-          </div>
-        </CardHeader>
+          </CardContent>
+        </Card>
 
         <div className="flex-1">
           <AppTabs defaultValue="overview" className="">
@@ -255,8 +252,8 @@ export default function TeacherDetailsPage() {
               </Card>
             </AppTabsContent>
 
-            <AppTabsContent id="classes" value="classes">
-              {/*   <ClassesSection teacherId={teacher?.id} /> */}
+            <AppTabsContent value="classes">
+              <ClassesSection teacherId={teacher?.id} />
             </AppTabsContent>
 
             <AppTabsContent value="schedule">

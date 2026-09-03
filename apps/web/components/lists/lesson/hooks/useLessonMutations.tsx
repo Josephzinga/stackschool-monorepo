@@ -1,5 +1,4 @@
 import { toast } from 'sonner';
-import { useLessonStore } from '@/store/lesson-store';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Day,
@@ -10,7 +9,8 @@ import {
   useUpdateLessonMutation,
   useUpdateLessonStatusMutation,
 } from '@stackschool/ui';
-import { CreateLessonFormData } from '@stackschool/contracts';
+import { CreateLessonSchema } from '@stackschool/contracts';
+import { useLessonStore } from '@/store/lesson-store';
 
 export const useLessonMutations = () => {
   const queryClient = useQueryClient();
@@ -125,7 +125,7 @@ export const useLessonMutations = () => {
   };
 
   const handleSubmitForm = async (
-    data: CreateLessonFormData,
+    data: CreateLessonSchema,
     lessonId: string,
     isUpdate: boolean,
   ) => {

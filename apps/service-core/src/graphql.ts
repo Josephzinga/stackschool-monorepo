@@ -23,27 +23,14 @@ export type LessonStatus = "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED" | "
 export type ResourceMode = "TEACHER" | "CLASS";
 export type link__Purpose = "SECURITY" | "EXECUTION";
 
-export class GetLessonsInput {
-    groupId?: Nullable<string>;
-    teacherId?: Nullable<string>;
-    classId?: Nullable<string>;
-    department?: Nullable<string>;
-    mode: ResourceMode;
-    hasLessonOnly?: Nullable<boolean>;
-    section?: Nullable<string>;
-    status?: Nullable<LessonStatus>;
-    level?: Nullable<string>;
-    limit: number;
-    page: number;
-}
-
 export class CreateParentInput {
     firstName: string;
     lastName: string;
     phoneNumber: string;
     isDelegate?: Nullable<boolean>;
+    gender: Gender;
     email?: Nullable<string>;
-    address: string;
+    address?: Nullable<string>;
     profession: string;
     children?: Nullable<ParentStudentInput[]>;
 }
@@ -148,6 +135,7 @@ export class User {
 
 export class TeacherAssignment {
     id: string;
+    teacherId: string;
     teacher?: Nullable<Teacher>;
 }
 
@@ -168,16 +156,10 @@ export class StudentCount {
     female: number;
 }
 
-export class LessonsEvents {
+export class Lesson {
     id: string;
-    resourceId?: Nullable<string>;
-    title: string;
-    startTime: string;
-    endTime: string;
     teacherId?: Nullable<string>;
-    day: Day;
-    status?: Nullable<LessonStatus>;
-    teacher?: Nullable<Teacher>;
+    teacher?: Nullable<LessonTeacher>;
 }
 
 export class LessonTeacher {
@@ -185,22 +167,6 @@ export class LessonTeacher {
     firstName: string;
     lastName: string;
     weeklyHours?: Nullable<number>;
-}
-
-export class LessonsData {
-    events?: Nullable<LessonsEvents[]>;
-    resources?: Nullable<LessonResources[]>;
-}
-
-export class LessonResources {
-    id: string;
-    title: string;
-    weeklyHours?: Nullable<number>;
-}
-
-export class LessonsList {
-    data: LessonsData;
-    meta?: Nullable<PaginationMeta>;
 }
 
 export class Permission {
@@ -253,6 +219,7 @@ export class Parent {
     parentStudent?: Nullable<Nullable<ParentStudent>[]>;
     schoolUserId?: Nullable<string>;
     schoolProfile?: Nullable<SchoolProfile>;
+    member?: Nullable<SchoolMembership>;
 }
 
 export class ParentStudent {
@@ -267,26 +234,6 @@ export class ParentStudent {
 export class ParentList {
     data?: Nullable<Parent[]>;
     meta?: Nullable<PaginationMeta>;
-}
-
-export abstract class IQuery {
-    abstract searchStudent(filter: StudentSearchInput): Nullable<Student[]> | Promise<Nullable<Student[]>>;
-
-    abstract searchSchool(filter: SchoolSearchInput): Nullable<School[]> | Promise<Nullable<School[]>>;
-
-    abstract school(schoolId: string): School | Promise<School>;
-
-    abstract teacher(id: string): Nullable<Teacher> | Promise<Nullable<Teacher>>;
-
-    abstract student(id: string): Nullable<Student> | Promise<Nullable<Student>>;
-
-    abstract getLessons(filter: GetLessonsInput): Nullable<LessonsList> | Promise<Nullable<LessonsList>>;
-
-    abstract getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList | Promise<TeacherList>;
-
-    abstract getSchoolStudents(input: GetSchoolStudentsInput): StudentList | Promise<StudentList>;
-
-    abstract getSchoolParents(filter: GetSchoolParentsInput): Nullable<ParentList> | Promise<Nullable<ParentList>>;
 }
 
 export class SchoolProfile {
@@ -369,7 +316,7 @@ export class Student {
     transportMode?: Nullable<TransportMode>;
     previousSchool?: Nullable<string>;
     classId: string;
-    enrollmentYear: string;
+    enrollmentYear?: Nullable<string>;
     status?: Nullable<StudentStatus>;
     disciplinaryActions?: Nullable<StudentDisciplinaryAction>;
     nationality?: Nullable<string>;
@@ -439,6 +386,24 @@ export class GenderStats {
     female: number;
 }
 
+export abstract class IQuery {
+    abstract searchStudent(filter: StudentSearchInput): Nullable<Nullable<Student>[]> | Promise<Nullable<Nullable<Student>[]>>;
+
+    abstract searchSchool(filter: SchoolSearchInput): Nullable<School[]> | Promise<Nullable<School[]>>;
+
+    abstract school(schoolId: string): School | Promise<School>;
+
+    abstract teacher(id: string): Nullable<Teacher> | Promise<Nullable<Teacher>>;
+
+    abstract student(id: string): Nullable<Student> | Promise<Nullable<Student>>;
+
+    abstract getSchoolTeachers(input: GetSchoolTeachersInput): TeacherList | Promise<TeacherList>;
+
+    abstract getSchoolStudents(input: GetSchoolStudentsInput): StudentList | Promise<StudentList>;
+
+    abstract getSchoolParents(filter: GetSchoolParentsInput): Nullable<ParentList> | Promise<Nullable<ParentList>>;
+}
+
 export class _Service {
     sdl?: Nullable<string>;
 }
@@ -454,5 +419,5 @@ export class ISchema {
 }
 
 export type Member = Teacher | Student | Parent | Staff;
-export type _Entity = Class | Parent | ParentStudent | Permission | School | SchoolMembership | SchoolSettings | SchoolStats | Staff | Student | Subject | Teacher | TeacherAssignment | User;
+export type _Entity = Class | Lesson | LessonTeacher | Parent | ParentStudent | Permission | School | SchoolMembership | SchoolSettings | SchoolStats | Staff | Student | Subject | Teacher | TeacherAssignment | User;
 type Nullable<T> = T | null;

@@ -7,6 +7,20 @@ query GetSubjectsOptions($input: GetSubjectInput!) {
     }
   }
 }
+query SearchStudent($input: StudentSearchInput!) {
+  searchStudent(filter: $input) {
+    id
+    schoolProfile {
+      firstName
+      lastName
+      avatarUrl
+    }
+    schoolClass {
+      name
+    }
+    matricule
+  }
+}
 
 query GetSchoolSubjects($input: GetSubjectInput!) {
   getSchoolSubjects(input: $input) {

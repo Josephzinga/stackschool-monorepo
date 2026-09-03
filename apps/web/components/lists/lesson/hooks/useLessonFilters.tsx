@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import {
   useGetClassesOptionsQuery,
   useGetTeacherOptionsQuery,
-  useLessonStore,
 } from '@stackschool/ui';
+import { useLessonStore } from '@/store/lesson-store';
 
 export const useLessonFilters = () => {
   const {

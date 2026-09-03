@@ -11,6 +11,7 @@ import { TeacherService } from './teacher.service';
 import {
   CreateTeacherInput,
   GetSchoolTeachersInput,
+  SchoolMembership,
   SchoolProfile,
   Teacher,
   TeacherList,
@@ -74,5 +75,15 @@ export class TeacherResolver {
     );
 
     return schoolProfile ?? null;
+  }
+
+  @ResolveField('schoolUser')
+  async getSchoolUser(
+    @Parent() teacher: Teacher,
+    @Loaders() loaders: dataloaderService.DataLoaders,
+  ): Promise<SchoolMembership | null> {
+    if (!teacher.schoolUserId) return null;
+    const member = await loaders.schoolUserLoader.load(teacher.schoolUserId);
+    return member ?? null;
   }
 }

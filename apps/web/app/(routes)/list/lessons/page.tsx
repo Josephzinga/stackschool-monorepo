@@ -5,12 +5,10 @@ import '@/app/styles/schedule-grid.css';
 import TimeGrid, { renderEventContent } from '@/components/lists/time-grid';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import LessonDialog from '@/components/lists/lesson/lesson-dialog';
-import { ResourceLabelContentArg } from '@fullcalendar/resource';
 import { CalendarFilter } from '@/components/lists/lesson/calendar-filter';
 import { useLessonEvents } from '@/components/lists/lesson/hooks/useLessonEvents';
 import { useLessonFilters } from '@/components/lists/lesson/hooks/useLessonFilters';
 import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonCalendar';
-import { useLessonStore } from '@/store/lesson-store';
 import { useQueryClient } from '@tanstack/react-query';
 import LessonAlertDialog from '@/components/lists/lesson/lesson-alert-dialog';
 import { LoaderOne } from '@/components/ui/loader';
@@ -29,31 +27,33 @@ import {
   TimeGridContainer,
 } from '@/components/lists/lesson/render-resource-content';
 import { ResourceMode } from '@stackschool/ui';
+import { ResourceCellInfo } from '@fullcalendar/react-scheduler';
+import { useLessonStore } from '@/store/lesson-store';
 
 function LessonsListPage() {
   const [isDragging, setIsDragging] = useState(false);
 
-  // SÉLECTEURS PRÉCIS (Empêche les re-renders inutiles)
-  const isLoading = useLessonStore((s) => s.isLoading);
-  const currentView = useLessonStore((s) => s.currentView);
-  const pagination = useLessonStore((s) => s.pagination);
-  const selectedFilter = useLessonStore((s) => s.selectedFilter);
-  const lessonDialogOpen = useLessonStore((s) => s.lessonDialogOpen);
-
-  const setSelectedFilter = useLessonStore((s) => s.setSelectedFilter);
-  const setCurrentView = useLessonStore((s) => s.setCurrentView);
-  const setTargetEventDrop = useLessonStore((s) => s.setTargetEventDrop);
-  const setAlertOpen = useLessonStore((s) => s.setAlertOpen);
-  const setPagination = useLessonStore((s) => s.setPagination);
-  const setResourceMode = useLessonStore((s) => s.setResourceMode);
-  const resetAll = useLessonStore((s) => s.resetAll);
+  const {
+    currentView,
+    resetAll,
+    setSelectedFilter,
+    setCurrentView,
+    setTargetEventDrop,
+    setAlertOpen,
+    setResourceMode,
+    selectedFilter,
+    pagination,
+    isLoading,
+    setPagination,
+    lessonDialogOpen,
+    setLessonDialogOpen,
+  } = useLessonStore();
 
   const {
     handleEventSelect,
     handleEventDrop,
     handleEventResize,
     handleEventClick,
-    handleCalendarMount,
     calendarRef,
   } = useLessonEvents();
 
@@ -117,7 +117,7 @@ function LessonsListPage() {
   );
 
   const renderResourceContent = useCallback(
-    (info: ResourceLabelContentArg) => {
+    (info: ResourceCellInfo) => {
       return (
         <RenderResourceContent
           resource={info.resource}
@@ -129,11 +129,11 @@ function LessonsListPage() {
   );
 
   return (
-    <div className="flex justify-center px-2 pt-2 w-full">
-      <Card className="flex flex-col gap-2 md:gap-4 h-full! w-full">
+    <div className="flex justify-center px-2 pt-2">
+      <Card className="flex flex-col gap-2 md:gap-4">
         <CalendarFilter onModeChange={handleSwitchMode} />
 
-        <CardContent className="px-1 h-full">
+        <CardContent className="">
           {isLoading ? (
             <div className="w-full min-h-[70vh] flex justify-center items-center">
               <LoaderOne />
@@ -161,7 +161,6 @@ function LessonsListPage() {
                 onEventDragStop={handleEventDragStop}
                 onResourceClick={handleResourceClick}
                 onViewChange={setCurrentView}
-                onCalendarMount={handleCalendarMount}
                 disabledTimeGrid={!selectedFilter}
                 renderResourceContent={renderResourceContent}
                 hasFilter={!!selectedFilter}
@@ -245,6 +244,7 @@ function LessonsListPage() {
             await queryClient.invalidateQueries({
               queryKey: ['getSchoolLessons'],
             });
+            setLessonDialogOpen(false);
           }}
         />
       )}

@@ -111,11 +111,22 @@ export class UpdateLessonInput {
     id: string;
     startTime?: Nullable<DateTime>;
     endTime?: Nullable<DateTime>;
+    day?: Nullable<Day>;
+    mode?: Nullable<ResourceMode>;
+}
+
+export class GetLessonsInput {
     groupId?: Nullable<string>;
     teacherId?: Nullable<string>;
-    subjectId?: Nullable<string>;
-    day?: Nullable<Day>;
+    classId?: Nullable<string>;
+    department?: Nullable<string>;
     mode: ResourceMode;
+    hasLessonOnly?: Nullable<boolean>;
+    section?: Nullable<string>;
+    status?: Nullable<LessonStatus>;
+    level?: Nullable<string>;
+    limit: number;
+    page: number;
 }
 
 export class CreateRoomInput {
@@ -272,16 +283,31 @@ export class Lesson {
     startTime?: Nullable<DateTime>;
     endTime?: Nullable<DateTime>;
     day?: Nullable<Day>;
-    teacherAssignmentId: string;
+    teacherAssignmentId?: Nullable<string>;
     teacherAssignment?: Nullable<TeacherAssignment>;
     status: LessonStatus;
+    teacherId?: Nullable<string>;
+    resourceId?: Nullable<string>;
+    mode?: Nullable<ResourceMode>;
     room?: Nullable<Room>;
+    group?: Nullable<Group>;
+    subject?: Nullable<Subject>;
 }
 
-export class LessonEvents {
+export class LessonsData {
+    events?: Nullable<Lesson[]>;
+    resources?: Nullable<LessonResources[]>;
+}
+
+export class LessonResources {
     id: string;
-    subject?: Nullable<Subject>;
-    room?: Nullable<Room>;
+    title: string;
+    weeklyHours?: Nullable<number>;
+}
+
+export class LessonsList {
+    data: LessonsData;
+    meta?: Nullable<PaginationMeta>;
 }
 
 export class Subject {
@@ -333,6 +359,8 @@ export abstract class IMutation {
 
     abstract updateRoom(input: CreateRoomInput): Room | Promise<Room>;
 
+    abstract deleteRooms(ids?: Nullable<string[]>, soft: boolean): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
+
     abstract createGroup(input: CreateGroupInput): Group | Promise<Group>;
 
     abstract createTeacherAssignment(input: CreateTeacherAssignmentInput): TeacherAssignment | Promise<TeacherAssignment>;
@@ -346,6 +374,8 @@ export abstract class IQuery {
     abstract getClassSubjects(classId?: Nullable<string>, teacherId?: Nullable<string>, groupId?: Nullable<string>, searchTerm?: Nullable<string>): Nullable<ClassSubject[]> | Promise<Nullable<ClassSubject[]>>;
 
     abstract class(id: string): Nullable<Class> | Promise<Nullable<Class>>;
+
+    abstract getLessons(input?: Nullable<GetLessonsInput>): Nullable<LessonsList> | Promise<Nullable<LessonsList>>;
 
     abstract getSchoolClasses(input: GetSchoolClassesInput): ClassList | Promise<ClassList>;
 
@@ -407,5 +437,5 @@ export class ISchema {
     Mutation: IMutation;
 }
 
-export type _Entity = Class | ClassStats | LessonEvents | Room | SchoolStats | Student | Subject | Teacher | TeacherAssignment;
+export type _Entity = Class | ClassStats | Lesson | Room | SchoolStats | Student | Subject | Teacher | TeacherAssignment;
 type Nullable<T> = T | null;

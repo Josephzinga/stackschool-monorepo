@@ -1,14 +1,14 @@
 'use client';
 
-import {SectionCards} from '@/components/section-cards';
+import { SectionCards } from '@/components/section-cards';
 import AttendanceChart from '@/components/attendance-chart';
-import {useGetAdminDashboardStatsQuery, useUserStore} from '@stackschool/ui';
-import {Spinner} from '@/components/ui/spinner';
-import {ChartRadialGender} from '@/components/student-gender-chart';
-import {ChartAreaInteractive} from '@/components/chart-area-interactive';
+import { useGetAdminDashboardStatsQuery, useUserStore } from '@stackschool/ui';
+import { Spinner } from '@/components/ui/spinner';
+import { ChartRadialGender } from '@/components/student-gender-chart';
+import { ChartAreaInteractive } from '@/components/chart-area-interactive';
 import EventSection from '@/components/event-section';
-import {useSocket} from '@/components/providers/socket-context';
-import {useEffect} from 'react';
+import { useSocket } from '@/components/providers/socket-context';
+import { useEffect } from 'react';
 
 export default function AdminDashboard() {
   const { currentSchool } = useUserStore();
@@ -25,9 +25,8 @@ export default function AdminDashboard() {
     });
 
     return () => {
-      socket.off('ENROLLMENT_COMPLETED')
+      socket.off('ENROLLMENT_COMPLETED');
     };
-
   }, [socket]);
 
   const { data, isLoading, error } = useGetAdminDashboardStatsQuery(
@@ -76,8 +75,6 @@ export default function AdminDashboard() {
           <ChartAreaInteractive />
         </div>
       </div>
-
-      <EventSection />
     </div>
   );
 }

@@ -2,6 +2,8 @@
 node_modules
 .idea
 .vscode
+.expo
+.nx
 coverage
 jest-exercices
 joseph
@@ -13,6 +15,10 @@ n
 !/types/**/*
 stackschool-monorepo.key
 infra/api-nest
+apps/api
+apps/mobile
+packages/db
+packages/shared
 
 
 

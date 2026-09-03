@@ -48,7 +48,7 @@ export const checkEventConflicts = (
   specificDate?: Date,
 ): boolean => {
   // la date de reférence
-  const referenceDate = specificDate;
+  const referenceDate = specificDate || new Date();
 
   // Obtenir la plage du nouvel événement
   const newRange = getEventDateTimeRange(newEvent, referenceDate);

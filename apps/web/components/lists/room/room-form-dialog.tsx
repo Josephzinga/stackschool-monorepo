@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { RoomForm } from '@/components/lists/room/room-form';
+import { RoomForm } from '@/components/lists/room/form/room-form';
 
 export function RoomFormDialog({
   open = false,

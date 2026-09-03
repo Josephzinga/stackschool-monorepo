@@ -8,6 +8,8 @@ import {
   AUTH_PATTERNS,
   AUTH_SERVICE,
   CoreRpcException,
+  FindTeachersPaginatedInput,
+  FindTeachersPaginatedResponse,
   generateUsername,
   mapCoreError,
   sendRmqRequest,
@@ -196,5 +198,46 @@ export class TeacherService {
       throw new CoreRpcException('TEACHER_NOT_FOUND', 'Enseignant non trouvé.');
     }
     return teacher;
+  }
+
+  async findTeachersPaginated(
+    input: FindTeachersPaginatedInput,
+  ): Promise<FindTeachersPaginatedResponse> {
+    const where: Prisma.TeacherWhereInput = {
+      schoolUser: {
+        schoolId: input.schoolId,
+      },
+      ...(input?.department ? { department: input.department } : {}),
+    };
+
+    const [teachers, totalCount] = await Promise.all([
+      this.prisma.teacher.findMany({
+        where,
+        select: {
+          id: true,
+          schoolUser: {
+            select: {
+              schoolProfile: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
+        },
+        skip: input.page * input.limit,
+        take: input.limit,
+      }),
+      this.prisma.teacher.count({ where }),
+    ]);
+    return {
+      teachers: teachers?.map((t) => ({
+        id: t.id,
+        firstName: t.schoolUser?.schoolProfile?.firstName ?? '',
+        lastName: t.schoolUser?.schoolProfile?.lastName ?? '',
+      })),
+      totalCount,
+    };
   }
 }

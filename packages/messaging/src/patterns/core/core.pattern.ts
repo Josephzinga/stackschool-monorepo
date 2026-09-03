@@ -17,8 +17,13 @@ const MEMBERSHIP_PATTERNS = {
     'core.membership.find_by_school_id_and_user_id',
 } as const;
 
+const TEACHER_PATTERNS = {
+  FIND_PAGINATED: 'core.teacher.find_paginated',
+} as const;
+
 export const CORE_PATTERNS = {
   SCHOOL: SCHOOL_PATTERNS,
   MEMBERSHIP: MEMBERSHIP_PATTERNS,
   COMPLETE_PROFILE: COMPLETE_PROFILE_PATTERNS,
+  TEACHER: TEACHER_PATTERNS,
 } as const;

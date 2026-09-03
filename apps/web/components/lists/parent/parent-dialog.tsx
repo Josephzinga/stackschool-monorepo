@@ -18,7 +18,7 @@ export function ParentDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="lg:w-250!">
+      <DialogContent className="sm:max-w-120 font-poppins max-h-[80vh] md:max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Crée un parent</DialogTitle>
           <DialogDescription></DialogDescription>

@@ -1,4 +1,4 @@
-import { LessonStatusEnum } from '@stackschool/contracts';
+import { LessonStatusEnum } from '../academic';
 
 export const lessonStatusConfig: Record<
   LessonStatusEnum,

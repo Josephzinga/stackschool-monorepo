@@ -6,7 +6,7 @@ export const dayMapping = {
   THURSDAY: 4,
   FRIDAY: 5,
   SATURDAY: 6,
-};
+} as const;
 export const dayConstants = [
   { value: 'MONDAY', label: 'Lundi' },
   { value: 'TUESDAY', label: 'Mardi' },
@@ -15,3 +15,13 @@ export const dayConstants = [
   { value: 'FRIDAY', label: 'Vendredi' },
   { value: 'SATURDAY', label: 'Samedi' },
 ];
+
+export const dayLabel = {
+  SUNDAY: 'Lundi',
+  MONDAY: 'Mardi',
+  TUESDAY: 'Mercredi',
+  WEDNESDAY: 'Jeudi',
+  THURSDAY: 'Vendredi',
+  FRIDAY: 'Samedi',
+  SATURDAY: 'Dimanche',
+} as const;

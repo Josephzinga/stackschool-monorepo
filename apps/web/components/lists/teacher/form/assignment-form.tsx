@@ -267,8 +267,8 @@ export const TeacherAssignmentForm = ({
                     <ComboboxContent>
                       <ComboboxEmpty>Aucune classe trouvée</ComboboxEmpty>
                       <ComboboxList>
-                        {(item) => (
-                          <ComboboxItem key={item.id} value={item.id}>
+                        {(item, i) => (
+                          <ComboboxItem key={`${item.id}_${i}`} value={item.id}>
                             {item.name} {item.level ? `(${item.level})` : ''}
                           </ComboboxItem>
                         )}
@@ -333,8 +333,8 @@ export const TeacherAssignmentForm = ({
                         : `Aucune matière ${subjects.length === 0 && 'libre'} disponible pour cette classe`}
                     </ComboboxEmpty>
                     <ComboboxList>
-                      {(item) => (
-                        <ComboboxItem key={item.id} value={item.id}>
+                      {(item, i) => (
+                        <ComboboxItem key={`${item.id}_${i}`} value={item.id}>
                           {item.name} {item.code && `(${item.code})`}
                         </ComboboxItem>
                       )}

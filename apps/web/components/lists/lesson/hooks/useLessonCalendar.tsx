@@ -1,11 +1,11 @@
 'use client';
 import { useEffect, useMemo } from 'react';
-import { useLessonStore } from '@/store/lesson-store';
+
 import { Day, ResourceMode, useGetSchoolLessonsQuery } from '@stackschool/ui';
-import { format } from 'date-fns';
 import { dayMapping } from '@stackschool/contracts';
-import { EventInput } from '@fullcalendar/core';
+import { EventInput } from '@fullcalendar/react';
 import { lessonStatusConfig } from '@/constant';
+import { useLessonStore } from '@/store/lesson-store';
 
 export const useLessonCalendar = () => {
   const {
@@ -21,7 +21,7 @@ export const useLessonCalendar = () => {
 
   const { data, isPending, isError, error } = useGetSchoolLessonsQuery(
     {
-      filter: {
+      input: {
         classId:
           isClassOnly && selectedFilter?.type === 'CLASS'
             ? selectedFilter?.id
@@ -66,9 +66,9 @@ export const useLessonCalendar = () => {
       data?.getLessons?.data?.events?.map((e) => ({
         id: e.id,
         resourceId: e.resourceId!,
-        title: e?.title,
-        startTime: format(new Date(e.startTime), 'HH:mm'),
-        endTime: format(new Date(e.endTime), 'HH:mm'),
+        title: e?.title ?? '',
+        startTime: e.startTime,
+        endTime: e.endTime,
         daysOfWeek: [dayMapping[e.day as Day]],
         backgroundColor: lessonStatusConfig[e.status ?? 'PLANNED'].color,
         extendedProps: {

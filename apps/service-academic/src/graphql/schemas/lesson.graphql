@@ -1,13 +1,18 @@
-type Lesson {
+type Lesson @key(fields: "id teacherId") {
   id: ID!
   title: String
   startTime: DateTime
   endTime: DateTime
   day: Day
-  teacherAssignmentId: ID!
+  teacherAssignmentId: ID
   teacherAssignment: TeacherAssignment
   status: LessonStatus!
+  teacherId: ID
+  resourceId: ID
+  mode: ResourceMode
   room: Room
+  group: Group
+  subject: Subject
 }
 
 input CreateLessonInput {
@@ -26,17 +31,38 @@ input UpdateLessonInput {
   id: ID!
   startTime: DateTime
   endTime: DateTime
-  groupId: ID
-  teacherId: ID
-  subjectId: ID
   day: Day
-  mode: ResourceMode!
+  mode: ResourceMode
 }
 
-type LessonEvents @key(fields: "id") {
+input GetLessonsInput {
+  groupId: ID
+  teacherId: ID
+  classId: ID
+  department: String
+  mode: ResourceMode!
+  hasLessonOnly: Boolean = true
+  section: String
+  status: LessonStatus
+  level: String
+  limit: Int! = 6
+  page: Int! = 0
+}
+
+type LessonsData {
+  events: [Lesson!]
+  resources: [LessonResources!]
+}
+
+type LessonResources {
   id: ID!
-  subject: Subject
-  room: Room
+  title: String!
+  weeklyHours: Int
+}
+
+type LessonsList {
+  data: LessonsData!
+  meta: PaginationMeta
 }
 
 type Subject @key(fields: "id") {

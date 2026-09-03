@@ -1,10 +1,15 @@
 import { GraphQLErrorExtensions, GraphQLFormattedError } from 'graphql';
-import {
-  HttpException,
-  HttpStatus,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { ZodError } from 'zod';
+import type {
+  AcademicErrorCode,
+  AuthErrorCode,
+  CoreErrorCode,
+  OperationsErrorCode,
+} from '@stackschool/messaging';
+
+export type GatewayErrorCode =
+  AcademicErrorCode | AuthErrorCode | CoreErrorCode | OperationsErrorCode;
 
 interface GraphqlReturnError {
   ok: boolean;
@@ -35,19 +40,7 @@ export const gqlFormatError = (
     };
   }
 
-  // 2. Vérifier si c'est une UnauthorizedException
-  if (originalError instanceof UnauthorizedException) {
-    return {
-      ok: false,
-      message: err.message || 'Non autorisé',
-      statusCode: HttpStatus.UNAUTHORIZED,
-      extensions: {
-        code: 'UNAUTHORIZED',
-      },
-    };
-  }
-
-  // 3. Vérifier si c'est une HttpException (toutes les autres exceptions NestJS)
+  // 2. Vérifier si c'est une HttpException (toutes les autres exceptions NestJS)
   if (originalError instanceof HttpException) {
     const status = originalError.getStatus();
     const response = originalError.getResponse();
@@ -66,18 +59,17 @@ export const gqlFormatError = (
       },
     };
   }
-  const serviceName = err.extensions?.serviceName as
-    'academic' | 'core' | 'auth' | 'operations';
+  const serviceName = err.extensions?.serviceName;
+  const errorCode = err.extensions?.code;
 
-  if (serviceName) {
+  if (serviceName && isGatewayErrorCode(errorCode)) {
     return {
       ok: false,
       message: err.message,
-      statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+      statusCode: getHttpStatusCode(errorCode),
       extensions: {
-        serviceName,
-        code: err.extensions?.code || 'INTERNAL_SERVER_ERROR',
-        path: err.path,
+        ...err.extensions,
+        timeStamp: new Date().toISOString(),
       },
     };
   }
@@ -90,4 +82,78 @@ export const gqlFormatError = (
       ...err.extensions,
     },
   };
+};
+
+export function getHttpStatusCode(code: GatewayErrorCode): number {
+  switch (code) {
+    case 'NOT_FOUND':
+    case 'SCHOOL_NOT_FOUND':
+    case 'SUBJECT_NOT_FOUND':
+    case 'USER_NOT_FOUND':
+    case 'MEMBERSHIP_NOT_FOUND':
+    case 'STUDENT_NOT_FOUND':
+    case 'TEACHER_NOT_FOUND':
+    case 'STAFF_NOT_FOUND':
+      return HttpStatus.NOT_FOUND;
+    case 'FORBIDDEN':
+      return HttpStatus.FORBIDDEN;
+    case 'CONFLICT':
+    case 'CLASS_ALREADY_EXISTS':
+    case 'SUBJECT_ALREADY_EXIST':
+    case 'MEMBERSHIP_ALREADY_EXIST':
+    case 'STUDENT_ALREADY_EXIST':
+    case 'EMAIL_TAKEN':
+    case 'USERNAME_TAKEN':
+    case 'PHONE_TAKEN':
+      return HttpStatus.CONFLICT;
+    case 'INVALID_CREDENTIALS':
+      return HttpStatus.UNAUTHORIZED;
+    case 'TOO_MANY_REQUEST':
+      return HttpStatus.TOO_MANY_REQUESTS;
+    case 'VALIDATION_ERROR':
+    case 'BAD_REQUEST':
+    case 'SOCIAL_ONLY_ACCOUNT':
+    case 'SCHOOL_ID_NOT_FOUND':
+      return HttpStatus.BAD_REQUEST;
+    case 'AUTH_SERVICE_ERROR':
+      return HttpStatus.BAD_GATEWAY;
+    case 'INTERNAL_ERROR':
+    case 'DB_ERROR':
+      return HttpStatus.INTERNAL_SERVER_ERROR;
+    default:
+      return HttpStatus.INTERNAL_SERVER_ERROR;
+  }
+}
+
+function isGatewayErrorCode(code: unknown): code is GatewayErrorCode {
+  return typeof code === 'string' && code in errorStatusCodes;
+}
+
+const errorStatusCodes: Record<GatewayErrorCode, true> = {
+  INTERNAL_ERROR: true,
+  VALIDATION_ERROR: true,
+  SCHOOL_NOT_FOUND: true,
+  SCHOOL_ID_NOT_FOUND: true,
+  DB_ERROR: true,
+  CLASS_ALREADY_EXISTS: true,
+  CONFLICT: true,
+  SUBJECT_ALREADY_EXIST: true,
+  NOT_FOUND: true,
+  FORBIDDEN: true,
+  SUBJECT_NOT_FOUND: true,
+  BAD_REQUEST: true,
+  EMAIL_TAKEN: true,
+  USERNAME_TAKEN: true,
+  PHONE_TAKEN: true,
+  USER_NOT_FOUND: true,
+  INVALID_CREDENTIALS: true,
+  SOCIAL_ONLY_ACCOUNT: true,
+  TOO_MANY_REQUEST: true,
+  MEMBERSHIP_ALREADY_EXIST: true,
+  AUTH_SERVICE_ERROR: true,
+  MEMBERSHIP_NOT_FOUND: true,
+  STUDENT_NOT_FOUND: true,
+  TEACHER_NOT_FOUND: true,
+  STAFF_NOT_FOUND: true,
+  STUDENT_ALREADY_EXIST: true,
 };

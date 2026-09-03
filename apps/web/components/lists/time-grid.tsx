@@ -1,11 +1,23 @@
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin, {
-  EventResizeDoneArg,
-} from '@fullcalendar/interaction';
-import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
-import frLocale from '@fullcalendar/core/locales/fr';
+'use client';
+import FullCalendar, {
+  CalendarRef,
+  DateSelectInfo,
+  EventClickInfo,
+  EventDisplayInfo,
+  EventDragStartInfo,
+  EventDragStopInfo,
+  EventDropInfo,
+  EventResizeDoneInfo,
+  EventSourceInput,
+  FormatterInput,
+} from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/react/daygrid';
+import timeGridPlugin from '@fullcalendar/react/timegrid';
+import interactionPlugin from '@fullcalendar/react/interaction';
+import resourceTimelinePlugin from '@fullcalendar/react-scheduler/timeline';
+import resourceTimelineWeek from '@fullcalendar/react-scheduler/resource-timeline';
+import timeline from '@fullcalendar/react-scheduler/resource-timeline';
+import frLocale from '@fullcalendar/react/locales/fr';
 import React, {
   forwardRef,
   useCallback,
@@ -13,15 +25,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  CustomContentGenerator,
-  DateSelectArg,
-  DatesSetArg,
-  EventClickArg,
-  EventContentArg,
-  EventDropArg,
-  EventSourceInput,
-} from '@fullcalendar/core';
 import '@/app/styles/schedule-grid.css';
 import { lessonStatusConfig } from '@/constant';
 import {
@@ -31,15 +34,19 @@ import {
 } from '@stackschool/ui';
 import { dayMapping } from '@stackschool/contracts';
 import {
-  ResourceLabelContentArg,
+  ResourceCellInfo,
   ResourceSourceInput,
-} from '@fullcalendar/resource';
+} from '@fullcalendar/react-scheduler';
 import { LoaderOne } from '@/components/ui/loader';
 import { ViewType } from '@/types/lessons-types';
 import { TimeGridHeader } from '@/components/lists/lesson/time-grid-header';
-import { VerboseFormattingArg } from '@fullcalendar/core/internal';
+import themesPlugin from '@fullcalendar/react/themes/monarch';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import '@/app/styles/calendar.css';
+import '@fullcalendar/react/skeleton.css'; // ALWAYS NEED SKELETON
+import '@fullcalendar/react/themes/monarch/theme.css'; // YOUR THEME
 
 export interface TimeGridHandle {
   getApi: () => any;
@@ -52,28 +59,27 @@ export interface TimeGridHandle {
 
 interface TimeGridProps {
   events?: EventSourceInput;
-  renderEventContent: CustomContentGenerator<EventContentArg>;
-  onDatesSet?: (arg: DatesSetArg) => void;
-  onEventClick?: (arg: EventClickArg) => void;
+  renderEventContent: any;
+  onDatesSet?: (arg: DateSelectInfo) => void;
+  onEventClick?: (arg: EventClickInfo) => void;
   showNavigation?: boolean;
   showViewButtons?: boolean;
   hideResourceViewButtons?: boolean;
   selectable: boolean;
   editable: boolean;
   disabledTimeGrid?: boolean;
-  onEventDrop?: (info: EventDropArg) => void;
-  onEventSelect?: (info: DateSelectArg) => void;
+  onEventDrop?: (info: EventDropInfo) => void;
+  onEventSelect?: (info: DateSelectInfo) => void;
   initialView?: ViewType;
   resources?: ResourceSourceInput;
   resourceHeaderContent?: string;
-  renderResourceContent?: CustomContentGenerator<ResourceLabelContentArg>;
-  slotLabelFormat?: (args: VerboseFormattingArg) => any;
-  onEventResize?: (arg: EventResizeDoneArg) => void;
-  onEventDragStart?: () => void;
-  onEventDragStop?: () => void;
+  renderResourceContent?: (info: ResourceCellInfo) => React.ReactNode;
+  slotLabelFormat?: (args: FormatterInput) => any;
+  onEventResize?: (info: EventResizeDoneInfo) => void;
+  onEventDragStart?: (info: EventDragStartInfo) => void;
+  onEventDragStop?: (info: EventDragStopInfo) => void;
   onViewChange?: (view: ViewType) => void;
   onResourceClick?: (resourceId: string) => void;
-  onCalendarMount?: (calendar: FullCalendar) => void;
   hasFilter?: boolean;
 }
 
@@ -82,7 +88,6 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
     {
       events,
       renderEventContent,
-      onDatesSet,
       onEventClick,
       editable = false,
       selectable = false,
@@ -90,20 +95,16 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
       onEventSelect,
       initialView = 'timeGridWeek',
       resources,
-      resourceHeaderContent,
       slotLabelFormat,
       onEventResize,
       onEventDragStart,
       onEventDragStop,
-      onResourceClick,
-      onCalendarMount,
       showViewButtons,
       showNavigation,
       hideResourceViewButtons,
       onViewChange,
       disabledTimeGrid,
       renderResourceContent,
-      hasFilter,
     },
     ref,
   ) => {
@@ -111,7 +112,7 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
     const [currentView, setCurrentView] = useState<ViewType>(
       initialView || 'resourceTimelineWeek',
     );
-    const calendarRef = useRef<FullCalendar | null>(null);
+    const calendarRef = useRef<CalendarRef | null>(null);
 
     const { currentSchool } = useUserStore();
     const { data, isPending } = useGetSchoolSettingsQuery(
@@ -162,14 +163,14 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
     }, []);
     if (isPending) {
       return (
-        <div className="w-full min-h-[70vh] flex justify-center items-center">
+        <div className="min-h-[70vh] flex justify-center items-center">
           <LoaderOne />
         </div>
       );
     }
     const isResourceView = currentView?.startsWith('resource');
     return (
-      <div className="w-full">
+      <div className="w-full h-full">
         {showNavigation !== false && (
           <TimeGridHeader
             onPrev={handlePrev}
@@ -188,21 +189,23 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
             })}
           />
         )}
-        <div className="h-full w-full rounded-lg border bg-card overflow-hidden">
+        <div className="rounded-lg border bg-card">
           <FullCalendar
             ref={calendarRef}
+            className="overflow-x-auto w-full"
             plugins={[
+              themesPlugin,
               dayGridPlugin,
               timeGridPlugin,
               interactionPlugin,
-              resourceTimelinePlugin,
+              resourceTimelineWeek,
             ]}
             initialView={initialView}
+            eventMinWidth={50}
+            eventMinHeight={100}
             locale={frLocale}
             resources={resources}
             eventContent={renderEventContent}
-            eventBorderColor="black"
-            eventClassNames="rounded-[6px]!"
             events={events}
             height="auto"
             eventDragStart={onEventDragStart}
@@ -213,9 +216,8 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
             eventDurationEditable={true} // Permettre l'édition de la durée
             eventStartEditable={true} // Permettre l'édition du début unselectAuto={true} // Désélectionner automatiquement
             selectLongPressDelay={300} // Délai pour la sélection sur mobile
-            slotLabelFormat={slotLabelFormat}
-            resourceLabelContent={renderResourceContent}
             headerToolbar={false}
+            eventClass="bg-red-500"
             businessHours={{
               daysOfWeek,
               startTime: `${startHour}:00`,
@@ -226,20 +228,17 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
               start: `${startHour}:00`,
               end: '12:00',
             }}
-            slotLabelClassNames="text-muted-foreground text-sm font-medium"
-            dayHeaderClassNames="text-foreground font-semibold py-2 border-none h-10!"
-            resourceLabelClassNames="bg-gray-200 dark:bg-gray-900/80!"
-            resourceAreaWidth={'15%'}
+            resourceColumnsWidth={'15%'}
             weekends={false}
             allDaySlot={false}
             nowIndicator={true}
             slotDuration={`00:${duration}:00`}
             firstDay={1}
-            slotMinWidth={100}
+            slotMinWidth={120}
+            slotMinHeight={150}
             lazyFetching
-            resourceAreaHeaderContent={resourceHeaderContent}
-            editable={editable}
-            selectable={selectable}
+            editable={true}
+            selectable={true}
             selectMirror={true}
             datesSet={(info) => setCurrentDateTitle(info.view.title)}
             eventClick={onEventClick}
@@ -247,13 +246,6 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
             eventDragStop={onEventDragStop}
             select={onEventSelect}
             eventResize={onEventResize}
-            slotLaneClassNames={(arg) => {
-              const hour = arg.date?.getHours();
-              if (hour === 12) {
-                return 'bg-gray-700/70 line-through text-muted-foreground/50';
-              }
-              return '';
-            }}
           />
         </div>
       </div>
@@ -263,7 +255,7 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
 
 export default TimeGrid;
 
-export const renderEventContent = (eventInfo: any) => {
+export const renderEventContent = (eventInfo: EventDisplayInfo) => {
   const status = eventInfo.event.extendedProps.status as LessonStatus;
   const cfg = lessonStatusConfig[status] ?? lessonStatusConfig.PLANNED;
   const profile = eventInfo.event.extendedProps.teacher;
@@ -292,7 +284,7 @@ export const renderEventContent = (eventInfo: any) => {
       >
         {mode === 'TEACHER'
           ? className
-          : `${profile?.firstname} ${profile?.lastname}`}
+          : `${profile?.firstName} ${profile?.lastName}`}
       </div>
 
       <div className="mt-auto text-[10px] text-gray-700 font-mono">

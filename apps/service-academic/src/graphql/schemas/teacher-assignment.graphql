@@ -1,6 +1,6 @@
 type TeacherAssignment @key(fields: "id") {
   id: ID!
-  teacherId: ID!
+  teacherId: ID! @shareable
   schoolId: ID
   classSubjectId: ID
   classSubject: ClassSubject

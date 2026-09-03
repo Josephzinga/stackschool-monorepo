@@ -30,13 +30,13 @@ Chaque microservice possède sa propre base PostgreSQL — aucune base n'est par
 
 ### Services
 
-| Service | Responsabilité |
-|---|---|
-| `gateway` | Point d'entrée unique. Authentification (Passport, sessions Redis), composition du schéma GraphQL fédéré, routage REST pour l'auth |
-| `service-auth` | Comptes utilisateurs, credentials, vérification (email/téléphone), tokens |
-| `service-core` | Personnel enseignant, affectations, données RH scolaires |
-| `service-academic` | Écoles, classes, matières, inscriptions, élèves |
-| `service-operations` | Présences, notifications (WhatsApp/SMS), opérations transverses |
+| Service              | Responsabilité                                                                                                                     |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `gateway`            | Point d'entrée unique. Authentification (Passport, sessions Redis), composition du schéma GraphQL fédéré, routage REST pour l'auth |
+| `service-auth`       | Comptes utilisateurs, credentials, vérification (email/téléphone), tokens                                                          |
+| `service-core`       | Personnel enseignant, affectations, données RH scolaires                                                                           |
+| `service-academic`   | Écoles, classes, matières, inscriptions, élèves                                                                                    |
+| `service-operations` | Présences, notifications (WhatsApp/SMS), opérations transverses                                                                    |
 
 ### Principes clés
 
@@ -78,6 +78,32 @@ RABBITMQ_PASSWORD=...
 # Sécurité inter-services
 GATEWAY_INTERNAL_SECRET=...
 SESSION_SECRET=...
+
+JWT_SECRET=lsdmlsdsdm@@@@!
+NEXT_PUBLIC_API_URL=http://api/4000
+SESSION_SECRET=mmdmdmdmddmdm
+
+POSTGRES_ACADEMIC_USER=...
+POSTGRES_ACADEMIC_PASSWORD=...
+POSTGRES_ACADEMIC_DB=...
+
+POSTGRES_CORE_USER=...
+POSTGRES_CORE_PASSWORD=...
+POSTGRES_CORE_DB=...
+
+POSTGRES_OPERATIONS_USER=...
+POSTGRES_OPERATIONS_PASSWORD=...
+POSTGRES_OPERATIONS_DB=...
+
+RABBITMQ_USER=...
+RABBITMQ_PASSWORD=...
+
+MINIO_ROOT_USER=...
+MINIO_ROOT_PASSWORD=...
+
+GATEWAY_INTERNAL_SECRET=...
+
+
 ```
 
 ### Lancer l'infrastructure (bases, cache, broker)
@@ -95,6 +121,8 @@ npx nx run-many -t dev --projects=gateway,service-auth,service-core,service-acad
 > En développement local (hors conteneur), `RABBITMQ_URL` doit pointer vers `localhost:5672` plutôt que vers le hostname Docker `rabbitmq`.
 
 ### Lancer tout en conteneurs (y compris les services applicatifs)
+
+- **il vaut mieux d'exécuté les serveurs dans l'hôte**
 
 ```bash
 docker compose up -d
@@ -115,11 +143,8 @@ apps/
   service-operations/
 
 packages/
-  db-auth/              # Schéma Prisma + client généré (service-auth)
-  db-core/
-  db-academic/
-  db-operations/
-  shared/               # Contrats Zod, patterns RabbitMQ, types partagés (indépendants de Prisma)
+ contract/ (Schéma zod, types et logique commun)
+ messaging/ (Partage de la logique serveur Nestjs et transport entre service)
 ```
 
 ## Développement

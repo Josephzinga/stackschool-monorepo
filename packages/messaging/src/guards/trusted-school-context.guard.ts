@@ -1,7 +1,12 @@
-import {CanActivate, ExecutionContext, ForbiddenException, Injectable,} from '@nestjs/common';
-import {Reflector} from '@nestjs/core';
-import {GqlExecutionContext} from '@nestjs/graphql';
-import {SCHOOL_ROLES_KEY} from '../decorators/role.decorator'
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
+import { SCHOOL_ROLES_KEY } from '../decorators/role.decorator';
 
 @Injectable()
 export class TrustedSchoolContextGuard implements CanActivate {

@@ -1,0 +1,45 @@
+query GetSchoolParents($filter: GetSchoolParentsInput!) {
+  getSchoolParents(filter: $filter) {
+    meta {
+      page
+      total
+      totalPages
+      limit
+    }
+    data {
+      ...ParentList
+    }
+  }
+}
+
+mutation CreateParent($input: CreateParentInput!) {
+  createParent(input: $input) {
+    ...ParentList
+  }
+}
+
+
+fragment ParentList on Parent {
+  id
+  profession
+   schoolProfile {
+     firstName
+     lastName
+     address
+     avatarUrl
+   }
+  parentStudent {
+    student {
+      id
+      schoolProfile {
+        firstName
+        lastName
+      }
+      schoolClass {
+        id
+        name
+        level
+      }
+    }
+  }
+}

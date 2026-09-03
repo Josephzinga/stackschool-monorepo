@@ -1,4 +1,3 @@
-import { pathsToModuleNameMapper } from 'ts-jest';
 import type { Config } from 'jest';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -11,15 +10,15 @@ const tsconfigPath = path.resolve(__dirname, './tsconfig.base.json');
 const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, 'utf-8'));
 
 const config: Config = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   modulePaths: ['<rootDir>'],
-  moduleNameMapper: pathsToModuleNameMapper(tsconfig.compilerOptions.paths, {
-    prefix: '<rootDir>/',
-  }),
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
   // Ajout de transform pour gérer le TS en ESM si nécessaire
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { useESM: true }],
+    '^.+\\.(ts|js)$': ['ts-jest', { useESM: true }],
   },
   extensionsToTreatAsEsm: ['.ts'],
 };

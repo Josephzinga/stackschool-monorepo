@@ -3,8 +3,9 @@ type User @key(fields: "id") {
   memberships: [SchoolMembership]
   schoolContext(schoolId: ID!): SchoolMembership
 }
-type TeacherAssignment @key(fields: "id") {
+type TeacherAssignment @key(fields: "id teacherId") {
   id: ID!
+  teacherId: ID!
   teacher: Teacher
 }
 type Class @key(fields: "id") {
@@ -21,4 +22,17 @@ type Subject @key(fields: "id") {
 type StudentCount {
   male: Int!
   female: Int!
+}
+
+type Lesson @key(fields: "id teacherId") {
+  id: ID!
+  teacherId: ID
+  teacher: LessonTeacher
+}
+
+type LessonTeacher @key(fields: "id") {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  weeklyHours: Int
 }

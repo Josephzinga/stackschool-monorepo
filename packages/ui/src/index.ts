@@ -8,5 +8,3 @@ export * from './constant/role';
 export * from './store/loading-store';
 export * from './constant/student-status';
 export * from './generated/v2/graphql';
-export * from './constant/lesson-status';
-export * from './store/lesson-store';

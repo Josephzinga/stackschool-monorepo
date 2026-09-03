@@ -1,11 +1,16 @@
+'use client';
+import { Button } from '@/components/ui/button';
+import { motion } from 'motion/react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import React from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ResourceCellInfo } from '@fullcalendar/react-scheduler';
 import { Clock, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { motion } from 'motion/react';
 
 interface ResourceWithDetails {
   id: string;
@@ -24,12 +29,15 @@ export function RenderResourceContent({
   resource,
   onClick,
 }: {
-  resource: ResourceWithDetails;
+  resource: ResourceCellInfo['resource'];
   onClick: (r: any) => void;
 }) {
+  console.log('Resource', resource);
+  console.log('Events', resource?.getEvents());
+  const weeklyHours = resource?._resource.extendedProps?.weeklyHours;
   return (
     <Popover>
-      <div className="flex flex-col h-full py-1 px-2 group cursor-pointer hover:bg-accent/50 transition-colors">
+      <div className="flex flex-col py-1 px-2 group cursor-pointer hover:bg-accent/50 transition-colors">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -37,7 +45,7 @@ export function RenderResourceContent({
           }}
           className="font-semibold text-sm truncate"
         >
-          {resource.title}
+          {resource?._resource?.title}
         </button>
       </div>
 
@@ -55,12 +63,12 @@ export function RenderResourceContent({
         </PopoverTrigger>
         <span
           className={`text-[10px] px-1 mt-1.5 rounded ${
-            resource?.totalHours > 8
+            weeklyHours > 8
               ? 'bg-red-100 text-red-700'
               : 'bg-green-100' + ' text-green-700'
           }`}
         >
-          {resource.totalHours}h
+          {weeklyHours}h
         </span>
       </div>
 
@@ -97,7 +105,7 @@ export function RenderResourceContent({
   );
 }
 
-export const TimeGridContainer = ({
+export const TimeGridContaine = ({
   children,
 }: {
   children: React.ReactNode;
@@ -114,3 +122,32 @@ export const TimeGridContainer = ({
     {children}
   </motion.div>
 );
+export const TimeGridContainer = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.fromTo(
+      containerRef.current,
+      {
+        opacity: 0,
+        x: -50,
+        duration: 0.5,
+      },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.4,
+        ease: 'power1.in',
+      },
+    );
+  });
+  return (
+    <div ref={containerRef} className="lesson-container">
+      {children}
+    </div>
+  );
+};

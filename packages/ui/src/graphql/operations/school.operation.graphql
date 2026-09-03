@@ -7,24 +7,6 @@ query SearchSchool($input: SchoolSearchInput!) {
     logo
   }
 }
-query SearchStudent($input: StudentSearchInput!) {
-  searchStudent(filter: $input) {
-    id
-    schoolUser {
-      user {
-        profile {
-          firstName
-          lastName
-          avatarUrl
-        }
-      }
-    }
-    schoolClass {
-      name
-    }
-    matricule
-  }
-}
 
 query GetSchoolSettings($schoolId: ID!) {
   school(schoolId: $schoolId) {

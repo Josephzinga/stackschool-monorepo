@@ -2,11 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LessonService } from './lesson.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
-  parseTimeString,
   AcademicRpcException,
+  CORE_SERVICE,
+  parseTimeString,
   SchoolRole,
 } from '@stackschool/messaging';
 import { Day, ResourceMode } from '../../graphql';
+import { ClientProxy } from '@nestjs/microservices';
 
 // ─────────────────────────────────────────────────────────────
 // 1. LE MOCK DE PRISMA
@@ -50,6 +52,7 @@ describe('LessonService', () => {
       providers: [
         LessonService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: CORE_SERVICE, useValue: ClientProxy },
       ],
     }).compile();
 
@@ -88,7 +91,7 @@ describe('LessonService', () => {
   const mockClassSubject = {
     id: 'cs-1',
     groupId: 'group-1',
-    subject: { name: 'Mathématiques' },
+    subject: { name: 'Mathématiques', id: 'subject-1' },
     group: { classes: [{ name: '6ème A' }] },
   };
 
@@ -189,7 +192,7 @@ describe('LessonService', () => {
         assignments: {
           classSubject: {
             subject: { name: 'Physique' },
-            group: { classes: [] },
+            group: { classes: [{ name: '10ème' }] },
           },
         },
       },

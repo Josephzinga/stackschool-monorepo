@@ -1,23 +1,27 @@
 'use client';
 import { useCallback, useRef } from 'react';
-import { useLessonStore } from '@/store/lesson-store';
 import {
   Day,
   useCreateLessonMutation,
   useUpdateLessonMutation,
 } from '@stackschool/ui';
-import { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 import { format, getDay } from 'date-fns';
 import { dayMapping } from '@stackschool/contracts';
 import { toast } from 'sonner';
-import { EventResizeDoneArg } from '@fullcalendar/interaction';
-import FullCalendar from '@fullcalendar/react';
+import FullCalendar, {
+  CalendarRef,
+  DateSelectInfo,
+  EventClickInfo,
+  EventDropInfo,
+  EventResizeDoneInfo,
+} from '@fullcalendar/react';
 import { checkEventConflicts } from '@/lib/lesson-calendar';
 import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonCalendar';
 import { Event } from '@/types/lessons-types';
+import { useLessonStore } from '@/store/lesson-store';
 
 export const useLessonEvents = () => {
-  const calendarRef = useRef<FullCalendar | null>(null);
+  const calendarRef = useRef<CalendarRef | null>(null);
 
   const {
     setTargetEventDrop,
@@ -33,7 +37,7 @@ export const useLessonEvents = () => {
   const updateMutate = useUpdateLessonMutation();
   const createMutate = useCreateLessonMutation();
 
-  const handleCalendarMount = useCallback((calendar: FullCalendar) => {
+  const handleCalendarMount = useCallback((calendar: CalendarRef) => {
     calendarRef.current = calendar;
   }, []);
 
@@ -66,8 +70,10 @@ export const useLessonEvents = () => {
 
   // Handler pour le clic sur un événement
   const handleEventClick = useCallback(
-    (args: EventClickArg) => {
-      setSelectedLessonData({ mode: 'UPDATE', args });
+    (info: EventClickInfo) => {
+      console.log('Event clicked:', info.event);
+      setSelectedLessonData({ mode: 'UPDATE', args: info.event });
+
       setLessonDialogOpen(true);
     },
     [setSelectedLessonData, setLessonDialogOpen],
@@ -75,20 +81,21 @@ export const useLessonEvents = () => {
 
   // Handler pour la sélection (création)
   const handleEventSelect = useCallback(
-    (args: DateSelectArg) => {
-      if (args.resource && !args.resource.id) {
+    (info: DateSelectInfo) => {
+      if (info.resource && !info.resource.id) {
         toast.error('Veuillez sélectionner une ressource');
         return;
       }
+
       if (
-        !args.resource &&
+        !info.resource &&
         resources &&
         resources[0]?.id === selectedFilter?.id
       ) {
         setResource({ id: selectedFilter?.id, title: resources[0].title });
       }
 
-      setSelectedLessonData({ mode: 'CREATE', args });
+      setSelectedLessonData({ mode: 'CREATE', args: info });
       setLessonDialogOpen(true);
     },
     [
@@ -101,7 +108,7 @@ export const useLessonEvents = () => {
   );
 
   const handleEventDrop = useCallback(
-    (info: EventDropArg) => {
+    (info: EventDropInfo) => {
       const { event, oldEvent, revert } = info;
       const newStart = event.start;
       const newEnd = event.end;
@@ -152,7 +159,7 @@ export const useLessonEvents = () => {
   );
 
   const handleEventResize = useCallback(
-    (info: EventResizeDoneArg) => {
+    (info: EventResizeDoneInfo) => {
       const { event, oldEvent, revert } = info;
       const newStart = event.start;
       const newEnd = event.end;

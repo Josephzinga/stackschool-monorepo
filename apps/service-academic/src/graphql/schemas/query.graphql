@@ -6,6 +6,7 @@ type Query {
     searchTerm: String
   ): [ClassSubject!]
   class(id: ID!): Class
+  getLessons(input: GetLessonsInput): LessonsList
   getSchoolClasses(input: GetSchoolClassesInput!): ClassList!
   getSchoolSubjects(input: GetSubjectInput!): SubjectList
   getSchoolRooms(filter: GetSchoolRoomInput!): RoomList!

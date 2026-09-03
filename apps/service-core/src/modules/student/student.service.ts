@@ -1,9 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
+  ApiResponse,
   CreateStudentInput,
   GetSchoolStudentsInput,
   Student,
   StudentList,
+  StudentSearchInput,
 } from '../../graphql';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/db/generated/client';
@@ -20,7 +22,6 @@ import {
   sendRmqRequest,
 } from '@stackschool/messaging';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 
 @Injectable()
 export class StudentService {
@@ -189,7 +190,11 @@ export class StudentService {
     });
   }
 
-  async deleteMany(ids: string[], soft: boolean, schoolId: string) {
+  async deleteMany(
+    ids: string[],
+    soft: boolean,
+    schoolId: string,
+  ): Promise<ApiResponse> {
     const exist = await this.prisma.student.findMany({
       where: {
         id: { in: ids },
@@ -245,11 +250,51 @@ export class StudentService {
           id: { in: schoolUserIds as string[] },
         },
       });
-
-      return {
-        ok: true,
-        message: `${ids.length} élève(s) supprimé(s) définitivement`,
-      };
     }
+    return {
+      ok: true,
+      message: `${ids.length} élève(s) supprimé(s) définitivement`,
+    };
+  }
+
+  async search(dto: StudentSearchInput, schoolId: string): Promise<Student[]> {
+    return this.prisma.student.findMany({
+      where: {
+        schoolId,
+        OR: [
+          {
+            schoolUser: {
+              schoolProfile: {
+                OR: [
+                  {
+                    firstName: {
+                      contains: dto.searchTerm ?? '',
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    lastName: {
+                      contains: dto.searchTerm ?? '',
+                      mode: 'insensitive',
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            matricule: { contains: dto.searchTerm ?? '', mode: 'insensitive' },
+          },
+        ],
+      },
+      take: dto.limit ?? 10,
+      orderBy: {
+        schoolUser: {
+          schoolProfile: {
+            lastName: 'asc',
+          },
+        },
+      },
+    });
   }
 }

@@ -5,6 +5,7 @@ type Parent @key(fields: "id") {
   parentStudent: [ParentStudent]
   schoolUserId: ID
   schoolProfile: SchoolProfile
+  member: SchoolMembership
 }
 
 type ParentStudent @key(fields: "id") {
@@ -21,8 +22,9 @@ input CreateParentInput {
   lastName: String!
   phoneNumber: String!
   isDelegate: Boolean
+  gender: Gender!
   email: String
-  address: String!
+  address: String
   profession: String!
   children: [ParentStudentInput!]
 }

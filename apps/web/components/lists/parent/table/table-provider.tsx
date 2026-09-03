@@ -1,8 +1,14 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useState } from 'react';
-import { OnChangeFn, PaginationState, RowSelectionState, VisibilityState } from '@tanstack/react-table';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
+import {
+  ColumnVisibilityState,
+  OnChangeFn,
+  PaginationState,
+  RowSelectionState,
+} from '@tanstack/react-table';
 import { PaginationMeta } from '@stackschool/ui';
+import { parseAsString, useQueryState } from 'nuqs';
 
 interface ParentFiltersState {
   searchTerm?: string;
@@ -16,13 +22,14 @@ interface TableContextType {
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   filters: ParentFiltersState;
   setFilters: React.Dispatch<React.SetStateAction<ParentFiltersState>>;
-  
+
   rowSelection: RowSelectionState;
   setRowSelection: OnChangeFn<RowSelectionState>;
+  dialogOpen: boolean;
+  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  columnVisibility: ColumnVisibilityState;
+  setColumnVisibility: OnChangeFn<ColumnVisibilityState>;
 
-  columnVisibility: VisibilityState;
-  setColumnVisibility: OnChangeFn<VisibilityState>;
-  
   meta?: Omit<PaginationMeta, 'page'>;
   isLoading?: boolean;
 }
@@ -34,10 +41,15 @@ export function TableProvider({ children }: { children: ReactNode }) {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useQueryState(
+    '',
+    parseAsString.withDefault(''),
+  );
   const [filters, setFilters] = useState<ParentFiltersState>({});
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [columnVisibility, setColumnVisibility] =
+    useState<ColumnVisibilityState>({});
 
   const value = {
     pagination,
@@ -50,6 +62,8 @@ export function TableProvider({ children }: { children: ReactNode }) {
     setRowSelection,
     columnVisibility,
     setColumnVisibility,
+    dialogOpen,
+    setDialogOpen,
   };
 
   return (
@@ -57,7 +71,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export const useTable = () => {
+export const useParentTable = () => {
   const context = useContext(TableContext);
   if (context === undefined) {
     throw new Error('useTable must be used within a TableProvider');

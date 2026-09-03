@@ -31,6 +31,7 @@ import { SchoolModule } from './modules/externals/school/school.module';
 import { StudentModule } from './modules/externals/student/student.module';
 import { TeacherAssignmentModule } from './modules/teacher-assignment/teacher-assignment.module';
 import { LessonModule } from './modules/lesson/lesson.module';
+import { RoomModule } from './modules/room/room.module';
 @Module({
   imports: [
     AuthModule,
@@ -96,7 +97,7 @@ import { LessonModule } from './modules/lesson/lesson.module';
               message: originalError.message as string, // Requis par GraphQL
               extensions: {
                 code: originalError.code,
-                details: originalError.meta, // Tes métadonnées
+                meta: originalError.meta, // Tes métadonnées
               },
             };
           } else if (originalError instanceof RpcException) {
@@ -104,7 +105,7 @@ import { LessonModule } from './modules/lesson/lesson.module';
               message: originalError.message,
               extensions: {
                 code: 'FORBIDDEN',
-                details: originalError.cause,
+                meta: originalError?.meta,
               },
             };
           }
@@ -132,6 +133,7 @@ import { LessonModule } from './modules/lesson/lesson.module';
     StudentModule,
     TeacherAssignmentModule,
     LessonModule,
+    RoomModule,
   ],
 })
 export class AcademicModule {}

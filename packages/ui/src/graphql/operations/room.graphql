@@ -1,0 +1,48 @@
+query GetSchoolRoom($filter: GetSchoolRoomInput!) {
+  getSchoolRooms(filter: $filter) {
+    meta {
+      totalPages
+      limit
+      total
+    }
+    data {
+      ...RoomFragment
+    }
+  }
+}
+
+mutation CreateRoom($input: CreateRoomInput!) {
+  createRoom(input: $input) {
+    ...RoomFragment
+  }
+}
+
+mutation DeleteRooms($ids: [ID!], $soft: Boolean! = true) {
+  deleteRooms(ids: $ids, soft: $soft) {
+    ok
+    message
+  }
+}
+
+mutation UpdateRoom($input: CreateRoomInput!) {
+  updateRoom(input: $input) {
+    ...RoomFragment
+  }
+}
+fragment RoomFragment on Room {
+  id
+  name
+  code
+  capacity
+  type
+  defaultForClass {
+    id
+    name
+    level
+  }
+  class {
+    id
+    name
+    level
+  }
+}

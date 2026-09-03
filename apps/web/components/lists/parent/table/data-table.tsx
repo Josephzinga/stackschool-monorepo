@@ -2,39 +2,54 @@
 
 import {
   type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  createFilteredRowModel,
+  createPaginatedRowModel,
+  createSortedRowModel,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  tableFeatures,
+  useTable,
 } from '@tanstack/react-table';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
-import { useTable } from './table-provider';
+import { useParentTable } from './table-provider';
 import { PaginationMeta } from '@stackschool/ui';
 import { useWindowSize } from 'react-use';
 import { DataTablePagination } from '@/components/data-table-pagination';
+import AppDataTable from '@/components/table/app-data-table';
+import { ParentData } from '@/components/lists/parent/table/column';
+import { AppTableMeta } from '@/types/tanstack-table';
+import { toast } from '@/components/ui/toast';
+import { AppAlertDialog } from '@/components/app-alert-dialog';
+import { ParentEmpty } from '@/components/lists/class/table/table-empty';
+import { ParentDialog } from '@/components/lists/parent/parent-dialog';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+const features = tableFeatures({
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  filteredRowModel: createFilteredRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+  sortedRowModel: createSortedRowModel(),
+  tableMeta: {} as AppTableMeta<ParentData>,
+});
+
+export type ParentFeatures = typeof features;
+
+interface DataTableProps {
+  columns: ColumnDef<ParentFeatures, ParentData>[];
+  data: ParentData[];
   isLoading: boolean;
   meta?: Omit<PaginationMeta, 'page'>;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  isLoading,
-  meta,
-}: DataTableProps<TData, TValue>) {
+export function DataTable({ columns, data, isLoading, meta }: DataTableProps) {
   const {
     pagination,
     setPagination,
@@ -42,10 +57,20 @@ export function DataTable<TData, TValue>({
     setRowSelection,
     columnVisibility,
     setColumnVisibility,
-  } = useTable();
+    dialogOpen,
+    setDialogOpen,
+  } = useParentTable();
 
   const { width } = useWindowSize();
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
+  const handleDelete = async () => {
+    // Sera implémenté avec la mutation correspondante
+    toast.add({
+      title: 'La suppression des parents sera bientôt disponible',
+    });
+    setShowDeleteAlert(false);
+  };
   useEffect(() => {
     if (width < 640) {
       setColumnVisibility({
@@ -68,16 +93,21 @@ export function DataTable<TData, TValue>({
     }
   }, [width, setColumnVisibility]);
 
-  const table = useReactTable({
+  const table = useTable({
+    features,
     columns,
     data,
-    getCoreRowModel: getCoreRowModel(),
     onPaginationChange: setPagination,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     getRowId: (row: any) => row.id,
     rowCount: meta?.total,
     manualPagination: true,
+    meta: {
+      openDelete: (data) => {
+        setShowDeleteAlert(true);
+      },
+    },
     state: {
       columnVisibility,
       pagination,
@@ -94,65 +124,29 @@ export function DataTable<TData, TValue>({
           </div>
         )}
 
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                className="h-10 bg-slate-100 dark:bg-slate-900"
-              >
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className="font-semibold font-inter text-md whitespace-nowrap"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className="h-14 even:bg-slate-50 dark:even:bg-slate-950 "
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  {isLoading ? 'Chargement...' : 'Aucun résultat.'}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <AppDataTable
+          table={table}
+          isLoading={isLoading}
+          columns={columns}
+          emptyComponent={<ParentEmpty />}
+        />
       </div>
 
       <DataTablePagination table={table} isLoading={isLoading} />
+
+      <AppAlertDialog
+        open={showDeleteAlert}
+        onOpenChange={setShowDeleteAlert}
+        title="Supprimer ce parent ?"
+        description="Cette action est irréversible. Les liens avec les élèves seront également supprimés."
+        onConfirm={handleDelete}
+        confirmLabel="Supprimer"
+        variant="destructive"
+      />
+
+      {dialogOpen && (
+        <ParentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      )}
     </div>
   );
 }

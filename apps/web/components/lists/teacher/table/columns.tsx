@@ -19,6 +19,7 @@ import {
   CellCheckBox,
   HeaderCheckBox,
 } from '@/components/table/table-checkbox';
+import { AvatarProfile } from '@/components/profile-avatar';
 
 export type TeachersData = {
   id: string;
@@ -66,41 +67,23 @@ export const columns = columnHelper.columns([
     },
     cell: ({ row }) => {
       const profile = row.original.profile;
-      const id = row.original.id;
 
       return (
-        <Link href={`/list/teachers/${id}`} className="block w-full h-full">
-          <div className="flex gap-3 items-center group p-1 rounded-md">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={profile?.avatarUrl} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                {profile.firstName?.[0]}
-                {profile.lastName?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="font-medium text-sm text-red group-hover:text-foreground/80 group-hover:underline group-hover:underline-offset-2">
-                {profile.firstName} {profile.lastName}
-              </span>
-            </div>
-          </div>
-        </Link>
+        <AvatarProfile
+          profile={profile}
+          href={`/list/teachers/${row.original.id}`}
+        />
       );
     },
   }),
-  columnHelper.group({
-    id: 'contact',
+  columnHelper.accessor('contact', {
     header: 'Contact',
-    columns: columnHelper.columns([
-      columnHelper.accessor('contact.phoneNumber', {
-        header: 'Téléphone',
-        cell: ({ row }) => <p>{row.original.contact.phoneNumber} </p>,
-      }),
-      columnHelper.accessor('contact.email', {
-        header: 'Email',
-        cell: ({ row }) => <p>{row.original.contact.email} </p>,
-      }),
-    ]),
+    cell: ({ row }) => (
+      <div>
+        <p>{row.original.contact?.phoneNumber}</p>
+        <p>{row.original.contact?.email} </p>
+      </div>
+    ),
   }),
   columnHelper.accessor('assignments.subject', {
     header: () => (

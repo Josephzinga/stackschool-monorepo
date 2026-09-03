@@ -15,6 +15,7 @@ import {
   TableFeatures,
 } from '@tanstack/react-table';
 import * as React from 'react';
+import { LoaderOne } from '@/components/ui/loader';
 
 interface AppDataTableProps<
   TFeatures extends TableFeatures,
@@ -23,13 +24,19 @@ interface AppDataTableProps<
   table: TableType<TFeatures, TData>;
   isLoading?: boolean;
   columns: ColumnDef<TFeatures, TData>[];
+  emptyComponent?: React.ReactNode;
 }
 
 export default function AppDataTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
   TValue extends CellData,
->({ table, columns, isLoading }: AppDataTableProps<TFeatures, TData>) {
+>({
+  table,
+  columns,
+  isLoading,
+  emptyComponent,
+}: AppDataTableProps<TFeatures, TData>) {
   return (
     <Table className="px-2 overflow-x-auto">
       <TableHeader>
@@ -69,7 +76,13 @@ export default function AppDataTable<
         ) : (
           <TableRow>
             <TableCell colSpan={columns.length} className="h-24 text-center">
-              {isLoading ? 'Chargement...' : 'Aucun résultat.'}
+              {isLoading ? (
+                <LoaderOne />
+              ) : emptyComponent ? (
+                emptyComponent
+              ) : (
+                'Aucun donné trouvé.'
+              )}
             </TableCell>
           </TableRow>
         )}

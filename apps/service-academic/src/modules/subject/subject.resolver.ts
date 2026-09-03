@@ -39,7 +39,6 @@ export class SubjectResolver {
     @Context('schoolId') schoolId: string,
     @Args('input') dto: GetSubjectInput,
   ): Promise<SubjectList> {
-    console.log('SchoolSubjectInput', dto);
     return this.subjectService.getAll(dto, schoolId);
   }
 

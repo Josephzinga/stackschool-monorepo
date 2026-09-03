@@ -6,8 +6,9 @@ import {
   SchoolProfile,
   SchoolUser,
   Student,
+  Teacher,
 } from '../../prisma/db/generated/client';
-import { StudentCount } from '../../graphql';
+import { LessonTeacher, StudentCount } from '../../graphql';
 
 /**
  * Token d'injection du client Prisma.
@@ -65,6 +66,55 @@ export class DataLoaderService {
         },
       ),
 
+      schoolUserLoader: new DataLoader<string, SchoolUser | undefined>(
+        async (schoolUserIds) => {
+          const schoolUsers = await prisma.schoolUser.findMany({
+            where: {
+              id: {
+                in: [...schoolUserIds],
+              },
+            },
+          });
+          const map = indexBy(schoolUsers, (item) => item.id);
+          return schoolUserIds.map((id) => map.get(id));
+        },
+      ),
+      teacherLoader: new DataLoader<string, Teacher | undefined>(
+        async (teacherIds) => {
+          const teachers = await prisma.teacher.findMany({
+            where: {
+              id: { in: [...teacherIds] },
+            },
+          });
+
+          const map = indexBy(teachers, (item) => item.id);
+          return teacherIds.map((id) => map.get(id));
+        },
+      ),
+      teacherLessonLoader: new DataLoader<string, LessonTeacher | undefined>(
+        async (teacherIds) => {
+          const teachers = await prisma.teacher.findMany({
+            where: {
+              id: { in: [...teacherIds] },
+            },
+            select: {
+              id: true,
+              schoolUser: {
+                select: {
+                  schoolProfile: true,
+                },
+              },
+            },
+          });
+          const lessonTeachers = teachers.map((t) => ({
+            id: t.id,
+            firstName: t.schoolUser?.schoolProfile?.firstName ?? '',
+            lastName: t.schoolUser?.schoolProfile?.lastName ?? '',
+          }));
+          const map = indexBy(lessonTeachers, (item) => item.id);
+          return teacherIds.map((id) => map.get(id));
+        },
+      ),
       schoolProfileLoader: new DataLoader<string, SchoolProfile | undefined>(
         async (schoolUserIds) => {
           const schoolProfiles = await prisma.schoolProfile.findMany({

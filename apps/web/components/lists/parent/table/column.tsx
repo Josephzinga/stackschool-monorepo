@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import * as React from 'react';
 import { useState } from 'react';
-import { RelationTypeEnum } from '@stackschool/shared';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Popover,
@@ -11,8 +10,10 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ParentActions } from '@/components/lists/parent/table/parent-actions';
+import { ParentFeatures } from '@/components/lists/parent/table/data-table';
+import { RelationTypeEnum } from '@stackschool/contracts';
 
-export type ParentColumn = {
+export type ParentData = {
   id: string;
   firstname: string;
   lastname: string;
@@ -33,7 +34,7 @@ export type ParentColumn = {
     };
   }[];
 };
-export const columns: ColumnDef<ParentColumn>[] = [
+export const columns: ColumnDef<ParentFeatures, ParentData>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -118,20 +119,20 @@ export const columns: ColumnDef<ParentColumn>[] = [
       return (
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger
-            asChild
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
-          >
-            <button
-              onClick={() => setOpen(true)}
-              className="text-xs border px-2 py-1 rounded-lg hover:bg-accent transition"
-            >
-              {firstStudent?.firstname} {firstStudent?.lastname}
-              {remainingCount > 0 && (
-                <span className="text-blue-600 ml-1">{` +${remainingCount}`}</span>
-              )}
-            </button>
-          </PopoverTrigger>
+            render={
+              <button
+                onClick={() => setOpen(true)}
+                className="text-xs border px-2 py-1 rounded-lg hover:bg-accent transition"
+              >
+                {firstStudent?.firstname} {firstStudent?.lastname}
+                {remainingCount > 0 && (
+                  <span className="text-blue-600 ml-1">{` +${remainingCount}`}</span>
+                )}
+              </button>
+            }
+          ></PopoverTrigger>
           <PopoverContent
             className="w-48 px-2"
             onMouseEnter={() => setOpen(true)}

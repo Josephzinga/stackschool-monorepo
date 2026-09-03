@@ -61,8 +61,7 @@ export const AppAlertDialog = ({
             {cancelLabel}
           </AlertDialogCancel>
           <AlertDialogAction
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() => {
               onConfirm();
             }}
             className={cn(

@@ -1,4 +1,4 @@
-import type {CodegenConfig} from '@graphql-codegen/cli';
+import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   overwrite: true,
@@ -10,7 +10,7 @@ const config: CodegenConfig = {
     // 'apps/service-operations/src/graphql/**/*.graphql',
   ],
 
-  documents: ['packages/contracts/src/graphql/operations/**/*.graphql'],
+  documents: ['packages/ui/src/graphql/operations/**/*.graphql'],
 
   generates: {
     'packages/ui/src/generated/v2/graphql.ts': {

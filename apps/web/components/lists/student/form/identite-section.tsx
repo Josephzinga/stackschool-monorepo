@@ -1,17 +1,27 @@
 'use client';
-import React, {useState} from 'react';
-import {GridForm} from '@/components/lists/grid-form';
-import {Field, FieldError, FieldLabel} from '@/components/ui/field';
-import {Input} from '@/components/ui/input';
-import {Calendar as CalendarIcon, User, User2Icon} from 'lucide-react';
-import {Controller, useFormContext} from 'react-hook-form';
+import React, { useState } from 'react';
+import { GridForm } from '@/components/lists/grid-form';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Calendar as CalendarIcon, User, User2Icon } from 'lucide-react';
+import { Controller, useFormContext } from 'react-hook-form';
 import 'react-phone-number-input/style.css';
-import {Popover, PopoverContent, PopoverTrigger,} from '@/components/animate-ui/components/radix/popover';
-import {Button} from '@/components/ui/button';
-import {Calendar} from '@/components/ui/calendar';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import PhoneInput from 'react-phone-number-input';
-import {CreateStudentSchema} from "@stackschool/contracts";
+import { CreateStudentSchema } from '@stackschool/contracts';
 
 export function IdentiteSection({
   mode,
@@ -134,19 +144,21 @@ export function IdentiteSection({
             name="birthDate"
             render={({ field: { onChange, value } }) => (
               <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    id="date"
-                    className="w-full justify-between rounded-md font-normal h-8"
-                    aria-invalid={!!errors.birthDate}
-                  >
-                    {value
-                      ? new Date(value).toLocaleDateString()
-                      : 'Sélectionner la date'}
-                    <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
+                <PopoverTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      id="date"
+                      className="w-full justify-between rounded-md font-normal h-8"
+                      aria-invalid={!!errors.birthDate}
+                    >
+                      {value
+                        ? new Date(value).toLocaleDateString()
+                        : 'Sélectionner la date'}
+                      <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                    </Button>
+                  }
+                ></PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-accent" align="start">
                   <Calendar
                     mode="single"

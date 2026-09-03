@@ -1,10 +1,15 @@
 'use client';
 
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import {
+  Controller,
+  FormProvider,
+  useFieldArray,
+  useForm,
+} from 'react-hook-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CreateParentFormData, createParentSchema } from '@stackschool/shared';
+import { CreateParentSchema } from '@stackschool/contracts';
 import { GridForm } from '@/components/lists/grid-form';
 import { ProfileSubForm } from '@/components/lists/form/profile-sub-form';
 import {
@@ -24,26 +29,28 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function CreateParentForm({
   initialValues,
 }: {
-  initialValues?: CreateParentFormData;
+  initialValues?: CreateParentSchema;
 }) {
   const { currentSchool } = useUserStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [open, setOpen] = useState(false);
   const debouncedSearch = useDebounce(searchTerm, 500);
-  const methods = useForm<CreateParentFormData>({
-    resolver: zodResolver(createParentSchema),
+  const methods = useForm<CreateParentSchema>({
+    resolver: zodResolver(CreateParentSchema),
     defaultValues: {
-      firstname: initialValues?.firstname,
-      lastname: initialValues?.lastname,
-      email: initialValues?.email,
-      phoneNumber: initialValues?.phoneNumber,
-      address: initialValues?.address,
-      profession: initialValues?.profession,
-      children: initialValues?.children,
+      phoneNumber: '',
+      ...initialValues,
     },
   });
 
@@ -85,7 +92,8 @@ export function CreateParentForm({
     isError,
     error,
   } = useCreateParentMutation();
-  const onSubmit = async (data: CreateParentFormData) => {
+
+  const onSubmit = async (data: CreateParentSchema) => {
     const promise = createMutate({
       input: data,
     });
@@ -98,16 +106,12 @@ export function CreateParentForm({
       },
     });
   };
-  console.log('SearchTErm', searchTerm);
   return (
     <FormProvider {...methods}>
       <form
-        onSubmit={
-          (handleSubmit(onSubmit),
-          (err) => {
-            console.log(err);
-          })
-        }
+        onSubmit={methods.handleSubmit(onSubmit, (err) => {
+          console.log(err);
+        })}
         className="flex flex-col gap-4 w-full"
       >
         <ProfileSubForm />
@@ -130,6 +134,24 @@ export function CreateParentForm({
               aria-invalid={!!errors.address}
             />
             <FieldError errors={[{ message: errors.address?.message }]} />
+          </Field>
+          <Field>
+            <FieldLabel>Genre</FieldLabel>
+            <Controller
+              control={control}
+              name="gender"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionné un genre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MALE">Homme</SelectItem>
+                    <SelectItem value="FEMALE">Femme</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </Field>
         </GridForm>
 
@@ -155,8 +177,8 @@ export function CreateParentForm({
               <CommandEmpty>Aucun élève trouvé</CommandEmpty>
               {data?.searchStudent?.map((student) => (
                 <CommandItem value={student.id} key={student.id}>
-                  {student.user?.profile?.firstname}{' '}
-                  {student.user?.profile?.lastname}
+                  {student.schoolProfile?.firstName}{' '}
+                  {student.schoolProfile?.lastName}
                 </CommandItem>
               ))}
             </CommandList>

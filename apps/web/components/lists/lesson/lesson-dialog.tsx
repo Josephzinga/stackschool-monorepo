@@ -1,6 +1,5 @@
 'use client';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +9,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { GridForm } from '@/components/lists/grid-form';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from '@/components/ui/field';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Select,
@@ -29,21 +35,24 @@ import {
   dayConstants,
   dayMapping,
   LessonStatusEnum,
+  UpdateLessonSchema,
 } from '@stackschool/contracts';
 import {
   Day,
   LessonStatus,
   useGetTeacherAssignmentsQuery,
   zodResolver,
-  useLessonStore,
 } from '@stackschool/ui';
 import { format, getDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useLessonMutations } from '@/components/lists/lesson/hooks/useLessonMutations';
+import { DateSelectInfo, EventClickInfo } from '@fullcalendar/react';
+import { useLessonStore } from '@/store/lesson-store';
+import { EventImpl } from '@fullcalendar/react/protected-api';
 
 export type InitialData =
-  | { mode: 'CREATE'; args: DateSelectArg }
-  | { mode: 'UPDATE'; args: EventClickArg }
+  | { mode: 'CREATE'; args: DateSelectInfo }
+  | { mode: 'UPDATE'; args: EventImpl }
   | undefined;
 
 interface LessonDialogProps {
@@ -57,27 +66,14 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
     lessonDialogOpen,
     selectedLessonData,
     resource,
-    setResource,
   } = useLessonStore();
   const isClassMode = resourceMode === 'CLASS';
   const isUpdate = selectedLessonData?.mode === 'UPDATE';
-  const {
-    register,
-    control,
-    handleSubmit,
-    setValue,
-    watch,
-    setError,
-    clearErrors,
-    formState: { errors, isValid, isDirty },
-  } = useForm<CreateLessonSchema>({
-    resolver: zodResolver(CreateLessonSchema),
-  });
 
   const { handleDelete, handleSubmitForm, handleUpdateStatus } =
     useLessonMutations();
 
-  const eventData = isUpdate ? selectedLessonData.args.event : null;
+  const eventData = isUpdate ? selectedLessonData.args : null;
   const selectionData = !isUpdate ? selectedLessonData?.args : null;
   const subject = eventData?._def?.extendedProps?.subject;
   const teacher = eventData?._def?.extendedProps?.teacher;
@@ -109,6 +105,32 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
 
   const classSubjectData = data?.getTeacherAssignments;
 
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    setError,
+    clearErrors,
+
+    formState: { errors, dirtyFields, isDirty },
+  } = useForm<CreateLessonSchema | UpdateLessonSchema>({
+    resolver: zodResolver(isUpdate ? UpdateLessonSchema : CreateLessonSchema),
+    defaultValues: {
+      id: lessonId || '',
+      startTime: start ? format(start, 'HH:mm') : '',
+      endTime: end ? format(end, 'HH:mm') : '',
+      mode: resourceMode,
+      day: Object.keys(dayMapping).find(
+        (key) => dayMapping[key as Day] === getDay(start!),
+      ) as CreateLessonSchema['day'],
+      subjectId: subject?.id || '',
+      teacherId: teacher?.id || '',
+      groupId: eventData?.extendedProps?.group?.id || '',
+    },
+  });
+
   useEffect(() => {
     if (isError) {
       setError('subjectId', { message: 'Erreur de chargement des matières.' });
@@ -120,29 +142,6 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
       clearErrors('teacherId');
     }
   }, [isError]);
-
-  useEffect(() => {
-    setValue('startTime', start ? format(start, 'HH:mm') : '');
-    setValue('endTime', end ? format(end, 'HH:mm') : '');
-    setValue('mode', resourceMode);
-
-    const day = Object.keys(dayMapping).find(
-      (key) => dayMapping[key as Day] === getDay(start!),
-    );
-    if (day) setValue('day', day as CreateLessonSchema['day']);
-
-    if (isUpdate) {
-      setValue('subjectId', subject?.id);
-
-      setValue('teacherId', teacher?.id);
-      setValue('groupId', eventData?.extendedProps?.group?.id);
-    } else {
-      if (!activeResourceId) return;
-      isClassMode
-        ? setValue('groupId', activeResourceId)
-        : setValue('teacherId', activeResourceId);
-    }
-  }, [selectedLessonData, eventData, setValue, resourceMode, activeResourceId]);
 
   const selectedSubjectId = watch('subjectId');
   const selectedSecondaryId = watch(isClassMode ? 'teacherId' : 'groupId');
@@ -220,8 +219,18 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
     [resourceMode],
   );
 
-  const onSubmit = async (data: CreateLessonFormData) => {
-    await handleSubmitForm(data, lessonId, isUpdate);
+  const onSubmit = async (data: CreateLessonSchema) => {
+    const updateData = Object.keys(dirtyFields).reduce((acc, key) => {
+      Object.assign(acc, {
+        [key]: data[key as keyof CreateLessonSchema],
+      });
+      return acc;
+    }, {} as Partial<CreateLessonSchema>);
+    await handleSubmitForm(
+      updateData as CreateLessonSchema,
+      lessonId,
+      isUpdate,
+    );
     onSuccess?.();
   };
 
@@ -274,7 +283,7 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                       value={value}
                     >
                       <SelectTrigger aria-invalid={!!errors?.subjectId}>
-                        <SelectValue placeholder="Selectionner une maitére"></SelectValue>
+                        <SelectValue placeholder="Sélectionné une matière"></SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {selectedSubjectId && selectedSubjectId !== '' && (
@@ -288,18 +297,25 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                             <SelectSeparator />
                           </>
                         )}
-                        {uniqueSubjects?.map((cls) => (
-                          <SelectItem
-                            key={cls?.classSubject?.subject?.id}
-                            value={cls?.classSubject?.subject?.id!}
-                          >
-                            {cls?.classSubject?.subject?.name}
+                        {uniqueSubjects.length > 0 ? (
+                          uniqueSubjects?.map((cls) => (
+                            <SelectItem
+                              key={cls?.classSubject?.subject?.id}
+                              value={cls?.classSubject?.subject?.id!}
+                            >
+                              {cls?.classSubject?.subject?.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="" className="text-gray-600">
+                            Aucune matière assigné
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                   )}
                 />
+
                 <FieldError>{errors?.subjectId?.message}</FieldError>
               </Field>
               <Field>
@@ -345,30 +361,44 @@ export default function LessonDialog({ onSuccess }: LessonDialogProps) {
                             <SelectSeparator />
                           </>
                         )}
-                        {uniqueSecondary?.map((cs) => (
-                          <SelectItem
-                            key={
-                              isClassMode
-                                ? cs?.teacher?.id
-                                : cs?.classSubject?.group?.id
-                            }
-                            value={
-                              isClassMode
-                                ? cs?.teacher?.id!
-                                : cs?.classSubject?.group?.id!
-                            }
-                          >
-                            {isClassMode
-                              ? `${cs?.teacher?.schoolProfile?.firstName} ${cs?.teacher?.schoolProfile?.lastName}`
-                              : cs?.classSubject?.group?.type === 'SOLO'
-                                ? cs.classSubject?.group?.classes?.[0]?.name
-                                : cs?.classSubject?.group?.name}
+                        {uniqueSecondary.length > 0 ? (
+                          uniqueSecondary?.map((cs) => (
+                            <SelectItem
+                              key={
+                                isClassMode
+                                  ? cs?.teacher?.id
+                                  : cs?.classSubject?.group?.id
+                              }
+                              value={
+                                isClassMode
+                                  ? cs?.teacher?.id!
+                                  : cs?.classSubject?.group?.id!
+                              }
+                            >
+                              {isClassMode
+                                ? `${cs?.teacher?.schoolProfile?.firstName} ${cs?.teacher?.schoolProfile?.lastName}`
+                                : cs?.classSubject?.group?.type === 'SOLO'
+                                  ? cs.classSubject?.group?.classes?.[0]?.name
+                                  : cs?.classSubject?.group?.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="">
+                            {!isClassMode
+                              ? 'Aucune classe assigné'
+                              : 'Aucun enseignant assigné'}
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                   )}
                 />
+                {uniqueSecondary.length === 0 && (
+                  <Button className="py-0" variant="link">
+                    {isClassMode ? ' Assigné un enseignant' : ''}
+                  </Button>
+                )}
+
                 <FieldError>
                   {isClassMode
                     ? errors?.teacherId?.message

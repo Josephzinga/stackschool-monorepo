@@ -1,16 +1,25 @@
 'use client';
 
-import { RoomDataTable } from '@/components/lists/room/data-table';
-import { columns, RoomColumns } from '@/components/lists/room/columns';
+import { RoomDataTable } from '@/components/lists/room/table/data-table';
+import { columns, RoomData } from '@/components/lists/room/table/columns';
 import { useGetSchoolRoomQuery } from '@stackschool/ui';
-import { useState } from 'react';
-import { RoomFormDialog } from '@/components/lists/room/room-form-dialog';
 import { useDebounce } from '@/hooks/useDebounce';
-import { RoomTableHeader } from '@/components/lists/room/table-header';
+import { RoomTableHeader } from '@/components/lists/room/table/table-header';
+import {
+  TableProvider,
+  useRoomTable,
+} from '@/components/lists/room/table/table-provider';
 
 export default function RoomsPage() {
-  const [open, setOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  return (
+    <TableProvider>
+      <RoomView />
+    </TableProvider>
+  );
+}
+
+function RoomView() {
+  const { setPagination, searchTerm } = useRoomTable();
   const search = useDebounce(searchTerm, 400);
 
   const { data, isPending } = useGetSchoolRoomQuery({
@@ -20,7 +29,7 @@ export default function RoomsPage() {
     },
   });
 
-  const roomData: RoomColumns[] = data?.getSchoolRooms?.data || [];
+  const roomData: RoomData[] = data?.getSchoolRooms?.data! || [];
   return (
     <div className="flex flex-col h-full p-3 md:p-6 z-10 gap-3">
       <RoomTableHeader />
@@ -28,11 +37,8 @@ export default function RoomsPage() {
         data={roomData}
         meta={data?.getSchoolRooms?.meta ?? undefined}
         columns={columns}
-        isLoading={false}
+        isLoading={isPending}
       />
-      <div className="flex justify-between">
-        <RoomFormDialog open={open} onOpenChange={setOpen} />
-      </div>
     </div>
   );
 }

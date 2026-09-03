@@ -25,6 +25,7 @@ import { createContext } from './graphql/context';
 import { StudentModule } from './modules/student/student.module';
 import { RabbitMQClientsModule } from './modules/rabbitmq/rabbitmq-clients.module';
 import { ExternalModule } from './modules/external/external.module';
+import { ParentModule } from './modules/parent/parent.module';
 
 @Module({
   imports: [
@@ -125,6 +126,7 @@ import { ExternalModule } from './modules/external/external.module';
       }),
     }),
     StudentModule,
+    ParentModule,
   ],
   exports: [MembershipModule, CacheModule],
 })

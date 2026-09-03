@@ -5,7 +5,7 @@
       "@stackschool/db/*": ["./packages/db/*"],
       "@stackschool/messaging/*": ["./packages/messaging/*"],
       "@stackschool/ui/*": ["./packages/ui/*"],
-      "@stackschool/api/*": ["./apps/api/*"],
+      "@stackschool/service-academic/*": ["./apps/service-academic/*"],
       "@stackschool/web/*": ["./apps/web/*"],
       "@stackschool/mobile/*": ["./apps/mobile/*"],
       "@stackschool/contracts/*": ["./packages/contracts/*"]

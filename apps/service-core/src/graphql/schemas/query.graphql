@@ -1,10 +1,9 @@
-type Query {
-  searchStudent(filter: StudentSearchInput!): [Student!]
+extend type Query {
+  searchStudent(filter: StudentSearchInput!): [Student]
   searchSchool(filter: SchoolSearchInput!): [School!]
   school(schoolId: ID!): School!
   teacher(id: ID!): Teacher
   student(id: ID!): Student
-  getLessons(filter: GetLessonsInput!): LessonsList
   getSchoolTeachers(input: GetSchoolTeachersInput!): TeacherList!
   getSchoolStudents(input: GetSchoolStudentsInput!): StudentList!
   getSchoolParents(filter: GetSchoolParentsInput!): ParentList

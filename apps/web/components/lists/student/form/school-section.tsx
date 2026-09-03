@@ -18,7 +18,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/animate-ui/components/radix/popover';
+} from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
@@ -150,19 +150,21 @@ export function SchoolSection({ mode }: { mode: 'QUICK_ADD' | 'FULL_EDIT' }) {
                 name="enrollmentDate"
                 render={({ field: { onChange, value } }) => (
                   <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        id="date"
-                        className="w-full justify-between font-normal h-10"
-                        aria-invalid={!!errors.birthDate}
-                      >
-                        {value
-                          ? new Date(value).toLocaleDateString()
-                          : 'Sélectionner la date'}
-                        <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
+                    <PopoverTrigger
+                      render={
+                        <Button
+                          variant="outline"
+                          id="date"
+                          className="w-full justify-between font-normal h-10"
+                          aria-invalid={!!errors.birthDate}
+                        >
+                          {value
+                            ? new Date(value).toLocaleDateString()
+                            : 'Sélectionner la date'}
+                          <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                        </Button>
+                      }
+                    ></PopoverTrigger>
                     <PopoverContent
                       className="w-auto p-0 bg-accent"
                       align="start"

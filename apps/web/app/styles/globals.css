@@ -90,14 +90,14 @@
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
 
-  --fc-small-font-size: .85em;
+  --fc-small-font-size: 0.85em;
   --fc-page-bg-color: var(--accent);
   --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
   --fc-neutral-text-color: #808080;
   --fc-border-color: #518fcd;
 
   --fc-button-text-color: #fff;
-  --fc-button-border-color: #2C3E50;
+  --fc-button-border-color: #2c3e50;
   --fc-button-hover-bg-color: #1e2b37;
   --fc-button-hover-border-color: #1a252f;
   --fc-button-active-bg-color: #1a252f;
@@ -151,15 +151,23 @@
   --sidebar-border: oklch(0.925 0.006 221.7);
   --sidebar-ring: oklch(0.925 0.006 221.7);
   --toaster-background: oklch(0.925 0.006 221.7);
-  --font-sans: "Poppins", sans-serif;
-  --font-heading: "Prata", sans-serif;
+  --font-sans: 'Poppins', sans-serif;
+  --font-heading: 'Prata', sans-serif;
   --radius: 0.75rem;
   --shadow-2xs: 0 1px 0 0 oklch(0.55 0.017 221.7 / 0.05);
   --shadow-xs: 0 1px 2px 0 oklch(0.55 0.017 221.7 / 0.05);
-  --shadow-sm: 0 1px 3px 0 oklch(0.55 0.017 221.7 / 0.1), 0 1px 2px -1px oklch(0.55 0.017 221.7 / 0.1);
-  --shadow-md: 0 4px 6px -1px oklch(0.55 0.017 221.7 / 0.1), 0 2px 4px -2px oklch(0.55 0.017 221.7 / 0.1);
-  --shadow-lg: 0 10px 15px -3px oklch(0.55 0.017 221.7 / 0.1), 0 4px 6px -4px oklch(0.55 0.017 221.7 / 0.1);
-  --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.1), 0 8px 10px -6px oklch(0.55 0.017 221.7 / 0.1);
+  --shadow-sm:
+    0 1px 3px 0 oklch(0.55 0.017 221.7 / 0.1),
+    0 1px 2px -1px oklch(0.55 0.017 221.7 / 0.1);
+  --shadow-md:
+    0 4px 6px -1px oklch(0.55 0.017 221.7 / 0.1),
+    0 2px 4px -2px oklch(0.55 0.017 221.7 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px oklch(0.55 0.017 221.7 / 0.1),
+    0 4px 6px -4px oklch(0.55 0.017 221.7 / 0.1);
+  --shadow-xl:
+    0 20px 25px -5px oklch(0 0 0 / 0.1),
+    0 8px 10px -6px oklch(0.55 0.017 221.7 / 0.1);
   --shadow-2xl: 0 25px 50px -12px oklch(0.55 0.017 221.7 / 0.15);
 }
 
@@ -199,10 +207,14 @@
   --sidebar-ring: oklch(0.689 0.111 221.7);
   --shadow-2xs: 0 1px 3px 0 hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0 hsl(0 0% 0% / 0.05);
-  --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-  --shadow-md: 0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-  --shadow-lg: 0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-  --shadow-xl: 0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-sm:
+    0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md:
+    0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg:
+    0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl:
+    0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0 1px 3px 0 hsl(0 0% 0% / 0.25);
 }
 @keyframes fade-in {
@@ -236,7 +248,6 @@
     -ms-overflow-style: none; /* IE et Edge */
     scrollbar-width: none; /* Firefox */
   }
-
 }
 
 /* styles/phone-input.css */

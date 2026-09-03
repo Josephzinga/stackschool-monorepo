@@ -12,3 +12,5 @@ export * from './academic/index.ts';
 export * from './constant/day.ts';
 export * from './lib/lesson-status-check.ts';
 export * from './utils/time.util.ts';
+export * from './utils/lesson-status.ts';
+export * from './constant/room.ts';

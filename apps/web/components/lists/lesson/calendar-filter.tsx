@@ -19,13 +19,9 @@ import {
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { AnimatedButtonGroup } from '@/components/animated-button-group';
-import {
-  LessonStatus,
-  ResourceMode,
-  lessonStatusConfig,
-  useLessonStore,
-} from '@stackschool/ui';
-import { LessonStatusEnum } from '@stackschool/contracts';
+import { LessonStatus, ResourceMode } from '@stackschool/ui';
+import { LessonStatusEnum, lessonStatusConfig } from '@stackschool/contracts';
+import { useLessonStore } from '@/store/lesson-store';
 
 export const CalendarFilter = ({
   onModeChange,

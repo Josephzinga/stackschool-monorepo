@@ -1,13 +1,13 @@
 'use client';
 
 import 'react-phone-number-input/style.css';
-import {Controller, useFormContext} from 'react-hook-form';
-import {GridForm} from '@/components/lists/grid-form';
-import {Field, FieldError, FieldLabel} from '@/components/ui/field';
-import {Input} from '@/components/ui/input';
-import {Mail, User, User2Icon} from 'lucide-react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { GridForm } from '@/components/lists/grid-form';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Mail, User, User2Icon } from 'lucide-react';
 import PhoneInput from 'react-phone-number-input';
-import {checkField} from '@/lib/check-profile-field';
+import { checkField } from '@/lib/check-profile-field';
 
 interface ProfileSubFormField {
   firstName: string;
@@ -78,6 +78,7 @@ export function ProfileSubForm() {
                 type="email"
                 icon={Mail}
                 aria-invalid={!!errors.email}
+                className="phone-input-custom h-8!"
                 placeholder="jean.dupont@ecole.com"
                 onBlur={async (e) => {
                   field.onBlur();
@@ -96,8 +97,9 @@ export function ProfileSubForm() {
             name="phoneNumber"
             render={({ field }) => (
               <PhoneInput
-                {...field}
                 international
+                onChange={(e) => field.onChange(e ?? '')}
+                value={field.value}
                 defaultCountry="ML"
                 className="phone-input-custom"
                 onBlur={async (e) => {

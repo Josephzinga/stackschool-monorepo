@@ -1,25 +1,15 @@
 'use client';
 
-import { Input } from '@/components/ui/input';
-import { useTable } from './table-provider';
+import { useParentTable } from './table-provider';
 import { Button } from '@/components/ui/button';
-import { Button as AnimateButton } from '@/components/animate-ui/components/buttons/button';
-import { Filter, Plus, Settings2, Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import { useUserStore } from '@stackschool/ui';
 import { toast } from 'sonner';
 import { AppAlertDialog } from '@/components/app-alert-dialog';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { parseAsString, useQueryState } from 'nuqs';
-import { ParentDialog } from '@/components/lists/parent/parent-dialog';
+import DataHeaderInput from '@/components/lists/data-filters';
 
 const PARENT_COLUMNS = [
   { id: 'info', label: 'Parents' },
@@ -41,10 +31,10 @@ export function DataTableHeader() {
     setRowSelection,
     columnVisibility,
     setColumnVisibility,
-  } = useTable();
+    setDialogOpen,
+  } = useParentTable();
   const [showFilters, setShowFilters] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const { currentSchool } = useUserStore();
 
   const hasActiveFilters = Object.values(filters).some((v) => v !== undefined);
@@ -94,74 +84,28 @@ export function DataTableHeader() {
               </Button>
             </div>
           ) : (
-            <>
-              <div className="relative h-full w-60 sm:w-72">
-                <Input
-                  placeholder="Rechercher un parent..."
-                  value={searchTerm}
-                  onChange={(event) => setSearchTerm(event.target.value)}
-                  className=" pr-8"
-                />
-                {searchTerm && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setSearchTerm('')}
-                    className="absolute h-8 w-8 top-1/2 -translate-y-1/2 right-1 text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              <Button
-                variant={
-                  showFilters || hasActiveFilters ? 'secondary' : 'outline'
-                }
-                onClick={() => setShowFilters(!showFilters)}
-                className="gap-2 h-full"
-              >
-                <Filter className="h-4 w-4" />
-                <span className="hidden sm:block">Filtres</span>
-                {hasActiveFilters && (
-                  <span className="ml-1 rounded-full bg-primary w-2 h-2" />
-                )}
-              </Button>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2 h-full">
-                    <Settings2 className="h-4 w-4" />
-                    <span className="hidden sm:block">Affichage</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  <DropdownMenuLabel>Colonnes visibles</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {PARENT_COLUMNS.map((col) => (
-                    <DropdownMenuCheckboxItem
-                      key={col.id}
-                      checked={columnVisibility[col.id] !== false}
-                      onCheckedChange={(checked) =>
-                        toggleColumn(col.id, checked)
-                      }
-                    >
-                      {col.label}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
+            <DataHeaderInput
+              inputPlaceholder="Rechercher un parent"
+              onShowFilterChange={setShowFilters}
+              hasActiveFilters={hasActiveFilters}
+              search={searchTerm}
+              showFilters={showFilters}
+              onSearchChange={setSearchTerm}
+              columns={PARENT_COLUMNS}
+              columnVisibility={columnVisibility}
+              onToggleColumn={toggleColumn}
+            />
           )}
         </div>
-        <AnimateButton
+        <Button
           onClick={() => setDialogOpen(true)}
-          className="gap-3 w-14 sm:w-30 h-full md:w-60 cursor-pointer"
+          className="gap-3 w-14 h-8! sm:w-30 md:w-60 cursor-pointer"
         >
           <Plus className="h-8 w-8" />
           <span className="hidden sm:block font-poppins font-semibold">
             Ajouter
           </span>
-        </AnimateButton>
+        </Button>
       </div>
 
       {showFilters && !selectedCount && (
@@ -183,9 +127,6 @@ export function DataTableHeader() {
           confirmLabel="Supprimer"
           variant="destructive"
         />
-      )}
-      {dialogOpen && (
-        <ParentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       )}
     </div>
   );

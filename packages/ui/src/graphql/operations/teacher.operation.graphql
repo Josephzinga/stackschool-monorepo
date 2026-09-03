@@ -129,6 +129,7 @@ fragment TeacherListData on Teacher {
   assignments {
     classSubject {
       group {
+        id
         type
         classes {
           id

@@ -1,19 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateLessonInput } from '../../graphql';
+import {
+  CreateLessonInput,
+  Day,
+  GetLessonsInput,
+  GroupType,
+  LessonsList,
+  LessonStatus,
+  SubjectCategory,
+  UpdateLessonInput,
+} from '../../graphql';
 import {
   AcademicRpcException,
-  Day,
+  CORE_PATTERNS,
+  CORE_SERVICE,
+  FindTeachersPaginatedInput,
+  FindTeachersPaginatedResponse,
+  lessonStatusConfig,
   LessonStatusEnum,
+  parseTimeString,
   RawLessonEvent,
   SchoolUserContract,
-  parseTimeString,
+  sendRmqRequest,
 } from '@stackschool/messaging';
 import { format } from 'date-fns';
+import { ClientProxy } from '@nestjs/microservices';
+import { Lesson, Prisma } from '../../prisma/db/generated/client';
 
 @Injectable()
 export class LessonService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CORE_SERVICE) private readonly coreClient: ClientProxy,
+  ) {}
 
   async create(
     dto: CreateLessonInput,
@@ -94,6 +113,7 @@ export class LessonService {
       teacherAssignmentId: assignment.id,
       groupId: currentCS.groupId!,
       roomId: roomId ?? undefined,
+      teacherId: teacherId ?? undefined,
     });
 
     if (conflicts.length > 0) {
@@ -104,7 +124,7 @@ export class LessonService {
       if (isTeacherConflict) {
         throw new AcademicRpcException(
           'CONFLICT',
-          `Le professeur a déjà un cours de ${conflict.assignments.classSubject.subject.name} à ce créneau.`,
+          `Le professeur a déjà un cours de ${conflict.assignments.classSubject.subject.name} dans la classe ${conflict.assignments.classSubject.group.name} à ce créneau.`,
         );
       }
       if (isRoomConflict) {
@@ -115,7 +135,9 @@ export class LessonService {
       }
       throw new AcademicRpcException(
         'CONFLICT',
-        `La classe a déjà un cours de ${conflict.assignments.classSubject.subject.name} à ce créneau.`,
+        mode === 'TEACHER'
+          ? `La classe a déjà un cours de ${conflict.assignments.classSubject.subject.name} à ce créneau.`
+          : `Le professeur a déjà un cours de ${conflict.assignments.classSubject.subject.name} dans la classe ${conflict.assignments.classSubject.group.name} à ce créneau.`,
       );
     }
 
@@ -131,58 +153,115 @@ export class LessonService {
       },
     });
   }
-  private async checkLessonConflict(input: {
-    schoolId: string;
-    day: Day;
-    startTime: Date;
-    endTime: Date;
-    teacherAssignmentId: string;
-    groupId: string;
-    roomId?: string;
-    excludeLessonId?: string; // utile en cas d'édition d'une leçon existante
-  }) {
-    const {
-      schoolId,
-      day,
-      startTime,
-      endTime,
-      teacherAssignmentId,
-      groupId,
-      roomId,
-      excludeLessonId,
-    } = input;
 
-    const conflicts = await this.prisma.lesson.findMany({
+  async update(
+    dto: UpdateLessonInput,
+    schoolId: string,
+    schoolUser: SchoolUserContract,
+  ): Promise<Lesson> {
+    const lesson = await this.prisma.lesson.findFirst({
       where: {
-        schoolId,
-        day,
-        deletedAt: null,
-        ...(excludeLessonId ? { id: { not: excludeLessonId } } : {}),
-
-        // Chevauchement horaire réel — filtré directement en SQL
-        AND: [{ startTime: { lt: endTime } }, { endTime: { gt: startTime } }],
-
-        // Conflit si : même groupe (classe déjà occupée) OU même prof OU même salle
-        OR: [
-          { assignments: { classSubject: { groupId } } },
-          { teacherAssignmentId },
-          ...(roomId ? [{ roomId }] : []),
-        ],
+        id: dto.id,
       },
       include: {
         assignments: {
           include: {
             classSubject: {
-              include: { subject: true, group: { include: { classes: true } } },
+              include: {
+                subject: true,
+              },
             },
-            teacher: { include: { schoolProfile: true } },
           },
         },
-        room: true,
+      },
+    });
+    if (!lesson)
+      throw new AcademicRpcException('NOT_FOUND', 'Leçon non trouvé.');
+
+    if (
+      schoolUser.role === 'TEACHER' &&
+      lesson.assignments.teacherId !== schoolUser.teacher?.id
+    ) {
+      throw new AcademicRpcException(
+        'FORBIDDEN',
+        "Vous ne pouvez pas modifier une leçon qui n'est pas la vôtre.",
+      );
+    }
+
+    if (lesson.status !== 'PLANNED') {
+      throw new AcademicRpcException(
+        'FORBIDDEN',
+        `Cette leçon est déjà "${lessonStatusConfig[lesson.status].label.toLocaleUpperCase()}". Vous ne pouvez plus modifier sa ressource ou son horaire.`,
+      );
+    }
+    const activeDay = (dto.day ?? lesson.day) as unknown as Day;
+    const activeStartTime = dto.startTime ?? lesson.startTime;
+    const activeEndTime = dto.endTime ?? lesson.endTime;
+    const hasChanges =
+      activeDay !== lesson.day ||
+      parseTimeString(activeStartTime).getTime() !==
+        lesson.startTime.getTime() ||
+      parseTimeString(activeEndTime).getTime() !== lesson.endTime.getTime();
+
+    if (!hasChanges) {
+      throw new AcademicRpcException(
+        'BAD_REQUEST',
+        'Aucune modification détectée. Modifiez au moins l’horaire ou le jour de la leçon.',
+      );
+    }
+
+    const isClassMode = dto.mode === 'CLASS';
+
+    const conflicts = await this.checkLessonConflict({
+      schoolId,
+      day: activeDay,
+      startTime: parseTimeString(activeStartTime),
+      endTime: parseTimeString(activeEndTime),
+      teacherAssignmentId: lesson.assignments.id,
+      groupId: lesson.assignments.classSubject.groupId,
+      roomId: lesson.roomId || undefined,
+      excludeLessonId: lesson.id,
+      teacherId: lesson.assignments.teacherId,
+    });
+    if (conflicts.length > 0) {
+      throw new AcademicRpcException(
+        'CONFLICT',
+        !isClassMode
+          ? `Conflit détecté : la classe est déjà occupé sur ce créneau `
+          : 'Conflit détecté : le professeur est déjà occupé sur ce créneau',
+      );
+    }
+
+    return await this.prisma.lesson.update({
+      where: { id: dto.id },
+      data: {
+        startTime: parseTimeString(activeStartTime),
+        endTime: parseTimeString(activeEndTime),
+        day: activeDay,
+        schoolId,
+      },
+    });
+  }
+
+  async delete(id: string, schoolId: string) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: {
+        schoolId,
+        id,
       },
     });
 
-    return conflicts;
+    if (!lesson) throw new AcademicRpcException('NOT_FOUND', 'Leçon no trouvé');
+    await this.prisma.lesson.delete({
+      where: {
+        schoolId,
+        id,
+      },
+    });
+    return {
+      ok: true,
+      message: 'Leçon supprimer avec succès.',
+    };
   }
 
   async findLessonsByTeacherIds(dto: {
@@ -221,12 +300,95 @@ export class LessonService {
     }));
   }
 
-  // service-academic : tout est local, sauf le nom du prof
-  async getLessonsByClassResource(input: GetLessonsInput, schoolId: string) {
-    const where = {
+  async getByTeacherResource(
+    input: GetLessonsInput,
+    schoolId: string,
+  ): Promise<LessonsList> {
+    const teachersData = await this.findTeachersPaginated({
       schoolId,
-      ...(input.department ? { department: input.department } : {}), // si applicable au niveau Group
-      ...(input.hasLessonOnly ? { lessonsCount: { gt: 0 } } : {}), // dénormalisé, même principe que classesCount
+      department: input.department ?? null,
+      hasLessonOnly: input.hasLessonOnly ?? false,
+      page: input.page,
+      limit: input.limit,
+    });
+    console.log('TEacherData: ', teachersData);
+    const teachers = teachersData?.teachers ?? [];
+    const totalCount = teachersData?.totalCount ?? 0;
+
+    if (teachers.length === 0) {
+      return {
+        data: { events: [], resources: [] },
+        meta: {
+          total: totalCount,
+          page: input.page,
+          limit: input.limit,
+          totalPages: Math.ceil(totalCount / input.limit),
+        },
+      };
+    }
+
+    const teacherIds = teachers.map((t) => t.id);
+
+    const lessons = await this.prisma.lesson.findMany({
+      where: {
+        schoolId,
+        deletedAt: null,
+        ...(input.status ? { status: input.status } : {}),
+        assignments: { teacherId: { in: teacherIds } },
+      },
+      include: {
+        assignments: {
+          include: {
+            classSubject: { include: { subject: true, group: true } },
+          },
+        },
+        room: true,
+      },
+    });
+
+    return {
+      data: {
+        resources: teachers.map((t) => ({
+          id: t.id,
+          title: `${t.firstName} ${t.lastName}`,
+          weeklyHours: t.weeklyHours ?? 10,
+        })),
+        events: lessons.map((l) => ({
+          id: l.id,
+          resourceId: l.assignments.teacherId,
+          title: l.title ?? l.assignments.classSubject.subject.name,
+          startTime: format(l.startTime, 'HH:mm'),
+          endTime: format(l.endTime, 'HH:mm'),
+          day: l.day as Day,
+          status: l.status as LessonStatus,
+          subject: {
+            ...l.assignments.classSubject.subject,
+            category: l.assignments.classSubject.subject
+              .category as SubjectCategory,
+          },
+          group: {
+            ...l.assignments.classSubject.group,
+            type: l.assignments.classSubject.group.type as GroupType,
+          },
+          room: l.room,
+          teacherId: l.assignments.teacherId,
+        })),
+      },
+      meta: {
+        total: totalCount,
+        limit: input.limit,
+        page: input.page,
+        totalPages: Math.ceil(totalCount / input.limit),
+      },
+    };
+  }
+
+  async getByClassResource(
+    input: GetLessonsInput,
+    schoolId: string,
+  ): Promise<LessonsList> {
+    const where: Prisma.GroupWhereInput = {
+      schoolId,
     };
 
     const [groups, totalCount] = await Promise.all([
@@ -248,8 +410,19 @@ export class LessonService {
       },
       include: {
         assignments: {
-          include: {
-            classSubject: true,
+          select: {
+            teacherId: true,
+            classSubject: {
+              select: {
+                groupId: true,
+                group: {
+                  include: {
+                    classes: true,
+                  },
+                },
+                subject: true,
+              },
+            },
           },
         },
         room: true,
@@ -264,15 +437,87 @@ export class LessonService {
           weeklyHours: 10,
         })),
         events: lessons.map((l) => ({
-          /* ... */
+          id: l.id,
           resourceId: l.assignments.classSubject.groupId,
+          title: l.title ?? l.assignments.classSubject.subject.name,
+          startTime: format(l.startTime, 'HH:mm'),
+          endTime: format(l.endTime, 'HH:mm'),
+          day: l.day as Day,
+          status: l.status as LessonStatus,
+          subject: l.assignments.classSubject.subject,
+          group: l.assignments.classSubject.group,
+          room: l.room,
           teacherId: l.assignments.teacherId,
         })),
       },
       meta: {
-        totalCount,
-        hasNextPage: (input.page + 1) * input.limit < totalCount,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / input.limit),
+        page: input.page,
+        limit: input.limit,
       },
     };
+  }
+
+  private async checkLessonConflict(input: {
+    schoolId: string;
+    day: Day;
+    startTime: Date;
+    endTime: Date;
+    teacherAssignmentId: string;
+    groupId: string;
+    roomId?: string;
+    excludeLessonId?: string; // utile en cas d'édition d'une leçon existante
+    teacherId?: string; // utile pour vérifier les conflits de prof
+  }) {
+    const {
+      schoolId,
+      day,
+      startTime,
+      endTime,
+      groupId,
+      roomId,
+      excludeLessonId,
+      teacherId,
+    } = input;
+    const conflicts = await this.prisma.lesson.findMany({
+      where: {
+        schoolId,
+        day,
+        ...(excludeLessonId ? { id: { not: excludeLessonId } } : {}),
+
+        AND: [{ startTime: { lt: endTime } }, { endTime: { gt: startTime } }], // Vérifie le chevauchement des horaires
+
+        // Conflit si : même groupe (classe déjà occupée) OU même prof OU même salle
+        assignments: {
+          OR: [{ classSubject: { groupId } }, { teacherId }],
+        },
+      },
+      include: {
+        assignments: {
+          include: {
+            classSubject: {
+              include: { subject: true, group: true },
+            },
+          },
+        },
+        room: true,
+      },
+    });
+
+    return conflicts;
+  }
+
+  private async findTeachersPaginated(
+    input: FindTeachersPaginatedInput,
+  ): Promise<FindTeachersPaginatedResponse | null> {
+    const result = await sendRmqRequest<FindTeachersPaginatedResponse>(
+      this.coreClient,
+      CORE_PATTERNS.TEACHER.FIND_PAGINATED,
+      input,
+      undefined,
+      4000,
+    );
+    return result || null;
   }
 }

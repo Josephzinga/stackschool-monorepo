@@ -3,7 +3,7 @@ import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import ProtectedRoute from '@/components/providers/protected-route';
 import { DashboardProvider } from '@/components/providers/dashboard-provider';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toast';
 import { SocketProvider } from '@/components/providers/socket-context';
 
 export default function DashboardLayout({
@@ -23,17 +23,12 @@ export default function DashboardLayout({
               } as React.CSSProperties
             }
           >
-            <AppSidebar className="z-30" variant="inset" collapsible="icon" />
+            <AppSidebar className="z-30" variant="sidebar" collapsible="icon" />
 
             <SidebarInset>
               <SiteHeader />
 
-              <Toaster
-                position="bottom-right"
-                className="bg-sky-500! text-lg"
-                duration={5000}
-                id="dashboard"
-              />
+              <Toaster />
 
               {children}
             </SidebarInset>

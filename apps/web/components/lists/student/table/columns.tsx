@@ -14,11 +14,12 @@ import {
   CellCheckBox,
   HeaderCheckBox,
 } from '@/components/table/table-checkbox';
+import { AvatarProfile } from '@/components/profile-avatar';
 
 export type StudentsData = {
   id: string | number;
-  firstName: string | null;
-  lastName: string | null;
+  firstName: string;
+  lastName: string;
   avatarUrl?: string | null;
   level: string;
   className: string | null;
@@ -56,27 +57,11 @@ export const columns = columnsHelper.columns([
       );
     },
     cell: ({ row }) => {
-      const photo = row.original.avatarUrl;
-      const id = row.original.id;
-
+      const profile = {
+        ...row.original,
+      };
       return (
-        <Link
-          href={`/list/students/${id}`}
-          className="block max-w-80 md:max-w-100 h-full group"
-        >
-          <div className="flex gap-2 items-center">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={photo ?? undefined} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                {row.original.firstName?.[0]}
-                {row.original.lastName?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <p className="font-medium text-sm text-foreground group-hover:inline-2">
-              {row.original.firstName} {row.original.lastName}
-            </p>
-          </div>
-        </Link>
+        <AvatarProfile profile={profile} href={`/list/student/${profile.id}`} />
       );
     },
   }),

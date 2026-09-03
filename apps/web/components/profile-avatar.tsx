@@ -1,30 +1,24 @@
-"use client";
-import Image from "next/image";
-import React, { useState } from "react";
+'use client';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { cn } from '@/lib/utils';
 
 interface AvatarNameProps {
-  name: string;
-  url?: string | null;
-  size?: number; // taille en pixels
+  profile: {
+    firstName: string;
+    lastName: string;
+    avatarUrl?: string | null;
+  };
   className?: string;
+  href: string;
 }
 
-export function AvatarName({
-  name,
-  url,
-  size = 40,
-  className = "",
+export function AvatarProfile({
+  profile: { firstName, lastName, avatarUrl },
+  className,
+  href,
 }: AvatarNameProps) {
-  const [imageError, setImageError] = useState(false);
-
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  // Génère une couleur stable à partir du nom
   const colorFromName = (name: string) => {
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -34,29 +28,22 @@ export function AvatarName({
     return `hsl(${hue}, 70%, 50%)`;
   };
 
-  const bgColor = colorFromName(name);
-
-  const showImage = url && !imageError;
+  const color = colorFromName(`${firstName} ${lastName}`);
 
   return (
-    <div
-      className={`relative flex items-center justify-center rounded-full overflow-hidden text-white font-semibold select-none ${className}`}
-      style={{
-        backgroundColor: bgColor,
-        width: size,
-        height: size,
-        fontSize: size * 0.4,
-      }}>
-      {showImage ? (
-        <Image
-          src={url}
-          alt={name}
-          onError={() => setImageError(true)}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      ) : (
-        <span>{initials}</span>
-      )}
-    </div>
+    <Link href={href} className="block max-w-80 md:max-w-100 h-full group">
+      <div className="flex gap-3 items-center">
+        <Avatar className="h-12 w-12">
+          <AvatarImage src={avatarUrl ?? undefined} />
+          <AvatarFallback className={cn(`bg-[${color}] text-primary text-xs`)}>
+            {firstName?.[0]}
+            {lastName?.[0]}
+          </AvatarFallback>
+        </Avatar>
+        <p className="font-semibold text-sm text-foreground font-poppins group-hover:underline group-hover:underline-offset-2 group-hover:text-primary">
+          {firstName} {lastName}
+        </p>
+      </div>
+    </Link>
   );
 }

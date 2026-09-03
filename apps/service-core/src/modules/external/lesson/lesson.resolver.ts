@@ -1,7 +1,16 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { LessonService } from './lesson.service';
+import { Lesson, LessonTeacher } from '../../../graphql';
+import { Loaders } from '../../dataloader/decorators/dataloader.decorator';
+import type { DataLoaders } from '../../dataloader/dataloader.service';
 
-@Resolver()
+@Resolver('Lesson')
 export class LessonResolver {
-  constructor(private readonly lessonService: LessonService) {}
+  @ResolveField('teacher')
+  async getTeacher(
+    @Parent() parent: Lesson,
+    @Loaders() loaders: DataLoaders,
+  ): Promise<LessonTeacher | null> {
+    if (!parent.teacherId) return null;
+    return (await loaders.teacherLessonLoader.load(parent.teacherId)) || null;
+  }
 }

@@ -4,6 +4,7 @@ query GetSchoolClasses($input: GetSchoolClassesInput!) {
       limit
       totalPages
       total
+      page
     }
 
     data {
@@ -15,6 +16,7 @@ query GetSchoolClasses($input: GetSchoolClassesInput!) {
 query GetClassesOptions(
   $input: GetSchoolClassesInput!
   $withMeta: Boolean = true
+  $includeGroup: Boolean = true
 ) {
   getSchoolClasses(input: $input) {
     meta @include(if: $withMeta) {
@@ -27,7 +29,7 @@ query GetClassesOptions(
       level
       name
       section
-      group {
+      group @include(if: $includeGroup) {
         id
         name
         type

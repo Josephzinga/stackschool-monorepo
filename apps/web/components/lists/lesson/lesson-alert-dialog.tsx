@@ -11,8 +11,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useLessonMutations } from '@/components/lists/lesson/hooks/useLessonMutations';
-import { useLessonStore } from '@stackschool/ui';
 import { dayConstants } from '@stackschool/contracts';
+import { useLessonStore } from '@/store/lesson-store';
 
 export default function LessonAlertDialog({
   onCancelUpdate,

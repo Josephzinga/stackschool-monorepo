@@ -1,5 +1,5 @@
-query GetSchoolLessons($filter: GetLessonsInput!) {
-  getLessons(filter: $filter) {
+query GetSchoolLessons($input: GetLessonsInput!) {
+  getLessons(input: $input) {
     meta {
       page
       totalPages

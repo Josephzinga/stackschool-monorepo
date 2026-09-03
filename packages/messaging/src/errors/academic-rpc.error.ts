@@ -10,7 +10,8 @@ export type AcademicErrorCode =
   | 'SUBJECT_ALREADY_EXIST'
   | 'NOT_FOUND'
   | 'FORBIDDEN'
-  | 'SUBJECT_NOT_FOUND';
+  | 'SUBJECT_NOT_FOUND'
+  | 'BAD_REQUEST';
 
 export class AcademicRpcException extends RpcException {
   constructor(

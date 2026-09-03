@@ -13,7 +13,7 @@ export * from './utils/matricule.util.ts';
 export * from './validation/create-list-teacher.schema.ts';
 export * from './lib/lesson-check-status.ts';
 export * from './validation/subject-list.schema.ts';
-export * from './validation/room.schema.ts';
+export * from '@stackschool/contracts/src/academic/room.schema.ts';
 export * from './constants/index.ts';
 export * from './lib/check-lesson-conflict.ts';
 export * from './messaging/index.ts';

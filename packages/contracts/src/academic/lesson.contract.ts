@@ -72,13 +72,10 @@ export const CreateLessonSchema = z
 
 export const UpdateLessonSchema = z.object({
   id: z.cuid2(),
-  mode: z.enum(['TEACHER', 'CLASS']),
+  mode: z.enum(['TEACHER', 'CLASS']).optional(),
   startTime: CreateLessonSchema.shape.startTime.optional(),
   endTime: CreateLessonSchema.shape.endTime.optional(),
   day: CreateLessonSchema.shape.day.optional(),
-  subjectId: z.string().optional(),
-  teacherId: z.string().optional(),
-  groupId: z.string().optional(),
 });
 
 export type UpdateLessonSchema = z.infer<typeof UpdateLessonSchema>;

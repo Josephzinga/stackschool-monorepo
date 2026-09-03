@@ -17,7 +17,7 @@ export const useLessonStore = create<LessonState>()(
       },
       showFilters: false,
       pagination: {
-        limit: 10,
+        limit: 5,
         page: 0,
         totalPages: 0,
         total: 0,
@@ -33,7 +33,7 @@ export const useLessonStore = create<LessonState>()(
       isClassOnly: false,
       resource: {
         id: '',
-        name: '',
+        title: '',
       },
 
       setCurrentView: (view) => set({ currentView: view }),

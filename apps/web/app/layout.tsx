@@ -2,7 +2,7 @@ import './styles/globals.css';
 import './styles/search-input.css';
 import NextTopLoader from 'nextjs-toploader';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toast';
 import QueryProvider from '@/components/providers/queryClientProvider';
 import { NuqsAdapter } from 'nuqs/adapters/next';
 import CsrfProvider from '@/components/providers/csrf-provider';
@@ -81,7 +81,7 @@ export default async function RootLayout({
               {' '}
               <CsrfProvider>{children}</CsrfProvider>
               <GlobalSpinner />
-              <Toaster position="top-center" duration={4000} />
+              <Toaster />
             </ThemeProvider>
           </NuqsAdapter>
           <NextTopLoader />

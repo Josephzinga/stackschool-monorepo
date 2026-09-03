@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, MoreHorizontal } from 'lucide-react';
-import { useGetTeacherAssignmentQuery } from '@stackschool/ui';
+import { useGetTeacherAssignmentsQuery } from '@stackschool/ui';
 import { Button } from '@/components/ui/button';
 import React from 'react';
 import {
@@ -21,9 +21,11 @@ function ClassesSection({ teacherId }: { teacherId?: string }) {
     TeacherAssignmentFormProps['initialValues']
   >({ teacherId });
   const queryClient = useQueryClient();
-  const { data, isPending, error } = useGetTeacherAssignmentQuery(
+  const { data, isPending, error } = useGetTeacherAssignmentsQuery(
     {
-      id: teacherId!,
+      filter: {
+        teacherId,
+      },
     },
     {
       enabled: !!teacherId,
@@ -33,8 +35,8 @@ function ClassesSection({ teacherId }: { teacherId?: string }) {
     string,
     { id: string; name: string; subjects: Array<{ name: string; id: string }> }
   >();
-  data?.getAssignments?.forEach((ass) => {
-    const classe = ass.classSubjects?.group.classes[0];
+  data?.getTeacherAssignments?.forEach((ass) => {
+    const classe = ass?.classSubject?.group?.classes?.[0];
     if (classe?.id) {
       if (map.has(classe.id)) {
         const classes = map.get(classe.id);
@@ -44,8 +46,8 @@ function ClassesSection({ teacherId }: { teacherId?: string }) {
           subjects: [
             ...classes.subjects,
             {
-              name: ass?.classSubjects?.subject.name ?? '',
-              id: ass.classSubjects?.subject.id ?? '',
+              name: ass?.classSubject?.subject?.name ?? '',
+              id: ass?.classSubject?.subject?.id ?? '',
             },
           ],
         });
@@ -55,8 +57,8 @@ function ClassesSection({ teacherId }: { teacherId?: string }) {
           name: classe.name ?? '',
           subjects: [
             {
-              name: ass.classSubjects?.subject.name ?? '',
-              id: ass?.classSubjects?.subject.id ?? '',
+              name: ass?.classSubject?.subject?.name ?? '',
+              id: ass?.classSubject?.subject?.id ?? '',
             },
           ],
         });
@@ -65,8 +67,10 @@ function ClassesSection({ teacherId }: { teacherId?: string }) {
   });
   const classes = Array.from(map.values());
 
-  const handleSucces = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['GetTeacherAssignment'] });
+  const handleSuccess = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ['GetTeacherAssignment', { filter: { teacherId } }],
+    });
     setOpen(!open);
   };
   const handleEdit = (classId: string, subjectIds: string[]) => {
@@ -92,13 +96,14 @@ function ClassesSection({ teacherId }: { teacherId?: string }) {
             return (
               <Card
                 key={cls.id}
-                className="hover:border-primary/50 font-inter transition-colors cursor-pointer group"
+                className="hover:border hover:border-primary/50 gap-1 p-2 font-inter transition-colors  cursor-pointer group"
               >
-                <CardHeader className="pb-2">
+                <CardHeader className="">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-base group-hover:text-primary transition-colors">
                       {cls.name}
                     </CardTitle>
+
                     <Button
                       onClick={() =>
                         handleEdit(
@@ -106,18 +111,22 @@ function ClassesSection({ teacherId }: { teacherId?: string }) {
                           cls.subjects.map((sub) => sub.id),
                         )
                       }
+                      variant="ghost"
                       size="icon-sm"
                     >
                       <MoreHorizontal />
                     </Button>
                   </div>
-                  {cls.subjects.map((sub) => (
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {sub.name}
-                    </p>
-                  ))}
                 </CardHeader>
-                <CardContent></CardContent>
+                <CardContent>
+                  <ol className="flex flex-wrap gap-5">
+                    {cls.subjects.map((sub) => (
+                      <li className="text-sm hover:text-card-foreground hover:underline list-disc font-jost font-medium">
+                        {sub.name}
+                      </li>
+                    ))}
+                  </ol>
+                </CardContent>
               </Card>
             );
           })}
@@ -138,7 +147,7 @@ function ClassesSection({ teacherId }: { teacherId?: string }) {
               <TeacherAssignmentForm
                 initialValues={initialValues}
                 showTeacherInput={false}
-                onSuccess={handleSucces}
+                onSuccess={handleSuccess}
               />
             </DialogHeader>
           </DialogContent>

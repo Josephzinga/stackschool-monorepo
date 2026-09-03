@@ -15,7 +15,7 @@ type Student @key(fields: "id") {
   transportMode: TransportMode
   previousSchool: String
   classId: ID! @shareable
-  enrollmentYear: String!
+  enrollmentYear: String
   status: StudentStatus
   disciplinaryActions: StudentDisciplinaryAction
   nationality: String

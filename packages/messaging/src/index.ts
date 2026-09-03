@@ -15,3 +15,4 @@ export * from './guards/index.ts';
 export * from './decorators/role.decorator.ts';
 export * from './constants/cache-ttl.constant.ts';
 export * from './constants/service-queue.constant.ts';
+export * from './errors/service-rpc.error.ts';

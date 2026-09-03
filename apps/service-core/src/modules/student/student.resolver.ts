@@ -9,25 +9,31 @@ import {
 } from '@nestjs/graphql';
 import { StudentService } from './student.service';
 import {
+  ApiResponse,
   CreateStudentInput,
   GetSchoolStudentsInput,
   ParentStudent,
   SchoolProfile,
   Student,
   StudentList,
+  StudentSearchInput,
 } from '../../graphql';
 import { UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../../common/guards/role.guard';
-import { RequiredRoles } from '../../common/decorators/role.decorator';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import type { DataLoaders } from '../dataloader/dataloader.service';
+import {
+  CoreRpcException,
+  Roles,
+  SchoolAccessGuard,
+} from '@stackschool/messaging';
 
 @Resolver('Student')
 export class StudentResolver {
   constructor(private readonly studentService: StudentService) {}
 
-  @RequiredRoles('ADMIN', 'TEACHER', 'STAFF')
-  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'TEACHER', 'STAFF')
+  @UseGuards(SchoolAccessGuard, RolesGuard)
   @Query('getSchoolStudents')
   async getSchoolStudent(
     @Args('input') input: GetSchoolStudentsInput,
@@ -36,8 +42,8 @@ export class StudentResolver {
     return this.studentService.findAll(input, schoolId);
   }
 
-  @RequiredRoles('ADMIN', 'STAFF')
-  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'STAFF')
+  @UseGuards(SchoolAccessGuard, RolesGuard)
   @Mutation('createStudent')
   async create(
     @Args('input') input: CreateStudentInput,
@@ -46,12 +52,27 @@ export class StudentResolver {
     return this.studentService.create(input, schoolId);
   }
 
+  @Roles('ADMIN')
+  @UseGuards(SchoolAccessGuard, RolesGuard)
   @Mutation('deleteStudents')
   async deleteMany(
     @Args() args: { studentIds: string[]; soft: boolean },
     @Context('schoolId') schoolId: string,
-  ): Promise<void> {
+  ): Promise<ApiResponse> {
     return this.studentService.deleteMany(args.studentIds, args.soft, schoolId);
+  }
+  @Query('searchStudent')
+  async searchStudent(
+    @Args('filter') dto: StudentSearchInput,
+    @Context('schoolId') schoolId: string,
+  ): Promise<Student[]> {
+    if (!schoolId && !dto.schoolId)
+      throw new CoreRpcException(
+        'BAD_REQUEST',
+        "L'identifiant de l'établissement manquant",
+      );
+    if (dto.searchTerm && dto.searchTerm.length <= 1) return [];
+    return this.studentService.search(dto, dto.schoolId || schoolId);
   }
 
   @ResolveField('schoolProfile')

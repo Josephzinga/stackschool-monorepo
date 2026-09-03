@@ -20,7 +20,8 @@
     "dev:api": "nx run-many --targets=dev --projects=@stackschool/shared,@stackschool/db & nx dev @stackschool/api-nest",
     "build:api": "nx build @stackschool/api-nest",
     "build:all": "nx run-many -t build",
-    "build:db": "nx run-many -t build --projects=db-operations,db-auth,db-academic,db-core"
+    "build:db": "nx run-many -t build --projects=db-operations,db-auth,db-academic,db-core",
+    "knip": "knip"
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.17.5",
@@ -41,6 +42,7 @@
     "@types/react-dom": "^19.2.5",
     "eslint": "^10.9.1",
     "jest": "^30.4.2",
+    "knip": "^6.34.0",
     "nx": "23.0.1",
     "ts-jest": "^29.4.12",
     "ts-loader": "^9.6.2",
@@ -50,15 +52,15 @@
     "tsx": "^4.23.12",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.68.0",
-    "vitest": "^4.1.11",
-    "zod": "^4.4.3"
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
     "prettier": "^3.9.6",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "zod": "^4.4.3"
   },
   "packageManager": "pnpm@11.22.0"
 }

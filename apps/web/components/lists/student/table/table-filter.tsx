@@ -128,7 +128,7 @@ export default function StudentFilter() {
               filters.isActive === undefined ? 'ALL' : String(filters.isActive)
             }
             onValueChange={(val) =>
-              updateFilter('isActive', val === 'ALL' ? false : val)
+              updateFilter('isActive', val === 'ALL' ? false : val!)
             }
           >
             <SelectTrigger className="w-35 h-8 font-jost">

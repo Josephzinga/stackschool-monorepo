@@ -25,8 +25,15 @@ import { ParentData } from '@/components/lists/parent/table/column';
 import { AppTableMeta } from '@/types/tanstack-table';
 import { toast } from '@/components/ui/toast';
 import { AppAlertDialog } from '@/components/app-alert-dialog';
-import { ParentEmpty } from '@/components/lists/class/table/table-empty';
-import { ParentDialog } from '@/components/lists/parent/parent-dialog';
+import { ParentEmpty } from '@/components/lists/parent/table/table-empty';
+import { ParentDialog } from '@/components/lists/parent/form/parent-dialog';
+import { ParentStudentDialog } from '../form/parent-student-dialog';
+import { RelationTypeEnum } from '@stackschool/contracts';
+import { useQueryClient } from '@tanstack/react-query';
+
+export interface ParentTableMeta extends AppTableMeta<ParentData> {
+  onAssignStudent: (data: ParentData) => void;
+}
 
 const features = tableFeatures({
   columnFilteringFeature,
@@ -37,7 +44,7 @@ const features = tableFeatures({
   filteredRowModel: createFilteredRowModel(),
   paginatedRowModel: createPaginatedRowModel(),
   sortedRowModel: createSortedRowModel(),
-  tableMeta: {} as AppTableMeta<ParentData>,
+  tableMeta: {} as ParentTableMeta,
 });
 
 export type ParentFeatures = typeof features;
@@ -59,18 +66,16 @@ export function DataTable({ columns, data, isLoading, meta }: DataTableProps) {
     setColumnVisibility,
     dialogOpen,
     setDialogOpen,
+    isUpdate,
+    setIsUpdate,
   } = useParentTable();
 
   const { width } = useWindowSize();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [rowData, setRowData] = useState<ParentData | null>(null);
+  const [openAssignment, setOpenAssignment] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleDelete = async () => {
-    // Sera implémenté avec la mutation correspondante
-    toast.add({
-      title: 'La suppression des parents sera bientôt disponible',
-    });
-    setShowDeleteAlert(false);
-  };
   useEffect(() => {
     if (width < 640) {
       setColumnVisibility({
@@ -107,6 +112,15 @@ export function DataTable({ columns, data, isLoading, meta }: DataTableProps) {
       openDelete: (data) => {
         setShowDeleteAlert(true);
       },
+      openEdit: (data) => {
+        setRowData(data);
+        setIsUpdate(true);
+        setDialogOpen(true);
+      },
+      onAssignStudent: (data) => {
+        setRowData(data);
+        setOpenAssignment(true);
+      },
     },
     state: {
       columnVisibility,
@@ -115,6 +129,21 @@ export function DataTable({ columns, data, isLoading, meta }: DataTableProps) {
     },
   });
 
+  const handleSuccess = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['GetSchoolParents'] });
+  };
+
+  const handleDelete = async () => {
+    // Sera implémenté avec la mutation correspondante
+    toast.add({
+      title: 'La suppression des parents sera bientôt disponible',
+    });
+    setShowDeleteAlert(false);
+  };
+
+  const handleConfirm = () => {
+    setDialogOpen(false);
+  };
   return (
     <div className="w-full h-full font-poppins z-10 flex flex-col gap-4">
       <div className="rounded-md border relative min-h-75 overflow-x-auto">
@@ -134,18 +163,43 @@ export function DataTable({ columns, data, isLoading, meta }: DataTableProps) {
 
       <DataTablePagination table={table} isLoading={isLoading} />
 
-      <AppAlertDialog
-        open={showDeleteAlert}
-        onOpenChange={setShowDeleteAlert}
-        title="Supprimer ce parent ?"
-        description="Cette action est irréversible. Les liens avec les élèves seront également supprimés."
-        onConfirm={handleDelete}
-        confirmLabel="Supprimer"
-        variant="destructive"
-      />
+      {showDeleteAlert && (
+        <AppAlertDialog
+          open={showDeleteAlert}
+          onOpenChange={setShowDeleteAlert}
+          title="Supprimer ce parent ?"
+          description="Cette action est irréversible. Les liens avec les élèves seront également supprimés."
+          onConfirm={handleDelete}
+          confirmLabel="Supprimer"
+          variant="destructive"
+        />
+      )}
 
       {dialogOpen && (
-        <ParentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+        <ParentDialog
+          onSuccess={handleSuccess}
+          open={dialogOpen}
+          onConfirm={handleConfirm}
+          onOpenChange={setDialogOpen}
+          defaultValues={isUpdate ? rowData : null}
+        />
+      )}
+      {openAssignment && rowData && (
+        <ParentStudentDialog
+          open={openAssignment}
+          parentId={rowData.id}
+          defaultValues={rowData.students?.map((s) => ({
+            parentId: rowData.id,
+            studentId: s.id,
+            relationType: s.relationType as RelationTypeEnum,
+            firstName: s.firstName,
+            lastName: s.lastName,
+            class: {
+              name: s.classe.name,
+            },
+          }))}
+          onOpenChange={setOpenAssignment}
+        />
       )}
     </div>
   );

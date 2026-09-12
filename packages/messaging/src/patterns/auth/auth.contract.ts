@@ -4,6 +4,7 @@ import {
   loginFormSchema,
   profileSchema,
   registerFormSchema,
+  UserContract,
   UserWithRelationsContract,
 } from '@stackschool/contracts';
 
@@ -21,6 +22,16 @@ export const createUserInput = z.object({
   confirm: registerFormSchema.shape.confirm.optional(),
   isActive: z.boolean().default(true),
   username: z.string(),
+});
+
+export const UpdateUserInput = z.object({
+  id: z.uuid(),
+  email: UserContract.shape.email.optional(),
+  phoneNumber: UserContract.shape.phoneNumber.optional(),
+  password: registerFormSchema.shape.password.optional(),
+  isActive: z.boolean().optional(),
+  hasMembership: UserContract.shape.hasMembership.optional(),
+  profileCompleted: UserContract.shape.profileCompleted.optional(),
 });
 
 export const resetPasswordInput = z.object({
@@ -41,6 +52,20 @@ export const refreshTokenResponse = z.object({
   ok,
   user: UserWithRelationsContract,
 });
+
+export const FindUserByIdentifiers = z
+  .object({
+    username: z.string().nullish(),
+    email: z.email().nullish(),
+    phoneNumber: z.string().nullish(),
+  })
+  .superRefine((data, tx) => {
+    if (!data.email && !data.phoneNumber && !data.username)
+      return tx.addIssue({
+        code: 'custom',
+        message: 'Au moins un des identifiants doit être donné.',
+      });
+  });
 
 export const verifyCodeInput = z.object({
   code: z.string(),
@@ -94,6 +119,9 @@ export const UpdateProfileInput = z.object({
   userId: z.uuid(),
   profileData: profileSchema,
 });
+
+export type UpdateUserInput = z.infer<typeof UpdateUserInput>;
+export type FindUserByIdentifiers = z.infer<typeof FindUserByIdentifiers>;
 export type UpdateProfileInput = z.infer<typeof UpdateProfileInput>;
 
 export type ValidateCredentialsOutput = z.infer<

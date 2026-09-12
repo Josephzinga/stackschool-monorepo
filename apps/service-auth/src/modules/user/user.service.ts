@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/db/generated/client';
 import {
   AuthRpcException,
+  FindUserByIdentifiers,
   UpdateProfileInput,
   ValidateUserFieldInput,
 } from '@stackschool/messaging';
@@ -41,6 +42,7 @@ export class UserService {
     selfCheck = true,
     userId,
   }: ValidateUserFieldInput) {
+    console.log('ValidateUserField: ', phoneNumber, email, userId, selfCheck);
     if (email) {
       const existingUser = await this.prisma.user.findFirst({
         where: {
@@ -117,6 +119,23 @@ export class UserService {
       console.log('DB_ERROR', e);
       throw new AuthRpcException('DB_ERROR', 'Erreur Interne du serveur.');
     }
+  }
+
+  async findByIdentifiers(dto: FindUserByIdentifiers) {
+    return this.findOne({
+      where: {
+        OR: [
+          { username: { equals: dto.username?.trim(), mode: 'insensitive' } },
+          {
+            phoneNumber: {
+              equals: dto.phoneNumber?.trim(),
+              mode: 'insensitive',
+            },
+          },
+          { email: { equals: dto?.email?.trim(), mode: 'insensitive' } },
+        ],
+      },
+    });
   }
 
   async findOne<T extends Prisma.UserFindFirstArgs>(

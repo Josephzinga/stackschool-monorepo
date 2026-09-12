@@ -21,13 +21,13 @@ export class SchoolAccessGuard implements CanActivate {
     if (!schoolUser || (!schoolId && !userId)) {
       throw new ServiceRpcException(
         'FORBIDDEN',
-        "vous n'êtes pas autorisé à accéder à cette établissement. Veuillez vous assurer que vous êtes connecté et que vous avez sélectionné un établissement.",
+        "vous n'êtes pas autorisé à accéder à cet établissement. Veuillez vous assurer que vous êtes connecté et que vous avez sélectionné un établissement.",
       );
     }
     if (!schoolUser.isActive) {
       throw new ServiceRpcException(
         'FORBIDDEN',
-        "Vous n'êtes pas autorisé à accéder à cette établissement",
+        "Vous n'êtes pas autorisé à accéder à cet établissement",
       );
     }
     return true;

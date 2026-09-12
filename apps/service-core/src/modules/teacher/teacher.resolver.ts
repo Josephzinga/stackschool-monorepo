@@ -16,24 +16,23 @@ import {
   Teacher,
   TeacherList,
 } from '../../graphql';
-import { PrismaService } from '../../prisma/prisma.service';
 import { UseGuards } from '@nestjs/common';
-import { RolesGuard } from '../../common/guards/role.guard';
 import * as dataloaderService from '../dataloader/dataloader.service';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import {
   CreateTeacherSchema,
   Roles,
+  RolesGuard,
   ZodValidationPipe,
 } from '@stackschool/messaging';
 import z from 'zod';
 
 @Resolver('Teacher')
+@UseGuards(RolesGuard)
 export class TeacherResolver {
   constructor(private readonly teacherService: TeacherService) {}
 
   @Roles('TEACHER', 'STAFF', 'ADMIN')
-  @UseGuards(RolesGuard)
   @Query('getSchoolTeachers')
   async getSchoolTeachers(
     @Args('input') input: GetSchoolTeachersInput,
@@ -44,7 +43,6 @@ export class TeacherResolver {
   }
 
   @Roles('ADMIN')
-  @UseGuards(RolesGuard)
   @Mutation('createTeacher')
   async createTeacher(
     @Args('input', new ZodValidationPipe(CreateTeacherSchema))
@@ -83,7 +81,7 @@ export class TeacherResolver {
     @Loaders() loaders: dataloaderService.DataLoaders,
   ): Promise<SchoolMembership | null> {
     if (!teacher.schoolUserId) return null;
-    const member = await loaders.schoolUserLoader.load(teacher.schoolUserId);
+    const member = await loaders.membershipLoader.load(teacher.schoolUserId);
     return member ?? null;
   }
 }

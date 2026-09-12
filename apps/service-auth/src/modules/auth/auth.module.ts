@@ -2,10 +2,6 @@ import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { FacebookAuthGuard } from './guards/facebook-auth.guard';
-import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { AuthUserService } from './services/auth-user.service';
 import { TokenService } from './services/token.service';
@@ -17,8 +13,8 @@ import { ResetPasswordService } from './services/reset-password.service';
 import { ResendCodeService } from './services/resend-code.service';
 import { VerifyCodeService } from './services/verify-code.service';
 import { JwtModule } from '@nestjs/jwt';
+import { OPERATIONS_SERVICE } from '@stackschool/messaging';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { OPERATIONS_SERVICE } from '../../constant/service.name';
 
 @Module({
   imports: [

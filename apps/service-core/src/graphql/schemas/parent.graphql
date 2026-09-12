@@ -10,11 +10,37 @@ type Parent @key(fields: "id") {
 
 type ParentStudent @key(fields: "id") {
   id: ID!
-  relationType: RelationType
+  relationType: RelationType!
   student: Student
-  studentId: ID
-  parentId: ID
+  studentId: ID!
+  parentId: ID!
   parent: Parent
+}
+
+input CreateParentStudentInput {
+  id: ID
+  parentId: ID!
+  studentId: ID!
+  relationType: RelationType!
+}
+
+input UpdateParentStudentInput {
+  id: ID!
+  relationType: RelationType
+}
+
+input UpdateParentInput {
+  id: ID!
+  firstName: String
+  lastName: String
+  phoneNumber: String
+  isDelegate: Boolean
+  gender: Gender
+  email: String
+  address: String
+  profession: String
+  children: [CreateParentStudentInput!]
+
 }
 
 input CreateParentInput {

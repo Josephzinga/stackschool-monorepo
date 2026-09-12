@@ -1,8 +1,11 @@
 @import 'tailwindcss';
+@import "shadcn/tailwind.css";
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
-
+.flex {
+  display: flex;
+}
 @theme {
   --font-jost: var(--font-jost);
   --font-inter: var(--font-inter);
@@ -31,6 +34,8 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.439 0 0);
+
+
   }
   * {
     @apply border-border outline-ring/50;
@@ -40,6 +45,14 @@
   }
   html {
     @apply font-serif;
+  }
+}
+@layer base {
+  :root {
+    --settings-sidebar: oklch(0.800 0 0);
+  }
+  .dark {
+    --settings-sidebar:  oklch(0.105 0 0);
   }
 }
 @theme inline {
@@ -115,6 +128,8 @@
   --fc-highlight-color: rgba(188, 232, 241, 0.3);
   --fc-today-bg-color: rgba(189, 226, 231, 0.76);
   --fc-now-indicator-color: red;
+
+  --color-settings-sidebar:  var(--settings-sidebar);
 }
 
 :root {
@@ -151,6 +166,7 @@
   --sidebar-border: oklch(0.925 0.006 221.7);
   --sidebar-ring: oklch(0.925 0.006 221.7);
   --toaster-background: oklch(0.925 0.006 221.7);
+  --settings-sidebar: oklch(0.800 0 0);
   --font-sans: 'Poppins', sans-serif;
   --font-heading: 'Prata', sans-serif;
   --radius: 0.75rem;
@@ -204,6 +220,7 @@
   --sidebar-accent-foreground: oklch(0.98 0 0);
   --sidebar-border: oklch(0.28 0.008 221.7);
   --toaster-background: oklch(0.18 0.011 221.7);
+  --settings-sidebar: oklch(0.162 0.026 194.927 / 0.65);
   --sidebar-ring: oklch(0.689 0.111 221.7);
   --shadow-2xs: 0 1px 3px 0 hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0 hsl(0 0% 0% / 0.05);
@@ -253,6 +270,7 @@
 /* styles/phone-input.css */
 .phone-input-custom {
   width: 100%;
+  height: 2rem;
 }
 
 .phone-input-custom .PhoneInputInput {

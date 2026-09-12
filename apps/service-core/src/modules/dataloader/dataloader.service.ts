@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import DataLoader from 'dataloader';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
+  Parent,
+  ParentStudent,
   Permission,
   SchoolProfile,
   SchoolUser,
+  Staff,
   Student,
   Teacher,
 } from '../../prisma/db/generated/client';
@@ -56,7 +59,7 @@ export class DataLoaderService {
     const prisma = this.prisma;
 
     return {
-      membershipLoader: new DataLoader<string, SchoolUser[] | undefined>(
+      membershipsLoader: new DataLoader<string, SchoolUser[] | undefined>(
         async (schoolUserIds) => {
           const schoolUsers = await prisma.schoolUser.findMany({
             where: { id: { in: [...schoolUserIds] } },
@@ -66,7 +69,48 @@ export class DataLoaderService {
         },
       ),
 
-      schoolUserLoader: new DataLoader<string, SchoolUser | undefined>(
+      membershipsByUserLoader: new DataLoader<string, SchoolUser[] | undefined>(
+        async (userIds) => {
+          const schoolUsers = await prisma.schoolUser.findMany({
+            where: {
+              userId: { in: [...userIds] },
+            },
+          });
+          const map = groupBy(schoolUsers, (su) => su.userId);
+          return userIds.map((id) => map.get(id));
+        },
+      ),
+
+      membershipBySchoolAndUserLoader: new DataLoader<
+        string,
+        SchoolUser | undefined
+      >(async (compositeKeys) => {
+        // compositeKeys ressemble à : ["school_A_user_1", "school_A_user_2"]
+
+        // 2. Extraire les couples d'identifiants uniques pour la requête Prisma
+        const parsedKeys = compositeKeys.map((key) => {
+          const [schoolId, userId] = key.split('_');
+          return { schoolId, userId };
+        });
+
+        // 3. Récupérer les données avec Prisma (en utilisant le filtre composite OR)
+        const schoolUsers = await prisma.schoolUser.findMany({
+          where: {
+            OR: parsedKeys,
+          },
+        });
+
+        // 4. Indexer les résultats avec la même clé composite ("schoolId_userId")
+        const map = new Map<string, SchoolUser>();
+        schoolUsers.forEach((su) => {
+          map.set(`${su.schoolId}_${su.userId}`, su);
+        });
+
+        // 5. Retourner les résultats dans l'exact même ordre que les clés reçues
+        return compositeKeys.map((key) => map.get(key));
+      }),
+
+      membershipLoader: new DataLoader<string, SchoolUser | undefined>(
         async (schoolUserIds) => {
           const schoolUsers = await prisma.schoolUser.findMany({
             where: {
@@ -89,6 +133,20 @@ export class DataLoaderService {
 
           const map = indexBy(teachers, (item) => item.id);
           return teacherIds.map((id) => map.get(id));
+        },
+      ),
+
+      teacherBySchoolUserLoader: new DataLoader<string, Teacher | undefined>(
+        async (schoolUserIds) => {
+          const teachers = await prisma.teacher.findMany({
+            where: {
+              schoolUserId: {
+                in: [...schoolUserIds],
+              },
+            },
+          });
+          const map = indexBy(teachers, (item) => item.schoolUserId);
+          return schoolUserIds.map((id) => map.get(id));
         },
       ),
       teacherLessonLoader: new DataLoader<string, LessonTeacher | undefined>(
@@ -115,6 +173,31 @@ export class DataLoaderService {
           return teacherIds.map((id) => map.get(id));
         },
       ),
+
+      staffBySchoolUserLoader: new DataLoader<string, Staff | undefined>(
+        async (schoolUserIds) => {
+          const staff = await prisma.staff.findMany({
+            where: {
+              schoolUserId: { in: [...schoolUserIds] },
+            },
+          });
+          const map = indexBy(staff, (item) => item.schoolUserId);
+          return schoolUserIds.map((id) => map.get(id));
+        },
+      ),
+
+      parentBySchoolUserLoader: new DataLoader<string, Parent | undefined>(
+        async (schoolUserIds) => {
+          const parents = await prisma.parent.findMany({
+            where: {
+              schoolUserId: { in: [...schoolUserIds] },
+            },
+          });
+          const map = indexBy(parents, (item) => item.schoolUserId);
+          return schoolUserIds.map((id) => map.get(id));
+        },
+      ),
+
       schoolProfileLoader: new DataLoader<string, SchoolProfile | undefined>(
         async (schoolUserIds) => {
           const schoolProfiles = await prisma.schoolProfile.findMany({
@@ -126,6 +209,46 @@ export class DataLoaderService {
           });
 
           const map = indexBy(schoolProfiles, (item) => item.schoolUserId);
+          return schoolUserIds.map((id) => map.get(id));
+        },
+      ),
+
+      parentLoader: new DataLoader<string, Parent | undefined>(
+        async (parentIds) => {
+          const parents = await prisma.parent.findMany({
+            where: {
+              id: {
+                in: [...parentIds],
+              },
+            },
+          });
+
+          const map = indexBy(parents, (p) => p.id);
+          return parentIds.map((id) => map.get(id));
+        },
+      ),
+
+      studentLoader: new DataLoader<string, Student | undefined>(
+        async (studentIds) => {
+          const students = await prisma.student.findMany({
+            where: {
+              id: { in: [...studentIds] },
+            },
+          });
+
+          const map = indexBy(students, (s) => s.id);
+          return studentIds.map((id) => map.get(id));
+        },
+      ),
+
+      studentBySchoolUserLoader: new DataLoader<string, Student | undefined>(
+        async (schoolUserIds) => {
+          const students = await prisma.student.findMany({
+            where: {
+              schoolUserId: { in: [...schoolUserIds] },
+            },
+          });
+          const map = indexBy(students, (s) => s.schoolUserId);
           return schoolUserIds.map((id) => map.get(id));
         },
       ),
@@ -161,6 +284,34 @@ export class DataLoaderService {
             male: maleCount,
             female: femaleCount,
           }));
+        },
+      ),
+
+      parentStudentByParentLoader: new DataLoader<string, ParentStudent[]>(
+        async (parentIds) => {
+          const parentStudents = await prisma.parentStudent.findMany({
+            where: {
+              parentId: {
+                in: [...parentIds],
+              },
+            },
+          });
+          const map = groupBy(parentStudents, (ps) => ps.parentId);
+          return parentIds.map((id) => map.get(id) ?? []);
+        },
+      ),
+
+      parentStudentByStudentLoader: new DataLoader<string, ParentStudent[]>(
+        async (studentIds) => {
+          const parentStudents = await prisma.parentStudent.findMany({
+            where: {
+              parentId: {
+                in: [...studentIds],
+              },
+            },
+          });
+          const map = groupBy(parentStudents, (ps) => ps.studentId);
+          return studentIds.map((id) => map.get(id) ?? []);
         },
       ),
 

@@ -96,33 +96,31 @@ export function DataTableHeader() {
               onClose={() => setRowSelection({})}
             />
           ) : (
-            <>
-              <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
-                <DataHeaderInput
-                  inputPlaceholder="Rechercher un élève..."
-                  onShowFilterChange={setShowFilters}
-                  hasActiveFilters={hasActiveFilters}
-                  search={searchTerm}
-                  showFilters={showFilters}
-                  onSearchChange={setSearchTerm}
-                  onToggleColumn={toggleColumns}
-                  columns={STUDENT_COLUMNS}
-                  columnVisibility={columnVisibility}
-                />
+            <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
+              <DataHeaderInput
+                inputPlaceholder="Rechercher un élève..."
+                onShowFilterChange={setShowFilters}
+                hasActiveFilters={hasActiveFilters}
+                search={searchTerm}
+                showFilters={showFilters}
+                onSearchChange={setSearchTerm}
+                onToggleColumn={toggleColumns}
+                columns={STUDENT_COLUMNS}
+                columnVisibility={columnVisibility}
+              />
 
-                {/* Bouton Ajouter  */}
-                <Button
-                  onClick={() => setOpen(true)}
-                  className="w-full sm:w-auto lg:w-auto gap-1.5 sm:gap-2 h-10 bg-linear-to-tr from-primary to-primary/50 hover:from-primary/90 hover:to-primary lg:ml-auto"
-                >
-                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="sm:hidden">Ajouter</span>
-                  <span className="hidden sm:inline font-medium">
-                    Ajouter un élève
-                  </span>
-                </Button>
-              </div>
-            </>
+              {/* Bouton Ajouter  */}
+              <Button
+                onClick={() => setOpen(true)}
+                className="w-full sm:w-auto lg:w-auto gap-1.5 sm:gap-2 h-10 bg-linear-to-tr from-primary to-primary/50 hover:from-primary/90 hover:to-primary lg:ml-auto"
+              >
+                <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="sm:hidden">Ajouter</span>
+                <span className="hidden sm:inline font-medium">
+                  Ajouter un élève
+                </span>
+              </Button>
+            </div>
           )}
         </div>
 

@@ -38,7 +38,8 @@ export function parseAxiosError(err: any) {
 
   const status = err?.response?.status ?? null;
   const data = err?.response?.data || err?.data || null;
-  const message = data?.message || data?.errors?.message || 'Erreur réseau';
+  const message =
+    data?.message || data?.errors?.[0]?.message || 'Erreur réseau';
   return { data, message, ok: false, status };
 }
 

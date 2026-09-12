@@ -19,6 +19,10 @@ export interface GqlContext {
   userId: string | null;
   user: UserWithRelationsContract | null;
   schoolUser?: SchoolUserContract | null;
+  teacherId?: string | null;
+  studentId?: string | null;
+  staffId?: string | null;
+  parentId?: string | null;
   loaders: DataLoaders;
 }
 interface CreateContextParams {
@@ -38,6 +42,10 @@ export const createContext = async ({
   const userId = req.headers['x-user-id'] as string | undefined;
   const schoolId = req.headers['x-school-id'] as string | undefined;
   const role = req.headers['x-school-role'] as SchoolRole | undefined;
+  const teacherId = req.headers['x-teacher-id'] as string | undefined;
+  const studentId = req.headers['x-student-id'] as string | undefined;
+  const staffId = req.headers['x-staff-id'] as string | undefined;
+  const parentId = req.headers['x-parent-id'] as string | undefined;
   console.log('userId ', userId, 'schoolId', schoolId);
   const userKey = `user:${userId}`;
   let user: UserWithRelationsContract | null = null;
@@ -57,7 +65,7 @@ export const createContext = async ({
       schoolUser = (await JSON.parse(schoolUserCached)) as SchoolUserContract;
     }
     if (!schoolUser) {
-      schoolUser = await prisma.schoolUser.findUnique({
+      const member = await prisma.schoolUser.findUnique({
         where: {
           schoolId_userId: {
             schoolId,
@@ -65,15 +73,34 @@ export const createContext = async ({
           },
         },
         include: {
-          permissions: true,
+          permissions: {
+            include: {
+              permission: {
+                select: {
+                  action: true,
+                  id: true,
+                  subject: true,
+                  name: true,
+                  description: true,
+                  module: true,
+                },
+              },
+            },
+          },
         },
       });
+      console.log('Member', member);
+      schoolUser = member
+        ? {
+            ...member,
+            permissions: member?.permissions.map((perm) => perm.permission),
+          }
+        : null;
       if (schoolUser) {
         await cacheManager.set(schoolUserKey, schoolUser, 1000 * 60 * 60 * 5);
       }
     }
   }
-
   if (!user && userId) {
     user = await firstValueFrom(
       authClient.send(AUTH_PATTERNS.FIND_FULL_USER, { userId }).pipe(
@@ -93,5 +120,9 @@ export const createContext = async ({
     user,
     role: role ?? null,
     schoolUser,
+    teacherId: teacherId ?? null,
+    studentId: studentId ?? null,
+    staffId: staffId ?? null,
+    parentId: parentId ?? null,
   };
 };

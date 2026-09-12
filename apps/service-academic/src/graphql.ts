@@ -370,22 +370,6 @@ export abstract class IMutation {
     abstract deleteTeacherAssignment(id: string, subjectIds?: Nullable<string[]>): Nullable<ApiResponse> | Promise<Nullable<ApiResponse>>;
 }
 
-export abstract class IQuery {
-    abstract getClassSubjects(classId?: Nullable<string>, teacherId?: Nullable<string>, groupId?: Nullable<string>, searchTerm?: Nullable<string>): Nullable<ClassSubject[]> | Promise<Nullable<ClassSubject[]>>;
-
-    abstract class(id: string): Nullable<Class> | Promise<Nullable<Class>>;
-
-    abstract getLessons(input?: Nullable<GetLessonsInput>): Nullable<LessonsList> | Promise<Nullable<LessonsList>>;
-
-    abstract getSchoolClasses(input: GetSchoolClassesInput): ClassList | Promise<ClassList>;
-
-    abstract getSchoolSubjects(input: GetSubjectInput): Nullable<SubjectList> | Promise<Nullable<SubjectList>>;
-
-    abstract getSchoolRooms(filter: GetSchoolRoomInput): RoomList | Promise<RoomList>;
-
-    abstract getTeacherAssignments(filter?: Nullable<GetTeacherAssignmentInput>): Nullable<Nullable<TeacherAssignment>[]> | Promise<Nullable<Nullable<TeacherAssignment>[]>>;
-}
-
 export class RoomList {
     data: Nullable<Room>[];
     meta?: Nullable<PaginationMeta>;
@@ -421,6 +405,22 @@ export class PaginationMeta {
 export class GenderStats {
     male: number;
     female: number;
+}
+
+export abstract class IQuery {
+    abstract getClassSubjects(classId?: Nullable<string>, teacherId?: Nullable<string>, groupId?: Nullable<string>, searchTerm?: Nullable<string>): Nullable<ClassSubject[]> | Promise<Nullable<ClassSubject[]>>;
+
+    abstract class(id: string): Nullable<Class> | Promise<Nullable<Class>>;
+
+    abstract getLessons(input?: Nullable<GetLessonsInput>): Nullable<LessonsList> | Promise<Nullable<LessonsList>>;
+
+    abstract getSchoolClasses(input: GetSchoolClassesInput): ClassList | Promise<ClassList>;
+
+    abstract getSchoolSubjects(input: GetSubjectInput): Nullable<SubjectList> | Promise<Nullable<SubjectList>>;
+
+    abstract getSchoolRooms(filter: GetSchoolRoomInput): RoomList | Promise<RoomList>;
+
+    abstract getTeacherAssignments(filter?: Nullable<GetTeacherAssignmentInput>): Nullable<Nullable<TeacherAssignment>[]> | Promise<Nullable<Nullable<TeacherAssignment>[]>>;
 }
 
 export class _Service {

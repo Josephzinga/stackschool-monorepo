@@ -1,13 +1,11 @@
 'use client';
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import * as React from 'react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import { TeacherTableActions } from './teacher-table-actions';
 import {
   Popover,
@@ -19,7 +17,7 @@ import {
   CellCheckBox,
   HeaderCheckBox,
 } from '@/components/table/table-checkbox';
-import { AvatarProfile } from '@/components/profile-avatar';
+import { ProfileCell } from '@/components/table/profile-cell';
 
 export type TeachersData = {
   id: string;
@@ -69,7 +67,7 @@ export const columns = columnHelper.columns([
       const profile = row.original.profile;
 
       return (
-        <AvatarProfile
+        <ProfileCell
           profile={profile}
           href={`/list/teachers/${row.original.id}`}
         />
@@ -110,20 +108,20 @@ export const columns = columnHelper.columns([
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger
             disabled={!remainingCount}
-            asChild
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
-          >
-            <button
-              onClick={() => setOpen(true)}
-              className="text-xs border px-2 py-1 rounded-lg hover:bg-accent transition"
-            >
-              {firstSubject}
-              {remainingCount > 0 && (
-                <span className="text-blue-600 ml-1">{` +${remainingCount}`}</span>
-              )}
-            </button>
-          </PopoverTrigger>
+            render={
+              <button
+                onClick={() => setOpen(true)}
+                className="text-xs border px-2 py-1 rounded-lg hover:bg-accent transition"
+              >
+                {firstSubject}
+                {remainingCount > 0 && (
+                  <span className="text-blue-600 ml-1">{` +${remainingCount}`}</span>
+                )}
+              </button>
+            }
+          ></PopoverTrigger>
           <PopoverContent
             className="w-48 px-2"
             onMouseEnter={() => setOpen(true)}
@@ -171,20 +169,20 @@ export const columns = columnHelper.columns([
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger
             disabled={!remainingCount}
-            asChild
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
-          >
-            <button
-              onClick={() => setOpen(true)}
-              className="text-xs border px-2 py-1 rounded-lg hover:bg-accent transition"
-            >
-              {firstClass}
-              {remainingCount > 0 && (
-                <span className="text-blue-600 ml-1">{` +${remainingCount}`}</span>
-              )}
-            </button>
-          </PopoverTrigger>
+            render={
+              <button
+                onClick={() => setOpen(true)}
+                className="text-xs border px-2 py-1 rounded-lg hover:bg-accent transition"
+              >
+                {firstClass}
+                {remainingCount > 0 && (
+                  <span className="text-blue-600 ml-1">{` +${remainingCount}`}</span>
+                )}
+              </button>
+            }
+          ></PopoverTrigger>
           <PopoverContent
             className="w-48 px-2"
             onMouseEnter={() => setOpen(true)}

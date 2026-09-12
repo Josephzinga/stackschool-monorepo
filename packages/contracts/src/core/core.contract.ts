@@ -3,8 +3,9 @@ import {
   ContactPreference,
   Day,
   DisciplinaryType,
-  PermissionCode,
+  PermissionAction,
   PermissionModule,
+  PermissionSubject,
   RelationType,
   SchoolRole,
   StudentStatus,
@@ -17,21 +18,21 @@ import { UserContract } from '../auth';
 export const TeacherContract = z.object({
   id: z.cuid2(),
   needAdminConfirm: z.boolean().default(false),
-  schoolUserId: z.string().nullable().optional(),
-  tempSchoolUserId: z.string().nullable().optional(),
-  diploma: z.string().nullable().optional(),
-  experience: z.string().nullable().optional(),
-  hireDate: z.coerce.date().nullable().optional(),
+  schoolUserId: z.string().nullish(),
+  tempSchoolUserId: z.string().nullish(),
+  diploma: z.string().nullish(),
+  experience: z.string().nullish(),
+  hireDate: z.coerce.date().nullish(),
   isActive: z.boolean().default(true),
-  salary: z.number().nullable().optional(),
-  department: z.string().nullable().optional(),
-  specialization: z.string().nullable().optional(),
+  salary: z.number().nullish(),
+  department: z.string().nullish(),
+  specialization: z.string().nullish(),
   createdAt: z.coerce.date().default(() => new Date()),
   updatedAt: z.coerce.date(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  bio: z.string().nullable().optional(),
-  cvUrl: z.string().nullable().optional(),
-  pendingAssignments: z.record(z.string(), z.any()).nullable().optional(), // Json
+  deletedAt: z.coerce.date().nullish(),
+  bio: z.string().nullish(),
+  cvUrl: z.string().nullish(),
+  pendingAssignments: z.record(z.string(), z.any()).nullish(), // Json
 });
 export type TeacherContract = z.infer<typeof TeacherContract>;
 
@@ -75,17 +76,17 @@ export const SchoolUserContract = z.object({
   role: SchoolRole,
   isOwner: z.boolean().default(false),
   createdAt: z.coerce
-    .date()
+    .date<Date | undefined>()
     .default(() => new Date())
-    .nullish(),
+    .optional(),
   parent: z.lazy(() => ParentContract.nullish()).nullish(),
-  staff: z.any().nullish(), // Staff non défini
+  staff: z.lazy(() => StaffContract).nullish(),
   student: z
     .lazy(() => StudentContract)
     .nullable()
     .nullish(),
   teacher: z.lazy(() => TeacherContract).nullish(),
-  permissions: z.array(z.lazy(() => SchoolUserPermissionContract)).nullish(),
+  permissions: z.array(z.lazy(() => PermissionContract)).optional(),
   school: z.lazy(() => SchoolContract.nullish()).nullish(),
 });
 export type SchoolUserContract = z.infer<typeof SchoolUserContract>;
@@ -97,8 +98,8 @@ export const SchoolProfileContract = z.object({
   lastName: z.string(),
   address: z.string(),
   gender: z.enum(['MALE', 'FEMALE']),
-  avatarUrl: z.string().nullable().optional(),
-  bio: z.string().nullable().optional(),
+  avatarUrl: z.string().nullish(),
+  bio: z.string().nullish(),
   schoolUserId: z.string(),
   schoolId: z.uuid(),
 });
@@ -108,31 +109,31 @@ export type SchoolProfileContract = z.infer<typeof SchoolProfileContract>;
 export const StudentContract = z.object({
   id: z.uuid(),
   needAdminConfirm: z.boolean().default(false),
-  tempSchoolUserId: z.string().nullable().optional(),
+  tempSchoolUserId: z.string().nullish(),
   schoolProfile: SchoolProfileContract.optional(),
   user: UserContract.optional(),
 
   schoolId: z.uuid(),
   classId: z.string(),
-  profileId: z.string(),
+  profileId: z.string().nullish(),
   matricule: z.string(),
   enrollmentYear: z.string(),
-  enrollmentDate: z.coerce.date().nullable().optional(),
+  enrollmentDate: z.coerce.date().nullish(),
   studentNumber: z.number().int(),
-  bloodGroup: z.string().nullable().optional(),
-  allergies: z.string().nullable().optional(),
-  medicalCondition: z.string().nullable().optional(),
-  schoolUserId: z.string().nullable().optional(),
+  bloodGroup: z.string().nullish(),
+  allergies: z.string().nullish(),
+  medicalCondition: z.string().nullish(),
+  schoolUserId: z.string().nullish(),
   birthDate: z.coerce.date(),
   createdAt: z.coerce.date().default(() => new Date()),
-  updatedAt: z.coerce.date(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  birthPlace: z.string().nullable().optional(),
-  nationality: z.string().nullable().optional(),
-  previousClass: z.string().nullable().optional(),
-  previousLevel: z.string().nullable().optional(),
-  birthCertificateNumber: z.string().nullable().optional(),
-  previousSchool: z.string().nullable().optional(),
+  updatedAt: z.coerce.date<Date>().optional(),
+  deletedAt: z.coerce.date<Date>().nullish(),
+  birthPlace: z.string().nullish(),
+  nationality: z.string().nullish(),
+  previousClass: z.string().nullish(),
+  previousLevel: z.string().nullish(),
+  birthCertificateNumber: z.string().nullish(),
+  previousSchool: z.string().nullish(),
   transportMode: TransportMode.default('WALK'),
   status: StudentStatus.default('ACTIVE'),
 });
@@ -154,15 +155,19 @@ export type SchoolSettingsContract = z.infer<typeof SchoolSettingsContract>;
 // --- Permission ---
 export const PermissionContract = z.object({
   id: z.cuid2(),
-  code: PermissionCode,
+  subject: PermissionSubject,
+  action: PermissionAction,
   name: z.string(),
   module: PermissionModule,
-  description: z.string().nullable().optional(),
+  description: z.string().nullish(),
   schoolUserPermissions: z
     .array(z.lazy(() => SchoolUserPermissionContract))
     .optional(),
-  createdAt: z.coerce.date().default(() => new Date()),
-  updatedAt: z.coerce.date(),
+  createdAt: z.coerce
+    .date()
+    .default(() => new Date())
+    .optional(),
+  updatedAt: z.coerce.date().optional(),
 });
 export type PermissionContract = z.infer<typeof PermissionContract>;
 
@@ -183,7 +188,7 @@ export const StudentDisciplinaryActionContract = z.object({
   type: DisciplinaryType,
   reason: z.string(),
   startDate: z.coerce.date(),
-  endDate: z.coerce.date().nullable().optional(),
+  endDate: z.coerce.date().nullish(),
   createdAt: z.coerce.date().default(() => new Date()),
   student: z.lazy(() => StudentContract),
 });
@@ -194,18 +199,15 @@ export type StudentDisciplinaryActionContract = z.infer<
 // --- Parent ---
 export const ParentContract = z.object({
   id: z.cuid2(),
-  schoolUserId: z.string().nullable().optional(),
-  tempSchoolUserId: z.string(),
-  profession: z.string().nullable().optional(),
+  schoolUserId: z.string().nullish(),
+  tempSchoolUserId: z.string().nullish(),
+  profession: z.string().nullable(),
   needAdminConfirm: z.boolean().default(false),
   isDelegate: z.boolean().default(false),
   createdAt: z.coerce.date().default(() => new Date()),
   updatedAt: z.coerce.date(),
   contactPreference: ContactPreference.nullable().default('WHATSAPP'),
-  tempSchoolUser: z
-    .lazy(() => TempSchoolUserContract)
-    .nullable()
-    .optional(),
+  tempSchoolUser: z.lazy(() => TempSchoolUserContract).nullish(),
 });
 export type ParentContract = z.infer<typeof ParentContract>;
 

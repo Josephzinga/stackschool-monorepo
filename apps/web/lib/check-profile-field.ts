@@ -1,9 +1,9 @@
-import { parseAxiosError, api } from '@stackschool/contracts';
+import { api, parseAxiosError } from '@stackschool/contracts';
 
 // lib/check-profile-field.ts
 export async function checkField(
-  field: string,
-  value: string,
+  { field, value }: { field: string; value: string },
+  userId?: string,
 ): Promise<{
   valid: boolean;
   message: string;
@@ -11,8 +11,8 @@ export async function checkField(
   status?: number | null;
 } | null> {
   try {
-    const response = await api.get(`/api/validate/user-field?`, {
-      params: { [field]: value },
+    const response = await api.get(`/api/validate/user-field`, {
+      params: { [field]: value, ...(userId && { userId }) },
     });
     if (response.data) {
       return {

@@ -2,8 +2,8 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { SCHOOL_ROLES_KEY } from '../decorators/role.decorator';
-import { SchoolRole } from '@stackschool/contracts';
-import { RpcException } from '@nestjs/microservices';
+import { ROLE_LABEL_FR, SchoolRole } from '@stackschool/contracts';
+import { ServiceRpcException } from '../errors';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -20,11 +20,16 @@ export class RolesGuard implements CanActivate {
     const schoolUser = gqlCtx?.schoolUser;
 
     if (!schoolUser) {
-      // Pas connecté, ou pas membre de cette école.
-      throw new RpcException('Aucun SchoolUser actif pour cette école.');
+      throw new ServiceRpcException(
+        'FORBIDDEN',
+        'Aucun SchoolUser actif pour cette école.',
+      );
     }
     if (!required.includes(schoolUser.role)) {
-      throw new RpcException(`Rôle requis : ${required.join(' ou ')}.`);
+      throw new ServiceRpcException(
+        'FORBIDDEN',
+        `Rôle requis : ${required.map((r) => ROLE_LABEL_FR[r]).join(' ou ')}.`,
+      );
     }
     return true;
   }

@@ -51,6 +51,7 @@ export class StudentService {
     let whereClause: Prisma.StudentWhereInput = {
       schoolId,
       deletedAt: null,
+      needAdminConfirm: false,
     };
 
     if (classId) {
@@ -140,7 +141,7 @@ export class StudentService {
       if (existingStudent) {
         throw new CoreRpcException(
           'CONFLICT',
-          "C'est élève existe déjà dans l'établissement",
+          "Cet élève existe déjà dans l'établissement",
         );
       }
 
@@ -261,6 +262,7 @@ export class StudentService {
     return this.prisma.student.findMany({
       where: {
         schoolId,
+        deletedAt: null,
         OR: [
           {
             schoolUser: {

@@ -36,11 +36,8 @@ export class MembershipController {
   async rpcFindBySchoolAndUserId(
     @Payload(new ZodValidationPipe(FindBySchoolIdAndUserIdInput))
     data: FindBySchoolIdAndUserIdInput,
-  ): Promise<Omit<
-    SchoolUserContract,
-    'parent' | 'staff' | 'teacher' | 'school' | 'student'
-  > | null> {
-    const schoolUser = await this.membershipService.findUnique({
+  ): Promise<SchoolUserContract | null> {
+    const schoolUser = await this.membershipService.findFull({
       schoolId_userId: {
         schoolId: data.schoolId,
         userId: data.userId,

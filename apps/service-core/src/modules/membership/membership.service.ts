@@ -8,13 +8,16 @@ import {
   CoreRpcException,
   type HandleRoleDataInput,
   parentChildDraft,
+  ParentContract,
   ProfileContract,
+  SchoolUserContract,
   teacherAssignmentDraft,
 } from '@stackschool/messaging';
 import { Prisma } from '../../prisma/db/generated/client';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import { z } from 'zod';
+import { GetSchoolMembershipsInput, SchoolMembership } from '../../graphql';
 
 @Injectable()
 export class MembershipService {
@@ -23,6 +26,39 @@ export class MembershipService {
     @Inject(AUTH_SERVICE) private readonly authClient: ClientProxy,
     @Inject(ACADEMIC_SERVICE) private readonly academicClient: ClientProxy,
   ) {}
+
+  async findSchool(
+    dto: GetSchoolMembershipsInput,
+    schoolId: string,
+  ): Promise<SchoolMembership[]> {
+    const where: Prisma.SchoolUserWhereInput = {
+      schoolId,
+      isActive: true,
+    };
+
+    if (dto.searchTerm) {
+      where.schoolProfile = {
+        OR: [
+          { firstName: { contains: dto.searchTerm, mode: 'insensitive' } },
+          { lastName: { contains: dto.searchTerm, mode: 'insensitive' } },
+        ],
+      };
+    }
+
+    if (dto.id) {
+      where.id = dto.id;
+    }
+
+    return this.prisma.schoolUser.findMany({
+      where,
+      orderBy: {
+        schoolProfile: {
+          firstName: 'asc',
+        },
+      },
+      take: dto.limit ?? 50,
+    });
+  }
 
   async create(input: Prisma.SchoolUserCreateInput) {
     return this.prisma.schoolUser.create({
@@ -33,6 +69,34 @@ export class MembershipService {
     return this.prisma.schoolUser.findUnique({
       where,
     });
+  }
+  async findFull(
+    where: Prisma.SchoolUserWhereUniqueInput,
+  ): Promise<SchoolUserContract | null> {
+    const schoolUser = await this.prisma.schoolUser.findUnique({
+      where,
+      include: {
+        permissions: {
+          select: {
+            permission: true,
+          },
+        },
+        Parent: true,
+        teacher: true,
+        staff: true,
+        student: true,
+      },
+    });
+
+    if (!schoolUser) {
+      return null;
+    }
+
+    return {
+      ...schoolUser,
+      parent: schoolUser.Parent,
+      permissions: schoolUser.permissions.map((perm) => perm.permission),
+    };
   }
   async findMany(schoolUserIds: string[]) {
     return this.prisma.schoolUser.findMany({

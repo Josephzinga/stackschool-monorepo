@@ -10,10 +10,12 @@ import { join } from 'node:path';
 import { Request, Response } from 'express';
 import { AuthModule } from './modules/auth/auth.module';
 import { ExternalModule } from './modules/external/external.module';
-import { CacheModule } from '@nestjs/cache-manager';
+import { Cache, CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import KeyvRedis, { Keyv } from '@keyv/redis';
 import { KeyvCacheableMemory } from 'cacheable';
+import { createContext } from './graphql/context';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
@@ -23,7 +25,8 @@ import { KeyvCacheableMemory } from 'cacheable';
     ExternalModule,
     GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
-      useFactory: () => ({
+      inject: [CACHE_MANAGER, PrismaService],
+      useFactory: (cacheManager: Cache, prisma: PrismaService) => ({
         typePaths: [
           join(process.cwd(), '/src/graphql/**/*.graphql'),
           join(
@@ -31,17 +34,13 @@ import { KeyvCacheableMemory } from 'cacheable';
             '../../packages/contracts/src/graphql/common/common.graphql',
           ),
         ],
-        context: ({ req, res }: { req: Request; res: Response }) => {
-          const userId = req.headers['x-user-id'];
-          const schoolId = req.headers['x-school-id'];
-          console.log('userId', userId, 'SchoolId', schoolId);
-          return {
+        context: ({ req, res }: { req: Request; res: Response }) =>
+          createContext({
             req,
             res,
-            userId,
-            schoolId,
-          };
-        },
+            cacheManager,
+            prisma,
+          }),
         buildSchemaOptions: {
           dateScalarMode: 'timestamp',
         },

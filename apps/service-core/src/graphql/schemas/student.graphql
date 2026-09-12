@@ -2,7 +2,7 @@ type Student @key(fields: "id") {
   id: ID!
   matricule: String!
   birthDate: DateTime
-  birthPlace: DateTime
+  birthPlace: String
   schoolUserId: ID
   enrollmentDate: DateTime
   previousClass: String

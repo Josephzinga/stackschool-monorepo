@@ -2,9 +2,9 @@ generator client {
   provider            = "prisma-client"
   output              = "./generated"
   engineType          = "client"
-  runtime             = "nodejs"
-  moduleFormat        = "cjs"
   importFileExtension = "js"
+  moduleFormat        = "cjs"
+  runtime             = "nodejs"
 }
 
 datasource db {
@@ -27,22 +27,23 @@ model School {
   orangeMerchantId String?
   paymentApiKey    String?
   walletBalance    Float           @default(0)
+  parentStudent    ParentStudent[]
+  profiles         SchoolProfile[]
+  settings         SchoolSettings?
   memberships      SchoolUser[]
   students         Student[]
   subscriptions    Subscription[]
-  profiles         SchoolProfile[]
-  settings         SchoolSettings?
 }
 
 model TempSchoolUser {
-  id       String     @id @default(cuid())
+  id       String     @id @default(uuid())
   schoolId String
   userId   String
   role     SchoolRole
+  parent   Parent?
+  staff    Staff?
   student  Student?
   teacher  Teacher?
-  staff    Staff?
-  parent   Parent?
 
   @@unique([userId, schoolId])
   @@index([userId, schoolId])
@@ -59,12 +60,12 @@ model SchoolUser {
   isOwner       Boolean                @default(false)
   createdAt     DateTime               @default(now())
   Parent        Parent?
+  schoolProfile SchoolProfile?
   school        School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  permissions   SchoolUserPermission[]
   staff         Staff?
   student       Student?
   teacher       Teacher?
-  permissions   SchoolUserPermission[]
-  schoolProfile SchoolProfile?
 
   @@unique([schoolId, userId])
   @@index([schoolId])
@@ -73,55 +74,50 @@ model SchoolUser {
 }
 
 model SchoolProfile {
-  id           String  @id @default(cuid())
+  id           String     @id @default(cuid())
   firstName    String
   lastName     String
   address      String?
-  gender       Gender
   avatarUrl    String?
   bio          String?
-  schoolUserId String  @unique
+  schoolUserId String     @unique
   schoolId     String
-
-  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id])
-  school     School     @relation(fields: [schoolId], references: [id])
+  gender       Gender
+  school       School     @relation(fields: [schoolId], references: [id])
+  schoolUser   SchoolUser @relation(fields: [schoolUserId], references: [id])
 }
 
-// Paramétre de l'ecole
 model SchoolSettings {
   id             String @id @default(cuid())
   schoolId       String @unique
-  lessonDuration Int    @default(50) // durée d'une lesson (5O min)
-  startHour      Int    @default(8) // début de cours (8 heure)
-  endHour        Int    @default(18) // fin de cours (18 heure)
+  lessonDuration Int    @default(50)
+  startHour      Int    @default(8)
+  endHour        Int    @default(18)
   daysOfWeek     Day[]
-  breakStartHour Int    @default(12) // 12 heure (heure de pause)
-  breakDuration  Int    @default(60) // 60 duration de la pause (60 min)
+  breakStartHour Int    @default(12)
+  breakDuration  Int    @default(60)
   school         School @relation(fields: [schoolId], references: [id])
 }
 
-// table de permission
 model Permission {
-  id          String           @id @default(cuid())
-  code        PermissionCode   @unique // L'identifiant strict, ex: "MARK_STUDENT_ATTENDANCE"
-  name        String // Nom lisible, ex: "Faire l'appel des élèves"
-  module      PermissionModule // Pour grouper dans l'UI, ex: "ATTENDANCE", "FINANCE", "GRADES"
-  description String? // Explication détaillée pour l'admin
+  id          String            @id @default(cuid())
+  action      PermissionAction
+  subject     PermissionSubject
+  module      PermissionModule  // garde le groupement pour ton UI existante
+  name        String            // libellé lisible, ex: "Saisir les notes"
+  description String?
+  conditions  Json?             // ex: { "teacherId": "${user.id}" } — optionnel
 
-  // Relation inverse : Une permission appartient à plusieurs utilisateurs
+  @@unique([action, subject])
   schoolUserPermissions SchoolUserPermission[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model SchoolUserPermission {
-  id           String @id @default(cuid())
+  id           String     @id @default(cuid())
   schoolUserId String
   permissionId String
-
-  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  schoolUser SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  schoolUser   SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
 
   @@unique([schoolUserId, permissionId])
 }
@@ -131,34 +127,32 @@ model StudentDisciplinaryAction {
   studentId String
   type      DisciplinaryType
   reason    String
-  startDate DateTime         @db.Date()
-  endDate   DateTime?        @db.Date()
+  startDate DateTime         @db.Date
+  endDate   DateTime?        @db.Date
   createdAt DateTime         @default(now())
   student   Student          @relation(fields: [studentId], references: [id])
 }
 
 /// * Parent
 model Parent {
-  id                String             @id @default(cuid())
+  id                String             @id @default(uuid())
   schoolUserId      String?            @unique
-  tempSchoolUserId  String             @unique
   profession        String?
-  needAdminConfirm  Boolean            @default(false)
   isDelegate        Boolean            @default(false)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   contactPreference ContactPreference? @default(WHATSAPP)
+  needAdminConfirm  Boolean            @default(false)
+  tempSchoolUserId  String?            @unique
   schoolUser        SchoolUser?        @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
-  students          ParentStudent[]
   tempSchoolUser    TempSchoolUser?    @relation(fields: [tempSchoolUserId], references: [id], onDelete: Cascade)
+  students          ParentStudent[]
 }
 
 /// *
 /// * Etudiant
 model Student {
-  id                     String                      @id @default(cuid())
-  needAdminConfirm       Boolean                     @default(false)
-  tempSchoolUserId       String?                     @unique
+  id                     String                      @id @default(uuid())
   matricule              String
   enrollmentYear         String?
   enrollmentDate         DateTime?
@@ -167,7 +161,7 @@ model Student {
   allergies              String?
   medicalCondition       String?
   schoolUserId           String?                     @unique
-  birthDate              DateTime                    @db.Date()
+  birthDate              DateTime                    @db.Date
   createdAt              DateTime                    @default(now())
   updatedAt              DateTime                    @updatedAt
   deletedAt              DateTime?
@@ -181,11 +175,13 @@ model Student {
   classId                String
   transportMode          TransportMode               @default(WALK)
   status                 StudentStatus               @default(ACTIVE)
+  needAdminConfirm       Boolean                     @default(false)
+  tempSchoolUserId       String?                     @unique
   parentStudent          ParentStudent[]
   school                 School                      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   schoolUser             SchoolUser?                 @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
-  disciplinaryActions    StudentDisciplinaryAction[]
   tempSchoolUser         TempSchoolUser?             @relation(fields: [tempSchoolUserId], references: [id], onDelete: Cascade)
+  disciplinaryActions    StudentDisciplinaryAction[]
 
   @@unique([matricule, schoolId])
   @@index([schoolUserId])
@@ -200,18 +196,18 @@ model ParentStudent {
   createdAt        DateTime     @default(now())
   parentId         String
   relationType     RelationType
-  parent           Parent       @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  student          Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
   needAdminConfirm Boolean      @default(false)
+  schoolId         String
+  parent           Parent       @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  school           School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  student          Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([parentId, studentId])
 }
 
 model Teacher {
-  id                 String          @id @default(cuid())
-  needAdminConfirm   Boolean         @default(false)
+  id                 String          @id @default(uuid())
   schoolUserId       String?         @unique
-  tempSchoolUserId   String?         @unique
   diploma            String?
   experience         String?
   hireDate           DateTime?
@@ -224,6 +220,8 @@ model Teacher {
   deletedAt          DateTime?
   bio                String?
   cvUrl              String?
+  needAdminConfirm   Boolean         @default(false)
+  tempSchoolUserId   String?         @unique
   pendingAssignments Json?
   schoolUser         SchoolUser?     @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
   tempSchoolUser     TempSchoolUser? @relation(fields: [tempSchoolUserId], references: [id], onDelete: Cascade)
@@ -232,18 +230,18 @@ model Teacher {
 }
 
 model Staff {
-  id               String          @id @default(cuid())
-  needAdminConfirm Boolean         @default(false)
-  schoolUserId     String?         @unique
-  tempSchoolUserId String          @unique
+  id               String         @id @default(uuid())
+  schoolUserId     String?        @unique
   hireDate         DateTime?
-  position         StaffPosition   @default(OTHER)
+  position         StaffPosition  @default(OTHER)
   positionOther    String?
   salary           Float?
   department       String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  schoolUser       SchoolUser?     @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  needAdminConfirm Boolean        @default(false)
+  tempSchoolUserId String?         @unique
+  schoolUser       SchoolUser?    @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
   tempSchoolUser   TempSchoolUser? @relation(fields: [tempSchoolUserId], references: [id], onDelete: Cascade)
 
   @@index([schoolUserId])
@@ -373,36 +371,43 @@ enum SessionStatus {
   STARTED
 }
 
-enum PermissionModule {
-  ATTENDANCE // Gestion des présences
-  ACADEMICS // Notes, bulletins, classes, matières
-  USERS // Gestion des profs, élèves, parents, staff
-  FINANCE // Frais de scolarité, paiements, salaires
-  SETTINGS // Configuration de l'école
+enum PermissionAction {
+  MANAGE   // wildcard CASL : toutes les actions sur le subject
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  MARK     // ex: présences
+  PUBLISH  // ex: bulletins
+  EXPORT   // ex: rapports
 }
 
-enum PermissionCode {
-  // --- MODULE: ATTENDANCE ---
-  MARK_STUDENT_ATTENDANCE
-  MARK_TEACHER_ATTENDANCE
-  MARK_STAFF_ATTENDANCE
-  VIEW_ATTENDANCE_REPORTS
+enum PermissionSubject {
+  STUDENT
+  TEACHER
+  PARENT
+  STAFF
+  CLASS
+  SUBJECT
+  GRADE
+  BULLETIN
+  TIMETABLE
+  EXAM
+  ATTENDANCE_RECORD
+  PAYMENT
+  PAYROLL
+  FINANCIAL_REPORT
+  SCHOOL_SETTINGS
+  SCHOOL_USER_PERMISSION
+  ALL      // correspond au subject 'all' de CASL
+}
 
-  // --- MODULE: ACADEMICS ---
-  MANAGE_CLASSES
-  MANAGE_SUBJECTS
-  INPUT_GRADES
-  PUBLISH_BULLETINS
-
-  // --- MODULE: USERS ---
-  CREATE_USER
-  UPDATE_USER
-  DELETE_USER
-  MANAGE_USER_PERMISSIONS // Permet à un admin secondaire de modifier les accès
-
-  // --- MODULE: FINANCE ---
-  MANAGE_PAYMENTS
-  VIEW_FINANCIAL_REPORTS
+enum PermissionModule {
+  ATTENDANCE
+  ACADEMICS
+  USERS
+  FINANCE
+  SETTINGS
 }
 
 enum StaffPosition {

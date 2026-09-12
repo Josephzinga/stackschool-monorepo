@@ -1,4 +1,4 @@
-type User @key(fields: "id") {
+ type User @key(fields: "id") {
   id: ID!
   memberships: [SchoolMembership]
   schoolContext(schoolId: ID!): SchoolMembership

@@ -1,6 +1,4 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { CreateSchoolInput } from './dto/create-school.input';
-import { UpdateSchoolInput } from './dto/update-school.input';
 import {
   CORE_PATTERNS,
   CORE_SERVICE,

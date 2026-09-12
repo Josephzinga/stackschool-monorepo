@@ -41,10 +41,7 @@ export class MembershipService {
   }
 
   async findBySchoolIdAndUserId(input: FindBySchoolIdAndUserIdInput) {
-    const cachedKey = `school_user:${input.userId}:${input.schoolId}`;
-    const cached = await this.cacheManager.get<string>(cachedKey);
-    if (cached) return JSON.parse(cached) as SchoolUserContract;
-    const member = await firstValueFrom(
+    return await firstValueFrom(
       this.coreService
         .send(CORE_PATTERNS.MEMBERSHIP.FIND_BY_SCHOOL_ID_AND_USER_ID, input)
         .pipe(
@@ -53,10 +50,6 @@ export class MembershipService {
           catchError((err) => throwError(() => mapCoreError(err))),
         ),
     );
-
-    if (member)
-      await this.cacheManager.set(cachedKey, JSON.stringify(member), 300);
-    return member;
   }
 
   async findMany(schoolUserIds: string[]) {

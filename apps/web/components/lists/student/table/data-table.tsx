@@ -5,7 +5,6 @@ import {
   createFilteredRowModel,
   createPaginatedRowModel,
   createSortedRowModel,
-  metaHelper,
   rowPaginationFeature,
   rowSelectionFeature,
   rowSortingFeature,
@@ -13,15 +12,30 @@ import {
   useTable,
 } from '@tanstack/react-table';
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useStudentTable } from './table-provider';
 import { useWindowSize } from 'react-use';
 import AppDataTable from '@/components/table/app-data-table';
 import { DataTablePagination } from '@/components/data-table-pagination';
 import { AppDataTableProps, AppTableMeta } from '@/types/tanstack-table';
 import DataTableSkeleton from '@/components/skeleton';
-import { ClassData } from '@/components/lists/class/table/columns';
 import { StudentsData } from '@/components/lists/student/table/columns';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
+import { UserIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { StudentDialog } from './student-dialog';
+import { AppAlertDialog } from '@/components/app-alert-dialog';
+import { useDeleteStudentsMutation } from '@stackschool/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { parseAxiosError } from '@stackschool/contracts';
 
 const studentFeatures = tableFeatures({
   columnFilteringFeature,
@@ -32,7 +46,7 @@ const studentFeatures = tableFeatures({
   filteredRowModel: createFilteredRowModel(),
   paginatedRowModel: createPaginatedRowModel(),
   sortedRowModel: createSortedRowModel(),
-  tableMeta: metaHelper<AppTableMeta<ClassData>>(),
+  tableMeta: {} as AppTableMeta<StudentsData>,
 });
 export type StudentFeatures = typeof studentFeatures;
 export function DataTable({
@@ -49,6 +63,10 @@ export function DataTable({
     columnVisibility,
     setColumnVisibility,
   } = useStudentTable();
+
+  const [rowData, setRowData] = useState<StudentsData | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   const { width } = useWindowSize();
 
@@ -97,12 +115,50 @@ export function DataTable({
     rowCount: meta?.total,
     manualPagination: true,
     manualFiltering: true,
+    meta: {
+      openEdit: (data) => {
+        setRowData(data);
+        setOpenDialog(true);
+      },
+      openDelete: (data) => {
+        setRowData(data);
+        setOpenDeleteDialog(true);
+      },
+    },
     state: {
       columnVisibility,
       pagination,
       rowSelection,
     },
   });
+
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useDeleteStudentsMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['GetSchoolStudents'] });
+    },
+  });
+
+  const handleDelete = async () => {
+    const promise = mutateAsync({
+      studentIds: rowData?.id,
+    });
+
+    toast.promise(promise, {
+      loading: 'Suppression en cours...',
+      success: (data) => {
+        return data.deleteStudents?.ok
+          ? data.deleteStudents?.message || 'Eleve supprimé avec succès'
+          : 'Erreur lors de la suppression';
+      },
+      error: (error) => {
+        const { message } = parseAxiosError(error);
+        return message || 'Erreur lors de la suppression';
+      },
+      toasterId: 'dashboard',
+    });
+  };
   const renderTotalCount = () => (
     <div>
       <p className="opacity-80 font-sans ">
@@ -124,6 +180,7 @@ export function DataTable({
               table={table}
               columns={columns}
               isLoading={isLoading}
+              emptyComponent={<StudentEmpty setDialogOpen={setOpenDialog} />}
             />
           )}
         </div>
@@ -133,6 +190,51 @@ export function DataTable({
           renderTotalCount={renderTotalCount()}
         />
       </>
+
+      {openDialog && (
+        <StudentDialog
+          open={openDialog}
+          setOpen={setOpenDialog}
+          defaultValues={rowData}
+        />
+      )}
+      {openDeleteDialog && (
+        <AppAlertDialog
+          open={openDeleteDialog}
+          onOpenChange={setOpenDeleteDialog}
+          title={'Êtes-vous absolument sûr ?'}
+          description="Cette action est irréversible. Elle supprimera définitivement cet élève et toutes les données associées de l'école."
+          onConfirm={handleDelete}
+          isLoading={isPending}
+          confirmLabel="Supprimer"
+          variant="destructive"
+        />
+      )}
     </div>
+  );
+}
+export function StudentEmpty({
+  setDialogOpen,
+}: {
+  setDialogOpen: (open: boolean) => void;
+}) {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <UserIcon />
+        </EmptyMedia>
+        <EmptyTitle>Aucun élève trouvé.</EmptyTitle>
+        <EmptyDescription>
+          Vous n'avez pas encore créé un élève.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent className="flex-row justify-center gap-2">
+        <Button className="cursor-pointer" onClick={() => setDialogOpen(true)}>
+          Cree un élève
+        </Button>
+        <Button variant="outline">Importer les données</Button>
+      </EmptyContent>
+    </Empty>
   );
 }

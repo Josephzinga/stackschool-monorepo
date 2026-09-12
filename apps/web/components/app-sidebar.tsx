@@ -22,19 +22,8 @@ import { useDashboard } from './providers/dashboard-provider';
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { currentSchool, user } = useUserStore();
 
-  // On essaie de récupérer le rôle depuis le contexte Dashboard (plus fiable)
-  // Sinon on fallback sur le store User
-  let role = 'GUEST';
-  try {
-    const dashboard = useDashboard();
-    role = dashboard.me?.schoolContext?.role!;
-  } catch (e) {
-    // Si on est hors du DashboardProvider (ex: page d'accueil), on utilise le store
-    role = currentSchool
-      ? user?.memberships?.find((m) => m?.school?.id === currentSchool?.id)
-          ?.role || 'GUEST'
-      : 'GUEST';
-  }
+  const dashboard = useDashboard();
+  const role = dashboard.me?.schoolContext?.role!;
 
   // Filtrage des menus
   const filteredNavMain = menuItems.navMain.filter(
@@ -48,11 +37,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const userData = {
     name: user?.username || 'Utilisateur',
     email: user?.email || '',
-    avatar: user?.profile?.photo || '',
+    avatar: user?.profile?.avatarUrl || '',
   };
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -82,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavDocuments items={filteredDocuments} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={userData} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

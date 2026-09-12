@@ -1,7 +1,7 @@
 'use client';
 
 import { FormProvider, useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { SubmitButton } from '@/components/submit-button';
 import {
   Gender,
@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IdentiteSection } from '@/components/lists/student/form/identite-section';
+import { IdentitySection } from '@/components/lists/student/form/identity-section';
 import { SchoolSection } from '@/components/lists/student/form/school-section';
 import { FamilySection } from '@/components/lists/student/form/family-section';
 import { SanteSection } from '@/components/lists/student/form/sante-section';
@@ -86,8 +86,6 @@ export function CreateStudentForm({
   const firstName = watch('firstName');
   const lastName = watch('lastName');
 
-  useEffect(() => {}, [initialValues]);
-
   const { mutateAsync: createMutateAsync } = useCreateStudentMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['GetSchoolStudents'] });
@@ -153,7 +151,6 @@ export function CreateStudentForm({
         }
         return 'Opération terminée';
       },
-      toasterId: 'dashboard',
     });
   };
 
@@ -163,9 +160,9 @@ export function CreateStudentForm({
         onSubmit={handleSubmit(onSubmit, (err) => {
           console.log('Error', err);
         })}
-        className="space-y-6"
+        className="space-y-4"
       >
-        <IdentiteSection mode={mode} />
+        <IdentitySection mode={mode} />
         <SchoolSection mode={mode} />
 
         {mode === 'FULL_EDIT' && (

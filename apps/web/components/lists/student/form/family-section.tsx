@@ -1,13 +1,22 @@
-import {Controller, useFormContext, useWatch} from 'react-hook-form';
-import {Field, FieldError, FieldLabel} from '@/components/ui/field';
-import {Input} from '@/components/ui/input';
-import {CreateStudentSchema} from '@stackschool/contracts';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
-import {Button} from '@/components/ui/button';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import {
+  CreateStudentSchema,
+  relationTypeConstant,
+} from '@stackschool/contracts';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import React from 'react';
-import {Parent, relationItems} from '@stackschool/ui';
+import { Parent } from '@stackschool/ui';
 
 export const FamilySection = ({
   parentsData,
@@ -67,7 +76,7 @@ export const FamilySection = ({
           <Field>
             <FieldLabel htmlFor="parent-firstname">Prènom</FieldLabel>
             <Input
-              {...register('parentData.newParent.fistName')}
+              {...register('parentData.newParent.firstName')}
               placeholder="Prénom du parent"
               id="parent-firstname"
               aria-invalid={!!errors.parentData?.newParent?.firstName}
@@ -79,14 +88,14 @@ export const FamilySection = ({
           <Field>
             <FieldLabel htmlFor="parent-lastname">Nom</FieldLabel>
             <Input
-              {...register('parentData.newParent.lastname')}
+              {...register('parentData.newParent.lastName')}
               placeholder="Nom du parent"
               id="parent-lastname"
-              aria-invalid={!!errors.parentData?.newParent?.lastname}
+              aria-invalid={!!errors.parentData?.newParent?.lastName}
             />
 
             <FieldError>
-              {errors.parentData?.newParent?.lastname?.message}
+              {errors.parentData?.newParent?.lastName?.message}
             </FieldError>
           </Field>
           <Field>
@@ -135,9 +144,9 @@ export const FamilySection = ({
                     <SelectValue placeholder="Selectionner voutre relation" />
                   </SelectTrigger>
                   <SelectContent>
-                    {relationItems.map((r) => (
-                      <SelectItem key={r.value} value={r.value}>
-                        {r.label}
+                    {Object.entries(relationTypeConstant).map((key, value) => (
+                      <SelectItem key={key} value={key}>
+                        {value}
                       </SelectItem>
                     ))}
                   </SelectContent>

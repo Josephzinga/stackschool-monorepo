@@ -37,13 +37,6 @@ query GetDashboardContext($input: ID!) {
     schoolContext(schoolId: $input) {
       id
       role
-      permissions {
-        id
-        code
-        name
-        description
-        module
-      }
       teacher {
         id
         department

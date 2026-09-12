@@ -5,6 +5,8 @@
     "target": "ES2022",
     "module": "esnext",
     "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "removeComments": true,
     "esModuleInterop": true,
     "outDir": "./dist",
     "rootDir": "./src",
@@ -14,7 +16,9 @@
     "ignoreDeprecations": "6.0",
     "emitDeclarationOnly": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["./src/**/*"],
   "exclude": ["./node_modules", "./dist"],

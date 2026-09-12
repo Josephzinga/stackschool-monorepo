@@ -1,5 +1,5 @@
 'use client';
-import { Row, TableMeta } from '@tanstack/react-table';
+import { Row } from '@tanstack/react-table';
 import { TeachersData } from '@/components/lists/teacher/table/columns';
 import { useDeleteTeachersMutation, useUserStore } from '@stackschool/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -28,7 +28,7 @@ export function TeacherTableActions({
   meta,
 }: {
   row: Row<TeacherFeatures, TeachersData>;
-  meta: TeacherMeta;
+  meta?: TeacherMeta;
 }) {
   const teacherId = row.original.id;
   const { currentSchool } = useUserStore();
@@ -74,16 +74,18 @@ export function TeacherTableActions({
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8 cursor-pointer"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Ouvrez le menu</span>
-          </Button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              className="data-[state=open]:bg-muted text-muted-foreground flex size-8 cursor-pointer"
+              size="icon"
+            >
+              <IconDotsVertical />
+              <span className="sr-only">Ouvrez le menu</span>
+            </Button>
+          }
+        ></DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
           <DropdownMenuItem onClick={() => setOpenEditDialog(true)}>
             Editer

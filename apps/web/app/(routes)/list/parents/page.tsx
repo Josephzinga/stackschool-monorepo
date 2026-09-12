@@ -3,16 +3,13 @@
 import { useDebounce } from '@/hooks/useDebounce';
 import { DataTable } from '@/components/lists/parent/table/data-table';
 import { useGetSchoolParentsQuery, useUserStore } from '@stackschool/ui';
-import {
-  parseAsInteger,
-  parseAsString,
-  SearchParams,
-  useQueryStates,
-} from 'nuqs';
-import { columns, ParentColumn } from '@/components/lists/parent/table/column';
+import { SearchParams } from 'nuqs';
+import { columns, ParentData } from '@/components/lists/parent/table/column';
 import { DataTableHeader } from '@/components/lists/parent/table/data-table-header';
-import { TableProvider } from '@/components/lists/parent/table/table-provider';
-import { useSearchParams } from 'next/navigation';
+import {
+  TableProvider,
+  useParentTable,
+} from '@/components/lists/parent/table/table-provider';
 import { useMemo } from 'react';
 
 export default function ParentPage({
@@ -27,50 +24,46 @@ export default function ParentPage({
   );
 }
 function ParentView() {
-  const search = useSearchParams();
-  const searchTerm = search.get('search');
-  const [pagination, setPagination] = useQueryStates({
-    pageIndex: parseAsInteger.withDefault(0),
-    pageSize: parseAsInteger.withDefault(10),
-  });
-
-  const [filter, setFilter] = useQueryStates({
-    studentId: parseAsString.withDefault(''),
-    payementStatus: parseAsString.withDefault(''),
-  });
+  const { searchTerm, pagination, filters } = useParentTable();
 
   const { currentSchool } = useUserStore();
 
   const debouncedSearchTerm = useDebounce(searchTerm, 400);
 
-  const { data, isLoading } = useGetSchoolParentsQuery(
-    {
-      filter: {
-        page: pagination.pageIndex,
-        limit: pagination.pageSize,
-        searchTerm: debouncedSearchTerm,
-      },
+  const { data, isLoading } = useGetSchoolParentsQuery({
+    filter: {
+      page: pagination.pageIndex,
+      limit: pagination.pageSize,
+      searchTerm: debouncedSearchTerm,
+      studentId: filters?.studentId,
     },
-    {
-      enabled: !!currentSchool?.id,
-    },
-  );
+  });
 
-  const parentsData: ParentColumn[] | undefined = useMemo(() => {
+  const parentsData: ParentData[] | undefined = useMemo(() => {
     return (
       data?.getSchoolParents?.data?.map((parent) => ({
         id: parent?.id!,
-        firstname: parent?.user?.profile?.firstname ?? '',
-        lastname: parent.user?.profile?.lastname ?? '',
-        phoneNumber: parent?.user?.phoneNumber ?? '',
+        profile: {
+          firstName: parent.schoolProfile?.firstName ?? '',
+          lastName: parent.schoolProfile?.lastName ?? '',
+          avatarUrl: parent.schoolProfile?.avatarUrl ?? undefined,
+        },
+        gender: parent.schoolProfile?.gender,
+        userId: parent.member?.user?.id,
+        contact: {
+          phoneNumber: parent.member?.user?.phoneNumber ?? '',
+          email: parent.member?.user?.email ?? '',
+        },
         profession: parent.profession ?? '',
+        address: parent.schoolProfile?.address ?? '',
         students:
           parent.parentStudent?.map((s) => ({
             id: s?.student?.id!,
-            firstname: s?.student?.user?.profile?.firstname ?? '',
-            lastname: s?.student?.user?.profile?.lastname ?? '',
-            relationType: 'MOTHER',
-            classe: s?.student?.schoolClass,
+            firstName: s?.student?.schoolProfile?.firstName ?? '',
+            lastName: s?.student?.schoolProfile?.lastName ?? '',
+            avatarUrl: s?.student?.schoolProfile?.avatarUrl ?? undefined,
+            relationType: s?.relationType!,
+            classe: s?.student?.schoolClass!,
           })) || [],
       })) || []
     );
@@ -84,7 +77,7 @@ function ParentView() {
       <DataTable
         columns={columns}
         data={parentsData || []}
-        meta={meta}
+        meta={meta!}
         isLoading={isLoading}
       />
     </div>

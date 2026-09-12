@@ -5,7 +5,7 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts && tsc --emitDeclarationOnly --declaration --outDir dist",
+    "build": "tsup src/index.ts --format esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "build:tsup": "tsup"
   },
@@ -13,9 +13,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/graphql": "^13.4.2",
-    "@nestjs/core": "^11.0.1",
+    "@nestjs/common": "catalog:",
+    "@nestjs/graphql": "catalog:",
+    "@nestjs/core": "catalog:",
     "@nestjs/microservices": "11.1.28",
     "@stackschool/contracts": "workspace:*",
     "class-transformer": "^0.5.1",

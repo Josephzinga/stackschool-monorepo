@@ -5,7 +5,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 
 /**
  * Custom RxJS Operator for end-to-end type safety.
- * Validates the stream data using a Zod schema and cleanly routes errors.
+ * Validates the stream data using a Zod schemas and cleanly routes errors.
  */
 export function validateWith<T>(
   schema: ZodSchema<T>,
@@ -19,7 +19,7 @@ export function validateWith<T>(
           return throwError(
             () =>
               new InternalServerErrorException(
-                'Microservice response payload failed schema validation.',
+                'Microservice response payload failed schemas validation.',
                 err,
               ),
           );

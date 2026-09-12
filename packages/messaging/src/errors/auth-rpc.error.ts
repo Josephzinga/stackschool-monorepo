@@ -1,4 +1,4 @@
-import {RpcException} from '@nestjs/microservices';
+import { RpcException } from '@nestjs/microservices';
 
 export type AuthErrorCode =
   | 'EMAIL_TAKEN'
@@ -10,7 +10,8 @@ export type AuthErrorCode =
   | 'INTERNAL_ERROR'
   | 'VALIDATION_ERROR'
   | 'TOO_MANY_REQUEST'
-  | 'DB_ERROR'  ;
+  | 'DB_ERROR'
+  | 'UNAUTHORIZED';
 
 export class AuthRpcException extends RpcException {
   constructor(

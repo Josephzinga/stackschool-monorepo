@@ -3,7 +3,6 @@ import {
   ConflictException,
   NotFoundException,
   ServiceUnavailableException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthErrorCode } from '@stackschool/messaging';
 import { ZodError } from 'zod';
@@ -27,7 +26,7 @@ export function mapAuthError(payload: {
     case 'INVALID_CREDENTIALS':
       return new BadRequestException(payload.message);
     case 'SOCIAL_ONLY_ACCOUNT':
-      return new UnauthorizedException({
+      return new BadRequestException({
         message: payload.message,
         ...payload.meta,
       });

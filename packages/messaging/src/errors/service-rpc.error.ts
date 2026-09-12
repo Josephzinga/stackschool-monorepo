@@ -1,7 +1,11 @@
 import { RpcException } from '@nestjs/microservices';
 
 export type ServiceErrorCode =
-  'VALIDATION_ERROR' | 'CONFLICT' | 'NOT_FOUND' | 'FORBIDDEN';
+  | 'VALIDATION_ERROR'
+  | 'CONFLICT'
+  | 'NOT_FOUND'
+  | 'FORBIDDEN'
+  | 'INTERNAL_ERROR';
 
 export class ServiceRpcException extends RpcException {
   constructor(

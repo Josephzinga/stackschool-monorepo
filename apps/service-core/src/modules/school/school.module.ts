@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { SchoolService } from './school.service';
 import { SchoolController } from './school.controller';
-import { SchoolResolver } from './school.resolver';
 import { MembershipModule } from '../membership/membership.module';
 import { MembershipService } from '../membership/membership.service';
+import { SchoolResolver } from './school.resolver';
 
 @Module({
   imports: [MembershipModule],

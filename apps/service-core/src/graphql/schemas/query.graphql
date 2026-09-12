@@ -1,10 +1,15 @@
 extend type Query {
   searchStudent(filter: StudentSearchInput!): [Student]
   searchSchool(filter: SchoolSearchInput!): [School!]
+  getMemberships(input:GetSchoolMembershipsInput!): [SchoolMembership]!
+  membership(id: ID!): SchoolMembership
+  permissions: [Permission!]!
   school(schoolId: ID!): School!
   teacher(id: ID!): Teacher
   student(id: ID!): Student
   getSchoolTeachers(input: GetSchoolTeachersInput!): TeacherList!
   getSchoolStudents(input: GetSchoolStudentsInput!): StudentList!
   getSchoolParents(filter: GetSchoolParentsInput!): ParentList
+  getSchoolStaff(input: GetSchoolStaffInput!): StaffList!
+
 }

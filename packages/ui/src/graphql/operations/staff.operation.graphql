@@ -1,0 +1,37 @@
+query GetSchoolStaff($input: GetSchoolStaffInput!) {
+  getSchoolStaff(input: $input) {
+    data {
+     ...StaffField
+    }
+    meta {
+      total
+      page
+      limit
+      totalPages
+    }
+  }
+}
+
+mutation CreateStaff($input: CreateStaffInput!) {
+  createStaff(input: $input) {
+    ...StaffField
+  }
+}
+fragment StaffField on Staff {
+  id
+  position
+  hireDate
+  department
+  schoolUserId
+  schoolProfile {
+    firstName
+    lastName
+    avatarUrl
+  }
+  schoolUser {
+    user {
+      phoneNumber
+      email
+    }
+  }
+}

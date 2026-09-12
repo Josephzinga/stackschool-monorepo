@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  type Icon,
   IconDots,
   IconFolder,
   IconShare3,
@@ -25,6 +24,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
+import { LucideIcon } from 'lucide-react';
 
 export function NavDocuments({
   items,
@@ -32,7 +32,7 @@ export function NavDocuments({
   items: {
     label: string;
     href: string;
-    icon: Icon;
+    icon: LucideIcon;
   }[];
 }) {
   const { isMobile } = useSidebar();
@@ -43,22 +43,26 @@ export function NavDocuments({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.label}>
-            <SidebarMenuButton asChild>
-              <Link href={item.href}>
-                <item.icon />
-                <span className="text-sm">{item.label} </span>
-              </Link>
-            </SidebarMenuButton>
+            <SidebarMenuButton
+              render={
+                <Link href={item.href}>
+                  <item.icon />
+                  <span className="text-sm">{item.label} </span>
+                </Link>
+              }
+            ></SidebarMenuButton>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction
-                  showOnHover
-                  className="data-[state=open]:bg-accent rounded-sm"
-                >
-                  <IconDots />
-                  <span className="sr-only">More</span>
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger
+                render={
+                  <SidebarMenuAction
+                    showOnHover
+                    className="data-[state=open]:bg-accent rounded-sm"
+                  >
+                    <IconDots />
+                    <span className="sr-only">More</span>
+                  </SidebarMenuAction>
+                }
+              ></DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-24 rounded-lg"
                 side={isMobile ? 'bottom' : 'right'}

@@ -2,22 +2,20 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { SortOrder, StudentSortField } from '@stackschool/ui';
+import { Gender, SortOrder, StudentSortField } from '@stackschool/ui';
 import { StudentTableActions } from './student-table-actions';
-import { Features } from '@/components/table/features';
 import {
   CellCheckBox,
   HeaderCheckBox,
 } from '@/components/table/table-checkbox';
-import { AvatarProfile } from '@/components/profile-avatar';
+import { StudentFeatures } from '@/components/lists/student/table/data-table';
+import { ProfileCell } from '@/components/table/profile-cell';
 
 export type StudentsData = {
-  id: string | number;
+  id: string;
   firstName: string;
   lastName: string;
   avatarUrl?: string | null;
@@ -27,8 +25,9 @@ export type StudentsData = {
   section: string | null;
   enrollmentYear: string | null;
   matricule: string | null;
+  gender: Gender;
 };
-const columnsHelper = createColumnHelper<Features, StudentsData>();
+const columnsHelper = createColumnHelper<StudentFeatures, StudentsData>();
 
 export const columns = columnsHelper.columns([
   columnsHelper.display({
@@ -61,7 +60,7 @@ export const columns = columnsHelper.columns([
         ...row.original,
       };
       return (
-        <AvatarProfile profile={profile} href={`/list/student/${profile.id}`} />
+        <ProfileCell profile={profile} href={`/list/student/${profile.id}`} />
       );
     },
   }),
@@ -130,6 +129,8 @@ export const columns = columnsHelper.columns([
   columnsHelper.display({
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => <StudentTableActions row={row} />,
+    cell: ({ row, table }) => (
+      <StudentTableActions meta={table.options.meta} row={row} />
+    ),
   }),
 ]);

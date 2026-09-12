@@ -4,7 +4,7 @@ export { authServices } from './services/auth/authServices.ts';
 export * from './lib/api.js';
 export { z, ZodError } from 'zod';
 export * from './types/index.ts';
-export * from './validation/auth.schema.ts';
+export * from './validation/auth.schemas.ts';
 export * from './services/schools/context.service.ts';
 export * from './validation/complete-profile.schema.ts';
 export * from './validation/create-invitation.schema.ts';

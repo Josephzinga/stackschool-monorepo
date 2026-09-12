@@ -60,11 +60,20 @@ export default function AppDataTable<
         ))}
       </TableHeader>
       <TableBody>
-        {table.getRowModel().rows?.length ? (
+        {/* 1. Si l'application charge les données, on affiche UNIQUEMENT le loader */}
+        {isLoading ? (
+          <TableRow>
+            <TableCell colSpan={columns.length} className="h-24 text-center">
+              <LoaderOne />
+            </TableCell>
+          </TableRow>
+        ) : table.getRowModel().rows?.length ? (
+          // 2. Si on a des lignes de données, on les affiche normalement
           table.getRowModel().rows.map((row) => (
             <TableRow
+              key={row.id}
               data-state={row.getIsSelected() && 'selected'}
-              className="h-16 even:bg-slate-50 dark:even:bg-gray-950 hover:dark:even:bg-slate-950 "
+              className="h-16 even:bg-slate-50 dark:even:bg-gray-950 hover:dark:even:bg-slate-950"
             >
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>
@@ -74,15 +83,16 @@ export default function AppDataTable<
             </TableRow>
           ))
         ) : (
+          // 3. Si aucune ligne n'est présente ET que le chargement est fini
           <TableRow>
-            <TableCell colSpan={columns.length} className="h-24 text-center">
-              {isLoading ? (
-                <LoaderOne />
-              ) : emptyComponent ? (
-                emptyComponent
-              ) : (
-                'Aucun donné trouvé.'
-              )}
+            <TableCell
+              colSpan={columns.length}
+              className="h-24 p-2! text-center"
+            >
+              {/* On vérifie si la table indique un total de 0 ligne au serveur */}
+              {emptyComponent && table.getRowCount() === 0
+                ? emptyComponent
+                : 'Aucune donnée trouvée.'}
             </TableCell>
           </TableRow>
         )}

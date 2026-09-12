@@ -11,4 +11,5 @@ export interface GraphQLContext {
   teacherId?: string;
   studentId?: string;
   staffId?: string;
+  parentId?: string;
 }

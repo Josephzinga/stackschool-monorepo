@@ -1,10 +1,32 @@
 type Staff @key(fields: "id") {
   id: ID!
   schoolUserId: String!
-  position: String!
+  position: StaffPosition!
   hireDate: DateTime
   salary: Float
   department: String
-  SchoolProfile: SchoolProfile
+  schoolProfile: SchoolProfile
   schoolUser: SchoolMembership
+}
+
+input CreateStaffInput {
+  firstName: String!
+  lastName: String!
+  phoneNumber: String
+  gender: Gender!
+  email: String
+  position: StaffPosition!
+  department: String
+  address: String
+}
+
+type StaffList {
+  data: [Staff!]!
+  meta: PaginationMeta!
+}
+
+input GetSchoolStaffInput {
+  page: Int! = 0
+  limit: Int! = 10
+  searchTerm: String
 }

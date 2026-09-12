@@ -6,7 +6,11 @@ import { UserController } from './user.controller';
 
 @Module({
   imports: [PrismaModule],
-  providers: [UserService, UserResolver],
+  providers: [
+    UserService,
+    UserResolver,
+    //   { provide: APP_GUARD, useClass: AuthenticatedGuard },
+  ],
   controllers: [UserController],
 })
 export class UserModule {}

@@ -27,7 +27,6 @@ const config: CodegenConfig = {
           DateTime: 'Date',
           Date: 'Date',
         },
-        skipTypename: false,
         reactQueryVersion: 5,
         addInfiniteQuery: true,
 

@@ -10,9 +10,8 @@ import {
 import { PaginationMeta } from '@stackschool/ui';
 import { parseAsString, useQueryState } from 'nuqs';
 
-interface ParentFiltersState {
-  searchTerm?: string;
-  profession?: string;
+export interface ParentFiltersState {
+  studentId?: string;
 }
 
 interface TableContextType {
@@ -29,9 +28,11 @@ interface TableContextType {
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
   columnVisibility: ColumnVisibilityState;
   setColumnVisibility: OnChangeFn<ColumnVisibilityState>;
-
+  clearFilters: () => void;
   meta?: Omit<PaginationMeta, 'page'>;
   isLoading?: boolean;
+  isUpdate: boolean;
+  setIsUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TableContext = createContext<TableContextType | undefined>(undefined);
@@ -42,7 +43,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
     pageSize: 10,
   });
   const [searchTerm, setSearchTerm] = useQueryState(
-    '',
+    'search',
     parseAsString.withDefault(''),
   );
   const [filters, setFilters] = useState<ParentFiltersState>({});
@@ -50,8 +51,14 @@ export function TableProvider({ children }: { children: ReactNode }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [columnVisibility, setColumnVisibility] =
     useState<ColumnVisibilityState>({});
+  const [isUpdate, setIsUpdate] = useState(false);
+
+  const clearFilters = () => {
+    setFilters({});
+  };
 
   const value = {
+    clearFilters,
     pagination,
     setPagination,
     searchTerm,
@@ -64,6 +71,8 @@ export function TableProvider({ children }: { children: ReactNode }) {
     setColumnVisibility,
     dialogOpen,
     setDialogOpen,
+    isUpdate,
+    setIsUpdate,
   };
 
   return (

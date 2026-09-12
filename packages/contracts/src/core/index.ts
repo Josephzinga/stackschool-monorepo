@@ -5,3 +5,4 @@ export * from './core.contract.ts';
 export * from './teacher.ts';
 export * from './students.schema.ts';
 export * from './parent.schema.ts';
+export * from './staff.schema.ts';

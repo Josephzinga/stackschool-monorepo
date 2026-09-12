@@ -32,10 +32,10 @@ export const UserContract = z.object({
 
 export const ValidateUserFieldInput = z
   .object({
-    email: z.email().optional(),
-    phoneNumber: UserContract.shape.phoneNumber.optional(),
-    selfCheck: z.boolean().default(true),
-    userId: z.uuid().nullable(),
+    email: z.email().nullish(),
+    phoneNumber: UserContract.shape.phoneNumber.nullish(),
+    selfCheck: z.boolean().optional(),
+    userId: z.uuid().nullish(),
   })
   .superRefine((data, ctx) => {
     if (data.selfCheck && !data.userId) {
@@ -46,6 +46,7 @@ export const ValidateUserFieldInput = z
       });
     }
   });
+
 export type ValidateUserFieldInput = z.infer<typeof ValidateUserFieldInput>;
 
 export const UpdateAvatarInput = z.object({

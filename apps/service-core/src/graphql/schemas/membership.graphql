@@ -1,11 +1,14 @@
 type Permission @key(fields: "id") {
   id: ID!
-  code: PermissionCode
-  module: PermissionModule
-  name: String
+  action: PermissionAction!
+  subject: PermissionSubject!
+  module: PermissionModule!
+  name: String!
   description: String
+  conditions: JSON
   createdAt: DateTime
   updatedAt: DateTime
+
 }
 
 type SchoolMembership @key(fields: "userId") {
@@ -18,11 +21,21 @@ type SchoolMembership @key(fields: "userId") {
   isOwner: Boolean!
   schoolProfile: SchoolProfile
   permissions: [Permission]
-  member: Member
+  member: SchoolMember
   teacher: Teacher
   student: Student
   parent: Parent
   staff: Staff
 }
+input UpdateSchoolUserPermissionsInput {
+  schoolUserId: ID!
+  grantPermissionIds: [ID]
+  revokePermissionIds: [ID]
+}
+input GetSchoolMembershipsInput {
+  id: ID
+  searchTerm: String
+  limit: Int = 10
+}
 
-union Member = Teacher | Student | Parent | Staff
+union SchoolMember = Teacher | Student | Parent | Staff

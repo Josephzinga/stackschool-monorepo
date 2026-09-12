@@ -1,0 +1,94 @@
+query GetSchoolMemberships($input: GetSchoolMembershipsInput!) {
+    getMemberships(input: $input) {
+        id
+        userId
+        role
+        user {
+            email
+            phoneNumber
+        }
+        schoolProfile {
+            firstName
+            lastName
+            avatarUrl
+        }
+        member {
+            ... on Student  {
+                id
+                schoolClass {
+                    name
+                }
+            }
+            ...on Staff {
+                id
+                position
+            }
+            ... on Parent {
+                id
+                profession
+            }
+            ... on Teacher {
+                id
+            }
+        }
+    }
+}
+
+mutation UpdateSchoolUserPermissions($input: UpdateSchoolUserPermissionsInput!) {
+    updateSchoolUserPermissions(input:$input ) {
+        id
+        member {
+            ...on Teacher {
+                id
+                schoolProfile {
+                    firstName
+                    lastName
+                }
+            }
+        }
+        permissions {
+            ...PermissionsField
+        }
+    }
+}
+
+
+
+query GetMembership($id: ID!) {
+    membership(id: $id) {
+        id
+        role
+        user {
+            email
+            phoneNumber
+        }
+        schoolProfile {
+            firstName
+            lastName
+        }
+        permissions {
+            ...PermissionsField
+        }
+    }
+}
+query GetPermissions {
+    permissions {
+        id
+        name
+        description
+        subject
+        action
+        conditions
+        module
+    }
+}
+fragment PermissionsField on Permission {
+    id
+    action
+    subject
+    name
+    module
+    description
+    conditions
+    createdAt
+}

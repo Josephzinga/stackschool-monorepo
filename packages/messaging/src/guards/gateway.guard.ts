@@ -1,7 +1,8 @@
 import 'dotenv/config';
-import {CanActivate, ExecutionContext, Injectable,} from '@nestjs/common';
-import {GqlExecutionContext} from '@nestjs/graphql';
-import {RpcException} from "@nestjs/microservices";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+import { RpcException } from '@nestjs/microservices';
+import { ServiceRpcException } from '../errors';
 
 @Injectable()
 export class GatewayGuard implements CanActivate {
@@ -13,8 +14,9 @@ export class GatewayGuard implements CanActivate {
     if (!gatewaySecret) throw new RpcException('Token manquant');
 
     if (internalSecret !== gatewaySecret)
-      throw new RpcException(
-        "L'accès direct au service n'est pas autoriser.",
+      throw new ServiceRpcException(
+        'FORBIDDEN',
+        "L'accès direct au service n'est pas autorisé.",
       );
 
     return true;

@@ -1,6 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import ProtectedRoute from '@/components/providers/protected-route';
 import { DashboardProvider } from '@/components/providers/dashboard-provider';
 import { Toaster } from '@/components/ui/toast';
@@ -25,13 +25,13 @@ export default function DashboardLayout({
           >
             <AppSidebar className="z-30" variant="sidebar" collapsible="icon" />
 
-            <SidebarInset>
+            <main className="w-full overflow-clip">
               <SiteHeader />
 
               <Toaster />
 
               {children}
-            </SidebarInset>
+            </main>
           </SidebarProvider>
         </SocketProvider>
       </DashboardProvider>

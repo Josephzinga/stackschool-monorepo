@@ -8,6 +8,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -80,10 +81,27 @@ export function SchoolSection({ mode }: { mode: 'QUICK_ADD' | 'FULL_EDIT' }) {
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger className="h-8!">
-                  <SelectValue placeholder="Sélectionner une classe" />
+                  <SelectValue placeholder="Sélectionner une classe">
+                    {(value) => {
+                      if (!value) return;
+                      const selectedClass =
+                        classesData?.getSchoolClasses.data?.find(
+                          (cls) => cls?.id === value,
+                        );
+                      return selectedClass ? (
+                        <span>
+                          {selectedClass.name}{' '}
+                          <span className="text-primary">
+                            {selectedClass.level}
+                          </span>
+                        </span>
+                      ) : null;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
                   <SelectGroup>
+                    <SelectLabel>Classe</SelectLabel>
                     {classesData?.getSchoolClasses.data?.map((cls) => (
                       <SelectItem
                         className="font-poppins text-xs"
@@ -108,7 +126,7 @@ export function SchoolSection({ mode }: { mode: 'QUICK_ADD' | 'FULL_EDIT' }) {
             name="enrollmentYear"
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger className="h-10!">
+                <SelectTrigger className="h-8!">
                   <SelectValue placeholder="Sélectionner l'année" />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
@@ -151,11 +169,12 @@ export function SchoolSection({ mode }: { mode: 'QUICK_ADD' | 'FULL_EDIT' }) {
                 render={({ field: { onChange, value } }) => (
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger
+                      className="h-8!"
                       render={
                         <Button
                           variant="outline"
                           id="date"
-                          className="w-full justify-between font-normal h-10"
+                          className="w-full justify-between font-normal h-8!"
                           aria-invalid={!!errors.birthDate}
                         >
                           {value

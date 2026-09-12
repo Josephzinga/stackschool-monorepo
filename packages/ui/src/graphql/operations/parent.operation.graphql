@@ -18,6 +18,22 @@ mutation CreateParent($input: CreateParentInput!) {
   }
 }
 
+mutation UpdateParent($input: UpdateParentInput!) {
+  updateParent(input: $input) {
+    ...ParentList
+  }
+}
+
+mutation CreateParentStudent($input: [CreateParentStudentInput!]) {
+  createParentStudent(input: $input) {
+    id
+    relationType
+    student {
+      id
+    }
+  }
+}
+
 
 fragment ParentList on Parent {
   id
@@ -27,18 +43,27 @@ fragment ParentList on Parent {
      lastName
      address
      avatarUrl
+     gender
    }
+  member {
+    user {
+      id
+      email
+      phoneNumber
+    }
+  }
   parentStudent {
+    relationType
     student {
       id
       schoolProfile {
         firstName
         lastName
+        avatarUrl
       }
       schoolClass {
         id
         name
-        level
       }
     }
   }

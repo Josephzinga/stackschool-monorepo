@@ -1,9 +1,9 @@
-// apps/gateway/src/lists/lists-context.interceptor.ts
+// apps/gateway/src/lists/lists-context.ts.interceptor.ts
 import {
+  CallHandler,
+  ExecutionContext,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable } from 'rxjs';

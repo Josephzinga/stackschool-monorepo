@@ -22,8 +22,6 @@ import {
   UpdateProfileInput,
   UserWithRelationsContract,
   ValidateCredentialsInput,
-  ValidateUserFieldInput,
-  ValidateUserFieldResponse,
   verifyCodeInput,
   type VerifyCodeInput,
   type VerifyCodeResponse,
@@ -45,7 +43,6 @@ export class AuthController {
     @Payload(new ZodValidationPipe(ValidateCredentialsInput))
     data: ValidateCredentialsInput,
   ) {
-    console.log('service auth', data);
     return this.authService.validateLocalUser(data);
   }
 

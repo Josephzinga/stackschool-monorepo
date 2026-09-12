@@ -1,7 +1,10 @@
 export const AUTH_PATTERNS = {
   VALIDATE_CREDENTIALS: 'auth.validate_credentials',
   FIND_FULL_USER: 'auth.find_full_user',
+  FIND_USER_BY_IDENTIFIERS: 'auth.find_user_by_identifiers',
+  FIND_USER_BY_ID: 'auth.find_user_by_id',
   CREATE_USER: 'auth.create_user',
+  UPDATE_USER: 'auth.update_user',
   CREATE_USER_SESSION: 'auth.create_user_session',
   FORGOT_PASSWORD: 'auth.forgot_password',
   RESET_PASSWORD: 'auth.reset_password',

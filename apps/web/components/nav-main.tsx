@@ -44,25 +44,28 @@ export function NavMain({ items }: { items: NavSecondaryItem['items'] }) {
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.label}>
-              <Link
-                href={
-                  item.label === 'Dashboard' ? `/dashboard/${role}` : item.href
+              <SidebarMenuButton
+                render={
+                  <Link
+                    href={
+                      item.label === 'Dashboard'
+                        ? `/dashboard/${role}`
+                        : item.href
+                    }
+                    className="w-full space-y-1"
+                  >
+                    {item.icon && <item.icon />}
+                    <span>{item.label}</span>
+                  </Link>
                 }
-                className="w-full space-y-1"
-              >
-                <SidebarMenuButton
-                  className="font-meduim"
-                  isActive={
-                    (pathname.includes('dashboard') &&
-                      item.href === '/dashboard') ||
-                    item.href.includes(pathname)
-                  }
-                  tooltip={item.label}
-                >
-                  {item.icon && <item.icon />}
-                  <span>{item.label}</span>
-                </SidebarMenuButton>
-              </Link>
+                className="font-meduim"
+                isActive={
+                  (pathname.includes('dashboard') &&
+                    item.href === '/dashboard') ||
+                  item.href.includes(pathname)
+                }
+                tooltip={item.label}
+              ></SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>

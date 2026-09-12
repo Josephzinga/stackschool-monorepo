@@ -9,7 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { SCHOOL_ROLES_KEY } from '../decorators/role.decorator';
 import { GraphQLContext } from '../../graphql/context';
-import { SchoolRole } from '../../graphql/graphql';
+import { SchoolRole } from '@stackschool/contracts';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

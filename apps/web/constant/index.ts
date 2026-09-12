@@ -1,4 +1,9 @@
-import { SubjectCategory, TransportMode } from '@stackschool/contracts';
+import {
+  SchoolRole,
+  StaffPosition,
+  SubjectCategory,
+  TransportMode,
+} from '@stackschool/contracts';
 import { Calendar, Check, Clock, Play, X } from 'lucide-react';
 
 export const studentStatusLabel = {
@@ -11,6 +16,17 @@ export const studentStatusLabel = {
   INACTIVE: 'Inactif',
   DECEASED: 'Décédé',
 };
+
+export const genderOptions = [
+  {
+    value: 'MALE',
+    label: 'Homme',
+  },
+  {
+    value: 'FEMALE',
+    label: 'Femme',
+  },
+];
 
 export const lessonStatusConfig = {
   PLANNED: {
@@ -66,3 +82,22 @@ export const transportMode: { value: TransportMode; label: string }[] = [
   { value: 'TAXI', label: 'Taxi' },
   { value: 'OTHER', label: 'Autre' },
 ];
+
+export const ROLE_BADGE_CLASS: Record<SchoolRole, string> = {
+  ADMIN: 'bg-violet-200 text-violet-900 hover:bg-violet-100',
+  TEACHER: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100',
+  STAFF: 'bg-green-200 text-green-950 hover:bg-amber-100',
+  PARENT: 'bg-cyan-200 text-cyan-950 hover:bg-cyan-100',
+  STUDENT: 'bg-yellow-200 text-yellow-950 hover:bg-slate-100',
+};
+export const STAFF_POSITION_CLASS: Record<StaffPosition, string> = {
+  SECRETARY: 'bg-violet-200/80 text-violet-800 hover:bg-violet-100',
+  GUARDIAN: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100',
+  ACCOUNTANT: 'bg-amber-100 text-amber-800 hover:bg-amber-100',
+  SUPERVISOR: 'bg-slate-100 text-slate-700 hover:bg-slate-100',
+  CLEANER: 'bg-cyan-100 text-cyan-700 hover:bg-cyan-200',
+  LIBRARIAN: 'bg-yellow-100 text-slate-700 hover:bg-yellow-100',
+  NURSE: 'bg-red-100 text-red-500 hover:bg-red-200',
+  OTHER: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+  MAINTENANCE: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+};

@@ -4,11 +4,11 @@ import {
   AUTH_PATTERNS,
   AUTH_SERVICE,
   UserWithRelationsContract,
+  ValidateUserFieldInput,
 } from '@stackschool/messaging';
 
 import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import { mapAuthError } from '../../errors/auth.error-maper';
-import { Request } from 'express';
 
 @Injectable()
 export class UserService {
@@ -23,9 +23,9 @@ export class UserService {
   }
 
   async validateField(
-    user: NonNullable<Request['user']>,
-    phoneNumber: string | null,
-    email: string | null,
+    userId: string | undefined,
+    phoneNumber: string | undefined,
+    email: string | undefined,
   ) {
     const result = await firstValueFrom<{
       ok: boolean;
@@ -35,10 +35,17 @@ export class UserService {
     }>(
       this.authClient
         .send(AUTH_PATTERNS.VALIDATE_USER_FIELD, {
-          phoneNumber,
-          email,
-          userId: user.id,
-        })
+          ...(phoneNumber && {
+            phoneNumber,
+          }),
+          ...(email && {
+            email,
+          }),
+          ...(userId && {
+            userId,
+          }),
+          selfCheck: !!userId,
+        } as ValidateUserFieldInput)
         .pipe(
           timeout(1500),
           catchError((err) => throwError(() => mapAuthError(err))),

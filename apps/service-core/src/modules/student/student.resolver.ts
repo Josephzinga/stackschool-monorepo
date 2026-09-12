@@ -19,21 +19,21 @@ import {
   StudentSearchInput,
 } from '../../graphql';
 import { UseGuards } from '@nestjs/common';
-import { RolesGuard } from '../../common/guards/role.guard';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import type { DataLoaders } from '../dataloader/dataloader.service';
 import {
   CoreRpcException,
   Roles,
+  RolesGuard,
   SchoolAccessGuard,
 } from '@stackschool/messaging';
 
 @Resolver('Student')
+@UseGuards(SchoolAccessGuard, RolesGuard)
 export class StudentResolver {
   constructor(private readonly studentService: StudentService) {}
 
   @Roles('ADMIN', 'TEACHER', 'STAFF')
-  @UseGuards(SchoolAccessGuard, RolesGuard)
   @Query('getSchoolStudents')
   async getSchoolStudent(
     @Args('input') input: GetSchoolStudentsInput,
@@ -42,8 +42,7 @@ export class StudentResolver {
     return this.studentService.findAll(input, schoolId);
   }
 
-  @Roles('ADMIN', 'STAFF')
-  @UseGuards(SchoolAccessGuard, RolesGuard)
+  @Roles('ADMIN', 'STAFF', 'TEACHER')
   @Mutation('createStudent')
   async create(
     @Args('input') input: CreateStudentInput,
@@ -53,7 +52,6 @@ export class StudentResolver {
   }
 
   @Roles('ADMIN')
-  @UseGuards(SchoolAccessGuard, RolesGuard)
   @Mutation('deleteStudents')
   async deleteMany(
     @Args() args: { studentIds: string[]; soft: boolean },
@@ -61,6 +59,7 @@ export class StudentResolver {
   ): Promise<ApiResponse> {
     return this.studentService.deleteMany(args.studentIds, args.soft, schoolId);
   }
+
   @Query('searchStudent')
   async searchStudent(
     @Args('filter') dto: StudentSearchInput,
@@ -81,6 +80,7 @@ export class StudentResolver {
     @Loaders() loaders: DataLoaders,
   ): Promise<SchoolProfile | null> {
     if (!student.schoolUserId) return null;
+
     return (
       (await loaders.schoolProfileLoader.load(student.schoolUserId)) || null
     );
@@ -89,7 +89,8 @@ export class StudentResolver {
   @ResolveField('parentStudent')
   async getParentStudent(
     @Parent() student: Student,
-  ): Promise<ParentStudent | null> {
-    return null;
+    @Loaders() loaders: DataLoaders,
+  ): Promise<ParentStudent[]> {
+    return loaders.parentStudentByStudentLoader.load(student.id);
   }
 }

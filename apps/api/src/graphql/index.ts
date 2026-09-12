@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 import { createHandler } from 'graphql-http/lib/use/express';
-import { makeExecutableSchema } from '@graphql-tools/schema';
+import { makeExecutableSchema } from '@graphql-tools/schemas';
 import path from 'node:path';
 import * as fs from 'node:fs';
 import { searchSchoolResolver } from './resolvers/searchSchool.resolver';
@@ -24,7 +24,6 @@ import { classSubjectResolvers } from './resolvers/classSubject';
 import { classResolvers } from './resolvers/class';
 import { teacherResolvers } from './resolvers/teacher';
 import { studentResolvers } from './resolvers/student';
-import { attendanceResolver } from './resolvers/attendance/query/attendance.resolver';
 import { attendanceResolvers } from './resolvers/attendance';
 import { checkRole } from '../lib/verify-role';
 

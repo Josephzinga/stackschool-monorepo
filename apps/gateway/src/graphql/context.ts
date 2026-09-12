@@ -1,30 +1,39 @@
 import { Request, Response } from 'express';
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { DataLoaders } from '../modules/dataloader/dataloader.service';
 import { SchoolUserContract } from '@stackschool/contracts';
-import { ClientProxy } from '@nestjs/microservices';
 import { Cache } from '@nestjs/cache-manager';
-import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
-import { CORE_PATTERNS } from '@stackschool/messaging';
-import { mapCoreError } from '../errors/core.error-maper';
+import { safeValidateSchema } from '@stackschool/messaging';
+
+import z from 'zod';
+import { MembershipService } from '../modules/membership/membership.service';
 
 export interface GraphQLContext {
   req: Request;
+  res: Response;
   user: NonNullable<Request['user']>;
   schoolId?: string;
   schoolUser?: SchoolUserContract;
   teacherId?: string;
   studentId?: string;
   staffId?: string;
+  parentId?: string;
   loaders?: DataLoaders;
 }
 
-export async function createContext(
-  req: Request,
-  res: Response,
-  coreClient: ClientProxy,
-  cacheManager: Cache,
-): Promise<GraphQLContext> {
+interface CreateContextParams {
+  req: Request;
+  res: Response;
+  cacheManager: Cache;
+  membershipService: MembershipService;
+}
+
+export async function createContext({
+  req,
+  res,
+  cacheManager,
+  membershipService,
+}: CreateContextParams): Promise<GraphQLContext> {
   const user = req.user;
 
   if (!user)
@@ -33,71 +42,51 @@ export async function createContext(
     );
   const schoolId =
     (req.headers['x-school-id'] as string) || (req.query?.schoolId as string);
-  const context: GraphQLContext = { req, schoolId, user };
+
+  const { success, errors } = safeValidateSchema(z.uuid().optional(), schoolId);
+  if (!success) {
+    throw new BadRequestException(errors?.[0]?.message, { cause: errors });
+  }
+
   let schoolUser: SchoolUserContract | undefined;
   if (user && schoolId) {
-    context.schoolId = schoolId;
     const cachedKey = `school_user:${schoolId}:${user.id}`;
     const cached = await cacheManager.get<string>(cachedKey);
     if (cached) {
       schoolUser = JSON.parse(cached) as SchoolUserContract;
     } else {
-      schoolUser = await firstValueFrom(
-        coreClient
-          .send(CORE_PATTERNS.MEMBERSHIP.FIND_BY_SCHOOL_ID_AND_USER_ID, {
-            schoolId,
-            userId: user.id,
-          })
-          .pipe(
-            timeout(3000),
-            catchError((err) => throwError(() => mapCoreError(err))),
-          ),
-      );
+      schoolUser = await membershipService.findBySchoolIdAndUserId({
+        schoolId,
+        userId: user.id,
+      });
+      if (schoolUser)
+        await cacheManager.set(
+          cachedKey,
+          JSON.stringify(schoolUser),
+          1000 * 60 * 60 * 5,
+        );
     }
-
-    if (schoolUser)
-      await cacheManager.set(
-        cachedKey,
-        JSON.stringify(schoolUser),
-        1000 * 60 * 60 * 5,
-      );
 
     if (!schoolUser)
       throw new UnauthorizedException(
         "Vous n'êtes pas autorisé à accéder à cette école.",
       );
-
-    context.schoolUser = schoolUser;
-
-    /* switch (schoolUser.role) {
-      case 'TEACHER': {
-        const teacher = await prisma.teacher.findFirst({
-          where: { schoolUserId: schoolUser.id },
-          select: { id: true },
-        });
-        context.teacherId = teacher?.id;
-        break;
-      }
-      case 'STUDENT': {
-        const student = await prisma.student.findFirst({
-          where: { schoolUserId: schoolUser.id },
-          select: { id: true },
-        });
-        context.studentId = student?.id;
-        break;
-      }
-      case 'STAFF': {
-        const staff = await prisma.staff.findFirst({
-          where: { schoolUserId: schoolUser.id },
-          select: { id: true },
-        });
-        context.staffId = staff?.id;
-        break;
-      }
-      default:
-        break;
-    }*/
   }
 
-  return context;
+  const teacherId = schoolUser?.teacher?.id;
+  const studentId = schoolUser?.student?.id;
+  const staffId = schoolUser?.staff?.id;
+  const parentId = schoolUser?.parent?.id;
+
+  return {
+    user,
+    schoolUser,
+    schoolId,
+    teacherId,
+    studentId,
+    staffId,
+    parentId,
+    req,
+    res,
+  };
 }

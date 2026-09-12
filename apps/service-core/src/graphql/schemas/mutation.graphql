@@ -2,14 +2,13 @@ type Mutation {
   createTeacher(input: CreateTeacherInput): Teacher
   updateTeacher(teacherId: ID!, data: CreateTeacherInput!): Teacher
   deleteTeachers(teacherIds: [ID!]!, soft: Boolean = true): ApiResponse
-  deleteStudents(
-    studentIds: [ID!]!
-    soft: Boolean = true
-  ): ApiResponse
+  deleteStudents(studentIds: [ID!]!, soft: Boolean = true): ApiResponse
   createStudent(input: CreateStudentInput!): Student
-  updateStudent(
-    studentId: ID!
-    input: CreateStudentInput!
-  ): Student
+  updateStudent(studentId: ID!, input: CreateStudentInput!): Student
   createParent(input: CreateParentInput!): Parent!
+  updateParent(input: UpdateParentInput!): Parent!
+  createParentStudent(input: [CreateParentStudentInput!]): [ParentStudent!]
+  updateParentStudent(input: [CreateParentStudentInput!]): [ParentStudent!]
+  createStaff(input: CreateStaffInput!): Staff!
+  updateSchoolUserPermissions(input: UpdateSchoolUserPermissionsInput!): SchoolMembership!
 }

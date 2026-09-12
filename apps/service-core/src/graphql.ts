@@ -15,13 +15,52 @@ export type SchoolRole = "ADMIN" | "TEACHER" | "STUDENT" | "PARENT" | "STAFF";
 export type StudentStatus = "ACTIVE" | "SUSPENDED" | "EXPELLED" | "TRANSFERRED" | "DROPPED_OUT" | "GRADUATED" | "INACTIVE" | "DECEASED";
 export type SortOrder = "ASC" | "DESC";
 export type StudentSortField = "firstName" | "lastName" | "level" | "enrolementYear";
-export type PermissionCode = "MARK_STUDENT_ATTENDANCE" | "MARK_TEACHER_ATTENDANCE" | "MARK_STAFF_ATTENDANCE" | "VIEW_ATTENDANCE_REPORTS" | "MANAGE_SUBJECTS" | "INPUT_GRADES" | "PUBLISH_BULLETINS" | "CREATE_USER" | "UPDATE_USER" | "DELETE_USER" | "MANAGE_USER_PERMISSIONS" | "MANAGE_PAYMENTS" | "VIEW_FINANCIAL_REPORTS";
+export type PermissionAction = "MANAGE" | "CREATE" | "READ" | "UPDATE" | "DELETE" | "MARK" | "PUBLISH" | "EXPORT";
+export type PermissionSubject = "STUDENT" | "TEACHER" | "PARENT" | "STAFF" | "CLASS" | "SUBJECT" | "GRADE" | "BULLETIN" | "TIMETABLE" | "EXAM" | "ATTENDANCE_RECORD" | "PAYMENT" | "PAYROLL" | "FINANCIAL_REPORT" | "SCHOOL_SETTINGS" | "SCHOOL_USER_PERMISSION" | "ALL";
+export type StaffPosition = "SECRETARY" | "GUARDIAN" | "SUPERVISOR" | "ACCOUNTANT" | "LIBRARIAN" | "NURSE" | "CLEANER" | "MAINTENANCE" | "OTHER";
 export type ParentStudentUpdateMode = "CREATE" | "CONNECT";
 export type PermissionModule = "ATTENDANCE" | "ACADEMICS" | "USERS" | "FINANCE" | "SETTINGS";
 export type DisciplinaryType = "SUSPENSION" | "EXPULSION" | "WARNING";
 export type LessonStatus = "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED" | "POSTPONED";
 export type ResourceMode = "TEACHER" | "CLASS";
 export type link__Purpose = "SECURITY" | "EXECUTION";
+
+export class UpdateSchoolUserPermissionsInput {
+    schoolUserId: string;
+    grantPermissionIds?: Nullable<Nullable<string>[]>;
+    revokePermissionIds?: Nullable<Nullable<string>[]>;
+}
+
+export class GetSchoolMembershipsInput {
+    id?: Nullable<string>;
+    searchTerm?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
+export class CreateParentStudentInput {
+    id?: Nullable<string>;
+    parentId: string;
+    studentId: string;
+    relationType: RelationType;
+}
+
+export class UpdateParentStudentInput {
+    id: string;
+    relationType?: Nullable<RelationType>;
+}
+
+export class UpdateParentInput {
+    id: string;
+    firstName?: Nullable<string>;
+    lastName?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
+    isDelegate?: Nullable<boolean>;
+    gender?: Nullable<Gender>;
+    email?: Nullable<string>;
+    address?: Nullable<string>;
+    profession?: Nullable<string>;
+    children?: Nullable<CreateParentStudentInput[]>;
+}
 
 export class CreateParentInput {
     firstName: string;
@@ -54,6 +93,23 @@ export class GetSchoolParentsInput {
 }
 
 export class SchoolSearchInput {
+    searchTerm?: Nullable<string>;
+}
+
+export class CreateStaffInput {
+    firstName: string;
+    lastName: string;
+    phoneNumber?: Nullable<string>;
+    gender: Gender;
+    email?: Nullable<string>;
+    position: StaffPosition;
+    department?: Nullable<string>;
+    address?: Nullable<string>;
+}
+
+export class GetSchoolStaffInput {
+    page: number;
+    limit: number;
     searchTerm?: Nullable<string>;
 }
 
@@ -171,10 +227,12 @@ export class LessonTeacher {
 
 export class Permission {
     id: string;
-    code?: Nullable<PermissionCode>;
-    module?: Nullable<PermissionModule>;
-    name?: Nullable<string>;
+    action: PermissionAction;
+    subject: PermissionSubject;
+    module: PermissionModule;
+    name: string;
     description?: Nullable<string>;
+    conditions?: Nullable<JSON>;
     createdAt?: Nullable<DateTime>;
     updatedAt?: Nullable<DateTime>;
 }
@@ -189,7 +247,7 @@ export class SchoolMembership {
     isOwner: boolean;
     schoolProfile?: Nullable<SchoolProfile>;
     permissions?: Nullable<Nullable<Permission>[]>;
-    member?: Nullable<Member>;
+    member?: Nullable<SchoolMember>;
     teacher?: Nullable<Teacher>;
     student?: Nullable<Student>;
     parent?: Nullable<Parent>;
@@ -210,6 +268,16 @@ export abstract class IMutation {
     abstract updateStudent(studentId: string, input: CreateStudentInput): Nullable<Student> | Promise<Nullable<Student>>;
 
     abstract createParent(input: CreateParentInput): Parent | Promise<Parent>;
+
+    abstract updateParent(input: UpdateParentInput): Parent | Promise<Parent>;
+
+    abstract createParentStudent(input?: Nullable<CreateParentStudentInput[]>): Nullable<ParentStudent[]> | Promise<Nullable<ParentStudent[]>>;
+
+    abstract updateParentStudent(input?: Nullable<CreateParentStudentInput[]>): Nullable<ParentStudent[]> | Promise<Nullable<ParentStudent[]>>;
+
+    abstract createStaff(input: CreateStaffInput): Staff | Promise<Staff>;
+
+    abstract updateSchoolUserPermissions(input: UpdateSchoolUserPermissionsInput): SchoolMembership | Promise<SchoolMembership>;
 }
 
 export class Parent {
@@ -224,10 +292,10 @@ export class Parent {
 
 export class ParentStudent {
     id: string;
-    relationType?: Nullable<RelationType>;
+    relationType: RelationType;
     student?: Nullable<Student>;
-    studentId?: Nullable<string>;
-    parentId?: Nullable<string>;
+    studentId: string;
+    parentId: string;
     parent?: Nullable<Parent>;
 }
 
@@ -292,19 +360,24 @@ export class MonthlyStats {
 export class Staff {
     id: string;
     schoolUserId: string;
-    position: string;
+    position: StaffPosition;
     hireDate?: Nullable<DateTime>;
     salary?: Nullable<number>;
     department?: Nullable<string>;
-    SchoolProfile?: Nullable<SchoolProfile>;
+    schoolProfile?: Nullable<SchoolProfile>;
     schoolUser?: Nullable<SchoolMembership>;
+}
+
+export class StaffList {
+    data: Staff[];
+    meta: PaginationMeta;
 }
 
 export class Student {
     id: string;
     matricule: string;
     birthDate?: Nullable<DateTime>;
-    birthPlace?: Nullable<DateTime>;
+    birthPlace?: Nullable<string>;
     schoolUserId?: Nullable<string>;
     enrollmentDate?: Nullable<DateTime>;
     previousClass?: Nullable<string>;
@@ -391,6 +464,12 @@ export abstract class IQuery {
 
     abstract searchSchool(filter: SchoolSearchInput): Nullable<School[]> | Promise<Nullable<School[]>>;
 
+    abstract getMemberships(input: GetSchoolMembershipsInput): Nullable<SchoolMembership>[] | Promise<Nullable<SchoolMembership>[]>;
+
+    abstract membership(id: string): Nullable<SchoolMembership> | Promise<Nullable<SchoolMembership>>;
+
+    abstract permissions(): Permission[] | Promise<Permission[]>;
+
     abstract school(schoolId: string): School | Promise<School>;
 
     abstract teacher(id: string): Nullable<Teacher> | Promise<Nullable<Teacher>>;
@@ -402,12 +481,15 @@ export abstract class IQuery {
     abstract getSchoolStudents(input: GetSchoolStudentsInput): StudentList | Promise<StudentList>;
 
     abstract getSchoolParents(filter: GetSchoolParentsInput): Nullable<ParentList> | Promise<Nullable<ParentList>>;
+
+    abstract getSchoolStaff(input: GetSchoolStaffInput): StaffList | Promise<StaffList>;
 }
 
 export class _Service {
     sdl?: Nullable<string>;
 }
 
+export type JSON = any;
 export type DateTime = any;
 export type link__Import = any;
 export type federation__FieldSet = any;
@@ -418,6 +500,6 @@ export class ISchema {
     Mutation: IMutation;
 }
 
-export type Member = Teacher | Student | Parent | Staff;
+export type SchoolMember = Teacher | Student | Parent | Staff;
 export type _Entity = Class | Lesson | LessonTeacher | Parent | ParentStudent | Permission | School | SchoolMembership | SchoolSettings | SchoolStats | Staff | Student | Subject | Teacher | TeacherAssignment | User;
 type Nullable<T> = T | null;

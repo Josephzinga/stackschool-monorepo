@@ -1,7 +1,6 @@
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import { HttpException } from '@nestjs/common';
-import { ServiceRpcException } from '../errors/service-rpc.error';
 
 export async function sendRmqRequest<T>(
   client: ClientProxy,
@@ -14,11 +13,7 @@ export async function sendRmqRequest<T>(
     client.send<T>(pattern, payload).pipe(
       timeout(timeoutMs),
       catchError((err) =>
-        throwError(() =>
-          mapError
-            ? mapError(err)
-            : new ServiceRpcException('VALIDATION_ERROR', err),
-        ),
+        throwError(() => (mapError ? mapError(err) : new RpcException(err))),
       ),
     ),
   );

@@ -76,6 +76,19 @@ query GetStudentDetails($id: ID!, $includeParent: Boolean) {
     }
 }
 
+query GetStudentOptions($input: GetSchoolStudentsInput!) {
+    getSchoolStudents(input: $input) {
+        data {
+            id
+            schoolProfile {
+                firstName
+                lastName
+                avatarUrl
+            }
+        }
+    }
+}
+
 mutation UpdateStudent(
     $studentId: ID!
     $input: CreateStudentInput!
@@ -84,6 +97,7 @@ mutation UpdateStudent(
         ...StudentDetails
     }
 }
+
 
 mutation CreateStudent($input: CreateStudentInput!) {
     createStudent(input: $input) {

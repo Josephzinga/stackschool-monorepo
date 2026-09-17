@@ -8,14 +8,14 @@ import {
   AUTH_PATTERNS,
   AUTH_SERVICE,
   CoreRpcException,
+  CreateUserInput,
   FindTeachersPaginatedInput,
   FindTeachersPaginatedResponse,
+  FindUserByIdentifiers,
   generateUsername,
   mapCoreError,
   sendRmqRequest,
-  UserWithRelationsContract,
-  ValidateUserFieldInput,
-  ValidateUserFieldResponse,
+  UserContract,
 } from '@stackschool/messaging';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -27,40 +27,41 @@ export class TeacherService {
     @Inject(ACADEMIC_SERVICE) private readonly academicClient: ClientProxy,
   ) {}
   async create(data: CreateTeacherInput, schoolId: string) {
-    const userFields: ValidateUserFieldInput = {
+    const userFields: FindUserByIdentifiers = {
       phoneNumber: data.phoneNumber ?? null,
       ...(data.email && {
         email: data.email,
       }),
-      selfCheck: false,
-      userId: null,
     };
-    const existing = await sendRmqRequest<ValidateUserFieldResponse>(
+    const existing = await sendRmqRequest<UserContract>(
       this.authClient,
-      AUTH_PATTERNS.VALIDATE_USER_FIELD,
+      AUTH_PATTERNS.FIND_USER_BY_IDENTIFIERS,
       userFields,
     );
-    console.log('Existing', existing);
 
-    if (!existing.valid) {
+    if (existing) {
       throw new CoreRpcException(
         'CONFLICT',
-        existing.message ?? 'Entré déjà utiliser.',
+        "Le numéro de téléphone ou l'adresse email déjà utiliser, si vous voulez joindre cet utilisateur veuillez lui" +
+          ' envoyer un lien.',
       );
     }
 
-    const user = await sendRmqRequest<UserWithRelationsContract>(
+    const createUserFields = {
+      phoneNumber: data?.phoneNumber ?? undefined,
+      email: data.email ?? undefined,
+      username: generateUsername({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        includeSuffix: true,
+      }),
+      isActive: false,
+    } satisfies CreateUserInput;
+
+    const user = await sendRmqRequest<UserContract>(
       this.authClient,
       AUTH_PATTERNS.CREATE_USER,
-      {
-        phoneNumber: data?.phoneNumber,
-        email: data.email,
-        username: generateUsername({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          includeSuffix: true,
-        }),
-      },
+      createUserFields,
       mapCoreError,
     );
 
@@ -99,8 +100,6 @@ export class TeacherService {
       classId,
       subjectId,
       isActive,
-      isSupervisor,
-      day,
     } = input;
 
     const skip = page * limit;

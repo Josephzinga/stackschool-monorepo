@@ -5,6 +5,7 @@ import {
   Day,
   GetLessonsInput,
   GroupType,
+  Lesson,
   LessonsList,
   LessonStatus,
   SubjectCategory,
@@ -12,6 +13,7 @@ import {
 } from '../../graphql';
 import {
   AcademicRpcException,
+  canTransition,
   CORE_PATTERNS,
   CORE_SERVICE,
   FindTeachersPaginatedInput,
@@ -25,7 +27,7 @@ import {
 } from '@stackschool/messaging';
 import { format } from 'date-fns';
 import { ClientProxy } from '@nestjs/microservices';
-import { Lesson, Prisma } from '../../prisma/db/generated/client';
+import { Prisma } from '../../prisma/db/generated/client';
 
 @Injectable()
 export class LessonService {
@@ -46,7 +48,6 @@ export class LessonService {
       subjectId,
       teacherId,
       groupId,
-      classId,
       roomId,
       mode,
       title,
@@ -232,7 +233,7 @@ export class LessonService {
       );
     }
 
-    return await this.prisma.lesson.update({
+    const newLesson = await this.prisma.lesson.update({
       where: { id: dto.id },
       data: {
         startTime: parseTimeString(activeStartTime),
@@ -241,6 +242,11 @@ export class LessonService {
         schoolId,
       },
     });
+    return {
+      ...newLesson,
+      status: newLesson.status as LessonStatus,
+      day: newLesson.day as Day,
+    };
   }
 
   async delete(id: string, schoolId: string) {
@@ -311,7 +317,6 @@ export class LessonService {
       page: input.page,
       limit: input.limit,
     });
-    console.log('TEacherData: ', teachersData);
     const teachers = teachersData?.teachers ?? [];
     const totalCount = teachersData?.totalCount ?? 0;
 
@@ -363,6 +368,7 @@ export class LessonService {
           status: l.status as LessonStatus,
           subject: {
             ...l.assignments.classSubject.subject,
+            code: l.assignments.classSubject.subject.code ?? '',
             category: l.assignments.classSubject.subject
               .category as SubjectCategory,
           },
@@ -390,6 +396,8 @@ export class LessonService {
     const where: Prisma.GroupWhereInput = {
       schoolId,
     };
+
+    if (input.groupId) where.id = input.groupId;
 
     const [groups, totalCount] = await Promise.all([
       this.prisma.group.findMany({
@@ -439,15 +447,24 @@ export class LessonService {
         events: lessons.map((l) => ({
           id: l.id,
           resourceId: l.assignments.classSubject.groupId,
-          title: l.title ?? l.assignments.classSubject.subject.name,
+          title: l.title ?? l.assignments.classSubject?.subject?.name,
           startTime: format(l.startTime, 'HH:mm'),
           endTime: format(l.endTime, 'HH:mm'),
           day: l.day as Day,
           status: l.status as LessonStatus,
-          subject: l.assignments.classSubject.subject,
-          group: l.assignments.classSubject.group,
+          subject: {
+            ...l.assignments.classSubject.subject,
+            code: l.assignments.classSubject.subject.code!,
+            category: l.assignments.classSubject.subject
+              .category as SubjectCategory,
+          },
+          group: {
+            ...l.assignments.classSubject.group,
+            type: l.assignments.classSubject.group.type as GroupType,
+          },
           room: l.room,
           teacherId: l.assignments.teacherId,
+          teacherAssignmentId: l.teacherAssignmentId,
         })),
       },
       meta: {
@@ -457,6 +474,42 @@ export class LessonService {
         limit: input.limit,
       },
     };
+  }
+
+  async updateStatus(
+    dto: { id: string; status: LessonStatus },
+    schoolId: string,
+    schoolUser: SchoolUserContract,
+  ) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: dto.id, schoolId },
+    });
+
+    if (!lesson)
+      throw new AcademicRpcException('NOT_FOUND', 'Leçon introuvable');
+
+    // Sécurité : Si prof, vérification de la propriété
+    if (
+      schoolUser.role === 'TEACHER' &&
+      lesson.teacherAssignmentId !== schoolUser.teacher?.id
+    ) {
+      throw new AcademicRpcException(
+        'FORBIDDEN',
+        "Vous n'êtes pas autorisé à modifier le statut de cette leçon",
+      );
+    }
+
+    if (!canTransition(lesson.status as LessonStatusEnum, dto.status)) {
+      throw new AcademicRpcException(
+        'BAD_REQUEST',
+        `Transition de statut impossible ${lesson.status} vers ${dto.status}`,
+      );
+    }
+
+    return this.prisma.lesson.update({
+      where: { id: dto.id, schoolId },
+      data: { status: dto.status },
+    });
   }
 
   private async checkLessonConflict(input: {

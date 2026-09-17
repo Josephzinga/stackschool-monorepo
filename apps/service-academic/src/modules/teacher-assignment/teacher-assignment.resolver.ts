@@ -1,11 +1,11 @@
 import {
+  Args,
+  Context,
+  Mutation,
   Parent,
+  Query,
   ResolveField,
   Resolver,
-  Query,
-  Args,
-  Mutation,
-  Context,
 } from '@nestjs/graphql';
 import { TeacherAssignmentService } from './teacher-assignment.service';
 import {
@@ -13,7 +13,6 @@ import {
   ClassSubject,
   CreateTeacherAssignmentInput,
   GetTeacherAssignmentInput,
-  Teacher,
   TeacherAssignment,
 } from '../../graphql';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
@@ -49,6 +48,8 @@ export class TeacherAssignmentResolver {
     @Loaders() loaders: DataLoaders,
   ): Promise<ClassSubject | null> {
     if (!parent.classSubjectId) return null;
-    return loaders.classSubjectLoader.load(parent.classSubjectId);
+    return (
+      (await loaders.classSubjectLoader.load(parent.classSubjectId)) || null
+    );
   }
 }

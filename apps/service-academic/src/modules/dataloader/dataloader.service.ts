@@ -8,7 +8,7 @@ import {
   Lesson,
   Subject,
   TeacherAssignment,
-} from 'src/prisma/db/generated/client';
+} from '../../prisma/db/generated/client';
 
 export interface ClassCount {
   students: { male: number; female: number };
@@ -241,6 +241,24 @@ export class DataLoaderService {
         const map = indexBy(assignments, (ass) => ass.classSubjectId);
         return classSubjectIds.map((id) => map.get(id));
       }),
+
+      assignmentLoader: new DataLoader<string, TeacherAssignment | undefined>(
+        async (assignmentIds) => {
+          const assignments = await prisma.teacherAssignment.findMany({
+            where: {
+              lessons: {
+                some: {
+                  id: {
+                    in: [...assignmentIds],
+                  },
+                },
+              },
+            },
+          });
+          const map = indexBy(assignments, (ass) => ass.id);
+          return assignmentIds.map((id) => map.get(id));
+        },
+      ),
 
       assignmentsByTeacherLoader: new DataLoader<string, TeacherAssignment[]>(
         async (teacherIds) => {

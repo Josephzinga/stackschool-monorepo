@@ -63,6 +63,12 @@ export enum link__Purpose {
     EXECUTION = "EXECUTION"
 }
 
+export class GetClassSubjectsInput {
+    classId?: Nullable<string>;
+    groupId?: Nullable<string>;
+    teacherId?: Nullable<string>;
+}
+
 export class ClassSubjectInput {
     id?: Nullable<string>;
     teacherId?: Nullable<string>;
@@ -88,6 +94,12 @@ export class GetSchoolClassesInput {
     teacherId?: Nullable<string>;
     searchTerm?: Nullable<string>;
     schoolId?: Nullable<string>;
+}
+
+export class SearchClassesInput {
+    searchTerm: string;
+    limit: number;
+    schoolId: string;
 }
 
 export class CreateGroupInput {
@@ -165,6 +177,12 @@ export class CreateSubjectInput {
 export class DeleteSubjectsInput {
     subjectIds: string[];
     soft: boolean;
+}
+
+export class GetPublicSubjectInput {
+    classId: string;
+    schoolId: string;
+    limit: number;
 }
 
 export class CreateTeacherAssignmentInput {
@@ -313,7 +331,7 @@ export class LessonsList {
 export class Subject {
     id: string;
     name: string;
-    code?: Nullable<string>;
+    code: string;
     category?: Nullable<SubjectCategory>;
     totalWeeklyHours?: Nullable<number>;
     mainTeacherId?: Nullable<string>;
@@ -408,7 +426,7 @@ export class GenderStats {
 }
 
 export abstract class IQuery {
-    abstract getClassSubjects(classId?: Nullable<string>, teacherId?: Nullable<string>, groupId?: Nullable<string>, searchTerm?: Nullable<string>): Nullable<ClassSubject[]> | Promise<Nullable<ClassSubject[]>>;
+    abstract getClassSubjects(input: GetClassSubjectsInput): Nullable<ClassSubject[]> | Promise<Nullable<ClassSubject[]>>;
 
     abstract class(id: string): Nullable<Class> | Promise<Nullable<Class>>;
 
@@ -421,6 +439,10 @@ export abstract class IQuery {
     abstract getSchoolRooms(filter: GetSchoolRoomInput): RoomList | Promise<RoomList>;
 
     abstract getTeacherAssignments(filter?: Nullable<GetTeacherAssignmentInput>): Nullable<Nullable<TeacherAssignment>[]> | Promise<Nullable<Nullable<TeacherAssignment>[]>>;
+
+    abstract searchClasses(input: SearchClassesInput): Nullable<Class>[] | Promise<Nullable<Class>[]>;
+
+    abstract getPublicSubjects(input: GetPublicSubjectInput): Nullable<Subject>[] | Promise<Nullable<Subject>[]>;
 }
 
 export class _Service {

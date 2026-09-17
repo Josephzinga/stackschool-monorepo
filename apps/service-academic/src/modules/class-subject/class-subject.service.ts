@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { ClassSubjectInput } from '../../graphql';
+import { GetClassSubjectsInput } from '../../graphql';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ClassSubjectService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(dto: ClassSubjectInput, schoolId: string) {
+  async findAll(dto: GetClassSubjectsInput, schoolId: string) {
     return this.prisma.classSubjects.findMany({
       where: {
         schoolId,
         group: {
-          id: dto?.groupId ?? undefined,
+          ...(dto?.groupId && {
+            id: dto.groupId,
+          }),
           ...(dto?.classId && {
             classes: {
               some: {

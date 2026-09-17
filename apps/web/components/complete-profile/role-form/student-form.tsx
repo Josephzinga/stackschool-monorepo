@@ -1,21 +1,43 @@
-import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-import {Button} from '@/components/ui/button';
-import {Calendar} from '@/components/ui/calendar';
-import {Controller, useCompleteProfileStore, useForm, useGetClassesOptionsQuery, zodResolver,} from '@stackschool/ui';
-import {Calendar as CalendarIcon, Flag, IdCard, MapPin, User,} from 'lucide-react';
-import {useState} from 'react';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Controller,
+  useCompleteProfileStore,
+  useForm,
+  useGetClassesOptionsQuery,
+  zodResolver,
+} from '@stackschool/ui';
+import {
+  Calendar as CalendarIcon,
+  Flag,
+  IdCard,
+  MapPin,
+  User,
+} from 'lucide-react';
+import { useState } from 'react';
 import {
   generateStudentMatricule,
   parseAxiosError,
   StudentFormDataType,
   studentFormSchema,
 } from '@stackschool/contracts';
-import {Field, FieldError, FieldLabel} from '@/components/ui/field';
-import {SubmitButton} from '@/components/submit-button';
-import {Popover, PopoverContent, PopoverTrigger,} from '@/components/animate-ui/components/radix/popover';
-import {toast} from 'sonner';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { SubmitButton } from '@/components/submit-button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { toast } from 'sonner';
 
 export default function StudentForm({ onBack }: { onBack: () => void }) {
   const { setRoleData, school, role, setCurrentStep, profile } =
@@ -124,20 +146,22 @@ export default function StudentForm({ onBack }: { onBack: () => void }) {
           control={control}
           render={({ field: { onChange, value } }) => (
             <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  aria-invalid={!!errors.birthPlace}
-                  size="sm"
-                  variant="outline"
-                  id="date"
-                  className="w-full justify-between font-normal"
-                >
-                  {value
-                    ? new Date(value).toLocaleDateString()
-                    : 'Sélectionné votre date'}
-                  <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                </Button>
-              </PopoverTrigger>
+              <PopoverTrigger
+                render={
+                  <Button
+                    aria-invalid={!!errors.birthPlace}
+                    size="sm"
+                    variant="outline"
+                    id="date"
+                    className="w-full justify-between font-normal"
+                  >
+                    {value
+                      ? new Date(value).toLocaleDateString()
+                      : 'Sélectionné votre date'}
+                    <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                  </Button>
+                }
+              ></PopoverTrigger>
               <PopoverContent
                 className="w-auto overflow-hidden p-0"
                 align="start"

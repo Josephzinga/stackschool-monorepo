@@ -33,11 +33,11 @@ export class NotificationsGateway
       return;
     }
     client.data.userId = user.id;
-    client.join(`user:${user.id}`);
+    await client.join(`user:${user.id}`);
     const schoolUsers = await this.memberService.findManyByUserId(user.id);
     for (const su of schoolUsers) {
-      client.join(`schoolUser:${su.schoolId}:${user.id}`);
-      client.join(`school:${su.schoolId}`);
+      await client.join(`schoolUser:${su.id}`);
+      await client.join(`school:${su.schoolId}`);
     }
 
     this.logger.log(
@@ -54,12 +54,12 @@ export class NotificationsGateway
   }
 
   notifySchoolUser(
+    schoolUserId: string,
     schoolId: string,
-    userId: string,
     event: string,
     payload: unknown,
   ) {
-    this.server.to(`schoolUser:${schoolId}:${userId}`).emit(event, payload);
+    this.server.to(`schoolUser:${schoolUserId}`).emit(event, payload);
   }
 
   notifySchoolRoom(schoolId: string, event: string, payload: unknown) {

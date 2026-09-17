@@ -20,7 +20,7 @@ const config: CodegenConfig = {
         'typescript-react-query',
       ],
       config: {
-        // AJOUTS ICI POUR CORRIGER LE CRASH MOBILE :
+        skipTypename: false,
         enumsAsTypes: true,
         scalars: {
           SchoolId: 'string',
@@ -29,7 +29,6 @@ const config: CodegenConfig = {
         },
         reactQueryVersion: 5,
         addInfiniteQuery: true,
-
         fetcher: {
           func: '@stackschool/contracts#fetcher',
         },

@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { ServiceRpcException } from '../errors/service-rpc.error';
 import { SchoolUserContract } from '@stackschool/contracts';
+import { IS_PUBLIC_KEY } from '../decorators';
 
 @Injectable()
 export class SchoolAccessGuard implements CanActivate {
@@ -14,6 +15,12 @@ export class SchoolAccessGuard implements CanActivate {
       schoolId: string;
       userId: string;
     }>();
+    const isPublic = this.reflector.get<boolean | undefined>(
+      IS_PUBLIC_KEY,
+      ctx.getHandler(),
+    );
+    console.log('isPublicKey: ', isPublic);
+    if (isPublic) return true;
     const schoolUser = gqlCtx.schoolUser;
     const schoolId = gqlCtx.schoolId;
     const userId = gqlCtx.userId;

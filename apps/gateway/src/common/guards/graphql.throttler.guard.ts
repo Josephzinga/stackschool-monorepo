@@ -1,7 +1,8 @@
-import { Injectable, ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { GraphQLContext } from '../../graphql/context';
+import type { Request } from 'express';
 
 @Injectable()
 export class GqlThrottlerGuard extends ThrottlerGuard {
@@ -12,7 +13,7 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     return { req: ctx.req };
   }
 
-  protected async getTracker(req: Record<string, any>): Promise<string> {
-    return req.ip;
+  protected async getTracker(req: Request): Promise<string> {
+    return Promise.resolve(req.ip!);
   }
 }

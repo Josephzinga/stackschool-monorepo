@@ -63,7 +63,7 @@ export class AuthService {
     res: Response,
     isRefresh: boolean = false,
   ) {
-    if (!user) throw new UnauthorizedException('Utilisateur non authentifier.');
+    if (!user) throw new UnauthorizedException('Utilisateur non-authentifier.');
 
     const session = await this.createUserSession(user.id);
     this.setResponseCookies(
@@ -75,7 +75,7 @@ export class AuthService {
     return res.status(HttpStatus.OK).json({
       ok: true,
       ...(!isRefresh && {
-        message: 'Authentification réussi avec succès!',
+        message: 'Authentification réussie avec succès !',
         user: {
           id: user?.id,
           email: user?.email,
@@ -264,7 +264,7 @@ export class AuthService {
     req.logIn(data.user, (err) => {
       if (err)
         throw new InternalServerErrorException(
-          'Impossible de se connecter après rafraichisement.',
+          'Impossible de se connecter après rafraichissement.',
         );
       this.login(data.user, res, true).catch((err) => {
         throw new InternalServerErrorException(err);

@@ -89,7 +89,6 @@ export const createContext = async ({
           },
         },
       });
-      console.log('Member', member);
       schoolUser = member
         ? {
             ...member,

@@ -32,8 +32,6 @@ export function RenderResourceContent({
   resource: ResourceCellInfo['resource'];
   onClick: (r: any) => void;
 }) {
-  console.log('Resource', resource);
-  console.log('Events', resource?.getEvents());
   const weeklyHours = resource?._resource.extendedProps?.weeklyHours;
   return (
     <Popover>
@@ -53,14 +51,16 @@ export function RenderResourceContent({
         className="flex items-center group justify-between
         "
       >
-        <PopoverTrigger asChild>
-          <Button
-            variant="link"
-            className="text-[10px] text-primary opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            Détails
-          </Button>
-        </PopoverTrigger>
+        <PopoverTrigger
+          render={
+            <Button
+              variant="link"
+              className="text-[10px] text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              Détails
+            </Button>
+          }
+        ></PopoverTrigger>
         <span
           className={`text-[10px] px-1 mt-1.5 rounded ${
             weeklyHours > 8
@@ -74,16 +74,16 @@ export function RenderResourceContent({
 
       <PopoverContent className="w-80 p-3">
         <div className="space-y-2">
-          <h4 className="font-semibold">{resource.title}</h4>
+          <h4 className="font-semibold">{resource?.title}</h4>
           <div className="flex items-center gap-2 text-sm">
             <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-            <span>{resource.totalHours} heures cette semaine</span>
+            <span>{resource?.totalHours} heures cette semaine</span>
           </div>
-          {resource.lessons && resource.lessons.length > 0 && (
+          {resource?.lessons && resource.lessons.length > 0 && (
             <div className="mt-2 border-t pt-2">
               <p className="text-xs font-medium mb-1">Cours à venir :</p>
               <ul className="text-xs space-y-1">
-                {resource.lessons.slice(0, 3).map((lesson, idx) => (
+                {resource?.lessons.slice(0, 3).map((lesson, idx) => (
                   <li key={idx} className="flex justify-between">
                     <span>
                       {lesson.day} {lesson.start}-{lesson.end}
@@ -136,6 +136,7 @@ export const TimeGridContainer = ({
         opacity: 0,
         x: -50,
         duration: 0.5,
+        yoyo: true,
       },
       {
         opacity: 1,

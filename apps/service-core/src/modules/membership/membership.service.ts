@@ -8,7 +8,6 @@ import {
   CoreRpcException,
   type HandleRoleDataInput,
   parentChildDraft,
-  ParentContract,
   ProfileContract,
   SchoolUserContract,
   teacherAssignmentDraft,
@@ -271,6 +270,16 @@ export class MembershipService {
         break;
     }
   }
+
+  async findAdmins(dto: any) {
+    return this.prisma.schoolUser.findMany({
+      where: {
+        role: 'ADMIN',
+        schoolId: dto.schoolId,
+      },
+    });
+  }
+
   private async getProfile(userId: string) {
     const result = firstValueFrom<ProfileContract>(
       this.authClient.send(AUTH_PATTERNS.GET_PROFILE, { userId }).pipe(

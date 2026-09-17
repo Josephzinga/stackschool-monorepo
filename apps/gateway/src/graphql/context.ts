@@ -42,6 +42,7 @@ export async function createContext({
     );
   const schoolId =
     (req.headers['x-school-id'] as string) || (req.query?.schoolId as string);
+  console.log('SchoolId: ', schoolId);
 
   const { success, errors } = safeValidateSchema(z.uuid().optional(), schoolId);
   if (!success) {
@@ -51,7 +52,9 @@ export async function createContext({
   let schoolUser: SchoolUserContract | undefined;
   if (user && schoolId) {
     const cachedKey = `school_user:${schoolId}:${user.id}`;
+
     const cached = await cacheManager.get<string>(cachedKey);
+    console.log('Cached: ', cached);
     if (cached) {
       schoolUser = JSON.parse(cached) as SchoolUserContract;
     } else {

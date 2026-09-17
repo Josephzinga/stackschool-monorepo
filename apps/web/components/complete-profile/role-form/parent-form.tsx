@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Controller,
-  relationItems,
   Student,
   useCompleteProfileStore,
   useFieldArray,
@@ -14,10 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Check, User, UserPlus, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
-  ParentFormDataType,
-  parentFormSchema,
+  ParentSchema,
   parseAxiosError,
-  RelationTypeEnum,
+  RelationType,
+  relationTypeConstant,
 } from '@stackschool/contracts';
 import { toast } from 'sonner';
 import { SubmitButton } from '@/components/submit-button';
@@ -53,15 +52,15 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
   const [childToConfigure, setChildToConfigure] = useState<Student | null>(
     null,
   );
-  const [tempRelation, setTempRelation] = useState<RelationTypeEnum>('FATHER');
+  const [tempRelation, setTempRelation] = useState<RelationType>('FATHER');
   const {
     handleSubmit,
     register,
     control,
 
     formState: { isSubmitting, errors },
-  } = useForm<ParentFormDataType>({
-    resolver: zodResolver(parentFormSchema),
+  } = useForm<ParentSchema>({
+    resolver: zodResolver(ParentSchema),
     defaultValues: {
       children: parentData?.children || [],
       contactPreference: parentData?.contactPreference || 'PHONE',
@@ -111,24 +110,27 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
     if (!childToConfigure) return;
     append({
       id: childToConfigure.id,
-      relation: childToConfigure.matricule,
-      firstname: childToConfigure.user?.profile?.firstname,
-      lastname: childToConfigure?.user?.profile?.lastname,
-      photo: childToConfigure.user?.profile?.photo ?? undefined,
+      firstName: childToConfigure.schoolProfile?.firstName!,
+      lastName: childToConfigure?.schoolProfile?.lastName!,
+      avatarUrl: childToConfigure.schoolProfile?.avatarUrl ?? undefined,
       relation: tempRelation,
     });
 
     setChildToConfigure(null);
     setSearchQuery('');
-    toast.success(`${childToConfigure?.user?.profile?.firstname} ajouté !`);
+    toast.success(`${childToConfigure?.schoolProfile?.firstName} ajouté !`);
   };
 
-  const relationSelected = (childRelation: RelationTypeEnum) => {
-    const relation = relationItems.filter((r) => r.value === childRelation);
-    return relation.length > 0 ? relation[0].label : '';
-  };
+  const relationItems = Object.entries(relationTypeConstant).map(
+    ([key, val]) => {
+      return {
+        value: key,
+        label: val,
+      };
+    },
+  );
 
-  const onSubmit = async (data: ParentFormDataType) => {
+  const onSubmit = async (data: ParentSchema) => {
     try {
       setRoleData({ role: 'PARENT', parent: data });
       setCurrentStep(4);
@@ -206,17 +208,17 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
-                      src={`/images/${student.user?.profile?.photo ?? undefined}`}
+                      src={student.schoolProfile?.avatarUrl ?? undefined}
                     />
                     <AvatarFallback>
-                      {student.user?.profile?.firstname[0]}
-                      {student?.user?.profile?.lastname[0]}
+                      {student.schoolProfile?.firstName[0]}
+                      {student?.schoolProfile?.lastName[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium text-sm">
-                      {student.user?.profile?.firstname}{' '}
-                      {student?.user?.profile?.lastname}
+                      {student.schoolProfile?.firstName}{' '}
+                      {student?.schoolProfile?.lastName}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Matricule: {student.matricule}
@@ -252,20 +254,20 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
                   <div className="w-full flex px-3 justify-between">
                     <div className="flex items-center gap-4">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={`/images/${field.photo}`} />
+                        <AvatarImage src={field.avatarUrl ?? ''} />
                         <AvatarFallback className=" bg-primary/10 text-primary font-bold text-sm font-jost ">
-                          {field.firstname[0]}
-                          {field.lastname[0]}
+                          {field.firstName[0]}
+                          {field.lastName[0]}
                         </AvatarFallback>
                       </Avatar>
                       <p className="font-medium text-sm font-inter">
-                        {field.firstname} {field.lastname}
+                        {field.firstName} {field.lastName}
                       </p>
                     </div>
 
                     <div className="flex items-center  gap-5 text-xs text-muted-foreground">
                       <Badge variant="outline">
-                        {relationSelected(field.relation)}
+                        {relationTypeConstant[field.relation]}
                       </Badge>
                     </div>
                   </div>
@@ -316,7 +318,7 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
             <DialogDescription>
               Précisez votre relation avec{' '}
               <span className="font-semibold">
-                {childToConfigure?.user?.profile?.firstname}.
+                {childToConfigure?.schoolProfile?.firstName}.
               </span>
             </DialogDescription>
           </DialogHeader>
@@ -327,7 +329,7 @@ export function ParentForm({ onBack }: { onBack: () => void }) {
               <Select
                 name="relation"
                 value={tempRelation}
-                onValueChange={setTempRelation as (value: string) => void}
+                onValueChange={(value) => setTempRelation(value!)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />

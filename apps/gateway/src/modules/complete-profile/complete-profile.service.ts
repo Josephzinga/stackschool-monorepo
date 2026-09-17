@@ -84,10 +84,9 @@ export class CompleteProfileService {
     try {
       const saveData = await this.cacheManager.get<string>(redisKey);
       if (!saveData) {
-        return res.status(400).json({
+        return res.status(200).json({
           ok: true,
           data: null,
-          message: 'Aucune progression sauvegardée',
         });
       }
 
@@ -141,7 +140,7 @@ export class CompleteProfileService {
     console.log(profileResult);
     if (!profileResult?.ok)
       throw new InternalServerErrorException(
-        'Erreur lors de la misse à jour de donnée utilisateur.',
+        'Erreur lors de la mise à jour de donnée utilisateur.',
       );
 
     const schoolResult = await this.createSchoolData(userId, school, role.role);
@@ -164,11 +163,20 @@ export class CompleteProfileService {
       const { ok } = await this.updateUserAfterProfileCompleted(userId);
       if (!ok)
         throw new InternalServerErrorException(
-          'Erreur lors de la misse à jour de compte utilisateur.',
+          'Erreur lors de la mise à jour de compte utilisateur.',
         );
     }
+
+    const admins = await sendRmqRequest(
+      this.coreClient,
+      CORE_PATTERNS.MEMBERSHIP.FIND_ADMINS,
+      {
+        schoolId: schoolResult.data?.schoolId,
+        requirePermissions: [{ action: 'MANAGE', subject: 'ENROLLMENT' }],
+      },
+    );
     const payload: NotificationPayload = {
-      userId,
+      schoolUserId: '',
       schoolId: schoolResult.data?.schoolId,
       title: 'Confirmé',
       message: "Un utilisateur s'est inscriptions votre établissement.",

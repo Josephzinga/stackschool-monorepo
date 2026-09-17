@@ -1,10 +1,21 @@
-import { StaffFormSchema, SchoolUserContract } from '@stackschool/contracts';
+import {
+  PermissionAction,
+  PermissionSubject,
+  SchoolRole,
+  SchoolUserContract,
+} from '@stackschool/contracts';
 import { z } from 'zod';
 
 export const FindManyMemberInput = z.object({
   ids: z.array(z.string()),
 });
-
+export const FindAdminsInput = z.object({
+  schoolId: z.uuid(),
+  role: SchoolRole,
+  permissions: z
+    .array(z.object({ action: PermissionAction, subject: PermissionSubject }))
+    .optional(),
+});
 export const FindManyMemberResponse = z.object({
   members: z.array(SchoolUserContract),
 });

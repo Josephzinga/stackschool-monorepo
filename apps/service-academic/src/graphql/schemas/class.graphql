@@ -44,4 +44,11 @@ input GetSchoolClassesInput {
 type ClassLessons {
   classSubject: ClassSubject
   lesson: Lesson
+
+}
+
+input SearchClassesInput {
+  searchTerm: String!
+  limit: Int! = 20
+  schoolId: ID!
 }

@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { CreateTeacherSchema } from './teacher.ts';
-import { RelationTypeEnum } from '../auth';
+import { RelationType } from './enums.contract.ts';
 
 export const ParentStudentSchema = z
   .object({
     parentId: z.string().optional(),
     studentId: z.string().optional(),
-    relationType: z.enum(RelationTypeEnum),
+    relationType: RelationType,
   })
   .superRefine((data, tx) => {
     if (!data.parentId && !data.studentId) {

@@ -18,10 +18,10 @@ import {
 } from '@/components/ui/select';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { AnimatedButtonGroup } from '@/components/animated-button-group';
-import { LessonStatus, ResourceMode } from '@stackschool/ui';
-import { LessonStatusEnum, lessonStatusConfig } from '@stackschool/contracts';
+import { ResourceMode } from '@stackschool/ui';
+import { lessonStatusConfig, LessonStatusEnum } from '@stackschool/contracts';
 import { useLessonStore } from '@/store/lesson-store';
+import { ButtonGroup } from '@/components/ui/button-group';
 
 export const CalendarFilter = ({
   onModeChange,
@@ -54,14 +54,10 @@ export const CalendarFilter = ({
   };
 
   return (
-    <div className="flex flex-col gap-3 px-2 py-2">
+    <div className="flex w-full flex-col gap-3 px-2 py-2">
       {/* Ligne principale : toggles + combobox + bouton filtres */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <AnimatedButtonGroup
-          gap={8}
-          className="flex justify-between"
-          direction="horizontal"
-        >
+      <div className="flex w-full flex-wrap justify-between gap-3">
+        <ButtonGroup>
           <Button
             className={`px-3  text-sm h-8 rounded-md transition-all duration-200 ${
               resourceMode === 'CLASS'
@@ -82,9 +78,9 @@ export const CalendarFilter = ({
           >
             Enseignants
           </Button>
-        </AnimatedButtonGroup>
+        </ButtonGroup>
 
-        <div className="flex-1 w-full sm:min-w-50">
+        <div className="flex-1 order-3 md:order-1 w-full min-w-50">
           {resourceMode === 'CLASS' ? (
             <Combobox
               items={classData || []}
@@ -93,13 +89,14 @@ export const CalendarFilter = ({
                 if (found?.id)
                   setSelectedFilter({ type: 'CLASS', id: found.id });
               }}
-              itemToStringValue={(item) => item?.name || ''}
+              itemToStringValue={(item: NonNullable<typeof classData>[0]) =>
+                item?.name || ''
+              }
             >
               <ComboboxInput
                 placeholder="Sélectionner une classe"
                 showClear
-                onClear={() => handleClearInput()}
-                className=" sm:max-w-90"
+                className="h-8 md:max-w-60"
               />
               <ComboboxContent>
                 <ComboboxEmpty>Aucune classe</ComboboxEmpty>
@@ -115,25 +112,16 @@ export const CalendarFilter = ({
           ) : (
             <Combobox
               items={teacherData || []}
-              onValueChange={(fullName) => {
-                const found = teacherData?.find(
-                  (t) =>
-                    `${t?.schoolProfile?.firstName} ${t?.schoolProfile?.lastName}` ===
-                    fullName,
-                );
+              onValueChange={(value) => {
+                const found = teacherData?.find((item) => item.id === value);
                 if (found?.id)
                   setSelectedFilter({ type: 'TEACHER', id: found.id });
               }}
-              itemToStringValue={(item) =>
-                item
-                  ? `${item?.schoolProfile.firstName} ${item?.schoolProfile?.lastName}`
-                  : ''
-              }
+              itemToStringValue={(item) => item.id}
             >
               <ComboboxInput
                 placeholder="Sélectionner un enseignant"
                 showClear
-                onClear={() => setSelectedFilter(null)}
                 className="max-w-90"
               />
               <ComboboxContent>
@@ -156,7 +144,7 @@ export const CalendarFilter = ({
         <Button
           variant={hasActiveAdvancedFilters ? 'secondary' : 'outline'}
           onClick={toggleShowFilters}
-          className="gap-1"
+          className="gap-1 sm:order-3"
           size="sm"
         >
           <Filter className="h-3.5 w-3.5" />

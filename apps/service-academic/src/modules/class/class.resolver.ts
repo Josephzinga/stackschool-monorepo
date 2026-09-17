@@ -14,8 +14,9 @@ import {
   ClassList,
   CreateClassInput,
   GetSchoolClassesInput,
+  SearchClassesInput,
 } from '../../graphql';
-import { AcademicRpcException } from '@stackschool/messaging';
+import { AcademicRpcException, Public } from '@stackschool/messaging';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import type { DataLoaders } from '../dataloader/dataloader.service';
 
@@ -38,6 +39,12 @@ export class ClassResolver {
       input,
       schoolId! || input.schoolId!,
     );
+  }
+
+  @Public()
+  @Query('searchClasses')
+  async search(@Args('input') dto: SearchClassesInput): Promise<Class[]> {
+    return this.classService.search(dto);
   }
 
   @Mutation('createClass')

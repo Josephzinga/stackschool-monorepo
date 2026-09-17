@@ -1,8 +1,7 @@
 import { Field, FieldLabel } from '@/components/ui/field';
 import { ItemTitle } from '@/components/ui/item';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { SchoolSelected } from '@stackschool/contracts';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import {
   SearchSchoolQuery,
   useCompleteProfileStore,
@@ -14,6 +13,7 @@ import { SearchInput } from '@/components/search-input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SchoolSelectedType } from '@stackschool/contracts';
 
 export const SearchSchoolFrom = () => {
   const {
@@ -24,9 +24,10 @@ export const SearchSchoolFrom = () => {
   } = useCompleteProfileStore();
   const [searchQuery, setSearchQuery] = useState('');
   const searchDebounce = useDebounce(searchQuery.trim(), 400);
-  const [schoolSelected, setSchoolSelected] = useState<SchoolSelected | null>(
-    schoolData?.type === 'join' ? schoolData.schoolSelected : null,
-  );
+  const [schoolSelected, setSchoolSelected] =
+    useState<SchoolSelectedType | null>(
+      schoolData?.type === 'join' ? schoolData.schoolSelected : null,
+    );
 
   const { data, isLoading, error } = useSearchSchoolQuery(
     {
@@ -52,9 +53,10 @@ export const SearchSchoolFrom = () => {
       },
     });
     setCurrentStep(2);
-    toast.success(`vous avez selectionner l'école ${school.name}`);
-
-    console.log('currentStep search-lists', currentStep);
+    toast.add({
+      type: 'success',
+      title: `vous avez selectionner l'école ${school.name}`,
+    });
   };
 
   return (

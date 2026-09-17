@@ -6,17 +6,37 @@ export interface RequiredRule {
   subject: PermissionSubject;
 }
 export type RequireAbilityMatch = 'every' | 'some';
-
+export type AbilityTuple = [PermissionAction, PermissionSubject];
+type RequireAbility = AbilityTuple | RequiredRule;
 export const REQUIRE_ABILITY_KEY = 'require_ability';
 export const REQUIRE_ABILITY_MATCH_KEY = 'require_ability_match';
 
-export function RequireAbility(
-  rules: RequiredRule | RequiredRule[],
+const createPolicyDecorator = (
+  abilities: RequireAbility[],
   match: RequireAbilityMatch = 'some',
-) {
-  const list = Array.isArray(rules) ? rules : [rules];
+) => {
+  const rules: RequiredRule[] = abilities.map((ability) => {
+    if (Array.isArray(ability)) {
+      const [action, subject] = ability;
+      return { action, subject };
+    }
+    return ability;
+  });
+
   return applyDecorators(
-    SetMetadata(REQUIRE_ABILITY_KEY, list),
+    SetMetadata(REQUIRE_ABILITY_KEY, rules),
     SetMetadata(REQUIRE_ABILITY_MATCH_KEY, match),
   );
+};
+
+export function RequireAbility(...abilities: RequireAbility[]) {
+  return createPolicyDecorator(abilities);
 }
+
+RequireAbility.any = (...abilities: RequireAbility[]) => {
+  return createPolicyDecorator(abilities, 'some');
+};
+
+RequireAbility.all = (...abilities: RequireAbility[]) => {
+  return createPolicyDecorator(abilities, 'every');
+};

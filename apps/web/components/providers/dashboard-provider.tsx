@@ -1,15 +1,15 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useEffect } from 'react';
+import React, { createContext, ReactNode, useContext } from 'react';
 import {
   GetDashboardContextQuery,
   useGetDashboardContextQuery,
+  useLoadingStore,
   useUserStore,
 } from '@stackschool/ui';
 import { parseAxiosError } from '@stackschool/contracts';
-import { LoaderCircleIcon } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useLoadingStore } from '@stackschool/ui';
+import { Loader2 } from 'lucide-react';
 
 const DashboardContext = createContext<GetDashboardContextQuery | undefined>(
   undefined,
@@ -22,7 +22,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const { show, hide } = useLoadingStore();
 
   const schoolId = currentSchool?.id;
-  const { data, isLoading, error, isError } = useGetDashboardContextQuery(
+  const { data, isPending, error, isError } = useGetDashboardContextQuery(
     { input: schoolId || '' },
     {
       enabled: !!schoolId,
@@ -33,45 +33,13 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const contextData = data?.me?.schoolContext;
   const role = currentMemberShip?.role || contextData?.role;
 
-  // Logique de redirection basée sur le rôle
-  useEffect(() => {
-    if (isLoading || !role) return;
-
-    // Mapping Rôle -> Route de base
-    const roleRoutes: Record<string, string> = {
-      ADMIN: '/dashboard/admin',
-      TEACHER: '/dashboard/teacher',
-      STUDENT: '/dashboard/student',
-      PARENT: '/dashboard/parents',
-    };
-
-    const allowedRoute = roleRoutes[role];
-
-    // Si on est à la racine /dashboard, on redirige vers le dashboard spécifique
-    if (pathname === '/dashboard') {
-      router.replace(allowedRoute || '/');
-      return;
-    }
-
-    // Protection des routes spécifiques
-    // Si je suis TEACHER et que j'essaie d'aller sur /dashboard/admin...
-    if (pathname.startsWith('/dashboard/admin') && role !== 'ADMIN') {
-      router.replace(allowedRoute || '/dashboard');
-    }
-    if (pathname.startsWith('/dashboard/teacher') && role !== 'TEACHER') {
-      router.replace(allowedRoute || '/dashboard');
-    }
-    // ... ajouter d'autres règles si besoin
-  }, [role, pathname, isLoading, router]);
-
-  useEffect(() => {
-    if (isLoading) {
-      show();
-    } else {
-      hide();
-    }
-  }, [isLoading, show, hide]);
-
+  if (isPending) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+      </div>
+    );
+  }
   if (isError) {
     const { message } = parseAxiosError(error);
     console.log('Error', message);

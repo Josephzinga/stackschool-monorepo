@@ -50,7 +50,8 @@ export function SearchResultsList<T extends { id: string | null }>({
     <div
       ref={containerRef}
       className={cn(
-        'absolute z-50 w-full mt-1 border rounded-md bg-white dark:bg-slate-900 shadow-lg max-h-60 overflow-y-auto overflow-x-hidden',
+        'absolute z-10 w-full mt-1 border rounded-md bg-white dark:bg-slate-900 shadow-lg max-h-60 overflow-y-auto' +
+          ' overflow-x-hidden',
         className,
       )}
     >

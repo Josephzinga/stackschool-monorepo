@@ -1,17 +1,25 @@
-import {z} from 'zod';
-import {parentFormSchema, profileSchema, registerFormSchema, RelationTypeEnum, studentFormSchema} from "../auth";
-import {StudentStatus, TransportMode} from "./enums.contract.ts";
-
+import { z } from 'zod';
+import {
+  ParentSchema,
+  profileSchema,
+  registerFormSchema,
+  studentFormSchema,
+} from '../auth';
+import {
+  RelationType,
+  StudentStatus,
+  TransportMode,
+} from './enums.contract.ts';
 
 export const searchStudentSchema = z.object({
-  schoolId: z.uuid().min(1, "L'identifiant de l'école est requis"),
+  schoolId: z.uuid().min(1, "L'identifiant de l'école est requis."),
 });
 export const CreateStudentSchema = z.object({
   // info profile
-  firstName: z.string().min(2, 'Le prénom est requis'),
-  lastName: z.string().min(2, 'Le nom est requis'),
+  firstName: z.string().min(2, 'Le prénom est requis.'),
+  lastName: z.string().min(2, 'Le nom est requis.'),
   gender: z.enum(['MALE', 'FEMALE']),
-  address: z.string('Veuillez entré une adresse valide').nullish(),
+  address: z.string('Veuillez entrer une adresse valide').nullish(),
   // info utilisateur optionnel
   email: registerFormSchema.shape.email.optional(),
   username: registerFormSchema.shape.username.optional(),
@@ -36,7 +44,7 @@ export const CreateStudentSchema = z.object({
   birthDate: studentFormSchema.shape.birthDate,
   birthPlace: z.string().optional(),
   matricule: studentFormSchema.shape.matricule,
-  classId: z.cuid2().min(1, 'La classe est requise'),
+  classId: z.cuid2().min(1, 'La classe est requise.'),
   enrollmentYear: studentFormSchema.shape.enrollmentYear,
   parentData: z.object({
     mode: z.enum(['CONNECT', 'CREATE']),
@@ -49,12 +57,12 @@ export const CreateStudentSchema = z.object({
         phoneNumber: profileSchema.shape.phoneNumber.nonoptional(),
         email: registerFormSchema.shape.email.optional(),
         gender: profileSchema.shape.gender.optional(),
-        relationType: z.enum(RelationTypeEnum),
-        profession: parentFormSchema.shape.profession.nonoptional(),
+        relationType: RelationType,
+        profession: ParentSchema.shape.profession.nonoptional(),
       })
       .optional(),
   }),
-  nationality: z.string().min(1, 'La nationalité est requis'),
+  nationality: z.string().min(1, 'La nationalité est requis.'),
   // info medical
   bloodGroup: z.string().optional(),
   allergies: z.string().optional(),

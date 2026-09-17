@@ -57,7 +57,7 @@ export const useLessonCalendar = () => {
 
   useEffect(() => {
     if (isError) {
-      setError(error || 'Erreur lors du chargements des leçons.');
+      setError(error || 'Erreur lors des chargements des leçons.');
     }
   }, [isError, error, setError]);
 
@@ -86,7 +86,6 @@ export const useLessonCalendar = () => {
       })) || []
     );
   }, [data]);
-
   const resources = useMemo(() => {
     if (!data?.getLessons?.data.resources) return null;
     return data?.getLessons?.data.resources.map((r) => ({

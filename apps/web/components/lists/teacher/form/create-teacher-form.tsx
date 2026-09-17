@@ -1,16 +1,20 @@
 'use client';
 
-import {useCreateTeacherMutation, useForm, useUpdateTeacherMutation, zodResolver,} from '@stackschool/ui';
-import {toast} from 'sonner';
-import {SubmitButton} from '@/components/submit-button';
-import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
-import {CreateTeacherSchema, GenderEnum,} from '@stackschool/contracts';
+import {
+  useCreateTeacherMutation,
+  useForm,
+  useUpdateTeacherMutation,
+  zodResolver,
+} from '@stackschool/ui';
+import { toast } from '@/components/ui/toast';
+import { SubmitButton } from '@/components/submit-button';
+import { Input } from '@/components/ui/input';
+import { CreateTeacherSchema } from '@stackschool/contracts';
 import 'react-phone-number-input/style.css';
-import {Field, FieldError, FieldLabel} from '@/components/ui/field';
-import {useQueryClient} from '@tanstack/react-query';
-import {Controller, FormProvider} from 'react-hook-form';
-import {ProfileSubForm} from '@/components/lists/form/profile-sub-form';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { useQueryClient } from '@tanstack/react-query';
+import { FormProvider } from 'react-hook-form';
+import { ProfileSubForm } from '@/components/lists/form/profile-sub-form';
 
 interface EditDefaultValues extends CreateTeacherSchema {
   id: string;
@@ -72,26 +76,25 @@ export function CreateTeacherForm({
       ? updateMutateAsync({
           data: {
             ...data,
-            email: data.email ?? null
+            email: data.email ?? null,
           },
           teacherId: editDefaultValues?.id as string,
         })
       : createMutateAsync({
           input: {
             ...data,
-            email: data.email ?? null
+            email: data.email ?? null,
           },
         });
 
-    toast.promise(promise, {
+    await toast.promise(promise, {
       loading: isEdit ? 'Modification en cours...' : 'Création en cours...',
       success: (data: any) => {
         return isEdit
           ? data?.updateTeacher?.message || 'Enseignant modifié avec succès'
           : data?.createTeacher?.message || 'Enseignant créé avec succès';
       },
-      error: (error) => error.message || 'Une erreur est survenue',
-      toasterId: 'dashboard',
+      error: (error) => error.message || 'Une erreur est survenue.',
     });
   };
 
@@ -122,25 +125,6 @@ export function CreateTeacherForm({
             <FieldError>{errors.specialization?.message}</FieldError>
           </Field>
         </div>
-        <Field>
-          <FieldLabel htmlFor="gender">Genre</FieldLabel>
-          <Controller
-            control={control}
-            name="gender"
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez le genre" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={GenderEnum.Female}>Homme</SelectItem>
-                  <SelectItem value={GenderEnum.Male}>Femme</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FieldError>{errors.gender?.message}</FieldError>
-        </Field>
 
         <div className="flex justify-end pt-4">
           <SubmitButton isSubmitting={isSubmitting}>

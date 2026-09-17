@@ -20,6 +20,7 @@ import { UseGuards } from '@nestjs/common';
 import * as dataloaderService from '../dataloader/dataloader.service';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import {
+  CaslAbilityGuard,
   CreateTeacherSchema,
   Roles,
   RolesGuard,
@@ -28,7 +29,7 @@ import {
 import z from 'zod';
 
 @Resolver('Teacher')
-@UseGuards(RolesGuard)
+@UseGuards(RolesGuard, CaslAbilityGuard)
 export class TeacherResolver {
   constructor(private readonly teacherService: TeacherService) {}
 

@@ -1,12 +1,15 @@
 'use client';
-import {CardDescription, CardTitle} from '@/components/ui/card';
-import {Tabs, TabsContent, TabsContents,} from '@/components/animate-ui/components/radix/tabs';
-import {TabsHighlight,} from '@/components/animate-ui/primitives/radix/tabs';
-import {useState} from 'react';
-import {CreateSchoolForm} from '@/components/complete-profile/school-form/create-school-form';
-import {InvitationForm} from '@/components/complete-profile/school-form/invitation-form';
-import {SearchSchoolFrom} from '@/components/complete-profile/school-form/search-school-from';
-import {AppTabsList, AppTabsTrigger} from "@/components/app-tabs";
+import { CardDescription, CardTitle } from '@/components/ui/card';
+import { Tabs } from '@/components/ui/tabs';
+import { useState } from 'react';
+import { CreateSchoolForm } from '@/components/complete-profile/school-form/create-school-form';
+import { InvitationForm } from '@/components/complete-profile/school-form/invitation-form';
+import { SearchSchoolFrom } from '@/components/complete-profile/school-form/search-school-from';
+import {
+  AppTabsContent,
+  AppTabsList,
+  AppTabsTrigger,
+} from '@/components/app-tabs';
 
 interface Value {
   value: 'join' | 'create' | 'invite';
@@ -35,32 +38,26 @@ export default function SchoolStep() {
         onValueChange={(val) => setMode(val as Value['value'])}
       >
         <div className="w-full flex justify-center">
-          <TabsHighlight className="w-full">
-            <AppTabsList className="h-10 w-full bg-[#232423] duration-300">
-              {constant.map((item) => (
-                  <AppTabsTrigger key={item.value}
-                    value={item.value}
-                  >
-                    {item.label}
-                  </AppTabsTrigger>
-              ))}
-            </AppTabsList>
-          </TabsHighlight>
+          <AppTabsList className="h-10 w-full bg-[#232423] duration-300">
+            {constant.map((item) => (
+              <AppTabsTrigger key={item.value} value={item.value}>
+                {item.label}
+              </AppTabsTrigger>
+            ))}
+          </AppTabsList>
         </div>
 
-        <TabsContents>
-          <TabsContent value="join">
-            <SearchSchoolFrom />
-          </TabsContent>
+        <AppTabsContent value="join">
+          <SearchSchoolFrom />
+        </AppTabsContent>
 
-          <TabsContent className="flex-1" value="create">
-            <CreateSchoolForm />
-          </TabsContent>
+        <AppTabsContent className="flex-1" value="create">
+          <CreateSchoolForm />
+        </AppTabsContent>
 
-          <TabsContent value="invite">
-            <InvitationForm />
-          </TabsContent>
-        </TabsContents>
+        <AppTabsContent value="invite">
+          <InvitationForm />
+        </AppTabsContent>
       </Tabs>
     </div>
   );

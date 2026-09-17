@@ -8,9 +8,8 @@ import {
   CoreRpcException,
   HandleRoleDataInput,
   HandleSchoolDataInput,
-  parentChildDraft,
   ProfileContract,
-  teacherAssignmentDraft,
+  TeacherAssignmentDraft,
 } from '@stackschool/messaging';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Injectable } from '@nestjs/common';
@@ -47,7 +46,7 @@ export class EnrolmentService {
 
     // Matérialise les assignations dans academic — SEULEMENT maintenant
     const assignments = z
-      .array(teacherAssignmentDraft)
+      .array(TeacherAssignmentDraft)
       .parse(teacher.pendingAssignments ?? []);
 
     if (assignments.length > 0) {
@@ -119,7 +118,7 @@ export class EnrolmentService {
 
       return {
         ok: true,
-        message: "Jointure de l'école réussi avec succès",
+        message: "Jointure de l'école réussie avec succès",
         data: {
           schoolId: existingSchool.id,
         },
@@ -175,7 +174,7 @@ export class EnrolmentService {
     switch (roleData.role) {
       case 'TEACHER': {
         const assignments = z
-          .array(teacherAssignmentDraft)
+          .array(TeacherAssignmentDraft)
           .parse(roleData.teacher.assignments ?? []);
 
         await this.prisma.teacher.upsert({

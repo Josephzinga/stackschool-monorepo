@@ -6,7 +6,7 @@ import { useLessonEvents } from '@/components/lists/lesson/hooks/useLessonEvents
 import LessonAlertDialog from '@/components/lists/lesson/lesson-alert-dialog';
 import LessonDialog from '@/components/lists/lesson/lesson-dialog';
 import { useLessonStore } from '@/store/lesson-store';
-import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonCalendar';
+import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonData';
 
 const ClassScheduleGrid = ({ classId }: { classId?: string }) => {
   const {

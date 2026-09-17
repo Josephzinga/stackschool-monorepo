@@ -22,6 +22,14 @@ query SearchStudent($input: StudentSearchInput!) {
   }
 }
 
+query GetPublicSubjects($input: GetPublicSubjectInput!) {
+  getPublicSubjects(input: $input) {
+    id
+    name
+    code
+  }
+}
+
 query GetSchoolSubjects($input: GetSubjectInput!) {
   getSchoolSubjects(input: $input) {
     meta {

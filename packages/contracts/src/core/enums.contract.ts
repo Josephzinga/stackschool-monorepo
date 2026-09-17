@@ -12,6 +12,7 @@ export const PermissionAction = z.enum([
   'MARK',
   'PUBLISH',
   'EXPORT',
+  'CONFIRM',
 ]);
 export type PermissionAction = z.infer<typeof PermissionAction>;
 
@@ -26,6 +27,8 @@ export const PermissionSubject = z.enum([
   'CLASS',
   'SUBJECT',
   'GRADE',
+  'LESSON',
+  'ENROLLMENT',
   'BULLETIN',
   'TIMETABLE',
   'EXAM',
@@ -48,6 +51,7 @@ export const PermissionModule = z.enum([
   'USERS',
   'FINANCE',
   'SETTINGS',
+  'ENROLLEMENT',
 ]);
 export type PermissionModule = z.infer<typeof PermissionModule>;
 

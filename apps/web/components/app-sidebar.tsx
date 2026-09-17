@@ -17,14 +17,12 @@ import { menuItems } from '@/lib/data';
 import { useUserStore } from '@stackschool/ui';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { School } from 'lucide-react';
-import { useDashboard } from './providers/dashboard-provider';
+import { ROLE_LABEL_FR } from '@stackschool/contracts';
+import { Badge } from '@/components/ui/badge';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { currentSchool, user } = useUserStore();
-
-  const dashboard = useDashboard();
-  const role = dashboard.me?.schoolContext?.role!;
-
+  const { currentSchool, currentMemberShip } = useUserStore();
+  const role = currentMemberShip?.role!;
   // Filtrage des menus
   const filteredNavMain = menuItems.navMain.filter(
     (item) => !item.visible || item.visible.includes(role),
@@ -34,19 +32,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) => !item.visible || item.visible.includes(role),
   );
 
-  const userData = {
-    name: user?.username || 'Utilisateur',
-    email: user?.email || '',
-    avatar: user?.profile?.avatarUrl || '',
-  };
-
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton className="data-[slot=sidebar-menu-button]:p-1.5! h-14">
-              <a href="#">
+              <a href="#" className="flex gap-3">
                 <Avatar className="w-11 h-11 rounded-xl">
                   <AvatarImage src={currentSchool?.logo ?? undefined} />
                   <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
@@ -57,9 +49,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="text-sm font-poppins font-semibold truncate w-full">
                     {currentSchool?.name}
                   </span>
-                  <span className="text-xs text-muted-foreground capitalize">
-                    {role?.toLowerCase()}
-                  </span>
+                  <Badge variant="outline" className="text-sm text-primary">
+                    {ROLE_LABEL_FR[role]}
+                  </Badge>
                 </div>
               </a>
             </SidebarMenuButton>

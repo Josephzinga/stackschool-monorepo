@@ -4,7 +4,7 @@ import '@/app/styles/schedule-grid.css';
 import TimeGrid, { renderEventContent } from '@/components/lists/time-grid';
 import { Loader } from '@/components/ui/loader';
 import { TimeGridContainer } from '@/components/lists/lesson/render-resource-content';
-import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonCalendar';
+import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonData';
 import { useLessonStore } from '@/store/lesson-store';
 import { useLessonEvents } from '@/components/lists/lesson/hooks/useLessonEvents';
 import LessonDialog from '@/components/lists/lesson/lesson-dialog';

@@ -1,4 +1,4 @@
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Day,
@@ -71,7 +71,7 @@ export const useLessonMutations = () => {
       },
     });
 
-    toast.promise(promise, {
+    await toast.promise(promise, {
       loading: 'Mise à jour en cours...',
       success: () => {
         queryClient.invalidateQueries({ queryKey: ['getSchoolLessons'] });
@@ -79,11 +79,9 @@ export const useLessonMutations = () => {
         return 'Leçon mise à jour avec succès';
       },
       error: (err) => {
-        console.error('Update error:', err);
         if (targetEventDrop) targetEventDrop?.revertFunc?.();
         return err?.message || 'Erreur lors de la mise à jour de la leçon';
       },
-      toasterId: 'dashboard',
     });
   };
   const handleDelete = async (lessonId?: string) => {
@@ -93,13 +91,12 @@ export const useLessonMutations = () => {
       id: lessonId,
     });
 
-    toast.promise(promise, {
+    await toast.promise(promise, {
       loading: 'Suppression en cours...',
       success: 'Leçon supprimer avec succès.',
       error: (err) => {
         return err?.message || 'Erreur lors de la suppression de leçon.';
       },
-      toasterId: 'dashboard',
     });
     setLessonDialogOpen(false);
   };
@@ -115,11 +112,10 @@ export const useLessonMutations = () => {
       id: lessonId,
     });
 
-    toast.promise(promise, {
-      loading: 'Mise à jour en cours..',
-      success: 'Mise à jour réussi avec succès',
+    await toast.promise(promise, {
+      loading: 'Mise à jour en cours...',
+      success: 'Mise à jour réussie avec succès',
       error: 'Error lors de la mise à jour',
-      toasterId: 'dashboard',
     });
     setLessonDialogOpen(false);
   };
@@ -145,7 +141,8 @@ export const useLessonMutations = () => {
             mode: resourceMode as ResourceMode,
           },
         });
-    toast.promise(promise, {
+
+    await toast.promise(promise, {
       loading: isUpdate ? 'Modification en cours...' : 'Création en cours...',
       success: isUpdate
         ? 'Modification réussie avec succès'
@@ -154,11 +151,10 @@ export const useLessonMutations = () => {
         return (
           err?.message ||
           (isUpdate
-            ? 'Erreur lors de la mise à jour du leçon'
-            : 'Erreur lors de la création du leçon')
+            ? 'Erreur lors de la mise à jour de la leçon'
+            : 'Erreur lors de la création de la leçon')
         );
       },
-      toasterId: 'dashboard',
     });
   };
 

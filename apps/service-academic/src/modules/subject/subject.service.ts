@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   CreateSubjectInput,
   DeleteSubjectsInput,
+  GetPublicSubjectInput,
   GetSubjectInput,
   SubjectCategory,
 } from '../../graphql';
@@ -13,6 +14,25 @@ import { AcademicRpcException } from '@stackschool/messaging';
 export class SubjectService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getPublic(dto: GetPublicSubjectInput) {
+    return this.prisma.subject.findMany({
+      where: {
+        schoolId: dto.schoolId,
+        classSubjects: {
+          some: {
+            group: {
+              classes: {
+                some: {
+                  id: dto.classId,
+                },
+              },
+            },
+          },
+        },
+      },
+      take: dto.limit,
+    });
+  }
   async create(dto: CreateSubjectInput, schoolId: string) {
     const exist = await this.prisma.subject.findFirst({
       where: {
@@ -71,7 +91,7 @@ export class SubjectService {
     };
   }
 
-  async getAll(dto: GetSubjectInput, schoolId: string) {
+  async getSchool(dto: GetSubjectInput, schoolId: string) {
     const skip = dto.page * dto.limit;
     const search = dto.searchTerm?.trim();
 

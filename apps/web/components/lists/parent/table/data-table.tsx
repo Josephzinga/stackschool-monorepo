@@ -19,7 +19,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useParentTable } from './table-provider';
 import { PaginationMeta } from '@stackschool/ui';
 import { useWindowSize } from 'react-use';
-import { DataTablePagination } from '@/components/data-table-pagination';
+import { DataTablePagination } from '@/components/table/data-table-pagination';
 import AppDataTable from '@/components/table/app-data-table';
 import { ParentData } from '@/components/lists/parent/table/column';
 import { AppTableMeta } from '@/types/tanstack-table';

@@ -11,6 +11,7 @@ export type CaslPermissionAction =
   | 'create'
   | 'read'
   | 'update'
+  | 'confirm'
   | 'delete'
   | 'mark' // e.g. attendance
   | 'publish' // e.g. bulletins
@@ -21,8 +22,10 @@ export type CaslPermissionSubject =
   | 'Teacher'
   | 'Parent'
   | 'Staff'
+  | 'Enrollment'
   | 'Class'
   | 'Subject'
+  | 'Lesson'
   | 'Grade'
   | 'Bulletin'
   | 'Timetable'

@@ -1,5 +1,12 @@
 import { Day, LessonStatus, PaginationMeta } from '@stackschool/ui';
-import { InitialData } from '@/components/lists/lesson/lesson-dialog';
+import { DateSelectInfo, EventClickInfo } from '@fullcalendar/react';
+
+export type InitialData =
+  | {
+      mode: 'UPDATE';
+      data: EventClickInfo['event'];
+    }
+  | { mode: 'CREATE'; data: DateSelectInfo };
 
 export interface Event {
   daysOfWeek: number[];
@@ -68,7 +75,7 @@ export interface LessonState {
 
   // Dialogue principal
   lessonDialogOpen: boolean;
-  selectedLessonData: InitialData;
+  selectedLessonData?: InitialData;
 
   // ===== ACTIONS =====
   // Actions de vue

@@ -15,6 +15,7 @@ import {
 } from '../../graphql';
 import { SchoolService } from './school.service';
 import { BadRequestException } from '@nestjs/common';
+import { Public } from '@stackschool/messaging';
 
 @Resolver('School')
 export class SchoolResolver {
@@ -31,11 +32,12 @@ export class SchoolResolver {
     return school;
   }
 
+  @Public()
   @Query('searchSchool')
   async searchSchool(@Args('filter') dto: SchoolSearchInput) {
     if (!dto?.searchTerm || dto.searchTerm.length < 2)
       throw new BadRequestException(
-        'Le terme de recherche dois contenir au moins 2 caractères.',
+        'Le terme de recherche doit contenir au moins 2 caractères.',
       );
     const school = this.schoolService.search(dto.searchTerm?.trim());
     return school;

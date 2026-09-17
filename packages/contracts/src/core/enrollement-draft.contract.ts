@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
-export const teacherAssignmentDraft = z.object({
-  classId: z.string().uuid(),
-  subjectIds: z.array(z.string().uuid()),
+export const TeacherAssignmentDraft = z.object({
+  classId: z.cuid2(),
+  subjectIds: z.array(z.cuid2()),
   isMainTeacher: z.boolean(),
 });
-export type peacherAssignmentDraft = z.infer<typeof teacherAssignmentDraft>;
+export type TeacherAssignmentDraft = z.infer<typeof TeacherAssignmentDraft>;
 
-export const parentChildDraft = z.object({
+export const ParentChildDraft = z.object({
   studentId: z.uuid().optional(), // rempli si matché via recherche
   studentRawName: z.string().optional(), // fallback si non matché
   relationType: z.enum(['FATHER', 'MOTHER', 'GUARDIAN']),
 });
-export type ParentChildDraft = z.infer<typeof parentChildDraft>;
+export type ParentChildDraft = z.infer<typeof ParentChildDraft>;

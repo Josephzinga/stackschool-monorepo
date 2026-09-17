@@ -34,7 +34,7 @@ export default function QueryProvider({
       {children}
       <ReactQueryDevtools
         position="left"
-        buttonPosition="bottom-left"
+        buttonPosition="top-right"
         initialIsOpen={false}
       />
     </PersistQueryClientProvider>

@@ -14,9 +14,7 @@ import FullCalendar, {
 import dayGridPlugin from '@fullcalendar/react/daygrid';
 import timeGridPlugin from '@fullcalendar/react/timegrid';
 import interactionPlugin from '@fullcalendar/react/interaction';
-import resourceTimelinePlugin from '@fullcalendar/react-scheduler/timeline';
 import resourceTimelineWeek from '@fullcalendar/react-scheduler/resource-timeline';
-import timeline from '@fullcalendar/react-scheduler/resource-timeline';
 import frLocale from '@fullcalendar/react/locales/fr';
 import React, {
   forwardRef,
@@ -43,19 +41,10 @@ import { TimeGridHeader } from '@/components/lists/lesson/time-grid-header';
 import themesPlugin from '@fullcalendar/react/themes/monarch';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+
 import '@/app/styles/calendar.css';
 import '@fullcalendar/react/skeleton.css'; // ALWAYS NEED SKELETON
 import '@fullcalendar/react/themes/monarch/theme.css'; // YOUR THEME
-
-export interface TimeGridHandle {
-  getApi: () => any;
-  prev: () => void;
-  next: () => void;
-  today: () => void;
-  changeView: (view: ViewType) => void;
-  getCurrentView: () => ViewType;
-}
 
 interface TimeGridProps {
   events?: EventSourceInput;
@@ -201,21 +190,26 @@ const TimeGrid = forwardRef<any, TimeGridProps>(
               resourceTimelineWeek,
             ]}
             initialView={initialView}
-            eventMinWidth={50}
-            eventMinHeight={100}
+            resourceCellContent={renderResourceContent}
             locale={frLocale}
             resources={resources}
             eventContent={renderEventContent}
             events={events}
+            eventAdd={(info) => {
+              console.log('Event Add', info);
+            }}
+            eventChange={(info) => {
+              console.log('Event Change', info);
+            }}
             height="auto"
             eventDragStart={onEventDragStart}
             slotMinTime={`${startHour}:00:00`}
             slotMaxTime={`${endHour}:00:00`}
-            eventDragMinDistance={5} // Distance minimum pour démarrer un drag
-            eventResizableFromStart={true} // Permettre le resize depuis le début
-            eventDurationEditable={true} // Permettre l'édition de la durée
-            eventStartEditable={true} // Permettre l'édition du début unselectAuto={true} // Désélectionner automatiquement
-            selectLongPressDelay={300} // Délai pour la sélection sur mobile
+            eventDragMinDistance={5}
+            eventResizableFromStart={true}
+            eventDurationEditable={true}
+            eventStartEditable={true}
+            selectLongPressDelay={300}
             headerToolbar={false}
             eventClass="bg-red-500"
             businessHours={{

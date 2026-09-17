@@ -5,10 +5,9 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   useReactTable,
-  VisibilityColumn,
   VisibilityState,
 } from '@tanstack/react-table';
-import { DataTablePagination } from '@/components/data-table-pagination';
+import { DataTablePagination } from '@/components/table/data-table-pagination';
 import AppDataTable from '@/components/table/app-data-table';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,7 +38,9 @@ export function AttendanceTable() {
   } = useAttendanceEvent();
   const { rows: data, getColumns, meta, isLoading } = useAttendanceData();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const setBulkMarkCallback = useAttendanceStore((state) => state.setBulkMarkCallback);
+  const setBulkMarkCallback = useAttendanceStore(
+    (state) => state.setBulkMarkCallback,
+  );
 
   const {
     handleSubmit,

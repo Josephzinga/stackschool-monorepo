@@ -1,18 +1,38 @@
 'use client';
-import {useState} from 'react';
-import {Controller, useCompleteProfileStore, useForm, useUserStore, zodResolver,} from '@stackschool/ui';
-import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from '../ui/select';
-import {toast} from 'sonner';
+import React, { useState } from 'react';
+import {
+  Controller,
+  useCompleteProfileStore,
+  useForm,
+  useUserStore,
+  zodResolver,
+} from '@stackschool/ui';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+import { toast } from '@/components/ui/toast';
 import PhoneInput from 'react-phone-number-input';
-import {api, parseAxiosError, ProfileFormType, profileSchema,} from '@stackschool/contracts';
-import {Field, FieldError, FieldLabel} from '../ui/field';
-import {Input} from '../ui/input';
-import {Button} from '../ui/button';
+import {
+  api,
+  parseAxiosError,
+  ProfileFormType,
+  profileSchema,
+} from '@stackschool/contracts';
+import { Field, FieldError, FieldLabel } from '../ui/field';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
 import 'react-phone-number-input/style.css';
-import {checkField} from '@/lib/check-profile-field';
-import {UploadProfilePicture} from '../profile-upload';
-import {SubmitButton} from '@/components/submit-button';
-import {HomeIcon, Mail, User2Icon, UserIcon} from 'lucide-react';
+import { checkField } from '@/lib/check-profile-field';
+import { UploadProfilePicture } from '../profile-upload';
+import { SubmitButton } from '@/components/submit-button';
+import { HomeIcon, Mail, User2Icon, UserIcon } from 'lucide-react';
+import { GridForm } from '@/components/lists/grid-form';
 
 export function ProfileStep() {
   const { user } = useUserStore();
@@ -36,7 +56,7 @@ export function ProfileStep() {
     defaultValues: {
       firstName: user?.profile?.firstName || profile?.firstName || '',
       lastName: user?.profile?.lastName || profile?.lastName || '',
-      phoneNumber: user?.phoneNumber ||  '',
+      phoneNumber: user?.phoneNumber || '',
       email: user?.email || profile?.email || '',
       gender: profile?.gender || undefined,
       address: profile?.address || undefined,
@@ -45,7 +65,10 @@ export function ProfileStep() {
     mode: 'onBlur',
   });
 
-  const validateField = async (fieldName: keyof ProfileFormType, value: string) => {
+  const validateField = async (
+    fieldName: keyof ProfileFormType,
+    value: string,
+  ) => {
     if (!value) return;
     if (
       (fieldName &&
@@ -57,10 +80,10 @@ export function ProfileStep() {
     )
       return;
 
-    const safeData = await checkField(fieldName as string, value);
+    const safeData = await checkField({ field: fieldName, value });
 
     if (safeData?.status === 401) {
-      return toast.error(safeData?.message);
+      return toast.add({ type: 'error', title: safeData?.message });
     }
 
     if (!safeData?.valid && safeData?.message) {
@@ -79,7 +102,10 @@ export function ProfileStep() {
     } catch (error) {
       const { message } = parseAxiosError(error);
       console.error('Erreur sauvegarde profil:', message);
-      toast.error(message || 'Erreur lors de la sauvegarde du profil');
+      toast.add({
+        type: 'error',
+        title: message || 'Erreur lors de la sauvegarde du profil',
+      });
     }
   };
 
@@ -90,27 +116,25 @@ export function ProfileStep() {
   };
 
   // Gestionnaire de blur pour le téléphone
-  const handlePhoneBlur = () => {
-    validateField('phoneNumber', phoneValue);
+  const handlePhoneBlur = async () => {
+    await validateField('phoneNumber', phoneValue);
   };
 
-  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    validateField('email', e.target.value);
+  const handleEmailBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    await validateField('email', e.target.value);
   };
 
-  const handleUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.warning('Veuillez sélectionner une image');
+      toast.add({ type: 'warning', title: 'Veuillez sélectionner une image' });
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.warning("L'image doit faire moins de 5MB");
+      toast.add({ type: 'warning', title: "L'image doit faire moins de 5MB" });
       return;
     }
 
@@ -125,21 +149,26 @@ export function ProfileStep() {
 
       if (data.success) {
         setValue('avatarUrl', data.avatarUrl);
-        toast.success(
-          `${res.data.message}` || 'Photo de profil téléchargée avec succès !',
-        );
+        toast.add({
+          type: 'success',
+          title:
+            `${res.data.message}` ||
+            'Photo de profil téléchargée avec succès !',
+        });
       } else {
         throw new Error(data.message);
       }
     } catch (error: any) {
       setIsLoading(false);
       const { message, status, data } = parseAxiosError(error);
-      toast.error(message || 'Erreur lors du téléchargement de la photo');
+      toast.add({
+        type: 'error',
+        title: message || 'Erreur lors du téléchargement de la photo',
+      });
     } finally {
       setIsLoading(false);
     }
   };
-console.log("AvatarUrl: ", watch('avatarUrl'))
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -156,7 +185,7 @@ console.log("AvatarUrl: ", watch('avatarUrl'))
       </div>
 
       <form onSubmit={handleSubmit(handleProfile)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <GridForm>
           {/* Prénom */}
           <Field>
             <FieldLabel htmlFor="firstName">Prénom</FieldLabel>
@@ -261,7 +290,7 @@ console.log("AvatarUrl: ", watch('avatarUrl'))
             />
             <FieldError errors={[{ message: errors.address?.message }]} />
           </Field>
-        </div>
+        </GridForm>
         <div className="flex gap-3 pt-4">
           <Button
             variant="outline"

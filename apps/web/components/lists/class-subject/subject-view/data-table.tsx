@@ -1,7 +1,7 @@
 'use client';
 
 import AppDataTable from '@/components/table/app-data-table';
-import { DataTablePagination } from '@/components/data-table-pagination';
+import { DataTablePagination } from '@/components/table/data-table-pagination';
 import {
   getCoreRowModel,
   getFilteredRowModel,

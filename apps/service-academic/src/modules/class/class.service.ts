@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/db/generated/client';
-import { CreateClassInput, GetSchoolClassesInput } from '../../graphql';
+import {
+  CreateClassInput,
+  GetSchoolClassesInput,
+  SearchClassesInput,
+} from '../../graphql';
 import { AcademicRpcException } from '@stackschool/messaging';
 
 @Injectable()
@@ -135,6 +139,22 @@ export class ClassService {
       where: {
         id,
       },
+    });
+  }
+
+  search(dto: SearchClassesInput) {
+    return this.prisma.class.findMany({
+      where: {
+        schoolId: dto.schoolId,
+        OR: [
+          { name: { contains: dto.searchTerm?.trim(), mode: 'insensitive' } },
+          {
+            section: { contains: dto.searchTerm?.trim(), mode: 'insensitive' },
+          },
+          { level: { contains: dto.searchTerm?.trim(), mode: 'insensitive' } },
+        ],
+      },
+      take: dto.limit,
     });
   }
 }

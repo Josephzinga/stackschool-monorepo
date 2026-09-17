@@ -20,7 +20,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Lock, Mail, User, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Controller, useForm, zodResolver } from '@stackschool/ui';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { ButtonSocial } from '@/components/auth/button-social';
 import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
@@ -46,12 +46,18 @@ export function RegisterForm({ className }: RegisterFormProps) {
   const handleRegister = async (data: RegisterFormType) => {
     try {
       const res = await authServices.register(data);
-      toast.success(res.message || 'Compte créé avec succès !');
+      toast.add({
+        type: 'success',
+        title: res.message || 'Compte créé avec succès !',
+      });
       router.push('/auth/finish?from=register');
     } catch (err: any) {
       const { message, data } = parseAxiosError(err);
       console.log('Message: ', message);
-      toast.error(message || "Erreur lors de l'inscription");
+      toast.add({
+        type: 'error',
+        title: message || "Erreur lors de l'inscription",
+      });
     }
   };
 
@@ -98,6 +104,7 @@ export function RegisterForm({ className }: RegisterFormProps) {
             <Input
               placeholder="John Doe"
               icon={User}
+              type="username"
               {...register('username')}
               aria-invalid={!!errors.username}
               className="h-9 text-sm"
@@ -110,6 +117,7 @@ export function RegisterForm({ className }: RegisterFormProps) {
             <Input
               placeholder="exemple@ecole.fr"
               icon={Mail}
+              type="email"
               {...register('email')}
               aria-invalid={!!errors.email}
               className="h-9 text-sm"
@@ -121,10 +129,12 @@ export function RegisterForm({ className }: RegisterFormProps) {
             <FieldLabel className="text-xs">WhatsApp</FieldLabel>
             <Controller
               name="phoneNumber"
+
               control={control}
               render={({ field }) => (
                 <PhoneInput
                   {...field}
+                  type="phone-number"
                   placeholder="+223 07 12 34 56 78"
                   defaultCountry="ML"
                   international

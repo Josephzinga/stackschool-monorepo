@@ -31,10 +31,10 @@ export function NavUser() {
   const { user } = useUserStore();
 
   return (
-    <SidebarMenu>
+    <SidebarMenu className="w-full">
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+          <DropdownMenuTrigger className="w-full font-poppins flex gap-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
             <Avatar className="h-8 w-8 rounded-lg grayscale">
               <AvatarImage
                 src={user?.profile?.avatarUrl ?? undefined}
@@ -48,7 +48,7 @@ export function NavUser() {
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user?.username}</span>
               <span className="text-muted-foreground truncate text-xs">
-                {user?.email}
+                {user?.email || user?.phoneNumber}
               </span>
             </div>
             <IconDotsVertical className="ml-auto size-4" />
@@ -59,34 +59,37 @@ export function NavUser() {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
-                    src={user?.profile?.avatarUrl ?? undefined}
-                    alt={user?.username}
-                  />
-                  <AvatarFallback className="rounded-lg">
-                    <UserIcon className="h-6 w-6" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user?.username}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user?.email || user?.phoneNumber}
-                  </span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
             <DropdownMenuGroup>
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage
+                      src={user?.profile?.avatarUrl ?? undefined}
+                      alt={user?.username}
+                    />
+                    <AvatarFallback className="rounded-lg">
+                      <UserIcon className="h-6 w-6" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">
+                      {user?.username}
+                    </span>
+                    <span className="text-muted-foreground truncate text-xs">
+                      {user?.email || user?.phoneNumber}
+                    </span>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+
               <DropdownMenuItem>
                 <IconUserCircle />
-                Account
+                Comptes
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconCreditCard />
-                Billing
+                Paiements
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconNotification />
@@ -96,7 +99,7 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <IconLogout />
-              Log out
+              Déconnexion
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

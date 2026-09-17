@@ -1,15 +1,15 @@
-import {Button} from '@/components/ui/button';
-import {Card} from '@/components/ui/card';
-import {useEffect, useState} from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
 import StudentForm from '@/components/complete-profile/role-form/student-form';
-import {allRoles, useCompleteProfileStore} from '@stackschool/ui';
-import {SchoolRole} from '@stackschool/contracts';
-import {ParentForm} from '@/components/complete-profile/role-form/parent-form';
-import {toast} from 'sonner';
-import {TeacherForm} from './role-form/teacher-form';
-import {cn} from '@/lib/utils';
+import { allRoles, useCompleteProfileStore } from '@stackschool/ui';
+import { SchoolRole } from '@stackschool/contracts';
+import { ParentForm } from '@/components/complete-profile/role-form/parent-form';
+import { toast } from '@/components/ui/toast';
+import { TeacherForm } from './role-form/teacher-form';
+import { cn } from '@/lib/utils';
 import StaffAdminForm from '@/components/complete-profile/role-form/staff-admin-form';
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function RoleStep() {
   const { school, setCurrentStep, setRoleData } = useCompleteProfileStore();
@@ -31,9 +31,11 @@ export default function RoleStep() {
 
   const handleRoleSelect = (role: SchoolRole) => {
     if (isSchoolCreator && role !== 'ADMIN') {
-      toast.warning(
-        "En tant que créateur de l'école, vous devez être Administrateur.",
-      );
+      toast.add({
+        type: 'warning',
+        title:
+          "En tant que créateur de l'école, vous devez être Administrateur.",
+      });
       return;
     }
     setSelectedRole(role);
@@ -62,7 +64,7 @@ export default function RoleStep() {
         return (
           <StaffAdminForm
             onSubmit={(data) => {
-                console.log("ADmin: ", data)
+              console.log('ADmin: ', data);
               setRoleData({ role: 'ADMIN', admin: data });
               setCurrentStep(4);
             }}
@@ -135,7 +137,8 @@ export default function RoleStep() {
         </Button>
         <div className="flex justify-cent flex-col items-center">
           <h2 className="text-xl lg:tex-2xl text-center lg:whitespace-nowrap font-semibold">
-            Informations{' '}{filteredRoles.find((r) => r.value === selectedRole)?.label}
+            Informations{' '}
+            {filteredRoles.find((r) => r.value === selectedRole)?.label}
           </h2>
           <p className="text-gray-600">
             Complétez vos informations spécifiques

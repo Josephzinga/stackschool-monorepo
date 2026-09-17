@@ -1,13 +1,17 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { loginFormSchema } from '@stackschool/contracts';
-import { safeValidateSchema } from '@stackschool/messaging';
+import { safeValidateSchema, USER_CACHE_TTL } from '@stackschool/messaging';
 import { AuthService } from '../auth.service';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-  constructor(private readonly authService: AuthService) {
+  constructor(
+    private readonly authService: AuthService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {
     super({
       usernameField: 'identifier',
       passwordField: 'password',
@@ -24,6 +28,14 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         errors?.[0]?.message ?? 'Erreur de validation',
       );
 
-    return this.authService.validateLocalUser(identifier, password);
+    const user = await this.authService.validateLocalUser(identifier, password);
+    if (user) {
+      await this.cacheManager.set(
+        `user:${user.id}`,
+        JSON.stringify(user),
+        USER_CACHE_TTL,
+      );
+    }
+    return user;
   }
 }

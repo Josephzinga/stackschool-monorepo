@@ -6,9 +6,8 @@ import { Plus } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import { TeacherFilters } from './teacher-filters';
-import { TeacherDialog } from './teacher-dialog';
 import { useDeleteTeachersMutation, useUserStore } from '@stackschool/ui';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { DeleteSelectedCount } from '@/components/lists/delete-selected-count';
 import { AppAlertDialog } from '@/components/app-alert-dialog';
 import DataHeaderInput from '@/components/lists/data-filters';
@@ -32,10 +31,11 @@ export function DataTableHeader() {
     setRowSelection,
     columnVisibility,
     setColumnVisibility,
+    setDialogOpen,
+    dialogOpen,
   } = useTeacherTable();
   const [showFilters, setShowFilters] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [open, setOpen] = useState(false);
   const { currentSchool } = useUserStore();
   const queryClient = useQueryClient();
 
@@ -59,14 +59,16 @@ export function DataTableHeader() {
       teacherIds,
     });
 
-    toast.promise(promise, {
+    await toast.promise(promise, {
       loading: 'Suppression en cours...',
-      success: async (data) => {
+      success: (data) => {
         if (data.deleteTeachers?.ok) {
-          return `${teacherIds.length} professeurs supprimé`;
+          return `${teacherIds.length} professeurs supprimés`;
         } else {
-          console.error(data.deleteTeachers?.message);
-          throw new Error(data.deleteTeachers?.message!);
+          return (
+            data.deleteTeachers?.message ??
+            'Erreur lors de suppression des enseignants.'
+          );
         }
       },
       error: (error) => {
@@ -103,7 +105,7 @@ export function DataTableHeader() {
             />
           ) : (
             <>
-              <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
+              <div className="w-full flex flex-col md:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
                 <DataHeaderInput
                   hasActiveFilters={hasActiveFilters}
                   showFilters={showFilters}
@@ -118,8 +120,8 @@ export function DataTableHeader() {
 
                 {/* Bouton Ajouter à droite sur lg */}
                 <Button
-                  onClick={() => setOpen(true)}
-                  className=" sm:w-auto lg:w-auto gap-1.5 sm:gap-2 "
+                  onClick={() => setDialogOpen(true)}
+                  className="order-1 sm:w-auto lg:w-auto gap-1.5 sm:gap-2 "
                 >
                   <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="sm:hidden">Ajouter</span>
@@ -132,13 +134,7 @@ export function DataTableHeader() {
           )}
         </div>
         {/* Filtres étendus */}
-        {showFilters && !selectedCount && (
-         
-            <TeacherFilters />
-          
-        )}
-        {/* Dialog d'ajout d'enseignant */}
-        {open && <TeacherDialog open={open} setOpen={setOpen} />}
+        {showFilters && !selectedCount && <TeacherFilters />}
 
         {showDeleteAlert && (
           <AppAlertDialog

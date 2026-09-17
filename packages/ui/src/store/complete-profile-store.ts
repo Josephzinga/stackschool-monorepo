@@ -1,7 +1,12 @@
-import {api, authServices, parseAxiosError, RedisService} from '@stackschool/contracts';
-import {create} from 'zustand';
-import {CompleteProfileStep} from '../types';
-import {createJSONStorage, persist} from 'zustand/middleware';
+import {
+  api,
+  authServices,
+  parseAxiosError,
+  RedisService,
+} from '@stackschool/contracts';
+import { create } from 'zustand';
+import { CompleteProfileStep } from '../types';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 const redisService = new RedisService(api);
 
@@ -98,29 +103,13 @@ export const useCompleteProfileStore = create<CompleteProfileStep>()(
         }
       },
 
-      loadFromRedis: async () => {
-        try {
-          const res = await redisService.loadFromRedis();
-          if (res.ok) {
-            const data = res.data;
-            if (data && data.currentStep) {
-              set({
-                school: data.school,
-                role: data.role,
-                profile: data.profile,
-                currentStep: data.currentStep,
-                lastSavedAt: data.savedAt,
-              });
-            }
-
-            return true;
-          }
-        } catch (error) {
-          return {
-            success: false,
-            error: 'Échec chargement Redis, utilisation localStorage',
-          };
-        }
+      setInitials: async (data) => {
+        set({
+          school: data.school,
+          role: data.role,
+          profile: data.profile,
+          currentStep: data.currentStep,
+        });
       },
       setError: (err) => set({ error: err }),
 

@@ -14,18 +14,21 @@ import {
   toCaslSubject,
 } from '@stackschool/contracts';
 import { CoreRpcException } from '../errors';
+import { GraphQLContext } from '../types/graphql.contex.ts';
 
 @Injectable()
 export class CaslAbilityGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const gqlCtx = GqlExecutionContext.create(context).getContext<any>();
+    const gqlCtx =
+      GqlExecutionContext.create(context).getContext<GraphQLContext>();
     const rules = this.reflector.get<RequiredRule[]>(
       REQUIRE_ABILITY_KEY,
       context.getHandler(),
     );
     if (!rules?.length) return true;
+    if (gqlCtx.schoolUser?.isOwner) return true;
     const match =
       this.reflector.get<RequireAbilityMatch>(
         REQUIRE_ABILITY_MATCH_KEY,
@@ -35,7 +38,7 @@ export class CaslAbilityGuard implements CanActivate {
     const schoolUser: SchoolUserForAbility = {
       ...gqlCtx.schoolUser,
       id: gqlCtx?.schoolUser?.id ?? '',
-      role: gqlCtx.role ?? '',
+      role: gqlCtx.schoolUser?.role!,
       schoolId: gqlCtx.schoolId!,
       grantedPermissions: gqlCtx.schoolUser?.permissions ?? [],
     };

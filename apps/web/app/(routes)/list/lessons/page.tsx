@@ -2,13 +2,11 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '@/app/styles/schedule-grid.css';
-import TimeGrid, { renderEventContent } from '@/components/lists/time-grid';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import LessonDialog from '@/components/lists/lesson/lesson-dialog';
 import { CalendarFilter } from '@/components/lists/lesson/calendar-filter';
 import { useLessonEvents } from '@/components/lists/lesson/hooks/useLessonEvents';
 import { useLessonFilters } from '@/components/lists/lesson/hooks/useLessonFilters';
-import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonCalendar';
+import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonData';
 import { useQueryClient } from '@tanstack/react-query';
 import LessonAlertDialog from '@/components/lists/lesson/lesson-alert-dialog';
 import { LoaderOne } from '@/components/ui/loader';
@@ -29,6 +27,7 @@ import {
 import { ResourceMode } from '@stackschool/ui';
 import { ResourceCellInfo } from '@fullcalendar/react-scheduler';
 import { useLessonStore } from '@/store/lesson-store';
+import { LessonTimeGrid } from '@/components/lists/lesson/lesson-time-grid';
 
 function LessonsListPage() {
   const [isDragging, setIsDragging] = useState(false);
@@ -129,111 +128,104 @@ function LessonsListPage() {
   );
 
   return (
-    <div className="flex justify-center px-2 pt-2">
-      <Card className="flex flex-col gap-2 md:gap-4">
-        <CalendarFilter onModeChange={handleSwitchMode} />
-
-        <CardContent className="">
-          {isLoading ? (
-            <div className="w-full min-h-[70vh] flex justify-center items-center">
-              <LoaderOne />
-            </div>
-          ) : (
-            <TimeGridContainer>
-              <TimeGrid
-                editable={true}
-                initialView="resourceTimelineWeek"
-                onEventSelect={handleEventSelect}
-                ref={calendarRef}
-                onEventClick={handleEventClick}
-                resourceHeaderContent={
-                  resourceMode === 'CLASS' ? 'Classes' : 'Enseignants'
-                }
-                events={events}
-                resources={resources ?? undefined}
-                showNavigation
-                showViewButtons
-                selectable
-                onEventDrop={handleEventDrop}
-                renderEventContent={renderEventContent}
-                onEventResize={handleEventResize}
-                onEventDragStart={handleEventDragStart}
-                onEventDragStop={handleEventDragStop}
-                onResourceClick={handleResourceClick}
-                onViewChange={setCurrentView}
-                disabledTimeGrid={!selectedFilter}
-                renderResourceContent={renderResourceContent}
-                hasFilter={!!selectedFilter}
-              />
-            </TimeGridContainer>
-          )}
-        </CardContent>
-        <CardFooter>
-          <div className="flex w-full flex-col sm:flex-row items-center justify-between px-2 gap-4">
-            <div className="text-sm text-muted-foreground">
-              {pagination?.total} résultat(s)
-            </div>
-
-            <div className="flex items-center gap-4 lg:gap-8 order-1 sm:order-2 w-full sm:w-auto justify-between sm:justify-end">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium hidden sm:block">Lignes</p>
-                <Select
-                  value={`${pagination?.limit}`}
-                  onValueChange={(value) =>
-                    setPagination({ ...pagination, limit: Number(value) })
-                  }
-                >
-                  <SelectTrigger className="h-8 w-[70px]">
-                    <SelectValue placeholder={pagination?.limit} />
-                  </SelectTrigger>
-                  <SelectContent side="top">
-                    {[5, 10, 15, 20, 30].map((pageSize) => (
-                      <SelectItem key={pageSize} value={`${pageSize}`}>
-                        {pageSize}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                Page {pagination?.page! + 1} / {pagination?.totalPages}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="h-8 w-8 p-0"
-                  onClick={() =>
-                    setPagination({
-                      ...pagination,
-                      page: (pagination?.page || 0) - 1,
-                    })
-                  }
-                  disabled={pagination?.page === 0}
-                >
-                  <IconChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-8 w-8 p-0"
-                  onClick={() =>
-                    setPagination({
-                      ...pagination,
-                      page: (pagination?.page || 0) + 1,
-                    })
-                  }
-                  disabled={
-                    pagination?.totalPages! <= (pagination?.page || 0) + 1
-                  }
-                >
-                  <IconChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+    <div className="flex flex-col h-full px-2 lg:px-4 pt-2">
+      <CalendarFilter onModeChange={handleSwitchMode} />
+      <div className="">
+        {isLoading ? (
+          <div className="w-full min-h-[70vh] flex justify-center items-center">
+            <LoaderOne />
           </div>
-        </CardFooter>
-      </Card>
+        ) : (
+          <TimeGridContainer>
+            <LessonTimeGrid
+              initialView="resourceTimelineWeek"
+              onEventSelect={handleEventSelect}
+              ref={calendarRef}
+              onEventClick={handleEventClick}
+              resourceHeaderContent={
+                resourceMode === 'CLASS' ? 'Classes' : 'Enseignants'
+              }
+              selectable={true}
+              editable={true}
+              events={events}
+              resources={resources ?? undefined}
+              showNavigation
+              showViewButtons
+              onEventDrop={handleEventDrop}
+              onEventResize={handleEventResize}
+              onEventDragStart={handleEventDragStart}
+              onEventDragStop={handleEventDragStop}
+              onResourceClick={handleResourceClick}
+              onViewChange={setCurrentView}
+              disabledTimeGrid={!selectedFilter}
+              renderResourceContent={renderResourceContent}
+              hasFilter={!!selectedFilter}
+            />
+          </TimeGridContainer>
+        )}
+      </div>
+
+      <div className="flex w-full flex-col sm:flex-row items-center justify-between px-2 gap-4">
+        <div className="text-sm text-muted-foreground">
+          {pagination?.total} résultat(s)
+        </div>
+
+        <div className="flex items-center gap-4 lg:gap-8 order-1 sm:order-2 w-full sm:w-auto justify-between sm:justify-end">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium hidden sm:block">Lignes</p>
+            <Select
+              value={`${pagination?.limit}`}
+              onValueChange={(value) =>
+                setPagination({ ...pagination, limit: Number(value) })
+              }
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={pagination?.limit} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {[5, 10, 15, 20, 30].map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+            Page {pagination?.page! + 1} / {pagination?.totalPages}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="h-8 w-8 p-0"
+              onClick={() =>
+                setPagination({
+                  ...pagination,
+                  page: (pagination?.page || 0) - 1,
+                })
+              }
+              disabled={pagination?.page === 0}
+            >
+              <IconChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-8 w-8 p-0"
+              onClick={() =>
+                setPagination({
+                  ...pagination,
+                  page: (pagination?.page || 0) + 1,
+                })
+              }
+              disabled={pagination?.totalPages! <= (pagination?.page || 0) + 1}
+            >
+              <IconChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* Dialog pour la création/édition - Monté conditionnellement */}
       {lessonDialogOpen && (

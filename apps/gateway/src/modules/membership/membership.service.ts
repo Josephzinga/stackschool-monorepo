@@ -46,7 +46,7 @@ export class MembershipService {
         .send(CORE_PATTERNS.MEMBERSHIP.FIND_BY_SCHOOL_ID_AND_USER_ID, input)
         .pipe(
           timeout(3000),
-          validateWith(SchoolUserContract),
+          validateWith(SchoolUserContract.optional()),
           catchError((err) => throwError(() => mapCoreError(err))),
         ),
     );

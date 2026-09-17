@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -26,7 +26,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Button as AnimatedButton } from '@/components/animate-ui/components/buttons/button';
 import { GridForm } from '@/components/lists/grid-form';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { TeacherAssignmentSchema } from '@stackschool/contracts';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppAlertDialog } from '@/components/app-alert-dialog';
@@ -91,12 +91,17 @@ export const TeacherAssignmentForm = ({
     enabled: !initialValues?.teacherId,
   });
   const { data: classesData } = useGetClassesOptionsQuery(
-    { input: { limit: 100 } },
+    { input: { limit: 100 }, withMeta: false, includeGroup: false },
     { enabled: !isClassFixed },
   );
   const { data: classSubjects, isLoading: subjectsLoading } =
     useGetClassSubjectsOptionQuery(
-      { classId: selectedClassId || initialValues?.classId || '' },
+      {
+        input: {
+          classId: selectedClassId || initialValues?.classId || '',
+        },
+        withGroup: false,
+      },
       { enabled: !!(selectedClassId || initialValues?.classId) },
     );
 
@@ -120,19 +125,29 @@ export const TeacherAssignmentForm = ({
       name: `${t.schoolProfile?.firstName}  ${t?.schoolProfile?.lastName}`,
     })) || [];
 
-  const subjects =
-    classSubjects?.getClassSubjects
-      ?.filter((cls) =>
-        !initialValues?.teacherId
-          ? !cls.assignment
-          : initialValues.subjectIds?.some((id) => id === cls.subject?.id) ||
-            !cls.assignment,
-      )
-      .map((cs) => ({
-        id: cs.subject?.id,
-        name: cs.subject?.name,
-        code: cs.subject?.code,
-      })) || [];
+  const subjects = useMemo(
+    () =>
+      classSubjects?.getClassSubjects
+        ?.filter((cls) =>
+          !initialValues?.teacherId
+            ? !cls.assignment
+            : initialValues.subjectIds?.some((id) => id === cls.subject?.id) ||
+              !cls.assignment,
+        )
+        .map((cs) => ({
+          id: cs.subject?.id,
+          name: cs.subject?.name,
+          code: cs.subject?.code,
+        })) || [],
+    [classSubjects],
+  );
+  const map = new Map();
+  const uniqueSubjects = subjects.map((subject) => {
+    if (map.has(subject.id)) {
+    }
+    map.set(subject.id, subject);
+    return map.get(subject.id);
+  });
 
   const subjectIds = watch('subjectIds');
   useEffect(() => {
@@ -159,16 +174,16 @@ export const TeacherAssignmentForm = ({
       input: data,
     });
 
-    toast.promise(promise, {
-      loading: "Création le l' assignation en cours...",
+    await toast.promise(promise, {
+      loading: "Création de l'assignation en cours...",
       success: 'Création réussie avec succès.',
       error: (err) => {
-        return err?.message || "Erreur lors de la création l' assignation ";
+        return err?.message || "Erreur lors de la création l'assignation ";
       },
     });
   };
 
-  const executeSync = (ids: string[]) => {
+  const executeSync = async (ids: string[]) => {
     const promise = updateMutation({
       input: {
         teacherId: initialValues?.teacherId || getValues('teacherId'),
@@ -177,7 +192,7 @@ export const TeacherAssignmentForm = ({
       },
     });
 
-    toast.promise(promise, {
+    await toast.promise(promise, {
       loading: 'Synchronisation en cours...',
       success: 'Modifications enregistrées !',
       error: (err) => err?.message || 'Erreur de synchro',
@@ -199,46 +214,45 @@ export const TeacherAssignmentForm = ({
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <GridForm>
-          {showTeacherInput && (
-            <Field>
-              <FieldLabel>Enseignant</FieldLabel>
-              <Controller
-                control={control}
-                name="teacherId"
-                render={({ field }) => (
-                  <Combobox
-                    items={teachers}
+        {showTeacherInput && (
+          <Field>
+            <FieldLabel>Enseignant</FieldLabel>
+            <Controller
+              control={control}
+              name="teacherId"
+              render={({ field }) => (
+                <Combobox
+                  items={teachers}
+                  disabled={!!initialValues?.teacherId}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  itemToStringLabel={(itemValue) =>
+                    teachers.find((t) => t.id === itemValue)?.name || ''
+                  }
+                >
+                  <ComboboxInput
+                    aria-invalid={!!errors.teacherId}
                     disabled={!!initialValues?.teacherId}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    itemToStringLabel={(itemValue) =>
-                      teachers.find((t) => t.id === itemValue)?.name || ''
-                    }
-                  >
-                    <ComboboxInput
-                      aria-invalid={!!errors.teacherId}
-                      disabled={!!initialValues?.teacherId}
-                      showClear
-                      placeholder="Sélectionner un enseignant"
-                    />
-                    <ComboboxContent className="z-50">
-                      <ComboboxEmpty>Aucun enseignant trouvé</ComboboxEmpty>
-                      <ComboboxList>
-                        {(item) => (
-                          <ComboboxItem key={item.id} value={item.id}>
-                            {item.name}
-                          </ComboboxItem>
-                        )}
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
-                )}
-              />
-              <FieldError>{errors.teacherId?.message}</FieldError>
-            </Field>
-          )}
-
+                    placeholder="Sélectionner un enseignant"
+                    className="w-full"
+                  />
+                  <ComboboxContent className="z-50">
+                    <ComboboxEmpty>Aucun enseignant trouvé</ComboboxEmpty>
+                    <ComboboxList>
+                      {(item) => (
+                        <ComboboxItem key={item.id} value={item.id}>
+                          {item.name}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+              )}
+            />
+            <FieldError>{errors.teacherId?.message}</FieldError>
+          </Field>
+        )}
+        <GridForm>
           {/* Sélection de la classe (si non fixée) */}
           {!isClassFixed && (
             <Field>
@@ -261,8 +275,8 @@ export const TeacherAssignmentForm = ({
                   >
                     <ComboboxInput
                       aria-invalid={!!errors.classId}
-                      showClear
                       placeholder="Sélectionner une classe"
+                      className="h-9"
                     />
                     <ComboboxContent>
                       <ComboboxEmpty>Aucune classe trouvée</ComboboxEmpty>
@@ -291,7 +305,7 @@ export const TeacherAssignmentForm = ({
                 <Combobox
                   multiple
                   autoHighlight
-                  items={subjects}
+                  items={uniqueSubjects}
                   value={field.value}
                   onValueChange={field.onChange}
                   itemToStringValue={(item) => item}
@@ -305,7 +319,9 @@ export const TeacherAssignmentForm = ({
                       {(values) => (
                         <>
                           {values.map((value: string) => {
-                            const sub = subjects.find((s) => s.id === value);
+                            const sub = uniqueSubjects.find(
+                              (s) => s.id === value,
+                            );
                             return sub ? (
                               <ComboboxChip key={value}>
                                 {sub.name}
@@ -330,7 +346,7 @@ export const TeacherAssignmentForm = ({
                     <ComboboxEmpty>
                       {subjectsLoading
                         ? 'Chargement...'
-                        : `Aucune matière ${subjects.length === 0 && 'libre'} disponible pour cette classe`}
+                        : `Aucune matière ${uniqueSubjects?.length === 0 && 'libre'} disponible pour cette classe`}
                     </ComboboxEmpty>
                     <ComboboxList>
                       {(item, i) => (
@@ -375,10 +391,10 @@ export const TeacherAssignmentForm = ({
         onOpenChange={setOpen}
         onCancel={handleCancel}
         title="Etes-vous sur ?"
-        description={`voulez vous vraiment supprimer La
+        description={`voulez-vous vraiment supprimer La
         ${assignmentToDelete?.map((ass) => ass?.name)} pour 
         ${teachers.find((t) => t.id === initialValues?.teacherId)?.name}
-        dans cette classe?   tous les lesson et autre donnée relié seront effacer`}
+        dans cette classe ?   tous les leçons et autre donnée reliée seront effacer`}
         onConfirm={onConfirmDelete}
       />
     </div>

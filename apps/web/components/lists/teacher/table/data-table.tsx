@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { useTeacherTable } from './table-provider';
 import { PaginationMeta } from '@stackschool/ui';
 import { useWindowSize } from 'react-use';
-import { DataTablePagination } from '@/components/data-table-pagination';
+import { DataTablePagination } from '@/components/table/data-table-pagination';
 import AppDataTable from '@/components/table/app-data-table';
 import { AppTableMeta } from '@/types/tanstack-table';
 import { TeachersData } from '@/components/lists/teacher/table/columns';
@@ -30,6 +30,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
+import { UserIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TeacherDialog } from '@/components/lists/teacher/table/teacher-dialog';
 
 interface DataTableProps {
   columns: ColumnDef<TeacherFeatures, TeachersData>[];
@@ -68,6 +79,8 @@ export function DataTable({ columns, data, isLoading, meta }: DataTableProps) {
     setRowSelection,
     columnVisibility,
     setColumnVisibility,
+    setDialogOpen,
+    dialogOpen,
   } = useTeacherTable();
 
   const { width } = useWindowSize();
@@ -142,10 +155,21 @@ export function DataTable({ columns, data, isLoading, meta }: DataTableProps) {
           </div>
         )}
 
-        <AppDataTable table={table} isLoading={isLoading} columns={columns} />
+        <AppDataTable
+          table={table}
+          isLoading={isLoading}
+          columns={columns}
+          emptyComponent={<TeacherEmpty />}
+        />
       </div>
       <DataTablePagination table={table} isLoading={isLoading} />
 
+      {/* Dialog d'ajout d'enseignant */}
+      {dialogOpen && (
+        <TeacherDialog open={dialogOpen} setOpen={setDialogOpen} />
+      )}
+
+      {/* Dialog d'assignation aux classes */}
       {assignmentOpen && (
         <Dialog
           open={assignmentOpen}
@@ -166,5 +190,28 @@ export function DataTable({ columns, data, isLoading, meta }: DataTableProps) {
         </Dialog>
       )}
     </div>
+  );
+}
+
+export function TeacherEmpty() {
+  const { setDialogOpen } = useTeacherTable();
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <UserIcon />
+        </EmptyMedia>
+        <EmptyTitle>Aucun enseignant trouvé.</EmptyTitle>
+        <EmptyDescription>
+          Vous n'avez pas encore créé un enseignant.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent className="flex-row justify-center gap-2">
+        <Button className="cursor-pointer" onClick={() => setDialogOpen(true)}>
+          Cree un enseignant
+        </Button>
+        <Button variant="outline">Importer les données</Button>
+      </EmptyContent>
+    </Empty>
   );
 }

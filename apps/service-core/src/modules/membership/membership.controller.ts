@@ -27,6 +27,11 @@ export class MembershipController {
     return this.membershipService.findMany(ids);
   }
 
+  @MessagePattern(CORE_PATTERNS.MEMBERSHIP.FIND_ADMINS)
+  async getAdmins(@Payload() dto: any) {
+    const admins = await this.membershipService.findAdmins(dto);
+  }
+
   @MessagePattern(CORE_PATTERNS.MEMBERSHIP.FIND_ONE)
   async rpcFindOne(@Payload() data: { id: string }) {
     return this.membershipService.findOne(data.id);

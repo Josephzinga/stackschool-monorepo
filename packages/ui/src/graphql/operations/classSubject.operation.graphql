@@ -27,19 +27,27 @@ query GetClassSubjectTable($classId: ID!) {
   }
 }
 
-query GetClassSubjectsOption($classId: ID!) {
-  getClassSubjects(classId: $classId) {
+query GetClassSubjectsOption($input: GetClassSubjectsInput!, $withGroup: Boolean! = true) {
+  getClassSubjects(input: $input) {
     assignment {
       id
+      teacher {
+        id
+        schoolProfile {
+          firstName
+          lastName
+        }
+      }
     }
     subject {
       id
       name
       code
     }
-    group {
+    group @include(if: $withGroup) {
       id
       type
+      name
       classes {
         id
         name

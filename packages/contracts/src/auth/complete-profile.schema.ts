@@ -1,18 +1,8 @@
 import { z } from 'zod';
-import { profileSchema, StaffPosition } from '../../src/index.js';
+import { profileSchema, RelationType, StaffPosition } from '../../src/index.js';
 
 z.config(z.locales.fr());
 
-export enum RelationTypeEnum {
-  FATHER = 'FATHER',
-  MOTHER = 'MOTHER',
-  GRAND_FATHER = 'GRAND_FATHER',
-  GRAND_MOTHER = 'GRAND_MOTHER',
-  UNCLE = 'UNCLE',
-  AUNT = 'AUNT',
-  OTHER = 'OTHER',
-  GUARDIAN = 'GUARDIAN',
-}
 export const createSchoolSchema = z.object({
   name: z
     .string()
@@ -80,15 +70,15 @@ export const studentFormSchema = z.object({
 });
 
 // Schéma pour les informations du parents
-export const parentFormSchema = z.object({
+export const ParentSchema = z.object({
   children: z
     .array(
       z.object({
         id: z.cuid2(),
-        firstname: z.string(),
-        lastname: z.string(),
-        photo: z.string().optional(),
-        relation: z.enum(RelationTypeEnum),
+        firstName: z.string(),
+        lastName: z.string(),
+        avatarUrl: z.string().optional(),
+        relation: RelationType,
       }),
     )
     .min(1, 'Veuillez sélectionner au moins un enfant.'),
@@ -139,7 +129,7 @@ export const roleDataSchema = z.discriminatedUnion('role', [
   }),
   z.object({
     role: z.literal('PARENT'),
-    parent: parentFormSchema,
+    parent: ParentSchema,
   }),
   z.object({
     role: z.literal('TEACHER'),
@@ -174,17 +164,18 @@ export const completeProfileDataSchema = z
       ctx.addIssue({
         code: 'custom',
         path: ['profile'],
-        message: 'Remplissez le donné du profile',
+        message: 'Remplissez le donné tu profiles',
       });
     }
   });
 
 // Types inférés
+export type SchoolSelectedType = z.infer<typeof schoolSelectedSchema>;
 export type StaffFormDataType = z.infer<typeof StaffFormSchema>;
 export type InvitationFormData = z.infer<typeof invitationSchema>;
 export type CreateSchoolType = z.infer<typeof createSchoolSchema>;
 export type StudentFormDataType = z.infer<typeof studentFormSchema>;
-export type ParentFormDataType = z.infer<typeof parentFormSchema>;
+export type ParentSchema = z.infer<typeof ParentSchema>;
 export type TeacherFormDataType = z.infer<typeof teacherSchema>;
 export type SchoolDataType = z.infer<typeof schoolDataSchema>;
 export type RoleDataType = z.infer<typeof roleDataSchema>;

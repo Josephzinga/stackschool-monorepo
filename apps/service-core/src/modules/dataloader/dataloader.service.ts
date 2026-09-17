@@ -164,6 +164,7 @@ export class DataLoaderService {
               },
             },
           });
+          console.log('DataLoader Teachers: ', teachers);
           const lessonTeachers = teachers.map((t) => ({
             id: t.id,
             firstName: t.schoolUser?.schoolProfile?.firstName ?? '',

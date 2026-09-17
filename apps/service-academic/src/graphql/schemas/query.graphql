@@ -1,9 +1,6 @@
 extend type Query {
   getClassSubjects(
-    classId: ID
-    teacherId: ID
-    groupId: ID
-    searchTerm: String
+    input: GetClassSubjectsInput!
   ): [ClassSubject!]
   class(id: ID!): Class
   getLessons(input: GetLessonsInput): LessonsList
@@ -11,4 +8,6 @@ extend type Query {
   getSchoolSubjects(input: GetSubjectInput!): SubjectList
   getSchoolRooms(filter: GetSchoolRoomInput!): RoomList!
   getTeacherAssignments(filter: GetTeacherAssignmentInput): [TeacherAssignment]
+  searchClasses(input: SearchClassesInput!): [Class]!
+  getPublicSubjects(input: GetPublicSubjectInput!): [Subject]!
 }

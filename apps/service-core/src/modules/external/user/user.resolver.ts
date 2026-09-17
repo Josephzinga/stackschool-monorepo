@@ -12,6 +12,7 @@ export class UserResolver {
     @Context() ctx: GraphqlContextWithLoaders,
     @Loaders() loaders: DataLoaders,
   ): Promise<SchoolMembership[]> {
+    console.log('User.membership', user);
     return (await loaders.membershipsByUserLoader.load(user.id)) || [];
   }
 

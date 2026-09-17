@@ -5,7 +5,7 @@
 import { AbilityBuilder } from '@casl/ability';
 import { AppAbility } from '../types/casl';
 import { toCaslAction, toCaslSubject } from './actions-subjects';
-import { PermissionAction, PermissionSubject } from '../core';
+import { PermissionAction, PermissionSubject, SchoolRole } from '../core';
 
 // One row = one SchoolUserPermission joined with its Permission.
 // `conditions` is the JSON column on SchoolUserPermission — a fixed scoping
@@ -23,7 +23,7 @@ export interface GrantedPermission {
 export interface SchoolUserForAbility {
   id: string;
   schoolId: string;
-  role: string;
+  role: SchoolRole;
   grantedPermissions: GrantedPermission[];
   // Anything resolved dynamically at request time (not stored as JSON)
   // that a role-based rule below needs, e.g. the teacher's own classes.
@@ -56,5 +56,5 @@ export function defineAbilityFor(schoolUser: SchoolUserForAbility): AppAbility {
     // for a __caslSubjectType__ marker, falling back to the constructor name.
     detectSubjectType: (obj: any) =>
       obj.__caslSubjectType__ ?? obj.constructor.name,
-  }) 
+  });
 }

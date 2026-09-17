@@ -12,17 +12,17 @@ import {
   ClassSubject,
   CreateSubjectInput,
   DeleteSubjectsInput,
+  GetPublicSubjectInput,
   GetSubjectInput,
   Subject,
   SubjectList,
 } from '../../graphql';
 import {
   createSubjectForm,
-  CreateSubjectForm,
+  Public,
   Roles,
   ZodValidationPipe,
 } from '@stackschool/messaging';
-import { dot } from 'node:test/reporters';
 import { UseGuards } from '@nestjs/common';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import type { DataLoaders } from '../dataloader/dataloader.service';
@@ -39,7 +39,7 @@ export class SubjectResolver {
     @Context('schoolId') schoolId: string,
     @Args('input') dto: GetSubjectInput,
   ): Promise<SubjectList> {
-    return this.subjectService.getAll(dto, schoolId);
+    return this.subjectService.getSchool(dto, schoolId);
   }
 
   @Roles('ADMIN')
@@ -61,6 +61,12 @@ export class SubjectResolver {
     @Context('schoolId') schoolId: string,
   ) {
     return this.subjectService.deleteMany(dto, schoolId);
+  }
+
+  @Public()
+  @Query('getPublicSubjects')
+  async getPublic(@Args('input') dto: GetPublicSubjectInput) {
+    return this.subjectService.getPublic(dto);
   }
 
   @ResolveField('classSubjects')

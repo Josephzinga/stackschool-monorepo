@@ -8,7 +8,8 @@ import {
   useCompleteProfileStore,
   useFieldArray,
   useForm,
-  useGetClassesOptionsQuery,
+  useGetPublicSubjectsQuery,
+  useSearchClassesQuery,
   zodResolver,
 } from '@stackschool/ui';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SubmitButton } from '@/components/submit-button';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { SearchInput } from '@/components/search-input';
 import { SearchResultsList } from '@/components/search-results-list';
 
@@ -58,17 +59,30 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
     },
   });
 
-  const { data: classes, isLoading } = useGetClassesOptionsQuery(
+  const { data: classes, isLoading } = useSearchClassesQuery(
     {
       input: {
         searchTerm: debouncedSearch,
+        schoolId,
+        limit: 20,
       },
     },
     {
       enabled: !!schoolId && debouncedSearch?.length! >= 2,
     },
   );
-  const classesData = classes?.getSchoolClasses.data;
+  const { data: subjects, isPending } = useGetPublicSubjectsQuery(
+    {
+      input: {
+        classId: selectedClass?.id,
+        schoolId,
+        limit: 30,
+      },
+    },
+    { enabled: !!selectedClass },
+  );
+  const subjectData = subjects?.getPublicSubjects ?? [];
+  const classesData = classes?.searchClasses ?? [];
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'assignments',
@@ -83,13 +97,16 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
   const confirmAddAssignment = () => {
     if (!selectedClass) return;
     if (tempSubjects.length === 0) {
-      toast.error('Veuillez sélectionner au moins une matière.');
+      toast.add({
+        type: 'error',
+        title: 'Veuillez sélectionner au moins une matière.',
+      });
       return;
     }
 
-    const subjectNames = selectedClass.subjects
-      .filter((s) => tempSubjects.includes(s.id))
-      .map((s) => s.name);
+    const subjectNames = subjectData
+      .filter((s) => tempSubjects.includes(s?.id ?? ''))
+      .map((s) => s?.name!);
 
     append({
       classId: selectedClass.id,
@@ -121,9 +138,9 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
     try {
       setRoleData({ role: 'TEACHER', teacher: data });
       setCurrentStep(4);
-      toast.success('Informations enregistrées !');
+      toast.add({ type: 'success', title: 'Informations enregistrées !' });
     } catch (e) {
-      toast.error("Erreur lors de l'enregistrement");
+      toast.add({ type: 'error', title: "Erreur lors de l'enregistrement" });
     }
   };
 
@@ -280,23 +297,26 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
             <Field>
               <FieldLabel>Matières enseignées</FieldLabel>
               <div className="border rounded-md p-2 max-h-48 overflow-y-auto space-y-2">
-                {selectedClass?.subjects?.map((subject, index) => (
-                  <div key={subject.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={tempSubjects.includes(subject.id)}
-                      onCheckedChange={() => toggleSubject(subject.id)}
-                    />
-
-                    <FieldLabel
-                      htmlFor={`subj-${subject.id}`}
-                      className="cursor-pointer text-sm font-normal w-full "
+                {subjectData.length > 0 &&
+                  subjectData.map((subject, index) => (
+                    <div
+                      key={subject?.id}
+                      className="flex items-center space-x-2"
                     >
-                      {subject.name}
-                    </FieldLabel>
-                  </div>
-                ))}
-                {(!selectedClass?.subjects ||
-                  selectedClass.subjects.length === 0) && (
+                      <Checkbox
+                        checked={tempSubjects.includes(subject?.id)}
+                        onCheckedChange={() => toggleSubject(subject?.id)}
+                      />
+
+                      <FieldLabel
+                        htmlFor={`subj-${subject?.id}`}
+                        className="cursor-pointer text-sm font-normal w-full "
+                      >
+                        {subject?.name}
+                      </FieldLabel>
+                    </div>
+                  ))}
+                {(!selectedClass?.subjects || subjectData.length === 0) && (
                   <p className="text-xs text-muted-foreground text-center py-2">
                     Aucune matière configurée pour cette classe.
                   </p>
@@ -314,7 +334,7 @@ export function TeacherForm({ onBack }: { onBack: () => void }) {
               disabled={tempSubjects.length === 0}
               className="font-poppins font-medium"
             >
-              Ajouter la classe
+              Ajouter les matières
             </Button>
           </DialogFooter>
         </DialogContent>

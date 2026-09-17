@@ -25,7 +25,7 @@ export function TeacherDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-150 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-120 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nouveau Professeur</DialogTitle>
           <DialogDescription>

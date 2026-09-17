@@ -74,7 +74,7 @@ function TeachersView() {
   const meta = data?.getSchoolTeachers.meta;
 
   return (
-    <div className="flex flex-col h-full p-3 md:p-6 z-10 gap-3">
+    <div className="flex flex-col h-full p-4 lg:px-4 z-10 gap-3">
       <DataTableHeader />
       <DataTable
         columns={columns}

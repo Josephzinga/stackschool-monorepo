@@ -37,6 +37,14 @@ query GetClassesOptions(
     }
   }
 }
+
+query SearchClasses($input: SearchClassesInput!) {
+  searchClasses(input: $input) {
+    id
+    name
+    section
+  }
+}
 mutation CreateClass($data: CreateClassInput!) {
   createClass(data: $data) {
     ...ClassListFragment

@@ -1,7 +1,7 @@
 type Subject @key(fields: "id") {
   id: ID!
   name: String!
-  code: String
+  code: String!
   category: SubjectCategory
   totalWeeklyHours: Float
   mainTeacherId: ID
@@ -29,4 +29,10 @@ type SubjectList {
 input DeleteSubjectsInput {
   subjectIds: [ID!]!
   soft: Boolean! = true
+}
+
+input GetPublicSubjectInput {
+  classId: ID!
+  schoolId: ID!
+  limit: Int! = 10
 }

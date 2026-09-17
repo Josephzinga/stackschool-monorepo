@@ -1,4 +1,5 @@
 import {
+  CompleteProfileDataType,
   ProfileFormType,
   RoleDataType,
   SchoolContract,
@@ -6,7 +7,6 @@ import {
   SchoolUserContract,
   UserWithRelationsContract,
 } from '@stackschool/contracts';
-
 
 type CurrentMemberShip = Omit<SchoolUserContract, 'school'>;
 
@@ -38,9 +38,9 @@ export interface CompleteProfileStep {
   setProfileData: (profileData: ProfileFormType) => void;
   setRoleData: (roleData: RoleDataType) => void;
   saveToRedis: () => Promise<void | { success: boolean; error?: string }>;
-  loadFromRedis: () => Promise<
-    boolean | undefined | { success: boolean; error?: string }
-  >;
+  setInitials: (
+    data: CompleteProfileDataType,
+  ) => Promise<boolean | undefined | { success: boolean; error?: string }>;
   clearAllData: () => Promise<void>;
   setCurrentStep: (step: number) => void;
 

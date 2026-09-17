@@ -15,6 +15,7 @@ const MEMBERSHIP_PATTERNS = {
   FIND_MANY_BY_USER_ID: 'core.membership.find_many_by_user_id',
   FIND_BY_SCHOOL_ID_AND_USER_ID:
     'core.membership.find_by_school_id_and_user_id',
+  FIND_ADMINS: 'core.membership.find_admins',
 } as const;
 
 const TEACHER_PATTERNS = {

@@ -1,12 +1,9 @@
-// apps/frontend/src/casl/AbilityProvider.tsx
-
 import React, { createContext, useContext, useMemo } from 'react';
-import { createContextualCan } from '@casl/react';
 import {
   AppAbility,
   defineAbilityFor,
   SchoolUserForAbility,
-} from '@stackschool/shared/casl';
+} from '@stackschool/contracts';
 
 const AbilityContext = createContext<AppAbility | null>(null);
 
@@ -28,7 +25,7 @@ export function AbilityProvider({
   );
 }
 
-export function useAbility(): AppAbility {
+export function usePPAbility(): AppAbility {
   const ability = useContext(AbilityContext);
   if (!ability)
     throw new Error('useAbility must be used within <AbilityProvider>');

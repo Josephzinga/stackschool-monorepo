@@ -8,14 +8,17 @@ import {
 } from '@nestjs/graphql';
 import { ClassSubjectService } from './class-subject.service';
 import {
-  Class,
   ClassSubject,
-  ClassSubjectInput,
+  GetClassSubjectsInput,
   Group,
+  GroupType,
   Subject,
+  SubjectCategory,
+  TeacherAssignment,
 } from '../../graphql';
 import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import type { DataLoaders } from '../dataloader/dataloader.service';
+import { AcademicRpcException } from '@stackschool/messaging';
 
 @Resolver('ClassSubject')
 export class ClassSubjectResolver {
@@ -23,9 +26,15 @@ export class ClassSubjectResolver {
 
   @Query('getClassSubjects')
   async getMany(
-    @Args('input') dto: ClassSubjectInput,
+    @Args('input') dto: GetClassSubjectsInput,
     @Context('schoolId') schoolId: string,
   ): Promise<ClassSubject[]> {
+    if (Object.values(dto).length === 0) {
+      throw new AcademicRpcException(
+        'BAD_REQUEST',
+        'Au moins un input est requis.',
+      );
+    }
     return this.classSubjectService.findAll(dto, schoolId);
   }
 
@@ -34,7 +43,15 @@ export class ClassSubjectResolver {
     @Parent() parent: ClassSubject,
     @Loaders() loaders: DataLoaders,
   ): Promise<Subject | null> {
-    return (await loaders.subjectLoader.load(parent.subjectId)) || null;
+    const subject =
+      (await loaders.subjectLoader.load(parent.subjectId)) || null;
+    return {
+      ...subject,
+      id: subject?.id!,
+      name: subject?.name ?? '',
+      category: subject?.category as SubjectCategory,
+      code: subject?.code!,
+    };
   }
 
   @ResolveField('group')
@@ -42,6 +59,23 @@ export class ClassSubjectResolver {
     @Parent() parent: ClassSubject,
     @Loaders() loaders: DataLoaders,
   ): Promise<Group | null> {
-    return (await loaders.groupLoader.load(parent.groupId)) || null;
+    const group = (await loaders.groupLoader.load(parent.groupId)) || null;
+    return {
+      ...group,
+      id: group?.id!,
+      name: group?.name!,
+      type: group?.type as GroupType,
+    };
+  }
+
+  @ResolveField('assignment')
+  async getAssignment(
+    @Parent() parent: ClassSubject,
+    @Loaders() loaders: DataLoaders,
+  ): Promise<TeacherAssignment | null> {
+    const assignment = await loaders.assignmentsByClassSubjectLoader.load(
+      parent.id,
+    );
+    return assignment || null;
   }
 }

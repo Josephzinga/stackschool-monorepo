@@ -8,7 +8,7 @@ import {
 import { format, getDay } from 'date-fns';
 import { dayMapping } from '@stackschool/contracts';
 import { toast } from 'sonner';
-import FullCalendar, {
+import {
   CalendarRef,
   DateSelectInfo,
   EventClickInfo,
@@ -16,7 +16,7 @@ import FullCalendar, {
   EventResizeDoneInfo,
 } from '@fullcalendar/react';
 import { checkEventConflicts } from '@/lib/lesson-calendar';
-import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonCalendar';
+import { useLessonCalendar } from '@/components/lists/lesson/hooks/useLessonData';
 import { Event } from '@/types/lessons-types';
 import { useLessonStore } from '@/store/lesson-store';
 
@@ -72,7 +72,7 @@ export const useLessonEvents = () => {
   const handleEventClick = useCallback(
     (info: EventClickInfo) => {
       console.log('Event clicked:', info.event);
-      setSelectedLessonData({ mode: 'UPDATE', args: info.event });
+      setSelectedLessonData({ mode: 'UPDATE', data: info.event });
 
       setLessonDialogOpen(true);
     },
@@ -95,7 +95,7 @@ export const useLessonEvents = () => {
         setResource({ id: selectedFilter?.id, title: resources[0].title });
       }
 
-      setSelectedLessonData({ mode: 'CREATE', args: info });
+      setSelectedLessonData({ mode: 'CREATE', data: info });
       setLessonDialogOpen(true);
     },
     [

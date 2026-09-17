@@ -1,34 +1,32 @@
 'use client';
 import {
+  columnFilteringFeature,
+  columnVisibilityFeature,
   createFilteredRowModel,
   createPaginatedRowModel,
   createSortedRowModel,
   rowPaginationFeature,
-  tableFeatures,
-  useTable,
-  columnFilteringFeature,
-  columnVisibilityFeature,
   rowSelectionFeature,
   rowSortingFeature,
+  tableFeatures,
+  useTable,
 } from '@tanstack/react-table';
 import AppDataTable from '@/components/table/app-data-table';
-import { DataTablePagination } from '@/components/data-table-pagination';
+import { DataTablePagination } from '@/components/table/data-table-pagination';
 import * as React from 'react';
 import { useSubjectTable } from '@/components/lists/subject/table/table-provider';
 import { AppDataTableProps, AppTableMeta } from '@/types/tanstack-table';
 import { SubjectColumns } from './columns';
-import { useDeleteSubjectsMutation } from '@stackschool/ui';
 import { AppAlertDialog } from '@/components/app-alert-dialog';
 import DataTableSkeleton from '@/components/skeleton';
 import {
   Dialog,
-  DialogHeader,
   DialogContent,
+  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import SubjectForm from '../subject-form';
 import { CreateSubjectForm, SubjectCategory } from '@stackschool/contracts';
-import { toast } from 'sonner';
 
 export interface SubjectTableMeta extends AppTableMeta<SubjectColumns> {}
 

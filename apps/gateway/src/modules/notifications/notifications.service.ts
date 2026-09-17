@@ -1,9 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { NotificationsGateway } from './notifications.gateway';
 
+type Identifiant =
+  | { userId: string; schoolId: string; schoolUserId: never }
+  | { userId: never; schoolId: never; schoolUserId: string };
+
 export interface NotificationPayload {
-  userId: string;
   schoolId?: string;
+  schoolUserId: string;
+  userId?: string;
   type: string;
   title: string;
   message: string;
@@ -16,6 +21,7 @@ export class NotificationsService {
 
   send(payload: NotificationPayload) {
     // Emission temps réel si connecté
+    if (!payload.userId) return;
     this.gateway.notifyUser(payload.userId, 'notification', payload);
 
     // Point d'extension pour plus tard : persistance en DB, push mobile, etc.
@@ -27,7 +33,7 @@ export class NotificationsService {
     if (!payload.schoolId)
       throw new BadRequestException('School Id must be provided');
     this.gateway.notifySchoolUser(
-      payload.userId,
+      payload.schoolUserId,
       payload?.schoolId,
       'ENROLLMENT_COMPLETED',
       payload.data,

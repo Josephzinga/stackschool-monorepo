@@ -10,7 +10,11 @@ export class LessonResolver {
     @Parent() parent: Lesson,
     @Loaders() loaders: DataLoaders,
   ): Promise<LessonTeacher | null> {
+    console.log('Lesson.Teacher', parent);
     if (!parent.teacherId) return null;
-    return (await loaders.teacherLessonLoader.load(parent.teacherId)) || null;
+    const teacher =
+      (await loaders.teacherLessonLoader.load(parent.teacherId)) || null;
+    console.log('Teacher', teacher);
+    return teacher;
   }
 }

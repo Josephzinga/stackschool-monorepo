@@ -5,8 +5,8 @@ export const SchoolContract = z.object({
   name: z.string(),
   code: z.string(),
   address: z.string(),
-  logo: z.string().nullable(),
-  slug: z.string().nullable(),
+  logo: z.string().optional(),
+  slug: z.string().nullish(),
   createdAt: z.coerce.date<Date>().optional(),
 });
 export type SchoolContract = z.infer<typeof SchoolContract>;

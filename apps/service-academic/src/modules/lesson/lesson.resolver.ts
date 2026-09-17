@@ -1,8 +1,18 @@
-import { Args, Query, Context, Mutation, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { LessonService } from './lesson.service';
 import {
   AcademicRpcException,
+  CaslAbilityGuard,
   CreateLessonSchema,
+  RequireAbility,
   Roles,
   SchoolAccessGuard,
   UpdateLessonSchema,
@@ -11,21 +21,28 @@ import {
 import {
   CreateLessonInput,
   GetLessonsInput,
-  LessonsList,
-  UpdateLessonInput,
   Lesson,
+  LessonsList,
+  LessonStatus,
+  TeacherAssignment,
+  UpdateLessonInput,
 } from '../../graphql';
 import { UseGuards } from '@nestjs/common';
 import type { GqlContext } from '../../graphql/context';
 import { RolesGuard } from '../../common/guards/role.guard';
-import { AcademicModule } from '../../academic.module';
+import type { DataLoaders } from '../dataloader/dataloader.service';
+import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 
 @Resolver('Lesson')
-@UseGuards(SchoolAccessGuard, RolesGuard)
+@UseGuards(SchoolAccessGuard, RolesGuard, CaslAbilityGuard)
 export class LessonResolver {
   constructor(private readonly lessonService: LessonService) {}
 
   @Mutation('createLesson')
+  @RequireAbility([
+    { action: 'MANAGE', subject: 'LESSON' },
+    { action: 'CREATE', subject: 'LESSON' },
+  ])
   @Roles('ADMIN', 'TEACHER')
   async create(
     @Args('input', new ZodValidationPipe(CreateLessonSchema))
@@ -35,7 +52,25 @@ export class LessonResolver {
     return this.lessonService.create(dto, ctx.schoolId!, ctx.schoolUser!);
   }
 
-  @Roles('ADMIN', 'TEACHER')
+  @Roles('ADMIN', 'TEACHER', 'STAFF')
+  @RequireAbility([
+    { action: 'MANAGE', subject: 'LESSON' },
+    { action: 'UPDATE', subject: 'LESSON' },
+  ])
+  @Mutation('updateLessonStatus')
+  async updateStatus(
+    @Args()
+    dto: { id: string; status: LessonStatus },
+    @Context() ctx: GqlContext,
+  ) {
+    return this.lessonService.updateStatus(dto, ctx.schoolId!, ctx.schoolUser!);
+  }
+
+  @Roles('ADMIN', 'TEACHER', 'STAFF')
+  @RequireAbility([
+    { action: 'MANAGE', subject: 'LESSON' },
+    { action: 'UPDATE', subject: 'LESSON' },
+  ])
   @Mutation('updateLesson')
   async update(
     @Args('input', new ZodValidationPipe(UpdateLessonSchema))
@@ -45,12 +80,16 @@ export class LessonResolver {
     if (!dto.id)
       throw new AcademicRpcException(
         'BAD_REQUEST',
-        "L'identifiant du leçon est manquant.",
+        "L'identifiant de la leçon est manquant.",
       );
     return this.lessonService.update(dto, ctx.schoolId!, ctx.schoolUser!);
   }
 
-  @Roles('ADMIN', 'STAFF')
+  @Roles('ADMIN', 'STAFF', 'TEACHER')
+  @RequireAbility([
+    { action: 'MANAGE', subject: 'LESSON' },
+    { action: 'DELETE', subject: 'LESSON' },
+  ])
   @Mutation('deleteLesson')
   async delete(@Args('id') id: string, @Context('schoolId') schoolId: string) {
     return this.lessonService.delete(id, schoolId);
@@ -66,5 +105,16 @@ export class LessonResolver {
       return this.lessonService.getByTeacherResource(input, schoolId);
     }
     return this.lessonService.getByClassResource(input, schoolId);
+  }
+
+  @ResolveField('teacherAssignment')
+  async getAssignment(
+    @Parent() lesson: Lesson,
+    @Loaders() loaders: DataLoaders,
+  ): Promise<TeacherAssignment | null> {
+    if (!lesson.teacherAssignmentId) return null;
+    return (
+      (await loaders.assignmentLoader.load(lesson.teacherAssignmentId)) ?? null
+    );
   }
 }

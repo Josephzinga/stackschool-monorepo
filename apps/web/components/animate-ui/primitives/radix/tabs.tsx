@@ -1,19 +1,19 @@
 'use client';
 
 import * as React from 'react';
-import { Tabs as TabsPrimitive } from 'radix-ui';
+import { Tabs as TabsPrimitive } from '@base-ui/react/tabs';
 import {
-  motion,
   AnimatePresence,
   type HTMLMotionProps,
+  motion,
   type Transition,
 } from 'motion/react';
 
 import {
   Highlight,
   HighlightItem,
-  type HighlightProps,
   type HighlightItemProps,
+  type HighlightProps,
 } from '@/components/animate-ui/primitives/effects/highlight';
 import { getStrictContext } from '@/lib/get-strict-context';
 import { useControlledState } from '@/hooks/use-controlled-state';
@@ -90,29 +90,35 @@ function TabsTrigger(props: TabsTriggerProps) {
   return <TabsPrimitive.Trigger data-slot="tabs-trigger" {...props} />;
 }
 
-type TabsContentProps = React.ComponentProps<typeof TabsPrimitive.Content> &
-  HTMLMotionProps<'div'>;
+type TabsContentProps = React.ComponentProps<TabsPrimitive.Panel.Props>;
 
 function TabsContent({
   value,
   forceMount,
   transition = { duration: 0.5, ease: 'easeInOut' },
   ...props
-}: TabsContentProps) {
+}: TabsPrimitive.Panel.Props & {
+  forceMount: boolean;
+  transition: Record<string, string | number>;
+}) {
   return (
     <AnimatePresence mode="wait">
-      <TabsPrimitive.Content asChild forceMount={forceMount} value={value}>
-        <motion.div
-          data-slot="tabs-content"
-          layout
-          layoutDependency={value}
-          initial={{ opacity: 0, filter: 'blur(4px)' }}
-          animate={{ opacity: 1, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, filter: 'blur(4px)' }}
-          transition={transition}
-          {...props}
-        />
-      </TabsPrimitive.Content>
+      <TabsPrimitive.Panel
+        render={
+          <motion.div
+            data-slot="tabs-content"
+            layout
+            layoutDependency={value}
+            initial={{ opacity: 0, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, filter: 'blur(4px)' }}
+            transition={transition}
+            {...props}
+          />
+        }
+        keepMounted={forceMount}
+        value={value}
+      ></TabsPrimitive.Panel>
     </AnimatePresence>
   );
 }

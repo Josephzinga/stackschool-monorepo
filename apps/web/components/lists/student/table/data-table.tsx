@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import { useStudentTable } from './table-provider';
 import { useWindowSize } from 'react-use';
 import AppDataTable from '@/components/table/app-data-table';
-import { DataTablePagination } from '@/components/data-table-pagination';
+import { DataTablePagination } from '@/components/table/data-table-pagination';
 import { AppDataTableProps, AppTableMeta } from '@/types/tanstack-table';
 import DataTableSkeleton from '@/components/skeleton';
 import { StudentsData } from '@/components/lists/student/table/columns';

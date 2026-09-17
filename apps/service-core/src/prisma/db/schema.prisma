@@ -380,6 +380,7 @@ enum PermissionAction {
   MARK     // ex: présences
   PUBLISH  // ex: bulletins
   EXPORT   // ex: rapports
+  CONFIRM
 }
 
 enum PermissionSubject {
@@ -389,10 +390,12 @@ enum PermissionSubject {
   STAFF
   CLASS
   SUBJECT
+  LESSON
   GRADE
   BULLETIN
   TIMETABLE
   EXAM
+  ENROLLEMENT
   ATTENDANCE_RECORD
   PAYMENT
   PAYROLL
@@ -407,6 +410,7 @@ enum PermissionModule {
   ACADEMICS
   USERS
   FINANCE
+  ENROLLEMENT
   SETTINGS
 }
 

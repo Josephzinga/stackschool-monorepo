@@ -23,7 +23,8 @@ interface TableContextType {
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   filters: TeacherFiltersState;
   setFilters: React.Dispatch<React.SetStateAction<TeacherFiltersState>>;
-
+  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  dialogOpen: boolean;
   rowSelection: RowSelectionState;
   setRowSelection: OnChangeFn<RowSelectionState>;
 
@@ -45,6 +46,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<TeacherFiltersState>({});
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [columnVisibility, setColumnVisibility] =
     useState<ColumnVisibilityState>({
       info: true,
@@ -65,6 +67,8 @@ export function TableProvider({ children }: { children: ReactNode }) {
     setRowSelection,
     columnVisibility,
     setColumnVisibility,
+    dialogOpen,
+    setDialogOpen,
   };
 
   return (

@@ -3,6 +3,7 @@ import z from 'zod';
 export const FindTeachersPaginatedInput = z.object({
   schoolId: z.uuid(),
   department: z.string().nullish(),
+  id: z.string().nullish(),
   hasLessonOnly: z.boolean(),
   page: z.number().min(0),
   limit: z.number().min(1).max(100),

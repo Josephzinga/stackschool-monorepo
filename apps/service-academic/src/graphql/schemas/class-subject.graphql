@@ -10,6 +10,12 @@ type ClassSubject {
   assessments: [Assessment!]
 }
 
+input GetClassSubjectsInput {
+  classId: ID
+  groupId: ID
+  teacherId: ID
+}
+
 input ClassSubjectInput {
   id: ID
   teacherId: ID

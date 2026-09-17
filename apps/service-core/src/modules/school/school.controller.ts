@@ -37,8 +37,7 @@ export class SchoolController {
       address: school?.address,
       code: school?.code ?? '',
       slug: school?.slug,
-      createdAt: school?.createdAt.toDateString(),
-      logo: school.logo,
+      logo: school.logo ?? undefined,
     };
   }
 
@@ -53,8 +52,8 @@ export class SchoolController {
       address: school?.address,
       code: school?.code ?? '',
       slug: school?.slug,
-      createdAt: school?.createdAt.toDateString(),
-      logo: school.logo,
+      createdAt: school?.createdAt,
+      logo: school.logo ?? undefined,
     }));
   }
 }

@@ -23,9 +23,7 @@ export enum LessonStatusEnum {
 
 export const CreateLessonSchema = z
   .object({
-    id: z.cuid2().optional(),
     mode: z.enum(['TEACHER', 'CLASS']),
-
     startTime: z
       .string()
       .trim()
@@ -42,8 +40,8 @@ export const CreateLessonSchema = z
       .string('Veuillez sélectionner une matière.')
       .min(1, 'Veuillez sélectionner une matière.'),
     teacherId: z.string().min(1, 'Veuillez sélectionner un enseignant.'),
-    groupId: z.cuid2().optional(),
-    classId: z.cuid2().optional(),
+    groupId: z.string().optional(),
+    classId: z.string().optional(),
   })
   .refine(validateTimeRange, {
     message: "L'heure de fin doit être après l'heure de début",
@@ -52,7 +50,7 @@ export const CreateLessonSchema = z
   .refine(
     (data) => {
       // Si on est en mode CLASS, on doit avoir un enseignant sélectionné
-      return !(data.mode === 'CLASS' && !data.teacherId);
+      return !(data.mode === 'CLASS' && (!data.teacherId || !data.groupId));
     },
     {
       message: 'Veuillez sélectionner un enseignant pour cette classe',
@@ -71,7 +69,7 @@ export const CreateLessonSchema = z
   );
 
 export const UpdateLessonSchema = z.object({
-  id: z.cuid2(),
+  id: z.string(),
   mode: z.enum(['TEACHER', 'CLASS']).optional(),
   startTime: CreateLessonSchema.shape.startTime.optional(),
   endTime: CreateLessonSchema.shape.endTime.optional(),

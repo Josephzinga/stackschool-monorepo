@@ -1,4 +1,4 @@
-import { LessonStatusEnum } from '../academic';
+import { LessonStatus } from '../academic';
 
 export const allowedTransitions = {
   PLANNED: ['ONGOING', 'CANCELLED', 'POSTPONED'],
@@ -8,7 +8,6 @@ export const allowedTransitions = {
   CANCELLED: [],
 };
 
-type LessonStatus = LessonStatusEnum;
 export function canTransition(current: LessonStatus | null, target: string) {
   if (!current) return;
   return allowedTransitions[current]?.includes(target as never);

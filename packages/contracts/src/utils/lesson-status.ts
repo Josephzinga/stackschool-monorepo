@@ -1,7 +1,7 @@
-import { LessonStatusEnum } from '../academic';
+import { LessonStatus } from '../academic';
 
 export const lessonStatusConfig: Record<
-  LessonStatusEnum,
+  LessonStatus,
   { label: string; badgeClass: string; eventClass: string; icon: string }
 > = {
   PLANNED: {

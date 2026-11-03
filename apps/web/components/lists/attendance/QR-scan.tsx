@@ -38,12 +38,14 @@ export function ScannerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <ScanLine className="h-4 w-4" />
-          Scanner un badge
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button variant="outline" className="gap-2">
+            <ScanLine className="h-4 w-4" />
+            Scanner un badge
+          </Button>
+        }
+      ></DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Scanner un badge élève</DialogTitle>

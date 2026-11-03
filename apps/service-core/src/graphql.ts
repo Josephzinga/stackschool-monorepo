@@ -9,20 +9,20 @@
 /* eslint-disable */
 export type RelationType = "FATHER" | "MOTHER" | "GUARDIAN" | "UNCLE" | "OTHER" | "GRAND_MOTHER" | "GRAND_FATHER" | "AUNT";
 export type Gender = "MALE" | "FEMALE";
-export type Day = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
 export type TransportMode = "BUS" | "WALK" | "CAR" | "MOTO" | "TAXI" | "PARENT" | "OTHER";
-export type SchoolRole = "ADMIN" | "TEACHER" | "STUDENT" | "PARENT" | "STAFF";
 export type StudentStatus = "ACTIVE" | "SUSPENDED" | "EXPELLED" | "TRANSFERRED" | "DROPPED_OUT" | "GRADUATED" | "INACTIVE" | "DECEASED";
 export type SortOrder = "ASC" | "DESC";
 export type StudentSortField = "firstName" | "lastName" | "level" | "enrolementYear";
-export type PermissionAction = "MANAGE" | "CREATE" | "READ" | "UPDATE" | "DELETE" | "MARK" | "PUBLISH" | "EXPORT";
-export type PermissionSubject = "STUDENT" | "TEACHER" | "PARENT" | "STAFF" | "CLASS" | "SUBJECT" | "LESSON" | "GRADE" | "BULLETIN" | "TIMETABLE" | "EXAM" | "ATTENDANCE_RECORD" | "PAYMENT" | "PAYROLL" | "FINANCIAL_REPORT" | "SCHOOL_SETTINGS" | "SCHOOL_USER_PERMISSION" | "ALL";
+export type PermissionAction = "MANAGE" | "CREATE" | "READ" | "UPDATE" | "DELETE" | "MARK" | "PUBLISH" | "EXPORT" | "CONFIRM";
+export type PermissionSubject = "STUDENT" | "TEACHER" | "PARENT" | "STAFF" | "CLASS" | "ENROLLMENT" | "SUBJECT" | "LESSON" | "GRADE" | "BULLETIN" | "TIMETABLE" | "EXAM" | "ATTENDANCE_RECORD" | "PAYMENT" | "PAYROLL" | "FINANCIAL_REPORT" | "SCHOOL_SETTINGS" | "SCHOOL_USER_PERMISSION" | "ALL";
 export type StaffPosition = "SECRETARY" | "GUARDIAN" | "SUPERVISOR" | "ACCOUNTANT" | "LIBRARIAN" | "NURSE" | "CLEANER" | "MAINTENANCE" | "OTHER";
 export type ParentStudentUpdateMode = "CREATE" | "CONNECT";
-export type PermissionModule = "ATTENDANCE" | "ACADEMICS" | "USERS" | "FINANCE" | "SETTINGS";
+export type PermissionModule = "ATTENDANCE" | "ACADEMICS" | "USERS" | "FINANCE" | "SETTINGS" | "ENROLLMENT";
 export type DisciplinaryType = "SUSPENSION" | "EXPULSION" | "WARNING";
 export type LessonStatus = "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED" | "POSTPONED";
 export type ResourceMode = "TEACHER" | "CLASS";
+export type Day = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
+export type SchoolRole = "ADMIN" | "TEACHER" | "STUDENT" | "PARENT" | "STAFF";
 export type link__Purpose = "SECURITY" | "EXECUTION";
 
 export class UpdateSchoolUserPermissionsInput {
@@ -195,6 +195,10 @@ export class TeacherAssignment {
     teacher?: Nullable<Teacher>;
 }
 
+export class SchoolEvent {
+    id: string;
+}
+
 export class Class {
     id: string;
     supervisor?: Nullable<Teacher>;
@@ -223,6 +227,13 @@ export class LessonTeacher {
     firstName: string;
     lastName: string;
     weeklyHours?: Nullable<number>;
+}
+
+export class AttendanceRecord {
+    id: string;
+    recordedById: string;
+    recordedBy?: Nullable<SchoolMembership>;
+    member?: Nullable<SchoolMember>;
 }
 
 export class Permission {
@@ -326,6 +337,7 @@ export class School {
     stats?: Nullable<SchoolStats>;
     settings?: Nullable<SchoolSettings>;
     teachers?: Nullable<Nullable<Teacher>[]>;
+    events?: Nullable<Nullable<SchoolEvent>[]>;
 }
 
 export class SchoolSettings {
@@ -501,5 +513,5 @@ export class ISchema {
 }
 
 export type SchoolMember = Teacher | Student | Parent | Staff;
-export type _Entity = Class | Lesson | LessonTeacher | Parent | ParentStudent | Permission | School | SchoolMembership | SchoolSettings | SchoolStats | Staff | Student | Subject | Teacher | TeacherAssignment | User;
+export type _Entity = AttendanceRecord | Class | Lesson | LessonTeacher | Parent | ParentStudent | Permission | School | SchoolEvent | SchoolMembership | SchoolSettings | SchoolStats | Staff | Student | Subject | Teacher | TeacherAssignment | User;
 type Nullable<T> = T | null;

@@ -12,15 +12,7 @@ enum Gender {
   MALE
   FEMALE
 }
-enum Day {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
-}
+
 enum TransportMode {
   BUS
   WALK
@@ -31,13 +23,7 @@ enum TransportMode {
   OTHER
 }
 
-enum SchoolRole {
-  ADMIN
-  TEACHER
-  STUDENT
-  PARENT
-  STAFF
-}
+
 
 enum StudentStatus {
   ACTIVE
@@ -69,6 +55,7 @@ enum PermissionAction {
   MARK
   PUBLISH
   EXPORT
+  CONFIRM
 }
 enum PermissionSubject {
   STUDENT
@@ -76,6 +63,7 @@ enum PermissionSubject {
   PARENT
   STAFF
   CLASS
+  ENROLLMENT
   SUBJECT
   LESSON
   GRADE
@@ -111,6 +99,7 @@ enum PermissionModule {
   USERS
   FINANCE
   SETTINGS
+  ENROLLMENT
 }
 enum DisciplinaryType {
   SUSPENSION

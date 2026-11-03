@@ -11,5 +11,4 @@ extend type Query {
   getSchoolStudents(input: GetSchoolStudentsInput!): StudentList!
   getSchoolParents(filter: GetSchoolParentsInput!): ParentList
   getSchoolStaff(input: GetSchoolStaffInput!): StaffList!
-
 }

@@ -41,19 +41,21 @@ export function AppCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full sm:w-56 lg:w-64 flex justify-between"
-        >
-          {selectedData
-            ? data?.find((c) => c.id === selectedData)?.name
-            : defaultValue}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger
+        render={
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full sm:w-56 lg:w-64 flex justify-between"
+          >
+            {selectedData
+              ? data?.find((c) => c.id === selectedData)?.name
+              : defaultValue}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        }
+      ></PopoverTrigger>
       <PopoverContent className="w-80">
         <Command className="w-full bg-transparent">
           <CommandInput placeholder={label} className="text-sm" />

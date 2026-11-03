@@ -12,14 +12,12 @@ import { SchoolUserContract } from '@stackschool/contracts';
 import { ClientProxy } from '@nestjs/microservices';
 import { validateWith } from '../../utils/validate.operator';
 import { mapCoreError } from '../../errors/core.error-maper';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class MembershipService {
   constructor(
     private readonly schoolService: SchoolService,
-    @Inject(CORE_SERVICE) private readonly coreService: ClientProxy,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(CORE_SERVICE) private readonly coreClient: ClientProxy,
   ) {}
 
   async getSchool(schoolId: string) {
@@ -27,13 +25,14 @@ export class MembershipService {
   }
 
   async findOne(schoolUserId: string) {
-    const result = await firstValueFrom<SchoolUserContract>(
-      this.coreService
+    const result = await firstValueFrom<SchoolUserContract | null>(
+      this.coreClient
         .send(CORE_PATTERNS.MEMBERSHIP.FIND_ONE, {
           id: schoolUserId,
         })
         .pipe(
-          validateWith(SchoolUserContract),
+          timeout(3000),
+          validateWith(SchoolUserContract.nullable()),
           catchError((err) => throwError(() => mapCoreError(err))),
         ),
     );
@@ -42,7 +41,7 @@ export class MembershipService {
 
   async findBySchoolIdAndUserId(input: FindBySchoolIdAndUserIdInput) {
     return await firstValueFrom(
-      this.coreService
+      this.coreClient
         .send(CORE_PATTERNS.MEMBERSHIP.FIND_BY_SCHOOL_ID_AND_USER_ID, input)
         .pipe(
           timeout(3000),
@@ -54,7 +53,7 @@ export class MembershipService {
 
   async findMany(schoolUserIds: string[]) {
     const result = await firstValueFrom<FindManyMemberResponse>(
-      this.coreService
+      this.coreClient
         .send(CORE_PATTERNS.MEMBERSHIP.FIND_MANY, { ids: schoolUserIds })
         .pipe(
           timeout(3000),
@@ -67,8 +66,9 @@ export class MembershipService {
   }
 
   async findManyByUserId(userId: string) {
+    console.log('Membership findManyByUserId: ', userId);
     const result = await firstValueFrom<FindManyMemberResponse>(
-      this.coreService
+      this.coreClient
         .send(CORE_PATTERNS.MEMBERSHIP.FIND_MANY_BY_USER_ID, {
           userIds: [userId],
         })

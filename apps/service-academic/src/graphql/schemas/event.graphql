@@ -1,0 +1,22 @@
+type SchoolEvent @key(fields: "id") {
+    id: ID!
+    title: String!
+    description: String
+    type: EventType!
+    audience: EventAudience!
+    schoolId: ID
+    startAt: DateTime
+    endAt: DateTime
+    allDay: Boolean
+    location: String
+    color: String
+    createdById: ID
+    createdAt:  DateTime
+    updatedAt: DateTime
+}
+
+input GetSchoolEventInput {
+    id: ID
+    from: DateTime
+    to: DateTime
+}

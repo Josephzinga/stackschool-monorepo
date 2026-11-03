@@ -233,10 +233,7 @@ export class AuthService {
           catchError((err) => throwError(() => mapAuthError(err))),
         ),
     );
-    const { success, errors, data } = safeValidateSchema(
-      resetPasswordResponse,
-      result,
-    );
+    const { success, data } = safeValidateSchema(resetPasswordResponse, result);
 
     if (!success || !data) {
       return;

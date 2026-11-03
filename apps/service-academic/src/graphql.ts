@@ -24,6 +24,22 @@ export enum AssessmentType {
     ORAL = "ORAL"
 }
 
+export enum EventType {
+    HOLIDAY = "HOLIDAY",
+    MEETING = "MEETING",
+    EXAM = "EXAM",
+    ANNOUNCEMENT = "ANNOUNCEMENT",
+    OTHER = "OTHER"
+}
+
+export enum EventAudience {
+    ALL = "ALL",
+    TEACHERS = "TEACHERS",
+    PARENTS = "PARENTS",
+    STUDENTS = "STUDENTS",
+    STAFF = "STAFF"
+}
+
 export enum AssessmentStatus {
     DRAFT = "DRAFT",
     PUBLISHED = "PUBLISHED",
@@ -33,16 +49,6 @@ export enum AssessmentStatus {
 export enum GroupType {
     SOLO = "SOLO",
     MULTIPLE = "MULTIPLE"
-}
-
-export enum Day {
-    MONDAY = "MONDAY",
-    TUESDAY = "TUESDAY",
-    WEDNESDAY = "WEDNESDAY",
-    THURSDAY = "THURSDAY",
-    FRIDAY = "FRIDAY",
-    SATURDAY = "SATURDAY",
-    SUNDAY = "SUNDAY"
 }
 
 export enum LessonStatus {
@@ -56,6 +62,24 @@ export enum LessonStatus {
 export enum ResourceMode {
     TEACHER = "TEACHER",
     CLASS = "CLASS"
+}
+
+export enum Day {
+    MONDAY = "MONDAY",
+    TUESDAY = "TUESDAY",
+    WEDNESDAY = "WEDNESDAY",
+    THURSDAY = "THURSDAY",
+    FRIDAY = "FRIDAY",
+    SATURDAY = "SATURDAY",
+    SUNDAY = "SUNDAY"
+}
+
+export enum SchoolRole {
+    ADMIN = "ADMIN",
+    TEACHER = "TEACHER",
+    STUDENT = "STUDENT",
+    PARENT = "PARENT",
+    STAFF = "STAFF"
 }
 
 export enum link__Purpose {
@@ -100,6 +124,12 @@ export class SearchClassesInput {
     searchTerm: string;
     limit: number;
     schoolId: string;
+}
+
+export class GetSchoolEventInput {
+    id?: Nullable<string>;
+    from?: Nullable<DateTime>;
+    to?: Nullable<DateTime>;
 }
 
 export class CreateGroupInput {
@@ -262,6 +292,23 @@ export class ClassStatistics {
 export class ClassLessons {
     classSubject?: Nullable<ClassSubject>;
     lesson?: Nullable<Lesson>;
+}
+
+export class SchoolEvent {
+    id: string;
+    title: string;
+    description?: Nullable<string>;
+    type: EventType;
+    audience: EventAudience;
+    schoolId?: Nullable<string>;
+    startAt?: Nullable<DateTime>;
+    endAt?: Nullable<DateTime>;
+    allDay?: Nullable<boolean>;
+    location?: Nullable<string>;
+    color?: Nullable<string>;
+    createdById?: Nullable<string>;
+    createdAt?: Nullable<DateTime>;
+    updatedAt?: Nullable<DateTime>;
 }
 
 export class Teacher {
@@ -443,6 +490,8 @@ export abstract class IQuery {
     abstract searchClasses(input: SearchClassesInput): Nullable<Class>[] | Promise<Nullable<Class>[]>;
 
     abstract getPublicSubjects(input: GetPublicSubjectInput): Nullable<Subject>[] | Promise<Nullable<Subject>[]>;
+
+    abstract getSchoolEvents(input: GetSchoolEventInput): Nullable<SchoolEvent>[] | Promise<Nullable<SchoolEvent>[]>;
 }
 
 export class _Service {
@@ -459,5 +508,5 @@ export class ISchema {
     Mutation: IMutation;
 }
 
-export type _Entity = Class | ClassStats | Lesson | Room | SchoolStats | Student | Subject | Teacher | TeacherAssignment;
+export type _Entity = Class | ClassStats | Lesson | Room | SchoolEvent | SchoolStats | Student | Subject | Teacher | TeacherAssignment;
 type Nullable<T> = T | null;

@@ -191,6 +191,34 @@ model AssessmentResult {
   @@index([assessmentId])
 }
 
+
+
+model Event {
+  id          String        @id @default(cuid())
+  schoolId    String
+  title       String
+  description String?
+  type        EventType     @default(OTHER)
+  audience    EventAudience @default(ALL)
+
+  startAt     DateTime
+  endAt       DateTime?
+  allDay      Boolean       @default(true)
+
+  location    String?
+  color       String?       // optional override; UI falls back to a color keyed on `type`
+
+  createdById String
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Covers the two queries this table actually serves: "events for this
+  // school in this date range" (dashboard widget, month view) and ordering
+  // by start date within that range.
+  @@index([schoolId, startAt])
+}
+
 enum AssessmentType {
   EXAM
   ASSIGNMENT
@@ -258,4 +286,21 @@ enum RoomType {
   STORAGE_ROOM
   MULTIPURPOSE_ROOM
   OTHER
+}
+enum EventType {
+  HOLIDAY
+  MEETING
+  EXAM
+  ANNOUNCEMENT
+  COURSE
+  OTHER
+}
+
+
+enum EventAudience {
+  ALL
+  TEACHERS
+  PARENTS
+  STUDENTS
+  STAFF
 }

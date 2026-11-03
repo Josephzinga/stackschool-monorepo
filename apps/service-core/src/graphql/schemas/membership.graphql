@@ -11,7 +11,7 @@ type Permission @key(fields: "id") {
 
 }
 
-type SchoolMembership @key(fields: "userId") {
+type SchoolMembership @key(fields: "userId id") {
   id: ID!
   role: SchoolRole!
   userId: ID!
@@ -37,5 +37,4 @@ input GetSchoolMembershipsInput {
   searchTerm: String
   limit: Int = 10
 }
-
 union SchoolMember = Teacher | Student | Parent | Staff

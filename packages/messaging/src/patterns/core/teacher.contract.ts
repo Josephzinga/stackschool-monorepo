@@ -21,6 +21,13 @@ export const FindTeachersPaginatedResponse = z.object({
   totalCount: z.number(),
 });
 
+export const FindOneTeacherInput = z.object({
+  id: z.string(),
+  schoolId: z.uuid(),
+});
+
+export type FindOneTeacherInput = z.infer<typeof FindOneTeacherInput>;
+
 export type FindTeachersPaginatedInput = z.infer<
   typeof FindTeachersPaginatedInput
 >;

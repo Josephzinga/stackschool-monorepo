@@ -51,7 +51,7 @@ export const PermissionModule = z.enum([
   'USERS',
   'FINANCE',
   'SETTINGS',
-  'ENROLLEMENT',
+  'ENROLLMENT',
 ]);
 export type PermissionModule = z.infer<typeof PermissionModule>;
 
@@ -118,12 +118,6 @@ export const TransportMode = z.enum([
   'OTHER',
 ]);
 export type TransportMode = z.infer<typeof TransportMode>;
-
-export const GroupType = z.enum(['SOLO', 'MULTIPLE']);
-export type GroupType = z.infer<typeof GroupType>;
-
-export const SessionStatus = z.enum(['FINISHED', 'STARTED']);
-export type SessionStatus = z.infer<typeof SessionStatus>;
 
 export const StaffPosition = z.enum([
   'SECRETARY',

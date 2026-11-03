@@ -11,6 +11,7 @@ type School @key(fields: "id") {
   stats: SchoolStats
   settings: SchoolSettings
   teachers: [Teacher]
+  events: [SchoolEvent]
 }
 
 type SchoolSettings @key(fields: "id") {

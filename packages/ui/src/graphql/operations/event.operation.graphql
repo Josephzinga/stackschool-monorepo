@@ -1,0 +1,14 @@
+
+query GetSchoolEvents($input: GetSchoolEventInput!) {
+  getSchoolEvents(input: $input) {
+    id
+    title
+    description
+    type
+    startAt
+    endAt
+    allDay
+    location
+    color
+  }
+}

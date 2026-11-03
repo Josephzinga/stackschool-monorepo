@@ -2,7 +2,6 @@ import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import {
   CreateParentSchema,
   ParentStudentSchema,
-  RelationTypeEnum,
   relationTypeOptions,
   UpdateParentSchema,
 } from '@stackschool/contracts';
@@ -108,7 +107,7 @@ export function ParentStudentForm({ mode = 'PARENT' }: ParentStudentFormProps) {
     append({
       studentId: student.id,
       relationType:
-        RelationTypeEnum.FATHER as CreateParentSchema['children'][number]['relationType'],
+        'FATHER' as CreateParentSchema['children'][number]['relationType'],
     });
     setSelectedStudents((current) => [...current, student]);
     setSearchTerm('');

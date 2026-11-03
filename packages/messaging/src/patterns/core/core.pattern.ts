@@ -15,11 +15,15 @@ const MEMBERSHIP_PATTERNS = {
   FIND_MANY_BY_USER_ID: 'core.membership.find_many_by_user_id',
   FIND_BY_SCHOOL_ID_AND_USER_ID:
     'core.membership.find_by_school_id_and_user_id',
-  FIND_ADMINS: 'core.membership.find_admins',
+} as const;
+
+const STUDENT_PATTERNS = {
+  FIND_ONE: 'core.student.find_one',
 } as const;
 
 const TEACHER_PATTERNS = {
   FIND_PAGINATED: 'core.teacher.find_paginated',
+  FIND_ONE: 'core.teacher.find_one',
 } as const;
 
 export const CORE_PATTERNS = {
@@ -27,4 +31,5 @@ export const CORE_PATTERNS = {
   MEMBERSHIP: MEMBERSHIP_PATTERNS,
   COMPLETE_PROFILE: COMPLETE_PROFILE_PATTERNS,
   TEACHER: TEACHER_PATTERNS,
+  STUDENT: STUDENT_PATTERNS,
 } as const;

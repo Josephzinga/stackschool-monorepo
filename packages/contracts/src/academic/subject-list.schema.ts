@@ -1,23 +1,17 @@
 import z from 'zod';
-
-export enum SubjectCategory {
-  General = 'GENERAL',
-  Literary = 'LITERARY',
-  Scientific = 'SCIENTIFIC',
-  Sport = 'SPORT',
-}
+import { SubjectCategory } from './enums.contract';
 
 export const createSubjectForm = z.object({
   name: z.string().min(1, 'Le nom de la matière est requis.'),
   code: z
     .string()
-    .min(1, 'Le code de la matière est requis')
+    .min(1, 'Le code de la matière est requis.')
     .max(
       10,
       'Le code de la matière ne peut pas contenir plus de 10 caractères',
     ),
   mainTeacherId: z.string().optional(),
-  category: z.enum(SubjectCategory),
+  category: SubjectCategory,
   classSubjects: z
     .array(
       z.object({
@@ -43,10 +37,10 @@ export const createClassSubjectSchema = z
     subjectId: z.cuid2('ID de matière invalide'),
     coefficient: z.coerce
       .number<number>()
-      .min(1, 'Le coefficient ne doit pas être inférieur ou égal à 0'),
+      .min(1, 'Le coefficient ne doit pas être inférieur ou égal à 0.'),
     weeklyHours: z.coerce
       .number<number>()
-      .min(1, "Le nombre d'heures ne doit pas être inférieur ou égal à 0")
+      .min(1, "Le nombre d'heures ne doit pas être inférieur ou égal à 0.")
       .optional(),
   })
   .refine(
@@ -54,7 +48,7 @@ export const createClassSubjectSchema = z
       return !!data.id || !!data.classId;
     },
     {
-      error: 'La classe est requise',
+      error: 'La classe est requise.',
       path: ['classId'],
     },
   );

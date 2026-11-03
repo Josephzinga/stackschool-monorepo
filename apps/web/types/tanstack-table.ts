@@ -1,6 +1,8 @@
 import '@tanstack/react-table';
 import type { ColumnDef, RowData, TableFeatures } from '@tanstack/react-table';
-import { PaginationMeta } from '@stackschool/ui';
+import type { MarkAttendanceSchema } from '@stackschool/contracts';
+import type { Control, UseFormSetValue, UseFormTrigger } from 'react-hook-form';
+import type { PaginationMeta } from '@stackschool/ui';
 
 export interface AppDataTableProps<
   TFeatures extends TableFeatures,
@@ -17,4 +19,8 @@ export interface AppTableMeta<TData extends RowData> {
   openAdd?: (data: TData) => void;
   onChange?: (data: TData) => void;
   onCellChange?: (rowIndex: number, data: TData, status: any) => void;
+  control?: Control<MarkAttendanceSchema>;
+  trigger?: UseFormTrigger<MarkAttendanceSchema>;
+  setValue?: UseFormSetValue<MarkAttendanceSchema>;
+  canMark?: boolean;
 }

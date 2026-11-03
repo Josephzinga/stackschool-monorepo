@@ -1,11 +1,18 @@
 'use client';
 
 import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-  VisibilityState,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  ColumnVisibilityState,
+  createFilteredRowModel,
+  createPaginatedRowModel,
+  createSortedRowModel,
+  metaHelper,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  tableFeatures,
+  useTable,
 } from '@tanstack/react-table';
 import { DataTablePagination } from '@/components/table/data-table-pagination';
 import AppDataTable from '@/components/table/app-data-table';
@@ -15,14 +22,28 @@ import { useEffect, useState } from 'react';
 import { useAttendanceUiState } from '@/components/lists/attendance/hooks/useAttendanceUiState';
 import { useAttendanceEvent } from '../hooks/useAttendanceEvent';
 import { useAttendanceData } from '../hooks/useAttendanceData';
-import {
-  MarkAttendanceFormType,
-  markAttendanceSchema,
-} from '@stackschool/shared';
+import { MarkAttendanceSchema } from '@stackschool/contracts';
 import { toast } from 'sonner';
 import { useDashboard } from '@/components/providers/dashboard-provider';
 import { useWindowSize } from 'react-use';
 import { useAttendanceStore } from '@/store/attendance';
+import { AppTableMeta } from '@/types/tanstack-table';
+import { AttendanceRow } from '@/types/attendance';
+import { getAttendanceColumns } from './columns';
+
+const features = tableFeatures({
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  filteredRowModel: createFilteredRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+  sortedRowModel: createSortedRowModel(),
+    tableMeta: metaHelper<AppTableMeta<AttendanceRow>>(),
+});
+
+export type AttendanceFeatures = typeof features;
 
 export function AttendanceTable() {
   const { me } = useDashboard();
@@ -36,8 +57,9 @@ export function AttendanceTable() {
     selectedClass,
     selectedSubject,
   } = useAttendanceEvent();
-  const { rows: data, getColumns, meta, isLoading } = useAttendanceData();
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const { rows: data, meta, isLoading } = useAttendanceData();
+  const [columnVisibility, setColumnVisibility] =
+    useState<ColumnVisibilityState>({});
   const setBulkMarkCallback = useAttendanceStore(
     (state) => state.setBulkMarkCallback,
   );
@@ -51,8 +73,8 @@ export function AttendanceTable() {
     reset,
     watch,
     formState: { dirtyFields, errors, isValid },
-  } = useForm<MarkAttendanceFormType>({
-    resolver: zodResolver(markAttendanceSchema),
+  } = useForm<MarkAttendanceSchema>({
+    resolver: zodResolver(MarkAttendanceSchema),
   });
   useEffect(() => {
     reset({
@@ -117,12 +139,10 @@ export function AttendanceTable() {
     setBulkMarkCallback,
   ]); */
 
-  const table = useReactTable({
+  const table = useTable({
     data,
-    columns: getColumns(),
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    features,
+    columns: getAttendanceColumns(mode),
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
@@ -139,7 +159,7 @@ export function AttendanceTable() {
           : true,
       onCellChange: async (rowIndex, data) => {
         setValue(`attendances.${rowIndex}.id`, data.id);
-        setValue(`attendances.${rowIndex}.userType`, data.userType);
+        setValue(`attendances.${rowIndex}.userType`, data?.userType);
         setValue(`attendances.${rowIndex}.date`, date);
 
         if (isAutoSave) {
@@ -148,7 +168,7 @@ export function AttendanceTable() {
           });
         }
       },
-    },
+    } as AppTableMeta<AttendanceRow>,
     state: {
       pagination,
       rowSelection,
@@ -166,7 +186,7 @@ export function AttendanceTable() {
     }
   }, [width]);
 
-  function onSubmit(data: MarkAttendanceFormType) {
+  function onSubmit(data: MarkAttendanceSchema) {
     const changedAttendances = data.attendances.filter((att, index) => {
       const isStatusDirty = dirtyFields.attendances?.[index]?.status;
       return isStatusDirty && (att.status !== null || att.status !== undefined);
@@ -191,7 +211,7 @@ export function AttendanceTable() {
       <div className="rounded-md border">
         <AppDataTable
           table={table}
-          columns={getColumns()}
+          columns={getAttendanceColumns(mode)}
           isLoading={isLoading}
         />
       </div>

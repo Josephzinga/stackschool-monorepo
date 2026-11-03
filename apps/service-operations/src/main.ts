@@ -5,6 +5,7 @@ import { GatewayGuard, RABBITMQ_QUEUES } from '@stackschool/messaging';
 import { OperationsModule } from './operations.module';
 import { ConfigService } from '@nestjs/config';
 
+const PORT = 4004;
 async function bootstrap() {
   const app = await NestFactory.create(OperationsModule);
   const config = app.get(ConfigService);
@@ -18,8 +19,8 @@ async function bootstrap() {
   });
   app.useGlobalGuards(new GatewayGuard());
   await app.startAllMicroservices();
-  await app.listen(4004, () => {
-    console.log('Service is running on port 4002');
+  await app.listen(PORT, () => {
+    console.log(`Service is running on port ${PORT}`);
   });
 }
-bootstrap();
+void bootstrap();

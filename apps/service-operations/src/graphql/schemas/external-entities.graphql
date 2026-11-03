@@ -1,0 +1,25 @@
+type Teacher @key(fields: "id") {
+  id: ID!
+  attendances(date: DateTime): [AttendanceRecord]
+}
+
+type Student @key(fields: "id") {
+  id: ID!
+  attendances(date: DateTime): [AttendanceRecord]
+}
+
+type SchoolStats @key(fields: "id") {
+  id: ID!
+  attendance: AttendanceStats
+}
+
+union SchoolMember = Teacher | Student | Staff
+
+type Staff @key(fields: "id") {
+  id: ID!
+}
+
+type SchoolMembership @key(fields: "id userId") {
+  id: ID!
+  userId: ID!
+}

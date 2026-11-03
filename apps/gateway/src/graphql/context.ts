@@ -3,7 +3,10 @@ import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { DataLoaders } from '../modules/dataloader/dataloader.service';
 import { SchoolUserContract } from '@stackschool/contracts';
 import { Cache } from '@nestjs/cache-manager';
-import { safeValidateSchema } from '@stackschool/messaging';
+import {
+  safeValidateSchema,
+  SCHOOL_USER_CACHE_TTL,
+} from '@stackschool/messaging';
 
 import z from 'zod';
 import { MembershipService } from '../modules/membership/membership.service';
@@ -54,7 +57,6 @@ export async function createContext({
     const cachedKey = `school_user:${schoolId}:${user.id}`;
 
     const cached = await cacheManager.get<string>(cachedKey);
-    console.log('Cached: ', cached);
     if (cached) {
       schoolUser = JSON.parse(cached) as SchoolUserContract;
     } else {
@@ -66,7 +68,7 @@ export async function createContext({
         await cacheManager.set(
           cachedKey,
           JSON.stringify(schoolUser),
-          1000 * 60 * 60 * 5,
+          SCHOOL_USER_CACHE_TTL,
         );
     }
 

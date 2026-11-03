@@ -23,7 +23,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   const schoolId = currentSchool?.id;
   const { data, isPending, error, isError } = useGetDashboardContextQuery(
-    { input: schoolId || '' },
+    { schoolId: schoolId || '' },
     {
       enabled: !!schoolId,
       staleTime: 1000 * 60 * 5,

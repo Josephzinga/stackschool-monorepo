@@ -51,21 +51,22 @@ export class SchoolService {
   }
 
   async getSchoolStats(schoolId: string) {
-    const totalStudents = await this.prisma.student.count({
-      where: {
-        schoolUser: {
-          schoolId,
+    const [totalStudents, totalTeachers] = await Promise.all([
+      this.prisma.student.count({
+        where: {
+          schoolUser: {
+            schoolId,
+          },
         },
-      },
-    });
-
-    const totalTeachers = await this.prisma.teacher.count({
-      where: {
-        schoolUser: {
-          schoolId,
+      }),
+      this.prisma.teacher.count({
+        where: {
+          schoolUser: {
+            schoolId,
+          },
         },
-      },
-    });
+      }),
+    ]);
     return {
       id: schoolId,
       totalStudents,

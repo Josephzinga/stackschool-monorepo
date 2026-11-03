@@ -1,14 +1,14 @@
 'use client';
-import CalendarDisplay from '@/components/bg-calendar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { IconWrapper } from '@/components/animate-ui/icons/icon';
 import { MoreHorizontal } from 'lucide-react';
 import { LectureCard } from '@/components/lecture-card';
+import CalendarDisplay from '@/components/bg-calendar';
 
 export default function EventSection() {
   return (
-    <Card className="h-screen! lg:flex md:max-w-120 px-2 w-full xl:w-[30%]  mt-4 border">
+    <Card className="h-screen! lg:flex lg:max-w-100 w-full border">
       <div className="flex justify-center w-full items-center h-100 text-center text-lg">
         <CalendarDisplay />
       </div>
@@ -34,10 +34,3 @@ export default function EventSection() {
     </Card>
   );
 }
-/* <LectureCard
-          subject="Histoire"
-          classe="10ème B"
-          time="8:00 - 9:30"
-          title="Histoire de la guerre mondial"
-          chapter={4}
-        /> */

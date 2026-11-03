@@ -1,5 +1,5 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { School, SchoolStats } from '../../../graphql';
+import { SchoolStats } from '../../../graphql';
 import { StatsService } from './stats.service';
 
 @Resolver('SchoolStats')
@@ -9,7 +9,7 @@ export class StatsResolver {
   async resolveClassesOccupancy(
     @Parent() parent: SchoolStats,
   ): Promise<SchoolStats['classesOccupancy']> {
-    console.log('SchoolStats Resolver: ', parent);
+    console.log('school-stats Resolver: ', parent);
     const occupancy = await this.statsService.getClassesOccupancy(parent.id);
   }
 

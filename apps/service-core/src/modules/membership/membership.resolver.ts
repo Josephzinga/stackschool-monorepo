@@ -19,7 +19,6 @@ import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import type { DataLoaders } from '../dataloader/dataloader.service';
 import { UseGuards } from '@nestjs/common';
 import { Roles, RolesGuard, SchoolAccessGuard } from '@stackschool/messaging';
-import { PrismaService } from '../../prisma/prisma.service';
 
 @Resolver('SchoolMembership')
 @UseGuards(SchoolAccessGuard, RolesGuard)
@@ -27,7 +26,6 @@ export class MembershipResolver {
   constructor(
     private readonly memberService: MembershipService,
     private readonly schoolService: SchoolService,
-    private readonly prisma: PrismaService,
   ) {}
 
   @Roles('ADMIN', 'STAFF', 'TEACHER')
@@ -76,42 +74,6 @@ export class MembershipResolver {
     @Parent() parent: SchoolMembership,
     @Loaders() loaders: DataLoaders,
   ) {
-    switch (parent.role) {
-      case 'STUDENT': {
-        const student = await loaders.studentBySchoolUserLoader.load(parent.id);
-        return {
-          ...student,
-          __typename: 'Student',
-        };
-      }
-      case 'TEACHER': {
-        const teacher = await loaders.teacherBySchoolUserLoader.load(parent.id);
-        if (!teacher) return null;
-
-        return {
-          ...teacher,
-          __typename: 'Teacher',
-        };
-      }
-      case 'STAFF': {
-        const staff = await loaders.staffBySchoolUserLoader.load(parent.id);
-        if (!staff) return null;
-        return {
-          ...staff,
-          __typename: 'Staff',
-        };
-      }
-
-      case 'PARENT': {
-        const parents = await loaders.parentBySchoolUserLoader.load(parent.id);
-        return {
-          ...parents,
-          __typename: 'Parent',
-        };
-      }
-      default: {
-        return null;
-      }
-    }
+    return this.memberService.getSchoolMember(parent, loaders);
   }
 }

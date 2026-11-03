@@ -34,14 +34,15 @@ export class NotificationsGateway
     }
     client.data.userId = user.id;
     await client.join(`user:${user.id}`);
-    const schoolUsers = await this.memberService.findManyByUserId(user.id);
+    const schoolUsers = []; // await this.memberService.findManyByUserId(user.id);
+    if (schoolUsers && schoolUsers.length === 0) return;
     for (const su of schoolUsers) {
       await client.join(`schoolUser:${su.id}`);
       await client.join(`school:${su.schoolId}`);
     }
 
     this.logger.log(
-      `Connecté: user=${user.id}, écoles=[${schoolUsers.map((s) => s.schoolId).join(', ')}]`,
+      `Connecté: user=${user.id}, écoles=[${schoolUsers.map((s) => s.id).join(', ')}]`,
     );
   }
 

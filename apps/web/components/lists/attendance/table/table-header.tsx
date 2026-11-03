@@ -2,13 +2,12 @@
 
 import { AppCombobox } from '@/components/lists/attendance/app-combobox';
 import { ScannerDialog } from '@/components/lists/attendance/QR-scan';
-import { CalendarIcon, LucideQrCode, QrCode, Save, Search } from 'lucide-react';
-import { fr } from 'react-day-picker/locale';
+import { CalendarIcon, QrCode, Save, Search } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/animate-ui/components/radix/popover';
+} from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { ModeButtonGroup } from '@/components/lists/attendance/mode-group-button';
@@ -19,11 +18,9 @@ import { QRCodeDialog } from '@/components/lists/attendance/employee-QR-generato
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { format } from 'date-fns';
 import { useDashboard } from '@/components/providers/dashboard-provider';
 import { useWindowSize } from 'react-use';
 import { cn } from '@/lib/utils';
-
 import { BulkMarking } from '@/components/lists/attendance/table/bulk-marking';
 
 export function AttendanceTableHeader() {
@@ -85,37 +82,43 @@ export function AttendanceTableHeader() {
           </h1>
           <div className="h-6 w-px bg-border hidden sm:block" />
           <span className="text-sm text-muted-foreground hidden sm:block">
-            {mode === 'STUDENT' ? 'Élèves' : mode === 'TEACHER' ? 'Enseignants' : 'Personnel'}
+            {mode === 'STUDENT'
+              ? 'Élèves'
+              : mode === 'TEACHER'
+                ? 'Enseignants'
+                : 'Personnel'}
           </span>
         </div>
 
         <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="gap-2 border-dashed hover:border-primary/50 transition-colors"
-            >
-              <CalendarIcon className="h-4 w-4 text-primary" />
-              <span className="capitalize">{formattedDate}</span>
-            </Button>
-          </PopoverTrigger>
+          <PopoverTrigger
+            render={
+              <Button
+                variant="outline"
+                className="gap-2 border-dashed hover:border-primary/50 transition-colors"
+              >
+                <CalendarIcon className="h-4 w-4 text-primary" />
+                <span className="capitalize">{formattedDate}</span>
+              </Button>
+            }
+          ></PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={date ? new Date(date) : undefined}
-                captionLayout="label"
-                weekStartsOn={1}
-                startMonth={new Date(1990, 0)}
-                onSelect={(date) => {
-                  if (date) setDate(new Date(format(date, 'yyyy-MM-dd')));
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        {/* Tabs button switch */}
-        <div className="flex justify-between items-center">
-          <ModeButtonGroup activeMode={mode} onModeChange={handleSwitchMode} />
+            <Calendar
+              mode="single"
+              selected={date ? new Date(date) : undefined}
+              captionLayout="label"
+              weekStartsOn={1}
+              startMonth={new Date(1990, 0)}
+              onSelect={(date) => {
+                if (date) setDate(new Date(date));
+              }}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      {/* Tabs button switch */}
+      <div className="flex justify-between items-center">
+        <ModeButtonGroup activeMode={mode} onModeChange={handleSwitchMode} />
 
         <div className="flex items-center gap-3 self-end sm:self-auto">
           <Label
@@ -140,7 +143,7 @@ export function AttendanceTableHeader() {
         <div className="relative rounded-xl border bg-card/50 p-3 shadow-sm backdrop-blur-sm">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             {/* Filtres */}
-            <div className="flex-1">
+            <div className="flex-1 bg-red-400">
               {mode === 'STUDENT' ? (
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <AppCombobox

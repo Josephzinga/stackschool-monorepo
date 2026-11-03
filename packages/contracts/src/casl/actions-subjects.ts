@@ -4,7 +4,12 @@
 // only service-auth has the Prisma client that generates these enums.
 // Update this file by hand whenever you add a value to the Prisma enums.
 
-import { PermissionAction, PermissionSubject } from '../core';
+import {
+  PermissionAction,
+  PermissionSubject,
+  SchoolUserContract,
+} from '../core';
+import { SchoolUserForAbility } from './define-ability.ts';
 
 export type CaslPermissionAction =
   | 'manage' // CASL wildcard: all actions on the subject
@@ -49,12 +54,22 @@ export function toCaslAction(
   return prismaAction.toLowerCase() as CaslPermissionAction;
 }
 
-export function toCaslSubject(
+export function toCaslSubject<T>(
   prismaSubject: PermissionSubject,
-): CaslPermissionSubject {
+): T | CaslPermissionSubject {
   return prismaSubject
     .toLowerCase()
     .split('_')
     .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join('') as CaslPermissionSubject;
+    .join('') as T | CaslPermissionSubject;
+}
+
+export function toSchoolUserAbility(
+  schoolUser: SchoolUserContract,
+): SchoolUserForAbility {
+  return {
+    ...schoolUser,
+    schoolId: schoolUser.schoolId!,
+    grantedPermissions: schoolUser.permissions ?? [],
+  };
 }

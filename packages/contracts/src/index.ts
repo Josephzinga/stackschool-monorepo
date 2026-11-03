@@ -15,3 +15,4 @@ export * from './constant/index.ts';
 export * from './casl/actions-subjects.ts';
 export * from './casl/define-ability.ts';
 export * from './types/casl.ts';
+export * from './operations';

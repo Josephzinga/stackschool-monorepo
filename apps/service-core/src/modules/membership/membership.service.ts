@@ -6,17 +6,20 @@ import {
   AUTH_PATTERNS,
   AUTH_SERVICE,
   CoreRpcException,
+  FindManyMemberInput,
+  FindManyMemberResponse,
   type HandleRoleDataInput,
-  parentChildDraft,
+  ParentChildDraft,
   ProfileContract,
   SchoolUserContract,
-  teacherAssignmentDraft,
+  TeacherAssignmentDraft,
 } from '@stackschool/messaging';
 import { Prisma } from '../../prisma/db/generated/client';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import { z } from 'zod';
 import { GetSchoolMembershipsInput, SchoolMembership } from '../../graphql';
+import type { DataLoaders } from '../dataloader/dataloader.service';
 
 @Injectable()
 export class MembershipService {
@@ -25,6 +28,46 @@ export class MembershipService {
     @Inject(AUTH_SERVICE) private readonly authClient: ClientProxy,
     @Inject(ACADEMIC_SERVICE) private readonly academicClient: ClientProxy,
   ) {}
+
+  async getSchoolMember(parent: SchoolMembership, loaders: DataLoaders) {
+    switch (parent.role) {
+      case 'STUDENT': {
+        const student = await loaders.studentBySchoolUserLoader.load(parent.id);
+        return {
+          ...student,
+          __typename: 'Student',
+        };
+      }
+      case 'TEACHER': {
+        const teacher = await loaders.teacherBySchoolUserLoader.load(parent.id);
+        if (!teacher) return null;
+
+        return {
+          ...teacher,
+          __typename: 'Teacher',
+        };
+      }
+      case 'STAFF': {
+        const staff = await loaders.staffBySchoolUserLoader.load(parent.id);
+        if (!staff) return null;
+        return {
+          ...staff,
+          __typename: 'Staff',
+        };
+      }
+
+      case 'PARENT': {
+        const parents = await loaders.parentBySchoolUserLoader.load(parent.id);
+        return {
+          ...parents,
+          __typename: 'Parent',
+        };
+      }
+      default: {
+        return null;
+      }
+    }
+  }
 
   async findSchool(
     dto: GetSchoolMembershipsInput,
@@ -95,16 +138,50 @@ export class MembershipService {
       ...schoolUser,
       parent: schoolUser.Parent,
       permissions: schoolUser.permissions.map((perm) => perm.permission),
-    };
+    } as SchoolUserContract;
   }
-  async findMany(schoolUserIds: string[]) {
-    return this.prisma.schoolUser.findMany({
+  async findMany(dto: FindManyMemberInput): Promise<FindManyMemberResponse> {
+    const { ids, schoolId, permissions, role } = dto;
+    const schoolUsers = await this.prisma.schoolUser.findMany({
       where: {
-        id: {
-          in: [...schoolUserIds],
+        schoolId,
+        ...(ids &&
+          ids.length > 0 && {
+            id: {
+              in: [...ids],
+            },
+          }),
+        ...(role && {
+          role,
+        }),
+      },
+      include: {
+        permissions: {
+          select: {
+            permission: true,
+          },
         },
       },
     });
+    return {
+      members: schoolUsers
+        .filter((su) => {
+          if (permissions && permissions.length > 0) {
+            for (const sup of su.permissions) {
+              return permissions.some(
+                (p) =>
+                  p.action === sup.permission.action &&
+                  p.subject === sup.permission.subject,
+              );
+            }
+          }
+          return true;
+        })
+        .map((su) => ({
+          ...su,
+          permissions: su.permissions.map((perm) => perm.permission),
+        })),
+    };
   }
 
   async findOne(id: string) {
@@ -147,7 +224,7 @@ export class MembershipService {
 
     // Matérialise les assignations dans academic — SEULEMENT maintenant
     const assignments = z
-      .array(teacherAssignmentDraft)
+      .array(TeacherAssignmentDraft)
       .parse(teacher.pendingAssignments ?? []);
     if (assignments.length > 0) {
       this.academicClient.send<void>(
@@ -185,7 +262,7 @@ export class MembershipService {
     switch (roleData.role) {
       case 'TEACHER': {
         const assignments = z
-          .array(teacherAssignmentDraft)
+          .array(TeacherAssignmentDraft)
           .parse(roleData.teacher.assignments ?? []);
 
         await this.prisma.teacher.upsert({
@@ -232,7 +309,7 @@ export class MembershipService {
 
       case 'PARENT': {
         const children = z
-          .array(parentChildDraft)
+          .array(ParentChildDraft)
           .parse(roleData.parent.children ?? []);
 
         const parent = await this.prisma.parent.create({
@@ -253,6 +330,7 @@ export class MembershipService {
                 parentId: parent.id,
                 studentId: child.studentId,
                 relationType: child.relationType,
+                schoolId,
               },
             });
           }

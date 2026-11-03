@@ -42,7 +42,6 @@ import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UserService,
   ) {}
 
   @Post('register')
@@ -66,6 +65,7 @@ export class AuthController {
       });
     });
   }
+
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')

@@ -1,13 +1,12 @@
-// components/StatusBadgeGroup.tsx
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Check, Clock, LucideProps, X, type LucideIcon } from 'lucide-react';
-import { AttendanceStatusEnum } from '@stackschool/shared';
+import { Check, Clock, type LucideIcon, X } from 'lucide-react';
+import { AttendanceStatus } from '@stackschool/contracts';
 
 interface StatusBadgeGroupProps {
-  value: AttendanceStatusEnum | null;
-  onChange: (status: AttendanceStatusEnum) => void;
+  value: AttendanceStatus | null;
+  onChange: (status: AttendanceStatus) => void;
   size?: 'sm' | 'md';
 }
 interface Style {
@@ -18,8 +17,11 @@ interface Style {
   darkActiveClass: string;
   darkInactiveClass: string;
 }
-const statusConfig: Record<string, Style> = {
-  [AttendanceStatusEnum.PRESENT]: {
+
+type Status = 'PRESENT' | 'ABSENT' | 'LATE';
+
+const statusConfig: Record<Status, Style> = {
+  PRESENT: {
     label: 'Présent',
     icon: Check,
     // Light mode
@@ -33,7 +35,7 @@ const statusConfig: Record<string, Style> = {
     darkInactiveClass:
       'dark:text-green-400 dark:border-green-700 dark:hover:bg-green-950/50 dark:hover:border-green-600',
   },
-  [AttendanceStatusEnum.ABSENT]: {
+  ABSENT: {
     label: 'Absent',
     icon: X,
     activeClass:
@@ -45,7 +47,7 @@ const statusConfig: Record<string, Style> = {
     darkInactiveClass:
       'dark:text-red-400 dark:border-red-700 dark:hover:bg-red-950/50 dark:hover:border-red-600',
   },
-  [AttendanceStatusEnum.LATE]: {
+  LATE: {
     label: 'Retard',
     icon: Clock,
     activeClass:
@@ -80,7 +82,7 @@ export function StatusBadgeGroup({
       role="group"
       aria-label="Statut de présence"
     >
-      {(Object.keys(statusConfig) as AttendanceStatusEnum[]).map((status) => {
+      {(Object.keys(statusConfig) as Status[]).map((status) => {
         const config = statusConfig[status];
         const Icon = config.icon;
         const isActive = value === status;
@@ -105,12 +107,14 @@ export function StatusBadgeGroup({
                   ),
             )}
           >
-            <Icon
-              className={cn(
-                iconSizes[size],
-                isActive ? 'stroke-[2.5px]' : 'stroke-2',
-              )}
-            />
+            {Icon && (
+              <Icon
+                className={cn(
+                  iconSizes[size],
+                  isActive ? 'stroke-[2.5px]' : 'stroke-2',
+                )}
+              />
+            )}
             {config.label}
           </button>
         );

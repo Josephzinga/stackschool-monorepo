@@ -6,9 +6,9 @@ mutation MarkAttendance($input: [MarkAttendanceInput!]) {
     status
     recordedBy {
       id
-      profile {
-        firstname
-        lastname
+      schoolProfile {
+        firstName
+        lastName
       }
     }
     member {
@@ -17,16 +17,26 @@ mutation MarkAttendance($input: [MarkAttendanceInput!]) {
         schoolClass {
           name
         }
-        profile {
-          firstname
-          lastname
+        schoolProfile {
+          firstName
+          lastName
+        }
+      }
+      ... on Teacher {
+        id
+        schoolProfile {
+          firstName
+          lastName
         }
       }
     }
   }
 }
 
-query GetStudentForAttendance($input: GetSchoolStudentsInput!, $date: Date) {
+query GetStudentForAttendance(
+  $input: GetSchoolStudentsInput!
+  $date: DateTime
+) {
   getSchoolStudents(input: $input) {
     meta {
       limit
@@ -35,13 +45,10 @@ query GetStudentForAttendance($input: GetSchoolStudentsInput!, $date: Date) {
     }
     data {
       id
-      user {
-        email
-        profile {
-          firstname
-          lastname
-          photo
-        }
+      schoolProfile {
+        firstName
+        lastName
+        avatarUrl
       }
       schoolClass {
         id
@@ -56,7 +63,10 @@ query GetStudentForAttendance($input: GetSchoolStudentsInput!, $date: Date) {
     }
   }
 }
-query GetTeacherForAttendance($input: GetSchoolTeachersInput!, $date: Date) {
+query GetTeacherForAttendance(
+  $input: GetSchoolTeachersInput!
+  $date: DateTime
+) {
   getSchoolTeachers(input: $input) {
     meta {
       total
@@ -65,17 +75,16 @@ query GetTeacherForAttendance($input: GetSchoolTeachersInput!, $date: Date) {
     }
     data {
       id
-      user {
-        profile {
-          firstname
-          lastname
-        }
+      schoolProfile {
+        firstName
+        lastName
+        avatarUrl
       }
       attendances(date: $date) {
         status
       }
       assignments {
-        classSubjects {
+        classSubject {
           subject {
             id
             name

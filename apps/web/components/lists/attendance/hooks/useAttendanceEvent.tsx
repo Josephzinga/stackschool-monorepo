@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 import { useAttendanceUiState } from '@/components/lists/attendance/hooks/useAttendanceUiState';
 import type { AttendanceMode } from '@/types/attendance';
+import { AttendanceRow } from '@/types/attendance';
 import { useQueryClient } from '@tanstack/react-query';
-import { Table, Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import {
   type AttendanceStatus,
   type GetStudentForAttendanceQuery,
@@ -11,19 +12,14 @@ import {
   useMarkAttendanceMutation,
 } from '@stackschool/ui';
 import {
+  parseAsInteger,
   parseAsString,
   parseAsStringEnum,
   useQueryState,
   useQueryStates,
-  parseAsInteger,
 } from 'nuqs';
-import {
-  hasPermission,
-  type MarkAttendanceFormType,
-} from '@stackschool/shared';
-import { CheckedState } from '@radix-ui/react-checkbox';
+import { type MarkAttendanceFormType } from '@stackschool/contracts';
 import { toast } from 'sonner';
-import { AttendanceRow } from '@/types/attendance';
 import { useDashboard } from '@/components/providers/dashboard-provider';
 
 export function useAttendanceEvent() {
@@ -96,7 +92,7 @@ export function useAttendanceEvent() {
                 const updateStudents = oldData.getSchoolStudents.data?.map(
                   (student) => {
                     const updateAttendance = Array.isArray(variables.input)
-                      ? variables.input.find((att) => att.id === student.id)
+                      ? variables.input?.find((att) => att.id === student.id)
                       : null;
                     if (updateAttendance) {
                       return {
@@ -181,18 +177,6 @@ export function useAttendanceEvent() {
   const handleSwitchMode = useCallback(
     async (mode: AttendanceMode) => {
       if (me?.schoolContext?.role === 'TEACHER') {
-        if (
-          mode === 'TEACHER' &&
-          !hasPermission(
-            me.schoolContext.permissions?.map((perm) => perm?.code!)!,
-            ['MARK_TEACHER_ATTENDANCE'],
-          )
-        ) {
-          toast.warning(`Permissions non accorder. `);
-          return;
-        }
-      } else {
-        setMode(mode);
       }
 
       if (mode !== 'STUDENT') {

@@ -20,6 +20,7 @@ import {
   generateUsername,
   mapCoreError,
   sendRmqRequest,
+  StudentContract,
 } from '@stackschool/messaging';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -30,6 +31,14 @@ export class StudentService {
     @Inject(AUTH_SERVICE) private readonly authClient: ClientProxy,
     @Inject(ACADEMIC_SERVICE) private readonly academicClient: ClientProxy,
   ) {}
+
+  async findOne(
+    where: Prisma.StudentWhereInput,
+  ): Promise<StudentContract | null> {
+    return this.prisma.student.findFirst({
+      where,
+    });
+  }
 
   async findAll(
     input: GetSchoolStudentsInput,

@@ -30,3 +30,20 @@ enum ResourceMode {
   TEACHER
   CLASS
 }
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+enum SchoolRole {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+  STAFF
+}

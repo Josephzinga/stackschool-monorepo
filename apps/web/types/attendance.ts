@@ -1,8 +1,12 @@
-import { AttendanceStatus, ClassSubject, Profile } from '@stackschool/ui';
+import { AttendanceStatus, ClassSubject } from '@stackschool/ui';
 
 export type AttendanceMode = 'STUDENT' | 'TEACHER' | 'STAFF';
 
-export type AttendanceProfile = Omit<Profile, 'id' | 'gender' | 'address'>;
+export type AttendanceProfile = {
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string | null;
+};
 
 export type ClassOption = {
   id: string;
@@ -43,4 +47,5 @@ export type AttendanceRow = {
   role?: string;
   assignments?: ClassSubject;
   userType: AttendanceMode;
+  
 };

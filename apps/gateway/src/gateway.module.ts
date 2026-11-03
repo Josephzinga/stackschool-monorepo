@@ -20,6 +20,8 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { SessionModule } from './modules/session/session.module';
 import { RabbitMQClientsModule } from './modules/rabbitmq/rabbitmq-clients.module';
 import { AppGraphqlModule } from './modules/graphql/graphql.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthenticatedGuard } from './modules/auth/guards/authenticated.guard';
 
 @Module({
   imports: [
@@ -63,7 +65,11 @@ import { AppGraphqlModule } from './modules/graphql/graphql.module';
     }),
     NotificationsModule,
   ],
-  providers: [MembershipService, SchoolService],
+  providers: [
+    MembershipService,
+    SchoolService,
+    { provide: APP_GUARD, useClass: AuthenticatedGuard },
+  ],
   exports: [CacheModule, MembershipModule],
 })
 export class GatewayModule {}

@@ -41,7 +41,6 @@ import { TimeGridHeader } from '@/components/lists/lesson/time-grid-header';
 import themesPlugin from '@fullcalendar/react/themes/monarch';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-
 import '@/app/styles/calendar.css';
 import '@fullcalendar/react/skeleton.css'; // ALWAYS NEED SKELETON
 import '@fullcalendar/react/themes/monarch/theme.css'; // YOUR THEME

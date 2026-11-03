@@ -31,7 +31,7 @@ export class NotificationsService {
   sendEnrollmentCompleted(payload: NotificationPayload) {
     console.log('send completeProfile', payload);
     if (!payload.schoolId)
-      throw new BadRequestException('School Id must be provided');
+      throw new BadRequestException('School id must be provided');
     this.gateway.notifySchoolUser(
       payload.schoolUserId,
       payload?.schoolId,

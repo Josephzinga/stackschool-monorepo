@@ -5,4 +5,5 @@ export const ACADEMIC_PATTERNS = {
     'academic.find_teacher_ids_by_class_subject',
   FIND_LESSONS_BY_TEACHER_IDS: 'academic.find_lessons_by_teacher_ids',
   GET_LESSONS_BY_CLASS_RESOURCE: 'academic.get_lessons_by_class_resource',
+  FIND_CLASS_SUBJECT: 'academic.find_class_subject',
 } as const;

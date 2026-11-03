@@ -32,9 +32,9 @@ query GetAdminDashboardStats($schoolId: ID!) {
   }
 }
 
-query GetDashboardContext($input: ID!) {
+query GetDashboardContext($schoolId: ID!) {
   me {
-    schoolContext(schoolId: $input) {
+    schoolContext(schoolId: $schoolId) {
       id
       role
       teacher {

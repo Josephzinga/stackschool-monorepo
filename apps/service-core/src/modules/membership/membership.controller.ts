@@ -6,6 +6,7 @@ import {
   FindBySchoolIdAndUserIdInput,
   FindManyByUserIdInput,
   FindManyMemberInput,
+  FindManyMemberResponse,
   SchoolUserContract,
   ZodValidationPipe,
 } from '@stackschool/messaging';
@@ -13,23 +14,14 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Controller()
 export class MembershipController {
-  constructor(
-    private readonly membershipService: MembershipService,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly membershipService: MembershipService) {}
 
   @MessagePattern(CORE_PATTERNS.MEMBERSHIP.FIND_MANY)
   async rpcFindManyMember(
     @Payload(new ZodValidationPipe(FindManyMemberInput))
-    data: FindManyMemberInput,
-  ) {
-    const ids = data.ids;
-    return this.membershipService.findMany(ids);
-  }
-
-  @MessagePattern(CORE_PATTERNS.MEMBERSHIP.FIND_ADMINS)
-  async getAdmins(@Payload() dto: any) {
-    const admins = await this.membershipService.findAdmins(dto);
+    dto: FindManyMemberInput,
+  ): Promise<FindManyMemberResponse> {
+    return this.membershipService.findMany(dto);
   }
 
   @MessagePattern(CORE_PATTERNS.MEMBERSHIP.FIND_ONE)
@@ -56,6 +48,7 @@ export class MembershipController {
     @Payload(new ZodValidationPipe(FindManyByUserIdInput))
     data: FindManyByUserIdInput,
   ) {
+    console.log('FindByUserId: ', data);
     const members = await this.membershipService.findManyByUserId(data.userIds);
     return {
       members,

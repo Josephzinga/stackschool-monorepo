@@ -42,7 +42,6 @@ export class UserService {
     selfCheck = true,
     userId,
   }: ValidateUserFieldInput) {
-    console.log('ValidateUserField: ', phoneNumber, email, userId, selfCheck);
     if (email) {
       const existingUser = await this.prisma.user.findFirst({
         where: {

@@ -8,6 +8,7 @@ import {
   CoreRpcException,
   HandleRoleDataInput,
   HandleSchoolDataInput,
+  ParentChildDraft,
   ProfileContract,
   TeacherAssignmentDraft,
 } from '@stackschool/messaging';
@@ -104,7 +105,7 @@ export class EnrolmentService {
       if (!existingSchool)
         throw new CoreRpcException('SCHOOL_NOT_FOUND', 'Ecole introuvable.');
 
-      await this.prisma.tempSchoolUser.upsert({
+      const temp = await this.prisma.tempSchoolUser.upsert({
         where: {
           userId_schoolId: { userId, schoolId: existingSchool.id },
         },
@@ -120,7 +121,7 @@ export class EnrolmentService {
         ok: true,
         message: "Jointure de l'école réussie avec succès",
         data: {
-          schoolId: existingSchool.id,
+          ...temp,
         },
       };
     }
@@ -177,7 +178,7 @@ export class EnrolmentService {
           .array(TeacherAssignmentDraft)
           .parse(roleData.teacher.assignments ?? []);
 
-        await this.prisma.teacher.upsert({
+        const teacher = await this.prisma.teacher.upsert({
           where: { tempSchoolUserId: tempSchoolUser.id },
           create: {
             tempSchoolUserId: tempSchoolUser.id,
@@ -192,17 +193,22 @@ export class EnrolmentService {
             department: roleData.teacher.department,
             pendingAssignments: assignments,
           },
+          include: {
+            tempSchoolUser: true,
+          },
         });
         return {
           ok: true,
           message: 'Professeur crée avec succès.',
-          data: {},
+          data: {
+            ...teacher,
+          },
         };
       }
 
       case 'STUDENT': {
         const s = roleData.student;
-        await this.prisma.student.upsert({
+        const student = await this.prisma.student.upsert({
           where: {
             tempSchoolUserId: tempSchoolUser.id,
           },
@@ -218,19 +224,22 @@ export class EnrolmentService {
             classId: s.classId,
           },
           update: {},
+          include: {
+            tempSchoolUser: true,
+          },
         });
         return {
           ok: true,
           message: 'Donné élève sauvegarder avec succès.',
           data: {
-            tempSchoolUserId: tempSchoolUser.id,
+            ...student,
           },
         };
       }
 
       case 'PARENT': {
         const children = z
-          .array(parentChildDraft)
+          .array(ParentChildDraft)
           .parse(roleData.parent.children ?? []);
 
         const parent = await this.prisma.parent.create({
@@ -261,7 +270,7 @@ export class EnrolmentService {
       }
 
       case 'STAFF': {
-        await this.prisma.staff.upsert({
+        const staff = await this.prisma.staff.upsert({
           where: {
             tempSchoolUserId: tempSchoolUser.id,
           },
@@ -277,13 +286,16 @@ export class EnrolmentService {
             hireDate: roleData.staff.hireDate,
             department: roleData.staff.department,
           },
+          include: {
+            tempSchoolUser: true,
+          },
         });
 
         return {
           ok: true,
           message: 'Staff créé un succès.',
           data: {
-            tempSchoolUserId: tempSchoolUser.id,
+            ...staff,
           },
         };
       }

@@ -17,6 +17,7 @@ import {
   AUTH_SERVICE,
   CORE_PATTERNS,
   CORE_SERVICE,
+  FindManyMemberResponse,
   OPERATIONS_SERVICE,
   ProfileFormType,
   sendRmqRequest,
@@ -167,24 +168,32 @@ export class CompleteProfileService {
         );
     }
 
-    const admins = await sendRmqRequest(
+    const { members } = await sendRmqRequest<FindManyMemberResponse>(
       this.coreClient,
-      CORE_PATTERNS.MEMBERSHIP.FIND_ADMINS,
+      CORE_PATTERNS.MEMBERSHIP.FIND_MANY,
       {
         schoolId: schoolResult.data?.schoolId,
-        requirePermissions: [{ action: 'MANAGE', subject: 'ENROLLMENT' }],
+        role: 'ADMIN',
+        requirePermissions: [
+          { action: 'MANAGE', subject: 'ENROLLMENT' },
+          { action: 'CONFIRM', subject: 'ENROLLMENT' },
+        ],
       },
     );
-    const payload: NotificationPayload = {
-      schoolUserId: '',
-      schoolId: schoolResult.data?.schoolId,
-      title: 'Confirmé',
-      message: "Un utilisateur s'est inscriptions votre établissement.",
-      type: 'ENROLLMENT_COMPLETED',
-      data: roleResult,
-    };
-
-    this.notificationsService.sendEnrollmentCompleted(payload);
+    console.log('Member', members);
+    if (members.length > 0) {
+      for (const member of members) {
+        const payload: NotificationPayload = {
+          schoolUserId: member.id,
+          schoolId: schoolResult.data?.schoolId,
+          title: 'Confirmé',
+          message: "Un utilisateur, c'est inscrit dans votre établissement.",
+          type: 'ENROLLMENT_COMPLETED',
+          data: roleResult,
+        };
+        this.notificationsService.sendEnrollmentCompleted(payload);
+      }
+    }
 
     await this.cacheManager.del(cachedKey);
 

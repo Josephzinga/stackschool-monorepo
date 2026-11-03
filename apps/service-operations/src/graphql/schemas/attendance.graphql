@@ -1,8 +1,5 @@
-# Attendance Stats
-extend type SchoolStats @key(fields: "id") {
-  id: ID!
-  attendance: AttendanceStats
-}
+scalar Date
+scalar DateTime
 
 type AttendanceStats {
   rate: Float!
@@ -13,7 +10,7 @@ type AttendanceStats {
   history: [DailyAttendance!]
 }
 type DailyAttendance {
-  date: String!
+  date: DateTime!
   rate: Float!
   present: Int!
   absent: Int!
@@ -24,7 +21,7 @@ input MarkAttendanceInput {
   id: String!
   classId: String
   status: AttendanceStatus!
-  date: Date!
+  date: DateTime!
   userType: SchoolRole!
   isSubjectMode: Boolean! = false
   subjectId: String
@@ -33,7 +30,7 @@ input MarkAttendanceInput {
 input MarkEmployeeAttendanceInput {
   schoolUserId: String!
   status: AttendanceStatus!
-  date: Date
+  date: DateTime
 }
 
 input GetTeacherForAttendanceInput {
@@ -42,7 +39,7 @@ input GetTeacherForAttendanceInput {
   page: Int! = 0
   limit: Int! = 10
 
-  attendanceDate: Date
+  attendanceDate: DateTime
 }
 
 input GenerateSessionInput {
@@ -57,12 +54,11 @@ type AttendanceSessionPayload {
   expiresAt: DateTime!
 }
 
-type AttendanceRecord {
-  id: String
-  member: Member
+type AttendanceRecord @key(fields: "id recordedById") {
+  id: ID!
   status: AttendanceStatus
   date: DateTime
   checkInTime: DateTime
-  recordedBy: User
+  recordedById: ID!
   type: AttendanceType
 }

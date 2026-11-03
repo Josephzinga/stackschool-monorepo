@@ -1,42 +1,51 @@
 'use client';
-import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const SocketContext = createContext<Socket | null>(null);
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const socketRef = useRef<Socket | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null); // 👈 AJOUT
 
   useEffect(() => {
-    socketRef.current = io(`${API_URL}/notifications`, {
+    const s = io(`${API_URL}/notifications`, {
       withCredentials: true,
       transports: ['websocket'],
     });
-    const socket = socketRef.current;
-    socket.on('connect', () => {
-      console.log('✅ Socket connecté', socket.id);
+    socketRef.current = s;
+    setSocket(s); // 👈 Déclenche le re-render
+
+    s.on('connect', () => {
+      console.log('✅ Socket connecté', s.id);
     });
 
-    socket.on('connect_error', (err) => {
-      console.error('❌ Erreur de connexion socket:', err.message);
+    s.on('connect_error', (err) => {
+      console.error('❌ Erreur de connexion socket :', err.message);
     });
 
-    socket.on('disconnect', (reason) => {
+    s.on('disconnect', (reason) => {
       console.log('🔌 Déconnecté:', reason);
     });
 
     return () => {
-      socket.disconnect();
+      s.disconnect();
+      socketRef.current = null;
+      setSocket(null);
     };
   }, []);
 
   return (
-    <SocketContext.Provider value={socketRef.current}>
-      {children}
-    </SocketContext.Provider>
+    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );
 };
-
 export const useSocket = () => {
   const context = useContext(SocketContext);
 

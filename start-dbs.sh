@@ -1,1 +1,1 @@
-docker compose up redis rabbitmq auth_db core_db academic_db -d
+docker compose up redis rabbitmq auth_db core_db academic_db operations_db -d

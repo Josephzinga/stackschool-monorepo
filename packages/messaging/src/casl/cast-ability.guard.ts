@@ -9,9 +9,9 @@ import {
 } from './require-ability.decorator.ts';
 import {
   defineAbilityFor,
-  SchoolUserForAbility,
   toCaslAction,
   toCaslSubject,
+  toSchoolUserAbility,
 } from '@stackschool/contracts';
 import { CoreRpcException } from '../errors';
 import { GraphQLContext } from '../types/graphql.contex.ts';
@@ -35,13 +35,7 @@ export class CaslAbilityGuard implements CanActivate {
         context.getHandler(),
       ) ?? 'every';
 
-    const schoolUser: SchoolUserForAbility = {
-      ...gqlCtx.schoolUser,
-      id: gqlCtx?.schoolUser?.id ?? '',
-      role: gqlCtx.schoolUser?.role!,
-      schoolId: gqlCtx.schoolId!,
-      grantedPermissions: gqlCtx.schoolUser?.permissions ?? [],
-    };
+    const schoolUser = toSchoolUserAbility(gqlCtx.schoolUser!);
 
     const ability = defineAbilityFor(schoolUser);
     const results = rules.map((r) =>

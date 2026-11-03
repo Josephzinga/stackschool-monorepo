@@ -26,6 +26,24 @@ export enum ResourceMode {
     CLASS = "CLASS"
 }
 
+export enum Day {
+    MONDAY = "MONDAY",
+    TUESDAY = "TUESDAY",
+    WEDNESDAY = "WEDNESDAY",
+    THURSDAY = "THURSDAY",
+    FRIDAY = "FRIDAY",
+    SATURDAY = "SATURDAY",
+    SUNDAY = "SUNDAY"
+}
+
+export enum SchoolRole {
+    ADMIN = "ADMIN",
+    TEACHER = "TEACHER",
+    STUDENT = "STUDENT",
+    PARENT = "PARENT",
+    STAFF = "STAFF"
+}
+
 export enum link__Purpose {
     SECURITY = "SECURITY",
     EXECUTION = "EXECUTION"

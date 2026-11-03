@@ -15,7 +15,7 @@ import {
 } from '../../graphql';
 import { SchoolService } from './school.service';
 import { BadRequestException } from '@nestjs/common';
-import { Public } from '@stackschool/messaging';
+import { Public, Roles } from '@stackschool/messaging';
 
 @Resolver('School')
 export class SchoolResolver {
@@ -26,32 +26,30 @@ export class SchoolResolver {
 
   @Query('school')
   async getSchool(@Args('schoolId') id: string): Promise<School | null> {
-    const school = await this.schoolService.findUnique({
+    return this.schoolService.findUnique({
       id,
     });
-    return school;
   }
 
   @Public()
   @Query('searchSchool')
-  async searchSchool(@Args('filter') dto: SchoolSearchInput) {
+  async searchSchool(
+    @Args('filter') dto: SchoolSearchInput,
+  ): Promise<School[]> {
     if (!dto?.searchTerm || dto.searchTerm.length < 2)
       throw new BadRequestException(
         'Le terme de recherche doit contenir au moins 2 caractères.',
       );
-    const school = this.schoolService.search(dto.searchTerm?.trim());
-    return school;
+    return this.schoolService.search(dto.searchTerm?.trim());
   }
 
   @ResolveField('settings')
-  async getSettings(@Parent() parent: School): Promise<SchoolSettings> {
-    const settings = await this.prisma.schoolSettings.findFirst({
+  async getSettings(@Parent() parent: School): Promise<SchoolSettings | null> {
+    return this.prisma.schoolSettings.findFirst({
       where: {
         schoolId: parent.id,
       },
     });
-
-    return settings!;
   }
 
   @ResolveField('teachers')
@@ -66,6 +64,7 @@ export class SchoolResolver {
     return teachers || [];
   }
 
+  @Roles('ADMIN')
   @ResolveField('stats')
   async getStats(@Parent() parent: School): Promise<School['stats'] | null> {
     const stats = await this.schoolService.getSchoolStats(parent.id);

@@ -13,7 +13,6 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import {
-  Subject,
   useGetClassesOptionsQuery,
   useGetSubjectsOptionsQuery,
 } from '@stackschool/ui';
@@ -38,10 +37,17 @@ export function TeacherFilters() {
     },
   });
   const classes = classesData?.getSchoolClasses.data;
-  const seenSubjects = new Map<string, Subject>();
+  const classItems = classes?.map((c) => ({
+    label: c.name,
+    value: c.id,
+  }));
+  // const seenSubjects = new Map<string, Subject>();
 
   const subjects = subjectsData?.getSchoolSubjects?.data;
-
+  const subjectItems = subjects?.map((s) => ({
+    value: s.id,
+    label: s.name,
+  }));
   const updateFilter = (key: keyof TeacherFiltersState, value: any) => {
     setFilters({ ...filters, [key]: value === 'ALL' ? undefined : value });
   };
@@ -61,6 +67,7 @@ export function TeacherFilters() {
             Classe
           </Label>
           <Select
+            items={classItems}
             value={filters.classId || 'ALL'}
             onValueChange={(val) => updateFilter('classId', val)}
           >
@@ -71,9 +78,9 @@ export function TeacherFilters() {
               <SelectGroup>
                 <SelectItem value="ALL">Toutes les classes</SelectItem>
 
-                {classes?.map((cls) => (
-                  <SelectItem key={cls.id} value={cls.id!}>
-                    {cls.name}
+                {classItems?.map((cls) => (
+                  <SelectItem key={cls.value} value={cls.value!}>
+                    {cls.label}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -87,6 +94,7 @@ export function TeacherFilters() {
             Matière
           </Label>
           <Select
+            items={subjectItems}
             value={filters.subjectId || 'ALL'}
             onValueChange={(val) => updateFilter('subjectId', val)}
           >
@@ -95,9 +103,9 @@ export function TeacherFilters() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">Toutes les matières</SelectItem>
-              {subjects?.map((sub) => (
-                <SelectItem key={sub?.id} value={sub?.id!}>
-                  {sub?.name}
+              {subjectItems?.map((sub) => (
+                <SelectItem key={sub?.value} value={sub?.value!}>
+                  {sub?.label}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -22,6 +22,7 @@ import { Loaders } from '../dataloader/decorators/dataloader.decorator';
 import {
   CaslAbilityGuard,
   CreateTeacherSchema,
+  RequireAbility,
   Roles,
   RolesGuard,
   ZodValidationPipe,
@@ -45,6 +46,7 @@ export class TeacherResolver {
 
   @Roles('ADMIN')
   @Mutation('createTeacher')
+  @RequireAbility(['CREATE', 'TEACHER'], ['MANAGE', 'TEACHER'])
   async createTeacher(
     @Args('input', new ZodValidationPipe(CreateTeacherSchema))
     data: CreateTeacherInput,
